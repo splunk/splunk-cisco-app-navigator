@@ -1,0 +1,624 @@
+﻿Splunkbase_ID,App_Name,Folder_Name,Developed_By,Latest_Version,type,Cisco_App_Class,Splunkbase_URL,Release_Date,Latest_Release_Date, Download_Count ,Support,Supported_Cisco_Products,Supported_Cisco_Products_Zipped,#_Products_Supported,Deprecated,Replacement,Dependencies,Archived,Archive_Status,Sourcetypes,Sourcetypes_Expanded,Collection_Method,Knowledge_Objects,Status,
+525,Cisco Security Suite,Splunk_CiscoSecuritySuite,Splunk Works,3.1.2,app,,https://splunkbase.splunk.com/app/525,"August 23, 2016","August 23, 2016"," 48,995 ",not_supported,"Cisco Secure Email Gateway
+Cisco Identity Services Engine (ISE)
+Cisco Secure Firewall (FTD/eStreamer/ASA)
+Cisco Secure Intrusion Prevention System (Cisco Secure IPS)
+Cisco Web Security Appliance (WSA)","Cisco Secure Email Gateway, Cisco Identity Services Engine (ISE), Cisco Secure Firewall (FTD/eStreamer/ASA), Cisco Secure Intrusion Prevention System (Cisco Secure IPS), Cisco Web Security Appliance (WSA)",2,No,,,TRUE,archived_manually,cisco:asa|cisco:esa:textmail|cisco:fwsm|cisco:pix|cisco:wsa:squid,"cisco:asa
+cisco:esa:textmail
+cisco:fwsm
+cisco:pix
+cisco:wsa:squid",,"13 eventtypes, 22 transforms, 89 saved searches, 15 lookups, 29 bin files, 65 dashboards",Validated,
+669,Cisco CDR Reporting and Analytics,cisco_cdr,Sideview LLC,8.3.1,app,,https://splunkbase.splunk.com/app/669,"February 9, 2026","February 9, 2026"," 19,320 ",developer,Cisco Unified Communications Manager (CUCM),Cisco Unified Communications Manager (CUCM),1,No,,,FALSE,live,cisco_cdr_log|cube_cdr|cube_cdr_compact|cucm_audit|cucm_cdr|cucm_cmr|cucm_kiwi_syslog|cvp_log,"cisco_cdr_log
+cube_cdr
+cube_cdr_compact
+cucm_audit
+cucm_cdr
+cucm_cmr
+cucm_kiwi_syslog
+cvp_log",,,Validated,
+1352,App for Cisco Network Data,cisco_ios,Mikael Bjerkeland,2.8.1,app,,https://splunkbase.splunk.com/app/1352,"October 8, 2024","October 8, 2024"," 83,303 ",not_supported,"Cisco Access Points (AP)
+Cisco Aggregation Services Routers (ASR)
+Cisco Carrier Routing System (CRS)
+Cisco Catalyst Switches
+Cisco Catalyst Center
+Cisco Integrated Services Routers (ISR)
+Cisco Nexus Switches (NEX)
+Cisco Wireless LAN Controller (WLC)","Cisco Access Points (AP), Cisco Aggregation Services Routers (ASR), Cisco Carrier Routing System (CRS), Cisco Catalyst Switches, Cisco Catalyst Center, Cisco Integrated Services Routers (ISR), Cisco Nexus Switches (NEX), Cisco Wireless LAN Controller (WLC)",9,No,,,FALSE,live,cisco:ios,cisco:ios,,,Validated,
+1467,DEPRECATED Add-on for Cisco Network Data,TA-cisco_ios,Mikael Bjerkeland,2.8.2,addon,,https://splunkbase.splunk.com/app/1467,"February 6, 2026","February 6, 2026"," 120,044 ",not_supported,"Cisco Access Points (AP)
+Cisco Aggregation Services Routers (ASR)
+Cisco Carrier Routing System (CRS)
+Cisco Catalyst Switches
+Cisco Catalyst Center
+Cisco Integrated Services Routers (ISR)
+Cisco Nexus Switches (NEX)
+Cisco Wireless LAN Controller (WLC)","Cisco Access Points (AP), Cisco Aggregation Services Routers (ASR), Cisco Carrier Routing System (CRS), Cisco Catalyst Switches, Cisco Catalyst Center, Cisco Integrated Services Routers (ISR), Cisco Nexus Switches (NEX), Cisco Wireless LAN Controller (WLC)",9,Yes,7538,,FALSE,live,cisco:ios|cisco:telemetry|rfc5424_syslog|syslog,"cisco:ios
+cisco:telemetry
+rfc5424_syslog
+syslog",Syslog (parsing only),"64 eventtypes, 18 tags, 138 transforms, 6 lookups",Validated,
+1589,Splunk for Cisco Identity Services (ISE),Splunk_CiscoISE,Jason Conger,2.1.4,app,,https://splunkbase.splunk.com/app/1589,"March 3, 2025","March 3, 2025"," 19,969 ",not_supported,Cisco Identity Services Engine (ISE),Cisco Identity Services Engine (ISE),1,No,,,FALSE,live,,,,"1 eventtypes, 1 saved searches, 3 lookups, 24 dashboards",Validated,
+1620,Splunk Add-on for Cisco ASA,Splunk_TA_cisco-asa,Splunk LLC,6.0.0,addon,Main Apps,https://splunkbase.splunk.com/app/1620,"July 25, 2025","July 25, 2025"," 121,750 ",splunk,Cisco Secure Firewall (FTD/eStreamer/ASA),Cisco Secure Firewall (FTD/eStreamer/ASA),1,No,,,FALSE,live,cisco:*|cisco:asa|cisco:ftd|cisco_asa|syslog,"cisco:*
+cisco:asa
+cisco:ftd
+cisco_asa
+syslog",Syslog (parsing only),"16 eventtypes, 13 tags, 189 transforms, 6 lookups, 1 dashboards",Validated,
+1629,Cisco eStreamer Client for Splunk,eStreamer,Cisco Security,2.2.2,app,,https://splunkbase.splunk.com/app/1629,"September 23, 2016","September 23, 2016"," 10,424 ",not_supported,Cisco Secure Firewall (FTD/eStreamer/ASA),Cisco Secure Firewall (FTD/eStreamer/ASA),2,No,7404,,TRUE,archived_manually,estreamer,estreamer,,,Validated,
+1747,Splunk Add-on for Cisco WSA,Splunk_TA_cisco-wsa,Splunk LLC,5.0.0,addon,Main Apps,https://splunkbase.splunk.com/app/1747,"December 13, 2024","December 13, 2024"," 43,584 ",splunk,Cisco Web Security Appliance (WSA),Cisco Web Security Appliance (WSA),1,No,,,FALSE,live,cisco:wsa:l4tm|cisco:wsa:squid|cisco:wsa:squid:new|cisco:wsa:syslog|cisco:wsa:w3c|cisco:wsa:w3c:recommended,"cisco:wsa:l4tm
+cisco:wsa:squid
+cisco:wsa:squid:new
+cisco:wsa:syslog
+cisco:wsa:w3c
+cisco:wsa:w3c:recommended",Syslog (parsing only),"11 eventtypes, 5 tags, 90 transforms, 2 lookups, 1 dashboards",Validated,
+1761,Splunk Add-on for Cisco ESA,Splunk_TA_cisco-esa,Splunk LLC,1.7.0,addon,Main Apps,https://splunkbase.splunk.com/app/1761,"July 30, 2024","June 17, 1975"," 25,170 ",splunk,Cisco Secure Email Gateway,Cisco Secure Email Gateway,1,No,,,FALSE,live,cisco:esa|cisco:esa:amp|cisco:esa:antispam|cisco:esa:authentication|cisco:esa:bounce|cisco:esa:cef|cisco:esa:content_scanner|cisco:esa:delivery|cisco:esa:error_logs|cisco:esa:http|cisco:esa:legacy|cisco:esa:system_logs|cisco:esa:textmail|cisco_esa,"cisco:esa
+cisco:esa:amp
+cisco:esa:antispam
+cisco:esa:authentication
+cisco:esa:bounce
+cisco:esa:cef
+cisco:esa:content_scanner
+cisco:esa:delivery
+cisco:esa:error_logs
+cisco:esa:http
+cisco:esa:legacy
+cisco:esa:system_logs
+cisco:esa:textmail
+cisco_esa",Syslog (parsing only),"21 eventtypes, 15 tags, 204 transforms, 4 lookups, 1 dashboards",Validated,
+1808,Splunk Add-on for Cisco FireSIGHT,Splunk_TA_sourcefire,Splunk Works,3.3.2,addon,,https://splunkbase.splunk.com/app/1808,"August 19, 1974","August 19, 1974"," 17,481 ",not_supported,Cisco Secure Firewall (FTD/eStreamer/ASA),Cisco Secure Firewall (FTD/eStreamer/ASA),1,No,7404,,TRUE,archived,cisco:sourcefire|cisco:sourcefire:appliance:syslog|cisco:sourcefire:defencecenter:syslog|estreamer|snort|sourcefire,"cisco:sourcefire
+cisco:sourcefire:appliance:syslog
+cisco:sourcefire:defencecenter:syslog
+estreamer
+snort
+sourcefire",Syslog (parsing only),"14 eventtypes, 16 tags, 20 transforms, 6 lookups",Validated,
+1809,Splunk App for Stream,splunk_app_stream,Splunk LLC,8.1.5,app,Prerequisites,https://splunkbase.splunk.com/app/1809,,,,,,,,,,,FALSE,live,,,#REF!,#REF!,Prereq,
+1811,Technology Add-on for Cisco Secure Access Control Server (ACS),TA-cisco_acs,Dave Shpritz,1.5.2,app,,https://splunkbase.splunk.com/app/1811,"March 3, 2021","March 3, 2021"," 8,387 ",not_supported,Cisco Secure Access Control Server (Cisco ACS),Cisco Secure Access Control Server (Cisco ACS),1,No,,,TRUE,archived,cisco:acs,cisco:acs,,"4 eventtypes, 4 tags, 5 transforms, 4 lookups",Validated,
+1896,Cisco ACI App for Splunk Enterprise (deprecated),cisco-app-ACI,Cisco Systems,5.1.0,app,,https://splunkbase.splunk.com/app/1896,"May 23, 2024","May 23, 2024"," 9,673 ",developer,Cisco Application Centric Infrastructure (Cisco ACI),Cisco Application Centric Infrastructure (Cisco ACI),1,Yes,7777,,FALSE,live,,,,"14 transforms, 29 saved searches, 12 lookups, 53 dashboards, 7 datamodels",Validated,
+1897,Cisco ACI Add-on for Splunk Enterprise (deprecated),TA_cisco-ACI,Cisco Systems,5.1.0,addon,,https://splunkbase.splunk.com/app/1897,"May 23, 2024","May 23, 2024"," 10,526 ",developer,Cisco Application Centric Infrastructure (Cisco ACI),Cisco Application Centric Infrastructure (Cisco ACI),1,Yes,7777,,FALSE,live,cisco:apic:authentication|cisco:apic:class|cisco:apic:cloud|cisco:apic:health|cisco:apic:stats|cisco:mso,"cisco:apic:authentication
+cisco:apic:class
+cisco:apic:cloud
+cisco:apic:health
+cisco:apic:stats
+cisco:mso",REST API + Script (13),"13 inputs, 6 eventtypes, 5 tags, 1 transforms, 77 bin files, 1 dashboards",Validated,
+1903,Splunk Add-on for Cisco IPS,Splunk_TA_cisco-ips,Splunk Works,2.1.6,addon,,https://splunkbase.splunk.com/app/1903,"August 29, 1974","August 29, 1974"," 6,419 ",not_supported,Cisco Secure Intrusion Prevention System (Cisco Secure IPS),Cisco Secure Intrusion Prevention System (Cisco Secure IPS),1,Yes,,,TRUE,archived_manually,cisco:ips:syslog|cisco_ips_syslog|sdee_connection,"cisco:ips:syslog
+cisco_ips_syslog
+sdee_connection",Script (3) + File Monitor (2) + Syslog (parsing only),"5 inputs, 2 eventtypes, 2 tags, 4 transforms, 1 lookups, 7 bin files",Validated,
+1915,Splunk Add-on for Cisco Identity Services,Splunk_TA_cisco-ise,Splunk LLC,5.0.0,addon,Main Apps,https://splunkbase.splunk.com/app/1915,"November 21, 2024","November 21, 2024"," 35,858 ",splunk,Cisco Identity Services Engine (ISE),Cisco Identity Services Engine (ISE),1,No,,,FALSE,live,cisco:ise|cisco:ise:syslog|syslog,"cisco:ise
+cisco:ise:syslog
+syslog",Syslog (parsing only),"18 eventtypes, 11 tags, 24 transforms, 3 lookups, 1 dashboards",Validated,
+1916,Cisco Nexus 9k App for Splunk Enterprise (deprecated),cisco-app-Nexus-9k,Cisco Systems,3.0.0,app,,https://splunkbase.splunk.com/app/1916,"October 29, 2024","October 29, 2024"," 2,711 ",developer,Cisco Nexus Switches (NEX),Cisco Nexus Switches (NEX),1,Yes,7777,,TRUE,archived_manually,cisco:app:nexus:9k:collect,cisco:app:nexus:9k:collect,,"5 transforms, 6 saved searches, 6 lookups, 52 bin files, 16 dashboards",Validated,
+1917,Cisco Nexus 9k Add-on for Splunk Enterprise (deprecated),TA_cisco-Nexus-9k,Cisco Systems,3.0.0,addon,,https://splunkbase.splunk.com/app/1917,"October 29, 2024","October 29, 2024"," 2,999 ",developer,Cisco Nexus Switches (NEX),Cisco Nexus Switches (NEX),1,Yes,7777,,TRUE,archived_manually,cisco:nexus:json|syslog|ta:cisco:nexus:9k:collect,"cisco:nexus:json
+syslog
+ta:cisco:nexus:9k:collect",Syslog (parsing only),"1 eventtypes, 1 tags, 9 bin files, 1 dashboards",Validated,
+2731,Splunk Add-on for Cisco UCS,Splunk_TA_cisco-ucs,Splunk LLC,4.3.1,addon,Main Apps,https://splunkbase.splunk.com/app/2731,"April 25, 2025","April 25, 2025"," 10,083 ",splunk,Cisco Unified Computing System (UCS),Cisco Unified Computing System (UCS),1,No,,,FALSE,live,splunk_ta_cisco_ucs|splunk_ta_cisco_ucs_migration|splunk_ta_cisco_ucs_ta_util|splunk_ta_cisco_ucs_utility|splunk_ta_cisco_ucs_validation|ta_app_conf|ta_cisco_ucs_controller.log,"splunk_ta_cisco_ucs
+splunk_ta_cisco_ucs_migration
+splunk_ta_cisco_ucs_ta_util
+splunk_ta_cisco_ucs_utility
+splunk_ta_cisco_ucs_validation
+ta_app_conf
+ta_cisco_ucs_controller.log",REST API + Script (3),"4 inputs, 32 eventtypes, 24 tags, 4 transforms, 4 lookups, 16 bin files, 3 dashboards",Validated,
+2791,Cisco Cloud Web Security (CWS) Add-on for Splunk,Cisco_CWS_TA,Cisco Systems,1.1,addon,,https://splunkbase.splunk.com/app/2791,"April 11, 2017","April 11, 2017", 769 ,not_supported,Cisco Cloud Web Security (CWS),Cisco Cloud Web Security (CWS),1,No,,,TRUE,archived,ciscocws,ciscocws,REST API,"1 inputs, 2 transforms, 2 lookups, 397 bin files",Validated,
+2992,Cisco Endpoint Security Analytics (CESA),CiscoNVM,Cisco Systems,4.0.8,app,,https://splunkbase.splunk.com/app/2992,"June 25, 2025","June 25, 2025"," 12,953 ",not_supported,Cisco Secure Email Gateway,Cisco Network Visibility Module (NVM),1,No,,,FALSE,live,cisco:nvm:flowdata|cisco:nvm:processinfodata,"cisco:nvm:flowdata
+cisco:nvm:processinfodata",,"13 transforms, 5 saved searches, 12 lookups, 42 dashboards",Validated,
+2997,Cisco CallManager API - TA-ciscoaxl,TA-ciscoaxl,Dominique Vocat,0.4,addon,,https://splunkbase.splunk.com/app/2997,"March 17, 2016","March 17, 2016", 707 ,not_supported,Cisco Unified Communications Manager (CUCM),Cisco Unified Communications Manager (CUCM),2,No,4434,,TRUE,archived,,,,"1 transforms, 24 saved searches, 1 lookups, 153 bin files, 2 dashboards",Validated,
+3018,TA-meraki,TA-meraki,Myron Davis,1.1.5,addon,,https://splunkbase.splunk.com/app/3018,"October 2, 2020","October 2, 2020"," 12,677 ",developer,Cisco Meraki (Meraki),Cisco Meraki (Meraki),1,No,5580,,TRUE,archived,meraki,meraki,,"6 eventtypes, 7 tags, 91 transforms, 5 lookups",Validated,
+3043,Cisco Cloudlock for Splunk,cloudlock,Yaron Caspy,1.0.19,app,,https://splunkbase.splunk.com/app/3043,"April 3, 2024","April 3, 2024"," 2,749 ",not_supported,Cisco Cloudlock Cloud Access Security Broker (CASB),Cisco Cloudlock Cloud Access Security Broker (CASB),1,No,,,FALSE,live,incident,incident,,,Validated,
+3194,DUO Log Add-on for Splunk,TA-DUOSecurity2FA,Brian Awood,1.2.2,addon,,https://splunkbase.splunk.com/app/3194,"February 13, 2019","February 13, 2019"," 2,860 ",not_supported,Cisco Duo Security (Duo),Cisco Duo Security (Duo),1,No,7404,,TRUE,archived_manually,duo:authentication,duo:authentication,,"1 eventtypes, 1 tags, 43 bin files",Validated,
+3324,Cisco Umbrella Investigate Add-on,opendns_investigate,OpenDNS Cisco,0.10.1,addon,,https://splunkbase.splunk.com/app/3324,"January 11, 2023","January 11, 2023"," 3,919 ",not_supported,Cisco Umbrella,Cisco Umbrella,1,No,7569,,TRUE,archived,opendns_investigate,opendns_investigate,,,Validated,
+3384,Cisco Spark Add-on for Splunk,splunk_app_spark_room,Alexandra Olteanu,1.24,addon,,https://splunkbase.splunk.com/app/3384,"September 9, 1974","September 9, 1974", 445 ,not_supported,Cisco Webex (Webex),Cisco Webex (Webex),1,No,8365,,TRUE,archived,,,,,Validated,
+3385,Cisco Spark App for Splunk,splunk_spark_app,Alexandra Olteanu,1.3,app,,https://splunkbase.splunk.com/app/3385,"November 23, 2016","November 23, 2016", 468 ,not_supported,Cisco Webex (Webex),Cisco Webex (Webex),1,No,8365,,TRUE,archived,spark_room_log,spark_room_log,,,Validated,
+3471,Cisco Splunk Add-on for AppDynamics,Splunk_TA_AppDynamics,Splunk Works,3.1.8,addon,,https://splunkbase.splunk.com/app/3471,"February 17, 2026","February 17, 2026"," 38,130 ",developer,Cisco AppDynamics (AppD),Cisco AppDynamics (AppD),1,No,,,FALSE,live,appdynamics_analytics|appdynamics_audit|appdynamics_custom_metrics|appdynamics_databases|appdynamics_events|appdynamics_hardware|appdynamics_licenses|appdynamics_security|appdynamics_snapshots|appdynamics_status,"appdynamics_analytics
+appdynamics_audit
+appdynamics_custom_metrics
+appdynamics_databases
+appdynamics_events
+appdynamics_hardware
+appdynamics_licenses
+appdynamics_security
+appdynamics_snapshots
+appdynamics_status",REST API (10),"10 inputs, 16 eventtypes, 6 tags, 1 transforms, 44 bin files, 4 dashboards",Validated,
+3496,Cisco CMX Add-on for Splunk,TA-CMX,Crest Data Systems,1.4,addon,,https://splunkbase.splunk.com/app/3496,"April 7, 2017","April 7, 2017", 582 ,not_supported,Cisco Connected Mobile Experiences (Cisco CMX),Cisco Connected Mobile Experiences (Cisco CMX),1,No,8485,,TRUE,archived,cmxactive|cmxanalytics|cmxfloor|cmxhttp|cmxmap,"cmxactive
+cmxanalytics
+cmxfloor
+cmxhttp
+cmxmap",,"2 eventtypes, 2 tags, 2 transforms, 28 bin files",Validated,
+3497,Cisco CMX App for Splunk,CMX,Crest Data Systems,1.3.4,app,,https://splunkbase.splunk.com/app/3497,"September 26, 1974","September 26, 1974", 610 ,not_supported,Cisco Connected Mobile Experiences (Cisco CMX),Cisco Connected Mobile Experiences (Cisco CMX),1,No,8485,,TRUE,archived,cmxactive|cmxhttp,"cmxactive
+cmxhttp",REST API + Script,"1 inputs, 3 transforms, 2 saved searches, 2 lookups, 3 bin files, 11 dashboards",Validated,
+3504,Duo Splunk Connector,duo_splunkapp,Duo Security,2.1.0,app,,https://splunkbase.splunk.com/app/3504,"November 14, 2024","December 2, 2024"," 15,845 ",developer,Cisco Duo Security (Duo),Cisco Duo Security (Duo),1,Yes,7404,,FALSE,live,,,,,Validated,
+3629,Umbrella Add-on for Splunk Enterprise,TA-Umbrella,Mikael Bjerkeland,1,addon,,https://splunkbase.splunk.com/app/3629,"June 23, 2017","June 23, 2017"," 1,742 ",not_supported,Cisco Umbrella,Cisco Umbrella,1,No,7569,,TRUE,archived_manually,opendns:dnslog,opendns:dnslog,,"1 eventtypes, 1 tags, 3 transforms, 1 lookups",Validated,
+3662,Cisco Secure eStreamer Client Add-On for Splunk,TA-eStreamer,Cisco Security,5.2.9,addon,,https://splunkbase.splunk.com/app/3662,"October 9, 2023","October 9, 2023"," 118,408 ",developer,Cisco Secure Firewall (FTD/eStreamer/ASA),Cisco Secure Firewall (FTD/eStreamer/ASA),1,No,7404,,TRUE,archived,cisco:estreamer:data|cisco:estreamer:log|cisco:firepower:syslog,"cisco:estreamer:data
+cisco:estreamer:log
+cisco:firepower:syslog",Script (3) + File Monitor + CLI/SSH + Syslog (parsing only),"4 inputs, 7 eventtypes, 7 tags, 6 transforms, 6 lookups, 78 bin files",Validated,
+3663,Cisco Firepower eNcore App for Splunk,eStreamer-Dashboard,Cisco Security,3.5.3,app,,https://splunkbase.splunk.com/app/3663,"September 6, 2018","September 6, 2018"," 5,504 ",not_supported,Cisco Secure Firewall (FTD/eStreamer/ASA),Cisco Secure Firewall (FTD/eStreamer/ASA),1,No,4388,,TRUE,archived_manually,cisco:estreamer:data,cisco:estreamer:data,,,Validated,
+3670,Cisco Secure Endpoint (formerly AMP for endpoints),amp4e_events_input,Cisco Security,3.0.0,app,,https://splunkbase.splunk.com/app/3670,"February 7, 2023","February 7, 2023"," 6,566 ",not_supported,Cisco Secure Endpoint (CSE/AMP),Cisco Secure Endpoint (CSE/AMP),1,No,7404,,TRUE,archived,cisco:amp:event,cisco:amp:event,REST API,"1 inputs, 183 bin files, 4 dashboards",Validated,
+3686,Cisco Secure Endpoint (formerly AMP for endpoints) CIM Add-On,TA-cisco-amp4e,Cisco AMPPortal,2.1.2,addon,,https://splunkbase.splunk.com/app/3686,"April 19, 2024","April 19, 2024"," 4,821 ",not_supported,Cisco Secure Endpoint (CSE/AMP),Cisco Secure Endpoint (CSE/AMP),1,No,,,FALSE,live,cisco:amp:event,cisco:amp:event,,"133 eventtypes, 133 tags, 1 transforms, 1 lookups, 1 dashboards",Validated,
+3800,Firegen Log Analyzer for Cisco ASA,firegen_cisco_asa,Adrian Grigorof,1.2,app,,https://splunkbase.splunk.com/app/3800,"October 17, 1974","October 17, 1974"," 2,755 ",not_supported,Cisco Secure Firewall (FTD/eStreamer/ASA),Cisco Secure Firewall (FTD/eStreamer/ASA),1,No,,,TRUE,archived,,,,,Validated,
+3820,Cisco Network Assurance Engine Add-on for Splunk Enterprise (Cisco NAE),TA_cisco-candid,Cisco Systems,2.6.0,addon,,https://splunkbase.splunk.com/app/3820,"November 23, 2020","November 23, 2020"," 2,976 ",developer,Cisco Network Assurance Engine,Cisco Network Assurance Engine,1,No,7777,,TRUE,archived,cisco:candid:events,cisco:candid:events,REST API + Script,"1 inputs, 1 transforms, 23 bin files, 1 dashboards",Validated,
+3821,Cisco Network Assurance Engine App for Splunk Enterprise (Cisco NAE),cisco-app-candid,Cisco Systems,2.5.0,app,,https://splunkbase.splunk.com/app/3821,"August 26, 2020","August 26, 2020"," 2,594 ",developer,Cisco Network Assurance Engine,Cisco Network Assurance Engine,1,No,7777,,TRUE,archived,,,,"2 transforms, 1 saved searches, 2 lookups, 14 dashboards",Validated,
+3827,Cisco StealthWatch Add-On,TA-cisco-stealthwatch,Nadhem AlFardan,1.0.0,addon,,https://splunkbase.splunk.com/app/3827,"December 17, 2017","December 17, 2017"," 2,095 ",not_supported,Cisco Secure Network Analytics (SNA),Cisco Secure Network Analytics (SNA),1,No,7404,,TRUE,archived,cisco:stealthwatch:alert,cisco:stealthwatch:alert,,"1 eventtypes, 1 tags, 1 transforms",Validated,
+3848,Technology Add-on for Cisco Stealthwatch Data Exporter,TA-stealthwatch_dataexporter,Discovered Intelligence,1,addon,,https://splunkbase.splunk.com/app/3848,"January 9, 2018","January 9, 2018"," 1,105 ",developer,Cisco Secure Network Analytics (SNA),Cisco Secure Network Analytics (SNA),1,No,7404,,TRUE,archived,stealthwatch:fc:flow,stealthwatch:fc:flow,,"1 eventtypes, 1 tags, 3 transforms, 1 lookups",Validated,
+3926,Cisco Umbrella Add-On for Splunk,TA-cisco_umbrella,Hurricane Labs,1.0.7,addon,,https://splunkbase.splunk.com/app/3926,"December 10, 2021","December 10, 2021"," 8,823 ",not_supported,Cisco Umbrella,Cisco Umbrella,1,No,7569,,TRUE,archived,opendns:auditlogs|opendns:dnslogs|opendns:firewalllogs|opendns:iplogs|opendns:proxylogs|opendns:s3,"opendns:auditlogs
+opendns:dnslogs
+opendns:firewalllogs
+opendns:iplogs
+opendns:proxylogs
+opendns:s3",,"4 eventtypes, 4 tags, 13 transforms, 1 lookups",Validated,
+3955,Cisco Firepower Threat Defense FTD sourcetype,TA-cisco-firepower-threat-defense-ftd-sourcetype,Juan Jose Ponce Dominguez,1.0.3,addon,,https://splunkbase.splunk.com/app/3955,"October 31, 1974","October 31, 1974"," 3,716 ",not_supported,Cisco Secure Firewall (FTD/eStreamer/ASA),Cisco Secure Firewall (FTD/eStreamer/ASA),2,No,7404,,TRUE,archived,cisco:ftd,cisco:ftd,,1 dashboards,Validated,
+4010,Cisco Firepower Threat Defense FTD Dashboards,TA-cisco-firepower-threat-defense-ftd-dashboards,Juan Jose Ponce Dominguez,1.0.0,app,,https://splunkbase.splunk.com/app/4010,"May 14, 2018","May 14, 2018"," 1,815 ",not_supported,Cisco Secure Firewall (FTD/eStreamer/ASA),Cisco Secure Firewall (FTD/eStreamer/ASA),2,No,7404,,TRUE,archived,,,,5 dashboards,Validated,
+4015,Cisco openVuln API Query,SA-openVulnQuery,Nathan Worsham,1.1,addon,,https://splunkbase.splunk.com/app/4015,"June 18, 2020","June 18, 2020", 605 ,not_supported,Cisco Product Security Incident Response Team (PSIRT),Cisco Product Security Incident Response Team (PSIRT),1,No,,,TRUE,archived,,,,"3 saved searches, 44 bin files, 3 dashboards",Validated,
+4221,Cisco Endpoint Security Analytics (CESA) Add-On for Splunk,TA-Cisco-NVM,Cisco Systems,4.0.7,addon,,https://splunkbase.splunk.com/app/4221,"July 22, 1970","June 25, 2025"," 22,138 ",not_supported,Cisco Secure Email Gateway,Cisco Network Visibility Module (NVM),1,No,,,FALSE,live,cisco:nvm:eve|cisco:nvm:flowdata|cisco:nvm:ifdata|cisco:nvm:osquery|cisco:nvm:processinfodata|cisco:nvm:sysdata,"cisco:nvm:eve
+cisco:nvm:flowdata
+cisco:nvm:ifdata
+cisco:nvm:osquery
+cisco:nvm:processinfodata
+cisco:nvm:sysdata",,"6 eventtypes, 6 tags, 1 transforms, 1 lookups",Validated,
+4251,Cisco Threat Grid Add-On,TA-cisco-threat-grid,Cisco Security,1.1.0,addon,,https://splunkbase.splunk.com/app/4251,"November 4, 2021","November 4, 2021"," 1,399 ",developer,Cisco Threat Grid,Cisco Threat Grid,1,No,7404,,TRUE,archived,cisco:tg:data,cisco:tg:data,REST API,"1 inputs, 971 bin files, 2 dashboards",Validated,
+4388,Cisco Secure Firewall App for Splunk,firepower_dashboard,Cisco Security,1.9.1,app,,https://splunkbase.splunk.com/app/4388,"November 20, 2023","February 20, 2024"," 17,984 ",developer,Cisco Secure Firewall (FTD/eStreamer/ASA),Cisco Secure Firewall (FTD/eStreamer/ASA),1,No,7404,,FALSE,flagged,cisco:estreamer:data|cisco:firepower:syslog|default,"cisco:estreamer:data
+cisco:firepower:syslog
+default",,,Validated,
+4434,TA for Cisco CDR Reporting and Analytics,TA_cisco_cdr,Sideview LLC,8.3.1,addon,,https://splunkbase.splunk.com/app/4434,"February 9, 2026","February 9, 2026"," 2,459 ",developer,"Cisco Unified Communications Manager (CUCM)
+Cisco Webex (Webex)","Cisco Unified Communications Manager (CUCM), Cisco Webex (Webex)",1,No,,,FALSE,live,cube_cdr|cube_cdr_compact|cube_syslog|cucm_audit|cucm_cdr|cucm_cmr,"cube_cdr
+cube_cdr_compact
+cube_syslog
+cucm_audit
+cucm_cdr
+cucm_cmr",Syslog (parsing only),14 transforms,Validated,
+4640,Supporting App for AXL,SA_cisco_cdr_axl,Sideview LLC,1.2.7,app,,https://splunkbase.splunk.com/app/4640,"February 9, 2026","February 9, 2026"," 3,215 ",developer,Cisco Unified Communications Manager (CUCM),Cisco Unified Communications Manager (CUCM),1,No,,,FALSE,live,sa_cisco_cdr_axl_log,sa_cisco_cdr_axl_log,,"2 saved searches, 160 bin files, 5 dashboards",Need to Validate,
+4761,Cisco SecureX threat response - Custom Search Command,TA-cisco-threat-response,Cisco Security,1.2.2,addon,,https://splunkbase.splunk.com/app/4761,"August 25, 2022","August 25, 2022"," 2,964 ",developer,Cisco SecureX,Cisco SecureX,1,No,7404,,TRUE,archived,cisco:tr:data|ta:cisco:threat:response:log,"cisco:tr:data
+ta:cisco:threat:response:log",REST API,"1 inputs, 1706 bin files, 3 dashboards",Validated,
+4785,Enosys Add-on for Cisco Firepower eStreamer,Splunk_TA_cisco-estreamer_Enosys,Simon Sigre,1.0.0,addon,,https://splunkbase.splunk.com/app/4785,"November 19, 2019","November 19, 2019", 951 ,developer,Cisco Secure Firewall (FTD/eStreamer/ASA),Cisco Secure Firewall (FTD/eStreamer/ASA),1,No,7404,,TRUE,archived,cisco:estreamer:data|cisco:estreamer:log|cisco:firepower:syslog,"cisco:estreamer:data
+cisco:estreamer:log
+cisco:firepower:syslog",Syslog (parsing only),"8 eventtypes, 7 tags, 5 transforms, 5 lookups",Validated,
+4817,Cisco Bug Search and Analytics,Cisco_Bug_Search_and_Analytics,Pavel Prostin,0.1.4,app,,https://splunkbase.splunk.com/app/4817,"January 29, 2024","January 29, 2024"," 2,456 ",developer,Cisco Bug Search Tool (BST),Cisco Bug Search Tool (BST),1,No,,,FALSE,flagged,cisco:bugs:csv|cisco:bugs:json,"cisco:bugs:csv
+cisco:bugs:json",,"1 eventtypes, 1 tags, 6 transforms, 1 saved searches, 1 lookups, 8 dashboards",Validated,
+4838,Meraki SNMP trap Add-on for Splunk,TA_Meraki_SNMP_trap,Laxmi Redij,1.0.0,addon,,https://splunkbase.splunk.com/app/4838,"January 7, 2020","January 7, 2020", 823 ,developer,Cisco Meraki (Meraki),Cisco Meraki (Meraki),1,No,5580,,TRUE,archived,meraki_syslog,meraki_syslog,Syslog (parsing only),"3 transforms, 1 lookups",Validated,
+4991,Cisco WebEx Meetings Add-on for Splunk,ta-cisco-webex-meetings-add-on-for-splunk,Splunk Works,1.1.14,addon,,https://splunkbase.splunk.com/app/4991,"May 13, 2022","May 13, 2022"," 2,522 ",not_supported,Cisco Webex (Webex),Cisco Webex (Webex),1,Yes,8365,,TRUE,archived,cisco:webex:meetings:general:summarysession|cisco:webex:meetings:history:eventattendeehistory|cisco:webex:meetings:history:eventsessionhistory|cisco:webex:meetings:history:meetingattendeehistory|cisco:webex:meetings:history:meetingusagehistory|cisco:webex:meetings:history:recordaccesshistory|cisco:webex:meetings:history:supportattendeehistory|cisco:webex:meetings:history:supportsessionhistory|cisco:webex:meetings:history:trainingattendeehistory|cisco:webex:meetings:history:trainingsessionhistory|taciscowebexmeetingsaddonforsplunk:log,"cisco:webex:meetings:general:summarysession
+cisco:webex:meetings:history:eventattendeehistory
+cisco:webex:meetings:history:eventsessionhistory
+cisco:webex:meetings:history:meetingattendeehistory
+cisco:webex:meetings:history:meetingusagehistory
+cisco:webex:meetings:history:recordaccesshistory
+cisco:webex:meetings:history:supportattendeehistory
+cisco:webex:meetings:history:supportsessionhistory
+cisco:webex:meetings:history:trainingattendeehistory
+cisco:webex:meetings:history:trainingsessionhistory
+taciscowebexmeetingsaddonforsplunk:log",,,Validated,
+4992,Cisco WebEx Meetings App for Splunk,cisco_webex_meetings_app_for_splunk,Splunk Works,1.0.3,app,,https://splunkbase.splunk.com/app/4992,"May 12, 2022","May 12, 2022"," 1,285 ",not_supported,Cisco Webex (Webex),Cisco Webex (Webex),1,No,8365,,TRUE,archived,,,,,Validated,
+5020,Add-on for Cisco Prime Infrastructure,TA-add-on-for-cisco-prime-infrastructure,Christopher Caldwell,2.1.2,addon,,https://splunkbase.splunk.com/app/5020,"February 18, 1975","February 18, 1975"," 1,266 ",developer,Cisco Prime Infrastructure (Cisco Prime),Cisco Prime Infrastructure (Cisco Prime),1,No,7858,,TRUE,archived_manually,cisco:pi:data:accesspoints|cisco:pi:data:alarms|cisco:pi:data:clients|cisco:pi:data:clientsessions|cisco:pi:data:devices|cisco:pi:data:events|cisco:pi:data:inventorydetails|taaddonforciscoprimeinfrastructure:log,"cisco:pi:data:accesspoints
+cisco:pi:data:alarms
+cisco:pi:data:clients
+cisco:pi:data:clientsessions
+cisco:pi:data:devices
+cisco:pi:data:events
+cisco:pi:data:inventorydetails
+taaddonforciscoprimeinfrastructure:log",REST API (7),"7 inputs, 3 eventtypes, 3 tags, 1612 bin files, 2 dashboards",Validated,
+5116,MIME Decoder Add-on for Cisco ESA,Alef_TA_MIMEDecoder,Tomas Moser,1.0.9,addon,,https://splunkbase.splunk.com/app/5116,"January 2, 2026","January 2, 2026"," 2,206 ",developer,Cisco Secure Email Gateway,Cisco Secure Email Gateway,1,No,,,FALSE,live,,,,,Validated,
+5152,Technology Add-on for Webex Teams,TA-DP-webex-teams,Datapunctum AG,1.0.1,addon,,https://splunkbase.splunk.com/app/5152,"August 4, 2020","August 4, 2020", 447 ,developer,Cisco Webex (Webex),Cisco Webex (Webex),1,No,8365,,TRUE,archived,tadpwebexteams:log|webex:teams:adminaudit:events|webex:teams:events,"tadpwebexteams:log
+webex:teams:adminaudit:events
+webex:teams:events",REST API (2),"2 inputs, 1 eventtypes, 1 tags, 1596 bin files, 2 dashboards",Validated,
+5183,Cisco PSIRT openVuln API Add-on for Splunk,ti-cisco-vuln,Graham Morley,1.0.0,addon,,https://splunkbase.splunk.com/app/5183,"August 13, 2020","August 13, 2020", 321 ,not_supported,Cisco Product Security Incident Response Team (PSIRT),Cisco Product Security Incident Response Team (PSIRT),1,No,,,TRUE,archived,cisco:vuln:advisories|cisco:vuln:advisories:cvrf:note|cisco:vuln:advisories:cvrf:product|cisco:vuln:advisories:cvrf:summary|cisco:vuln:advisories:cvrf:vuln,"cisco:vuln:advisories
+cisco:vuln:advisories:cvrf:note
+cisco:vuln:advisories:cvrf:product
+cisco:vuln:advisories:cvrf:summary
+cisco:vuln:advisories:cvrf:vuln",,,Validated,
+5238,Splunk Add-on for Stream Forwarders,Splunk_TA_stream,Splunk LLC,8.1.5,addon,Prerequisites,https://splunkbase.splunk.com/app/5238,,,,,,,,,,,FALSE,live,,,#REF!,#REF!,Prereq,
+5322,Cisco Firepower pcap Add-on,TA-cisco-firepower-pcap-add-on,D C,1.0.0,addon,,https://splunkbase.splunk.com/app/5322,"November 6, 2020","November 6, 2020", 522 ,not_supported,Cisco Secure Firewall (FTD/eStreamer/ASA),Cisco Secure Firewall (FTD/eStreamer/ASA),1,No,,,TRUE,archived,,,,,Validated,
+5420,Cisco SecureX threat response - CESA Relay,tr-splunk-relay,Cisco Security,1.2.1,addon,,https://splunkbase.splunk.com/app/5420,"April 2, 1975","April 2, 1975", 951 ,developer,Cisco Network Visibility Module (NVM),Cisco Network Visibility Module (NVM),1,No,7404,,TRUE,archived,trsplunkrelay:log,trsplunkrelay:log,,,Validated,
+5470,Cisco DMP/APP Add-On for Splunk,TA-cisco_DP_PD,Agari Data,1.1.0,addon,,https://splunkbase.splunk.com/app/5470,"January 10, 2022","January 10, 2022", 364 ,not_supported,Cisco Domain Protection,Cisco Domain Protection,1,No,,,TRUE,archived,cisco:app:messages|cisco:app:policy_events|cisco:app:status|cisco:dp:alerts|cisco:dp:failures|cisco:dp:status|cisco:dp:threatfeeds|ta:cisco:logs,"cisco:app:messages
+cisco:app:policy_events
+cisco:app:status
+cisco:dp:alerts
+cisco:dp:failures
+cisco:dp:status
+cisco:dp:threatfeeds
+ta:cisco:logs",REST API (2),"2 inputs, 4 eventtypes, 2 tags, 981 bin files, 2 dashboards",Validated,
+5471,Cisco DMP/APP App for Splunk,Cisco_DP_PD,Agari Data,1.0.2,app,,https://splunkbase.splunk.com/app/5471,"January 10, 2022","January 10, 2022", 354 ,not_supported,Cisco Domain Protection,Cisco Domain Protection,1,No,,,TRUE,archived,,,,17 dashboards,Validated,
+5524,Cisco Web Security Appliance (WSA) Insight,Cisco_WSA_Insight,Pavel Prostin,0.0.11,app,,https://splunkbase.splunk.com/app/5524,"February 1, 2024","February 1, 2024"," 1,949 ",developer,Cisco Web Security Appliance (WSA),Cisco Web Security Appliance (WSA),1,No,,,FALSE,flagged,cisco:wsa:prox_track|cisco:wsa:shd|cisco:wsa:systemlogs,"cisco:wsa:prox_track
+cisco:wsa:shd
+cisco:wsa:systemlogs",,"3 eventtypes, 3 tags, 195 transforms, 3 saved searches, 31 dashboards",Validated,
+5557,Cisco Cloud Security Umbrella Add-on for Splunk,TA-cisco-cloud-security-umbrella-addon,Cisco Systems,1.0.33,addon,,https://splunkbase.splunk.com/app/5557,"November 16, 2023","November 16, 2023"," 4,380 ",not_supported,Cisco Umbrella,Cisco Umbrella,1,No,7569,,TRUE,archived_manually,cisco:umbrella:audit|cisco:umbrella:dlp|cisco:umbrella:dns|cisco:umbrella:firewall|cisco:umbrella:ip|cisco:umbrella:proxy,"cisco:umbrella:audit
+cisco:umbrella:dlp
+cisco:umbrella:dns
+cisco:umbrella:firewall
+cisco:umbrella:ip
+cisco:umbrella:proxy",REST API,"1 inputs, 6 eventtypes, 4 tags, 7 transforms, 1131 bin files, 3 dashboards",Validated,
+5558,Cisco Secure Access App for Splunk,cisco-cloud-security,"Cisco Systems, Inc.",1.0.53,app,Main Apps,https://splunkbase.splunk.com/app/5558,"January 14, 2026","January 14, 2026"," 4,066 ",cisco,"Cisco Cloudlock Cloud Access Security Broker (CASB)
+Cisco Secure Access (SSE)
+Cisco ThousandEyes (TE)
+Cisco Umbrella","Cisco Cloudlock Cloud Access Security Broker (CASB), Cisco Secure Access (SSE), Cisco ThousandEyes (TE), Cisco Umbrella",4,No,,,FALSE,live,cisco:cloud_security:appdiscovery|cisco:cloud_security:audit|cisco:cloud_security:cloudlock|cisco:cloud_security:dlp|cisco:cloud_security:dns|cisco:cloud_security:fileevent|cisco:cloud_security:firewall|cisco:cloud_security:intrusion|cisco:cloud_security:investigated|cisco:cloud_security:ip|cisco:cloud_security:privateapps|cisco:cloud_security:proxy|cisco:cloud_security:ravpn|cisco:cloud_security:ztna|cisco:cloud_security:ztnaenrollment|cisco:cloud_security:ztnaflow,"cisco:cloud_security:appdiscovery
+cisco:cloud_security:audit
+cisco:cloud_security:cloudlock
+cisco:cloud_security:dlp
+cisco:cloud_security:dns
+cisco:cloud_security:fileevent
+cisco:cloud_security:firewall
+cisco:cloud_security:intrusion
+cisco:cloud_security:investigated
+cisco:cloud_security:ip
+cisco:cloud_security:privateapps
+cisco:cloud_security:proxy
+cisco:cloud_security:ravpn
+cisco:cloud_security:ztna
+cisco:cloud_security:ztnaenrollment
+cisco:cloud_security:ztnaflow",REST API (10),"10 inputs, 15 eventtypes, 12 tags, 34 transforms, 129 bin files, 15 dashboards",Validated,
+5580,Cisco Meraki Add-on for Splunk,Splunk_TA_cisco_meraki,"Cisco Systems, Inc.",3.2.0,addon,Main Apps,https://splunkbase.splunk.com/app/5580,"August 14, 2025","August 14, 2025"," 13,943 ",cisco,Cisco Meraki (Meraki),Cisco Meraki (Meraki),1,No,,,FALSE,live,cisco_meraki_log|meraki:accesspoints|meraki:airmarshal|meraki:apirequestshistory|meraki:apirequestsoverview|meraki:apirequestsresponsecodes|meraki:appliancesdwanstatistics|meraki:appliancesdwanstatuses|meraki:assurancealerts|meraki:audit|meraki:cameras|meraki:devices|meraki:devicesavailabilitieschangehistory|meraki:devicesuplinksaddressesbydevice|meraki:firmwareupgrades|meraki:licensescotermlicenses|meraki:licensesoverview|meraki:licensessubscriptionentitlements|meraki:licensessubscriptions|meraki:organizations|meraki:organizationsecurity|meraki:organizationsnetworks|meraki:portstransceiversreadingshistorybyswitch|meraki:powermodulesstatusesbydevice|meraki:securityappliances|meraki:sensorreadingshistory|meraki:summaryswitchpowerhistory|meraki:summarytopappliancesbyutilization|meraki:summarytopclientsbyusage|meraki:summarytopdevicesbyusage|meraki:summarytopswitchesbyenergyusage|meraki:switches|meraki:switchportsbyswitch|meraki:switchportsoverview|meraki:webhook|meraki:webhooklogs:api|meraki:wirelesscontrolleravailabilitieschangehistory|meraki:wirelesscontrollerdevicesinterfacespacketsoverviewbydevice|meraki:wirelesscontrollerdevicesinterfacesusagehistorybyinterval|meraki:wirelessdevicesethernetstatuses|meraki:wirelessdevicespacketlossbydevice|meraki:wirelessdeviceswirelesscontrollersbydevice,"cisco_meraki_log
+meraki:accesspoints
+meraki:airmarshal
+meraki:apirequestshistory
+meraki:apirequestsoverview
+meraki:apirequestsresponsecodes
+meraki:appliancesdwanstatistics
+meraki:appliancesdwanstatuses
+meraki:assurancealerts
+meraki:audit
+meraki:cameras
+meraki:devices
+meraki:devicesavailabilitieschangehistory
+meraki:devicesuplinksaddressesbydevice
+meraki:firmwareupgrades
+meraki:licensescotermlicenses
+meraki:licensesoverview
+meraki:licensessubscriptionentitlements
+meraki:licensessubscriptions
+meraki:organizations
+meraki:organizationsecurity
+meraki:organizationsnetworks
+meraki:portstransceiversreadingshistorybyswitch
+meraki:powermodulesstatusesbydevice
+meraki:securityappliances
+meraki:sensorreadingshistory
+meraki:summaryswitchpowerhistory
+meraki:summarytopappliancesbyutilization
+meraki:summarytopclientsbyusage
+meraki:summarytopdevicesbyusage
+meraki:summarytopswitchesbyenergyusage
+meraki:switches
+meraki:switchportsbyswitch
+meraki:switchportsoverview
+meraki:webhook
+meraki:webhooklogs:api
+meraki:wirelesscontrolleravailabilitieschangehistory
+meraki:wirelesscontrollerdevicesinterfacespacketsoverviewbydevice
+meraki:wirelesscontrollerdevicesinterfacesusagehistorybyinterval
+meraki:wirelessdevicesethernetstatuses
+meraki:wirelessdevicespacketlossbydevice
+meraki:wirelessdeviceswirelesscontrollersbydevice",REST API (39) + Webhook/HEC (2),"41 inputs, 45 eventtypes, 45 tags, 11 transforms, 11 lookups, 151 bin files, 32 dashboards",Validated,
+5605,Cisco SecureX threat response - Relay module,relay-module,Cisco Security,1.1.1,app,,https://splunkbase.splunk.com/app/5605,"July 7, 2022","July 7, 2022", 743 ,developer,Cisco SecureX,Cisco SecureX,1,No,7404,,TRUE,archived,,,,,Validated,
+5737,Cisco ThousandEyes Alerting App for Splunk,cisco_thousandeyes_alerting_app_for_splunk,Splunk Developer,1.0.1,app,,https://splunkbase.splunk.com/app/5737,"September 10, 2021","September 10, 2021", 347 ,not_supported,Cisco ThousandEyes (TE),Cisco ThousandEyes (TE),1,No,7719,,TRUE,archived,snmptrap|snow:incident|thousandeyes:alerts|thousandeyes:enriched_alerts,"snmptrap
+snow:incident
+thousandeyes:alerts
+thousandeyes:enriched_alerts",,,Validated,
+5743,Cisco Suite for Splunk,Cisco-suite-for-splunk,Prewin Thomas,1.1.1,app,,https://splunkbase.splunk.com/app/5743,"June 28, 1975","November 20, 2024"," 2,721 ",not_supported,"Cisco Secure Firewall (FTD/eStreamer/ASA)
+Cisco Identity Services Engine (ISE)
+Cisco Secure Email Gateway
+Cisco Web Security Appliance (WSA)","Cisco Secure Firewall (FTD/eStreamer/ASA), Cisco Identity Services Engine (ISE), Cisco Secure Email Gateway, Cisco Web Security Appliance (WSA)",4,No,,,FALSE,live,,,Syslog (parsing only),"9 dashboards, 1 datamodels",Validated,
+5747,Cisco Cyber Vision Splunk App,cisco_cybervision_app_for_splunk,Cyber Vision,2.2.0,app,,https://splunkbase.splunk.com/app/5747,"February 10, 2026","February 10, 2026"," 1,100 ",developer,Cisco Cyber Vision (CCV),Cisco Cyber Vision (CCV),1,No,,,FALSE,live,cisco:cybervision:events,cisco:cybervision:events,,,Validated,
+5748,Cisco Cyber Vision Splunk Add On,TA-cisco_cybervision,Cyber Vision,2.2.0,addon,,https://splunkbase.splunk.com/app/5748,"February 10, 2026","February 10, 2026"," 1,284 ",developer,Cisco Cyber Vision (CCV),Cisco Cyber Vision (CCV),1,No,,,FALSE,live,cisco:cybervision:activities|cisco:cybervision:components|cisco:cybervision:devices|cisco:cybervision:events|cisco:cybervision:flows|cisco:cybervision:syslog|cisco:cybervision:vulnerabilities|taciscocybervision:log,"cisco:cybervision:activities
+cisco:cybervision:components
+cisco:cybervision:devices
+cisco:cybervision:events
+cisco:cybervision:flows
+cisco:cybervision:syslog
+cisco:cybervision:vulnerabilities
+taciscocybervision:log",REST API (7) + Syslog (parsing only),"7 inputs, 9 eventtypes, 9 tags, 5 transforms, 2 saved searches, 3 lookups, 685 bin files, 2 dashboards",Validated,
+6117,Cisco Nexus Dashboard Insights App for Splunk (deprecated),cisco-app-NI,Cisco Systems,1.1.0,app,,https://splunkbase.splunk.com/app/6117,"November 19, 2024","November 19, 2024", 591 ,developer,Cisco Nexus Switches (NEX),Cisco Nexus Switches (NEX),1,Yes,7777,,TRUE,archived_manually,,,,"2 saved searches, 2 dashboards, 1 datamodels",Validated,
+6118,Cisco Nexus Dashboard Insights Add-On for Splunk (deprecated),TA_cisco-NI,Cisco Systems,1.1.0,addon,,https://splunkbase.splunk.com/app/6118,"November 19, 2024","November 19, 2024", 630 ,developer,Cisco Nexus Switches (NEX),Cisco Nexus Switches (NEX),1,Yes,7777,,TRUE,archived_manually,cisco:ni:advisories|cisco:ni:anomalies|tacisconi:log,"cisco:ni:advisories
+cisco:ni:anomalies
+tacisconi:log",REST API,"1 inputs, 2 eventtypes, 2 tags, 641 bin files, 2 dashboards",Validated,
+6201,Add On for Cisco Meraki Operations,TA-cisco_meraki_operations,Summit Technology Group,2.0.0,addon,,https://splunkbase.splunk.com/app/6201,"February 12, 2022","February 12, 2022", 702 ,developer,Cisco Meraki (Meraki),Cisco Meraki (Meraki),1,No,5580,,TRUE,archived,meraki:devices|meraki:networkdevices|meraki:uplinks|meraki:uplinkslossandlatency,"meraki:devices
+meraki:networkdevices
+meraki:uplinks
+meraki:uplinkslossandlatency",REST API (4),"4 inputs, 982 bin files, 2 dashboards",Validated,
+6398,Cisco Secure Network Analytics (Stealthwatch) App for Splunk Enterprise,cisco_sna_app,Cisco Systems,2.0.4,app,,https://splunkbase.splunk.com/app/6398,"February 20, 2025","March 14, 2025"," 1,984 ",not_supported,Cisco Secure Network Analytics (SNA),Cisco Secure Network Analytics (SNA),1,No,,,FALSE,live,,,,,Validated,
+6482,Cisco Intersight Add-on for Splunk (Deprecated),TA-intersight-addon,Karthik Karupasamy,1.3.1,addon,,https://splunkbase.splunk.com/app/6482,"August 3, 2022","August 3, 2022", 473 ,not_supported,Cisco Intersight (Intersight),Cisco Intersight (Intersight),1,Yes,7828,,TRUE,archived,cisco:intersight:aaaauditrecords|cisco:intersight:assetdevicecontractinformations|cisco:intersight:assettargets|cisco:intersight:computephysicalsummaries|cisco:intersight:condalarms|cisco:intersight:condhclstatuses|cisco:intersight:convergedinfrapods|cisco:intersight:default|cisco:intersight:equipmentchassis|cisco:intersight:hyperflexclusters|cisco:intersight:hyperflexlicenses|cisco:intersight:hyperflexnodes|cisco:intersight:hyperflexstoragecontainers|cisco:intersight:licenseaccountlicensedata|cisco:intersight:licenselicenseinfos|cisco:intersight:networkelementsummaries|cisco:intersight:storagehitachiarrays|cisco:intersight:storagehitachicontrollers|cisco:intersight:storagehitachivolumes|cisco:intersight:storagenetappclusters|cisco:intersight:storagenetappnodes|cisco:intersight:storagenetappstoragevms|cisco:intersight:storagenetappvolumes|cisco:intersight:storagepurearrays|cisco:intersight:storagepurecontrollers|cisco:intersight:storagepurevolumes|cisco:intersight:tamadvisoryinstances|taintersightaddon:log,"cisco:intersight:aaaauditrecords
+cisco:intersight:assetdevicecontractinformations
+cisco:intersight:assettargets
+cisco:intersight:computephysicalsummaries
+cisco:intersight:condalarms
+cisco:intersight:condhclstatuses
+cisco:intersight:convergedinfrapods
+cisco:intersight:default
+cisco:intersight:equipmentchassis
+cisco:intersight:hyperflexclusters
+cisco:intersight:hyperflexlicenses
+cisco:intersight:hyperflexnodes
+cisco:intersight:hyperflexstoragecontainers
+cisco:intersight:licenseaccountlicensedata
+cisco:intersight:licenselicenseinfos
+cisco:intersight:networkelementsummaries
+cisco:intersight:storagehitachiarrays
+cisco:intersight:storagehitachicontrollers
+cisco:intersight:storagehitachivolumes
+cisco:intersight:storagenetappclusters
+cisco:intersight:storagenetappnodes
+cisco:intersight:storagenetappstoragevms
+cisco:intersight:storagenetappvolumes
+cisco:intersight:storagepurearrays
+cisco:intersight:storagepurecontrollers
+cisco:intersight:storagepurevolumes
+cisco:intersight:tamadvisoryinstances
+taintersightaddon:log",REST API,"1 inputs, 4 transforms, 1050 bin files, 2 dashboards",Validated,
+6656,DEPRECATED - Cisco Catalyst SD-WAN Add-on for Splunk,ta-cisco-sdwan,"Cisco Systems, Inc.",3.0.0,addon,,https://splunkbase.splunk.com/app/6656,"June 22, 2023","June 22, 2023"," 1,299 ",cisco,Cisco Catalyst SD-WAN,Cisco Catalyst SD-WAN,1,Yes,7538,,TRUE,archived,cisco:firewall:logs|cisco:sdwan:alert:off|cisco:sdwan:alert:on|cisco:sdwan:block:host|cisco:sdwan:dmi:cli:engine:write:fail|cisco:sdwan:drop:pkt|cisco:sdwan:host:tcp:alert:on|cisco:sdwan:log:summary|cisco:sdwan:pass:pkt|cisco:sdwan:session:audit:trail|cisco:sdwan:session:audit:trail:start|cisco:sdwan:sessions:maximum|cisco:sdwan:smart:lic:platform:error|cisco:sdwan:unblock:host|cisco:sdwan:utd:logs|stream:netflow,"cisco:firewall:logs
+cisco:sdwan:alert:off
+cisco:sdwan:alert:on
+cisco:sdwan:block:host
+cisco:sdwan:dmi:cli:engine:write:fail
+cisco:sdwan:drop:pkt
+cisco:sdwan:host:tcp:alert:on
+cisco:sdwan:log:summary
+cisco:sdwan:pass:pkt
+cisco:sdwan:session:audit:trail
+cisco:sdwan:session:audit:trail:start
+cisco:sdwan:sessions:maximum
+cisco:sdwan:smart:lic:platform:error
+cisco:sdwan:unblock:host
+cisco:sdwan:utd:logs
+stream:netflow",,,Validated,
+6657,DEPRECATED - Cisco Catalyst SD-WAN App for Splunk,cisco-sdwan-app,"Cisco Systems, Inc.",3.1.1,app,Main Apps,https://splunkbase.splunk.com/app/6657,"July 22, 1970","June 17, 2025"," 1,642 ",cisco,Cisco Catalyst SD-WAN,Cisco Catalyst SD-WAN,1,Yes,7539,,FALSE,live,,,,,Validated,
+6668,Cisco DNA Center Add-on,Splunk-TA-cisco-dnacenter,Cisco EN Programmability,1.0.7,addon,,https://splunkbase.splunk.com/app/6668,"April 14, 2025","April 28, 2025"," 2,587 ",developer,Cisco Catalyst Center,Cisco Catalyst Center,1,No,7858,,FALSE,flagged,cisco:dnac:clienthealth|cisco:dnac:compliance|cisco:dnac:devicehealth|cisco:dnac:issue|cisco:dnac:networkhealth|cisco:dnac:securityadvisory|splunktaciscodnacenter:log,"cisco:dnac:clienthealth
+cisco:dnac:compliance
+cisco:dnac:devicehealth
+cisco:dnac:issue
+cisco:dnac:networkhealth
+cisco:dnac:securityadvisory
+splunktaciscodnacenter:log",REST API (6),"6 inputs, 639 bin files, 2 dashboards",Validated,
+6669,Cisco DNA Center App,Splunk_CiscoDNACenter,"Cisco Systems, Inc.",1.0.3,app,,https://splunkbase.splunk.com/app/6669,"April 14, 2025","April 28, 2025"," 1,517 ",cisco,Cisco Catalyst Center,Cisco Catalyst Center,1,No,7859,,TRUE,archived,,,,11 dashboards,Validated,
+6872,Cisco Catalyst Enhanced Netflow Add-on for Splunk,splunk_app_stream_ipfix_cisco_hsl,"Cisco Systems, Inc.",2.1.0,addon,Main Apps,https://splunkbase.splunk.com/app/6872,"September 10, 2024","September 10, 2024"," 1,286 ",cisco,Cisco Catalyst Center,Cisco Catalyst Center,1,No,,,FALSE,live,,,,,Validated,
+7219,Cisco Secure Malware Analytics,TA-cisco-secure-malware-analytics,Cisco Security,2.0.0,addon,,https://splunkbase.splunk.com/app/7219,"May 30, 1975","May 30, 1975", 223 ,developer,Cisco Secure Malware Analytics (SMA),Cisco Secure Malware Analytics (SMA),1,No,7404,,FALSE,flagged,,,REST API,"1 inputs, 622 bin files, 2 dashboards",Validated,
+7243,Cisco Email Threat Defense connector for Splunk - DISCONTINUED (use app 7404),TA-cisco-etd-connector,Sergio Pinto,1.0.4,addon,,https://splunkbase.splunk.com/app/7243,"May 29, 2024","May 29, 2024", 234 ,not_supported,Cisco Email Threat Defense (ETD),Cisco Email Threat Defense (ETD),1,No,7404,,TRUE,archived_manually,etd_input_python|taciscoetdconnector:log,"etd_input_python
+taciscoetdconnector:log",REST API,"1 inputs, 621 bin files, 3 dashboards",Validated,
+7404,Cisco Security Cloud,CiscoSecurityCloud,"Cisco Systems, Inc.",3.6.1,addon,Main Security App,https://splunkbase.splunk.com/app/7404,"February 9, 2026","February 9, 2026"," 45,593 ",cisco,"Cisco AI Defense
+Cisco Duo Security (Duo)
+Cisco Email Threat Defense (ETD)
+Cisco Extended Detection and Response (XDR)
+Cisco Identity Intelligence (CII)
+Cisco Isovalent (Isovalent)
+Cisco Isovalent Edge Processor (IEP)
+Cisco Multicloud Defense (MCD)
+Cisco Network Visibility Module (NVM)
+Cisco Secure Endpoint (CSE/AMP)
+Cisco Secure Firewall (FTD/eStreamer/ASA)
+Cisco Secure Malware Analytics (SMA)
+Cisco Secure Network Analytics (SNA)
+Cisco Secure Workload (CSW)
+Cisco Vulnerability Intelligence (CVI)","Cisco AI Defense, Cisco Duo Security (Duo), Cisco Email Threat Defense (ETD), Cisco Extended Detection and Response (XDR), Cisco Identity Intelligence (CII), Cisco Isovalent (Isovalent), Cisco Isovalent Edge Processor (IEP), Cisco Multicloud Defense (MCD), Cisco Network Visibility Module (NVM), Cisco Secure Endpoint (CSE/AMP), Cisco Secure Firewall (FTD/eStreamer/ASA), Cisco Secure Malware Analytics (SMA), Cisco Secure Network Analytics (SNA), Cisco Secure Workload (CSW), Cisco Vulnerability Intelligence (CVI)",15,No,,,FALSE,live,cisco:ai:defense|cisco:ai:defense:notable|cisco:asa|cisco:cii|cisco:cvi|cisco:duo:authentication|cisco:duo:authentication_v2|cisco:etd|cisco:ftd:syslog|cisco:isovalent|cisco:isovalent:alert|cisco:isovalent:edge_processor|cisco:isovalent:edge_processor:alert|cisco:isovalent:edge_processor:processconnect|cisco:isovalent:edge_processor:processexec|cisco:isovalent:edge_processor:telemetry:network|cisco:isovalent:edge_processor:telemetry:process|cisco:isovalent:processconnect|cisco:isovalent:processexec|cisco:isovalent:telemetry:network|cisco:isovalent:telemetry:process|cisco:multicloud:defense:appid|cisco:multicloud:defense:auditlogs|cisco:multicloud:defense:av|cisco:multicloud:defense:dlp|cisco:multicloud:defense:dpi|cisco:multicloud:defense:fqdn_resoleve|cisco:multicloud:defense:fqdnfilter|cisco:multicloud:defense:l4_fw|cisco:multicloud:defense:l7dos|cisco:multicloud:defense:malicious_src|cisco:multicloud:defense:session_summary|cisco:multicloud:defense:sni|cisco:multicloud:defense:systemlogs|cisco:multicloud:defense:tls_error|cisco:multicloud:defense:tls_log|cisco:multicloud:defense:urlfilter|cisco:multicloud:defense:valtix_internal|cisco:multicloud:defense:waf|cisco:nvm:eve:v2|cisco:nvm:flowdata:v2|cisco:nvm:ifdata:v2|cisco:nvm:osquery:v2|cisco:nvm:processinfodata:v2|cisco:nvm:sysdata:v2|cisco:sbg:api:error|cisco:sbg:api:status|cisco:sbg:data|cisco:se|cisco:secure:workload|cisco:sfw:estreamer|cisco:sma:submissions|cisco:sna|cisco:sna:notable|cisco:sna:risk|cisco:xdr:incidents|cisco:xdr:incidents-summary|cisco:xdr:incidents-summary:notable|gateway,"cisco:ai:defense
+cisco:ai:defense:notable
+cisco:asa
+cisco:cii
+cisco:cvi
+cisco:duo:authentication
+cisco:duo:authentication_v2
+cisco:etd
+cisco:ftd:syslog
+cisco:isovalent
+cisco:isovalent:alert
+cisco:isovalent:edge_processor
+cisco:isovalent:edge_processor:alert
+cisco:isovalent:edge_processor:processconnect
+cisco:isovalent:edge_processor:processexec
+cisco:isovalent:edge_processor:telemetry:network
+cisco:isovalent:edge_processor:telemetry:process
+cisco:isovalent:processconnect
+cisco:isovalent:processexec
+cisco:isovalent:telemetry:network
+cisco:isovalent:telemetry:process
+cisco:multicloud:defense:appid
+cisco:multicloud:defense:auditlogs
+cisco:multicloud:defense:av
+cisco:multicloud:defense:dlp
+cisco:multicloud:defense:dpi
+cisco:multicloud:defense:fqdn_resoleve
+cisco:multicloud:defense:fqdnfilter
+cisco:multicloud:defense:l4_fw
+cisco:multicloud:defense:l7dos
+cisco:multicloud:defense:malicious_src
+cisco:multicloud:defense:session_summary
+cisco:multicloud:defense:sni
+cisco:multicloud:defense:systemlogs
+cisco:multicloud:defense:tls_error
+cisco:multicloud:defense:tls_log
+cisco:multicloud:defense:urlfilter
+cisco:multicloud:defense:valtix_internal
+cisco:multicloud:defense:waf
+cisco:nvm:eve:v2
+cisco:nvm:flowdata:v2
+cisco:nvm:ifdata:v2
+cisco:nvm:osquery:v2
+cisco:nvm:processinfodata:v2
+cisco:nvm:sysdata:v2
+cisco:sbg:api:error
+cisco:sbg:api:status
+cisco:sbg:data
+cisco:se
+cisco:secure:workload
+cisco:sfw:estreamer
+cisco:sma:submissions
+cisco:sna
+cisco:sna:notable
+cisco:sna:risk
+cisco:xdr:incidents
+cisco:xdr:incidents-summary
+cisco:xdr:incidents-summary:notable
+gateway",REST API (9) + Syslog (3) + HEC (4) + eStreamer + NVM Agent + AWS S3,"19 inputs, 77 eventtypes, 66 tags, 249 transforms, 14 lookups, 109 bin files, 24 dashboards, 1 datamodels",Validated,
+7538,Cisco Catalyst Add-on for Splunk,TA_cisco_catalyst,"Cisco Systems, Inc.",3.0.0,addon,Main Network App,https://splunkbase.splunk.com/app/7538,"November 7, 2025","November 7, 2025"," 3,256 ",cisco,"Cisco Access Points (AP)
+Cisco Aggregation Services Routers (ASR)
+Cisco Carrier Routing System (CRS)
+Cisco Catalyst Center
+Cisco Catalyst SD-WAN
+Cisco Catalyst Switches
+Cisco Cyber Vision (CCV)
+Cisco Identity Services Engine (ISE)
+Cisco Integrated Services Routers (ISR)
+Cisco Meraki (Meraki)
+Cisco Nexus Switches (NEX)
+Cisco ThousandEyes (TE)
+Cisco Wireless LAN Controller (WLC)","Cisco Access Points (AP), Cisco Aggregation Services Routers (ASR), Cisco Carrier Routing System (CRS), Cisco Catalyst Center, Cisco Catalyst SD-WAN, Cisco Catalyst Switches, Cisco Cyber Vision (CCV), Cisco Identity Services Engine (ISE), Cisco Integrated Services Routers (ISR), Cisco Meraki (Meraki), Cisco Nexus Switches (NEX), Cisco ThousandEyes (TE), Cisco Wireless LAN Controller (WLC)",13,No,,,FALSE,live,cisco:catalyst:syslog|cisco:cybervision:activities|cisco:cybervision:components|cisco:cybervision:devices|cisco:cybervision:events|cisco:cybervision:flows|cisco:cybervision:syslog|cisco:cybervision:vulnerabilities|cisco:dnac:audit:logs|cisco:dnac:client|cisco:dnac:clienthealth|cisco:dnac:compliance|cisco:dnac:devicehealth|cisco:dnac:issue|cisco:dnac:networkhealth|cisco:dnac:securityadvisory|cisco:dnac:site:topology|cisco:firewall:logs|cisco:ios|cisco:ise|cisco:ise:radius:authz:policy|cisco:ise:radius:policyset|cisco:ise:securitygroups|cisco:ise:sgtbindings|cisco:ise:syslog|cisco:ise:tacacs:authz:policy|cisco:ise:tacacs:policyset|cisco:sdwan:acl:logs|cisco:sdwan:alert:off|cisco:sdwan:alert:on|cisco:sdwan:audit:logs|cisco:sdwan:block:host|cisco:sdwan:dmi:cli:engine:write:fail|cisco:sdwan:drop:pkt|cisco:sdwan:host:tcp:alert:on|cisco:sdwan:linkhealth|cisco:sdwan:log:summary|cisco:sdwan:pass:pkt|cisco:sdwan:session:audit:trail|cisco:sdwan:session:audit:trail:start|cisco:sdwan:sessions:maximum|cisco:sdwan:sgacl:logs|cisco:sdwan:sitehealth|cisco:sdwan:smart:lic:platform:error|cisco:sdwan:ssetunnels|cisco:sdwan:system:logs|cisco:sdwan:tunnelhealth|cisco:sdwan:unblock:host|cisco:sdwan:utd:logs|cisco:sdwan:utdhealth|cisco:sgacl:logs|cisco:telemetry|rfc5424_syslog|splunktaciscocybervision:log|splunktaciscodnacenter:log|splunktaciscoise:log|splunktaciscosdwan:log|stream:netflow|syslog,"cisco:catalyst:syslog
+cisco:cybervision:activities
+cisco:cybervision:components
+cisco:cybervision:devices
+cisco:cybervision:events
+cisco:cybervision:flows
+cisco:cybervision:syslog
+cisco:cybervision:vulnerabilities
+cisco:dnac:audit:logs
+cisco:dnac:client
+cisco:dnac:clienthealth
+cisco:dnac:compliance
+cisco:dnac:devicehealth
+cisco:dnac:issue
+cisco:dnac:networkhealth
+cisco:dnac:securityadvisory
+cisco:dnac:site:topology
+cisco:firewall:logs
+cisco:ios
+cisco:ise
+cisco:ise:radius:authz:policy
+cisco:ise:radius:policyset
+cisco:ise:securitygroups
+cisco:ise:sgtbindings
+cisco:ise:syslog
+cisco:ise:tacacs:authz:policy
+cisco:ise:tacacs:policyset
+cisco:sdwan:acl:logs
+cisco:sdwan:alert:off
+cisco:sdwan:alert:on
+cisco:sdwan:audit:logs
+cisco:sdwan:block:host
+cisco:sdwan:dmi:cli:engine:write:fail
+cisco:sdwan:drop:pkt
+cisco:sdwan:host:tcp:alert:on
+cisco:sdwan:linkhealth
+cisco:sdwan:log:summary
+cisco:sdwan:pass:pkt
+cisco:sdwan:session:audit:trail
+cisco:sdwan:session:audit:trail:start
+cisco:sdwan:sessions:maximum
+cisco:sdwan:sgacl:logs
+cisco:sdwan:sitehealth
+cisco:sdwan:smart:lic:platform:error
+cisco:sdwan:ssetunnels
+cisco:sdwan:system:logs
+cisco:sdwan:tunnelhealth
+cisco:sdwan:unblock:host
+cisco:sdwan:utd:logs
+cisco:sdwan:utdhealth
+cisco:sgacl:logs
+cisco:telemetry
+rfc5424_syslog
+splunktaciscocybervision:log
+splunktaciscodnacenter:log
+splunktaciscoise:log
+splunktaciscosdwan:log
+stream:netflow
+syslog",REST API (18) + Syslog (parsing only),"18 inputs, 123 eventtypes, 60 tags, 198 transforms, 12 lookups, 60 bin files, 5 dashboards, 1 datamodels",Validated,
+7539,Cisco Enterprise Networking for Splunk Platform,cisco-catalyst-app,"Cisco Systems, Inc.",3.0.0,app,Main Network App,https://splunkbase.splunk.com/app/7539,"November 7, 2025","November 7, 2025"," 2,016 ",cisco,"Cisco Cyber Vision (CCV)
+Cisco Catalyst Center
+Cisco Identity Services Engine (ISE)
+Cisco Meraki (Meraki)
+Cisco Catalyst SD-WAN
+Cisco ThousandEyes (TE)","Cisco Cyber Vision (CCV), Cisco Catalyst Center, Cisco Identity Services Engine (ISE), Cisco Meraki (Meraki), Cisco Catalyst SD-WAN, Cisco ThousandEyes (TE)",6,No,,,FALSE,live,,,,"3 transforms, 5 saved searches, 3 lookups, 9 dashboards, 1 datamodels",Validated,
+7557,Cisco Talos Intelligence for Enterprise Security Cloud,Splunk_TA_Talos_Intelligence,Splunk LLC,1.0.1,app,Main Apps,https://splunkbase.splunk.com/app/7557,"September 16, 2025","September 16, 2025"," 1,166 ",splunk,Cisco Talos (Talos),Cisco Talos (Talos),1,No,,,FALSE,live,,,Threat Intel Feed,"1 inputs, 13 bin files, 2 dashboards",Validated,
+7569,Cisco Secure Access Add-on for Splunk,TA-cisco-cloud-security-addon,"Cisco Systems, Inc.",1.0.48,addon,Main Apps,https://splunkbase.splunk.com/app/7569,"January 14, 2026","January 14, 2026"," 3,125 ",cisco,"Cisco Cloudlock Cloud Access Security Broker (CASB)
+Cisco Secure Access (SSE)
+Cisco Umbrella","Cisco Cloudlock Cloud Access Security Broker (CASB), Cisco Secure Access (SSE), Cisco Umbrella",3,No,,,FALSE,live,cisco:cloud_security:audit|cisco:cloud_security:dlp|cisco:cloud_security:dns|cisco:cloud_security:fileevent|cisco:cloud_security:firewall|cisco:cloud_security:intrusion|cisco:cloud_security:proxy|cisco:cloud_security:ravpn|cisco:cloud_security:ztna|cisco:cloud_security:ztnaenrollment|cisco:cloud_security:ztnaflow,"cisco:cloud_security:audit
+cisco:cloud_security:dlp
+cisco:cloud_security:dns
+cisco:cloud_security:fileevent
+cisco:cloud_security:firewall
+cisco:cloud_security:intrusion
+cisco:cloud_security:proxy
+cisco:cloud_security:ravpn
+cisco:cloud_security:ztna
+cisco:cloud_security:ztnaenrollment
+cisco:cloud_security:ztnaflow",REST API (3) + AWS S3,"4 inputs, 11 eventtypes, 9 tags, 14 transforms, 30 bin files, 4 dashboards",Validated,
+7719,Cisco ThousandEyes App for Splunk,ta_cisco_thousandeyes,"Cisco Systems, Inc.",0.5.0,app,Main Apps,https://splunkbase.splunk.com/app/7719,"February 5, 2026","February 5, 2026"," 1,837 ",cisco,Cisco ThousandEyes (TE),Cisco ThousandEyes (TE),1,No,,,FALSE,live,cisco:thousandeyes:activity|cisco:thousandeyes:alerts|cisco:thousandeyes:event|cisco:thousandeyes:metric|cisco:thousandeyes:path-vis|cisco:thousandeyes:trace|ciscothousandeyes:log,"cisco:thousandeyes:activity
+cisco:thousandeyes:alerts
+cisco:thousandeyes:event
+cisco:thousandeyes:metric
+cisco:thousandeyes:path-vis
+cisco:thousandeyes:trace
+ciscothousandeyes:log",,,Validated,
+7777,Cisco DC Networking,cisco_dc_networking_app_for_splunk,"Cisco Systems, Inc.",1.2.0,app,Main Apps,https://splunkbase.splunk.com/app/7777,"February 5, 2026","February 5, 2026"," 1,428 ",cisco,"Cisco Nexus Switches (NEX)
+Cisco Application Centric Infrastructure (Cisco ACI)
+Cisco Nexus Dashboard (ND)
+Cisco Nexus HyperFabric","Cisco Nexus Switches (NEX), Cisco Application Centric Infrastructure (Cisco ACI), Cisco Nexus Dashboard (ND), Cisco Nexus HyperFabric",4,No,,,FALSE,live,cisco:dc:aci:authentication|cisco:dc:aci:class|cisco:dc:aci:health|cisco:dc:aci:stats|cisco:dc:aci:syslog|cisco:dc:mso:syslog|cisco:dc:nd:advisories|cisco:dc:nd:anomalies|cisco:dc:nd:congestion|cisco:dc:nd:endpoints|cisco:dc:nd:fabrics|cisco:dc:nd:flows|cisco:dc:nd:mso|cisco:dc:nd:protocols|cisco:dc:nd:switches|cisco:dc:nd:syslog|cisco:dc:nexus9k|cisco:dc:nexus9k:syslog|ciscodcaci:log|ciscodcn9k:log|ciscodcnd:log,"cisco:dc:aci:authentication
+cisco:dc:aci:class
+cisco:dc:aci:health
+cisco:dc:aci:stats
+cisco:dc:aci:syslog
+cisco:dc:mso:syslog
+cisco:dc:nd:advisories
+cisco:dc:nd:anomalies
+cisco:dc:nd:congestion
+cisco:dc:nd:endpoints
+cisco:dc:nd:fabrics
+cisco:dc:nd:flows
+cisco:dc:nd:mso
+cisco:dc:nd:protocols
+cisco:dc:nd:switches
+cisco:dc:nd:syslog
+cisco:dc:nexus9k
+cisco:dc:nexus9k:syslog
+ciscodcaci:log
+ciscodcn9k:log
+ciscodcnd:log",,,Validated,
+7828,Cisco Intersight Add-on for Splunk,Splunk_TA_Cisco_Intersight,"Cisco Systems, Inc.",3.1.0,addon,Main Apps,https://splunkbase.splunk.com/app/7828,"August 11, 1975","August 11, 1975", 544 ,cisco,Cisco Intersight (Intersight),Cisco Intersight (Intersight),1,No,,,FALSE,live,cisco:intersight:advisories|cisco:intersight:alarms|cisco:intersight:auditrecords|cisco:intersight:compute|cisco:intersight:contract|cisco:intersight:contracts|cisco:intersight:custom:inventory|cisco:intersight:custom:metrics|cisco:intersight:fabric|cisco:intersight:license|cisco:intersight:licenses|cisco:intersight:metrics|cisco:intersight:network|cisco:intersight:networkelements|cisco:intersight:networkobjects|cisco:intersight:pools|cisco:intersight:profiles|cisco:intersight:target|cisco:intersight:targets,"cisco:intersight:advisories
+cisco:intersight:alarms
+cisco:intersight:auditrecords
+cisco:intersight:compute
+cisco:intersight:contract
+cisco:intersight:contracts
+cisco:intersight:custom:inventory
+cisco:intersight:custom:metrics
+cisco:intersight:fabric
+cisco:intersight:license
+cisco:intersight:licenses
+cisco:intersight:metrics
+cisco:intersight:network
+cisco:intersight:networkelements
+cisco:intersight:networkobjects
+cisco:intersight:pools
+cisco:intersight:profiles
+cisco:intersight:target
+cisco:intersight:targets",REST API (4),"4 inputs, 7 eventtypes, 6 tags, 85 transforms, 16 saved searches, 20 bin files, 15 dashboards, 1 datamodels",Validated,
+7858,Catalyst Center Add-on,Splunk-TA-cisco-catalyst-center,Cisco EN Programmability,1.0.1,addon,,https://splunkbase.splunk.com/app/7858,"July 22, 1970","June 26, 2025", 469 ,developer,Cisco Catalyst Center,Cisco Catalyst Center,1,No,,,FALSE,live,cisco:catalyst:client|cisco:catalyst:clienthealth|cisco:catalyst:compliance|cisco:catalyst:devicehealth|cisco:catalyst:issue|cisco:catalyst:networkhealth|cisco:catalyst:securityadvisory|splunktaciscocatalystcenter:log,"cisco:catalyst:client
+cisco:catalyst:clienthealth
+cisco:catalyst:compliance
+cisco:catalyst:devicehealth
+cisco:catalyst:issue
+cisco:catalyst:networkhealth
+cisco:catalyst:securityadvisory
+splunktaciscocatalystcenter:log",REST API (7),"7 inputs, 677 bin files, 2 dashboards",Validated,
+7859,Catalyst Center App,Splunk-cisco-catalyst-center,Cisco EN Programmability,1.0.0,app,,https://splunkbase.splunk.com/app/7859,"May 27, 2025","May 27, 2025", 343 ,developer,Cisco Catalyst Center,Cisco Catalyst Center,1,No,,,FALSE,live,,,,12 dashboards,Validated,
+8365,Webex Add-on for Splunk,ta_cisco_webex_add_on_for_splunk,Yuan Ling,1.3.1,addon,,https://splunkbase.splunk.com/app/8365,"January 13, 2026","July 24, 1970", 42 ,developer,Cisco Webex (Webex),Cisco Webex (Webex),1,No,,,FALSE,live,cisco:webex:admin:audit:events|cisco:webex:call:detailed_history|cisco:webex:meeting:attendee:reports|cisco:webex:meeting:qualities|cisco:webex:meeting:usage:reports|cisco:webex:meetings|cisco:webex:security:audit:events|taciscowebexaddonforsplunk:log,"cisco:webex:admin:audit:events
+cisco:webex:call:detailed_history
+cisco:webex:meeting:attendee:reports
+cisco:webex:meeting:qualities
+cisco:webex:meeting:usage:reports
+cisco:webex:meetings
+cisco:webex:security:audit:events
+taciscowebexaddonforsplunk:log",,,Validated,
+8413,Supporting App for Cisco Meeting Server,SA_cisco_meeting_server,Nick Mealy,0.5.2,app,,https://splunkbase.splunk.com/app/8413,"February 9, 2026","February 9, 2026", 5 ,developer,Cisco Meeting Server (CMS),Cisco Meeting Server (CMS),1,No,,,FALSE,live,cms_cdr,cms_cdr,,"4 transforms, 3 dashboards",Validated,
+8429,Sideview Supporting App for Webex,SA_sideview_webex,Nick Mealy,0.5.0,app,,https://splunkbase.splunk.com/app/8429,"January 30, 2026","January 30, 2026", 6 ,developer,Cisco Webex (Webex),Cisco Webex (Webex),1,No,,,FALSE,live,,,,"1 transforms, 3 dashboards",Validated,
+1297,AppDynamics,appdynamics,Pranta Das,1.8.4,app,,,,,,not_supported,,Cisco AppDynamics,,No,3471,,TRUE,archived,,,,,,
+3472,Splunk App for AppDynamics,splunk_app_AppDynamics,Splunk Works,3.0.4,app,,,,,,not_supported,,Cisco AppDynamics,,No,3471,,TRUE,archived,,,,,,
+4870,Cisco Webex Teams Alert Action,WebexTeams_AlertAction,Venkat Bongoni,1.0.3,addon,,,,,,not_supported,,Cisco Webex,,No,,,TRUE,archived,,,,,,
+5543,Splunk TA CCX Unified Cisco Firepower eStreamer,Splunk_TA_CCX_Unified_Cisco_Firepower_eStreamer,CCX,1.1.3,addon,,,,,,not_supported,,Cisco Secure Firewall (FTD/eStreamer/ASA),,No,,,FALSE,live,cisco:estreamer:data,,,,,
+5779,Cisco ESA,7bf76da9-f31c-448b-906b-7c6de9d3cc70,Splunk,3.0.2,connector,SOAR,,,,,splunk,,Cisco Secure Email Gateway,,No,,,FALSE,live,,,,,,
+5780,Cisco Umbrella Investigate,5fc14867-8c8e-4cc2-8198-641df784bf1a,Splunk,1.2.2,connector,SOAR,,,,,splunk,,Cisco Umbrella,,No,,,FALSE,live,,,,,,
+5781,Cisco Webex,34624d1a-f0ae-47d6-a731-8499d5617cf7,Splunk,2.2.0,connector,SOAR,,,,,splunk,,Cisco Webex,,No,,,FALSE,live,,,,,,
+5885,Cisco ISE,85232924-4776-4896-88fa-b982b304af7c,Splunk,3.2.1,connector,SOAR,,,,,splunk,,Cisco Identity Services Engine (ISE),,No,,,FALSE,live,,,,,,
+5887,Cisco Umbrella,96f3e021-5396-42d0-97f4-4fab683e9adb,Splunk,1.2.4,connector,SOAR,,,,,splunk,,Cisco Umbrella,,No,,,FALSE,live,,,,,,
+5897,FireAMP,897890aa-14f5-4d6c-b68c-e557ff30d251,Splunk,2.1.14,connector,SOAR,,,,,splunk,,Cisco Secure Endpoint (CSE/AMP),,No,,,FALSE,live,,,,,,
+5995,Cisco Firepower,F501CF42-46D4-4023-A156-208640865AA8,Splunk,2.0.4,connector,SOAR,,,,,splunk,,Cisco Secure Firewall (FTD/eStreamer/ASA),,No,,,FALSE,live,,,,,,
+6145,Cisco Secure Malware Analytics (Threat Grid),e52c6b70-2972-47e2-ad80-c131f9604ff4,Splunk,2.4.4,connector,SOAR,,,,,splunk,,Cisco Secure Malware Analytics (SMA),,No,,,FALSE,live,,,,,,
+6460,Splunk TA CCX Cisco ISE,Splunk_TA_CCX_Cisco_ISE,CCX,1.0.4,addon,community_alternative,,,,,not_supported,,Cisco Identity Services Engine (ISE),,No,,,FALSE,live,cisco:ise:syslog,,,,,
+6481,Splunk TA CCX Cisco Secure Endpoint,Splunk_TA_CCX_Cisco_Secure_Endpoint,CCX,1.0.4,addon,community_alternative,,,,,not_supported,,Cisco Secure Endpoint (CSE/AMP),,No,,,FALSE,live,cisco:amp:event,,,,,
+6544,Splunk TA CCX DUO Connector Support,Splunk_TA_CCX_DUO_Connector_Support,CCX,2.0.0,addon,community_alternative,,,,,not_supported,,Cisco Duo Security (Duo),,No,,,FALSE,live,duo:authentication,,,,,
+7092,Splunk TA CCX Cisco Secure Network Analytics,Splunk_TA_CCX_Cisco_Secure_Network_Analytics,CCX,1.0.5,addon,community_alternative,,,,,not_supported,,Cisco Secure Network Analytics (SNA),,No,,,TRUE,archived,cisco:stealthwatch:alert,,,,,
+7365,Splunk TA CCX Cisco Meraki,Splunk_TA_CCX_Cisco_Meraki,CCX,1.0.4,addon,community_alternative,,,,,not_supported,,Cisco Meraki (Meraki),,No,,,FALSE,live,meraki:syslog,,,,,
+7548,Custom Alert for Cisco ISE MAC Block,splunk_cisco_ise_alert,WIMBO PRABA CANDRA SUCI,1.0.4,addon,,,,,,not_supported,,Cisco Identity Services Engine (ISE),,No,,,FALSE,live,,,,,,
+7711,Cisco Talos Intelligence,7c653487-22c8-4ec1-bca0-16a8b1513c86,Splunk,1.0.14,connector,SOAR,,,,,splunk,,Cisco Talos (Talos),,No,,,FALSE,live,,,,,,
+7745,Cisco Secure Firewall,268cecc2-a5ea-438b-96f8-3ab1d8443d93,Splunk,1.0.2,connector,SOAR,,,,,splunk,,Cisco Secure Firewall (FTD/eStreamer/ASA),,No,,,FALSE,live,,,,,,
+7770,Cisco Secure Email and Web Manager,aace5ad3-282e-4779-87a1-75762f83f5c9,Splunk,1.0.4,connector,SOAR,,,,,splunk,,"Cisco Secure Email Gateway, Cisco Web Security Appliance",,No,,,FALSE,live,,,,,,
+7960,Cisco Meraki,c6d3d4d5-5c2f-4f0d-a1b2-c3d4e5f6a7b8,Splunk,1.0.1,connector,SOAR,,,,,splunk,,Cisco Meraki,,No,,,FALSE,live,,,,,,
+8085,Cisco Umbrella v2,1f90d598-9e22-4121-99a7-e05f7a01bb26,Splunk,1.0.0,connector,SOAR,,,,,splunk,,Cisco Umbrella,,No,,,FALSE,live,,,,,,
+8358,Webex Alert Action,webex_alert,alexandre argeris,1.0.0,app,,,,,,not_supported,,Cisco Webex,,No,,,FALSE,live,,,,,,
+8485,Spaces Add-On for Splunk,ta_cisco_spaces,Tjene,1.0.7,addon,,,,,,developer,,"Cisco Connected Mobile Experiences (Cisco CMX), Cisco Spaces",,No,,,FALSE,live,,,,,,
