@@ -1,4 +1,4 @@
-# Cisco Control Center (CCC)
+# Splunk Cisco App Navigator (SCAN)
 
 **Codename:** "The Front Door"
 
@@ -8,7 +8,7 @@
 
 ## Summary for Executive Leadership
 
-> *"The Cisco Control Center is the App Store for the Cisco Ecosystem within Splunk. It doesn't just list apps — it audits the environment, identifies outdated 'Legacy Debt,' validates data pipelines, and provides a 'One-Click' path to modernization. We have moved from a 'Search and Hope' model to a 'Detect and Direct' model, ensuring the 'Network is Innocent' by default."*
+> *"The Splunk Cisco App Navigator is the App Store for the Cisco Ecosystem within Splunk. It doesn't just list apps — it audits the environment, identifies outdated 'Legacy Debt,' validates data pipelines, and provides a 'One-Click' path to modernization. We have moved from a 'Search and Hope' model to a 'Detect and Direct' model, ensuring the 'Network is Innocent' by default."*
 
 ---
 
@@ -24,7 +24,7 @@ The "Systemic Mess" of dozens of Cisco apps on Splunkbase creates three critical
 
 ## 2. The Solution: The "Product Card" Interface
 
-The CCC App introduces a **Product Catalog UI** — a card-based discovery model following the **IS4S (Insights Suite for Splunk) green design language**. Each Cisco product (ISE, Meraki, ASA, Duo, Nexus, etc.) is represented by an **intelligent card** that actively inspects the local Splunk environment and renders real-time status.
+The SCAN App introduces a **Product Catalog UI** — a card-based discovery model following the **IS4S (Insights Suite for Splunk) green design language**. Each Cisco product (ISE, Meraki, ASA, Duo, Nexus, etc.) is represented by an **intelligent card** that actively inspects the local Splunk environment and renders real-time status.
 
 ### Current Product Catalog (57 Products)
 
@@ -37,7 +37,7 @@ The CCC App introduces a **Product Catalog UI** — a card-based discovery model
 | **Deprecated**   | —      | —           | 10         | 10    |
 | **Total**        | **43** | **4**       | **10**     | **57**|
 
-### Anatomy of a CCC Product Card
+### Anatomy of a SCAN Product Card
 
 Each card is a self-contained intelligence unit with the following layers:
 
@@ -117,15 +117,16 @@ A horizontal pill-style filter bar that allows instant filtering by domain:
 - **🎧 Collaboration** — Meeting, messaging, calling platforms
 - **📦 Deprecated** — Archived or deprecated products
 
-**Cross-cutting filters** (separated by a vertical divider):
+**Cross-cutting filters** (separated by vertical dividers):
+- **🔐 Secure Networking** — Shows products in Cisco's Secure Networking Go-To-Market strategy (teal-green styling). Driven by `secure_networking_gtm` field. 31 of 57 products tagged.
 - **⚡ SOAR** — Shows only products with Splunk SOAR connectors (amber styling)
 - **🔔 Alert Actions** — Shows only products with custom alert actions (blue styling)
 
-Each filter pill shows a live count of matching products.
+Each filter pill shows a live count of matching products. Cross-cutting counts are excluded from the "All" total to avoid double-counting.
 
 ### C. The "Legacy Debt" Auditor
 
-The CCC runs a background scan of the Splunk REST `/services/apps/local` endpoint and compares installed apps against the product catalog's `legacy_apps` manifest. Currently tracks legacy mappings for:
+The SCAN runs a background scan of the Splunk REST `/services/apps/local` endpoint and compares installed apps against the product catalog's `legacy_apps` manifest. Currently tracks legacy mappings for:
 
 | Product            | Legacy Apps Detected                                              |
 |--------------------|-------------------------------------------------------------------|
@@ -140,13 +141,22 @@ The CCC runs a background scan of the Splunk REST `/services/apps/local` endpoin
 2. **Legacy Audit Banner** — A persistent yellow banner at the top of the page when any legacy apps are detected, with a "View Report" button.
 3. **Legacy Audit Modal** — A detailed report showing all detected legacy apps with migration guidance and Splunkbase links.
 
-### D. Mean Time to Innocence (MTTI) — Data Validation
+### D. Mean Time to Innocence (MTTI) — Optimised Data Validation
 
-Every product card with defined sourcetypes performs a live SPL search (`earliest=-24h`) to validate data flow:
+The SCAN uses a **single optimised SPL search** to validate all 321 sourcetypes across 52 products in one query:
+
+```spl
+| tstats count WHERE index=* by sourcetype
+| search sourcetype IN ("cisco:asa", "cisco:ftd", ...)
+```
+
+This replaced the original per-product approach (52 individual searches) with a single sub-second query. Results are distributed to each product card:
 
 - **📊 Data Flowing (N events)** — Green badge confirming events are arriving and parsed.
 - **📊 Data Found — No Add-on Detected** — Orange badge warning that data exists but the TA is not installed (orphaned data).
 - **No data warning** — Yellow panel with a direct search link to investigate missing sourcetypes using `| metadata type=sourcetypes`.
+
+**Performance:** 1 search instead of 52. Sub-second response. No Splunk search concurrency pressure.
 
 ### E. SOAR Connector Intelligence
 
@@ -185,7 +195,7 @@ The Category Filter Bar includes a cross-cutting **🔔 Alert Actions** filter.
 
 ### H. Community App Detection
 
-When the CCC detects a third-party (non-Cisco) community add-on installed that shadows an official Cisco TA, a collapsible **"⚠ Third-party add-on detected"** warning appears on the card. The warning is collapsed by default with a "+ Details" toggle that reveals:
+When the SCAN detects a third-party (non-Cisco) community add-on installed that shadows an official Cisco TA, a collapsible **"⚠ Third-party add-on detected"** warning appears on the card. The warning is collapsed by default with a "+ Details" toggle that reveals:
 
 - The community app name and Splunkbase link
 - A recommendation to migrate to the official Cisco add-on
@@ -194,7 +204,7 @@ Currently 5 products have community app mappings (e.g., Duo, Secure Endpoint, IS
 
 ### I. Version Intelligence & Upgrade Buttons
 
-The CCC reads `update.version` from each app's `/services/apps/local/<app_id>` entry. When an update is available:
+The SCAN reads `update.version` from each app's `/services/apps/local/<app_id>` entry. When an update is available:
 
 - An **orange ⬆ badge** appears in the intelligence row.
 - An **orange ⬆ vX.Y.Z button** appears in the card footer (one per dependency — separate buttons for TA and viz app).
@@ -212,7 +222,7 @@ Each card offers a 💡 Best Practices button that opens a modal with tailored g
 
 ### K. Custom Dashboard Launch
 
-The CCC allows customers to customize the Launch button per product. Each product card's Launch button features a **split-button** design:
+The SCAN allows customers to customize the Launch button per product. Each product card's Launch button features a **split-button** design:
 
 - **Main button ("Launch")** — Opens the preferred dashboard (custom if set, otherwise the Cisco default).
 - **Caret button ("▾")** — Opens a dropdown menu with all available launch options.
@@ -237,7 +247,7 @@ A persistent **"Give Feedback"** tab is fixed to the right edge of the viewport.
 - **Feedback Type** selector (Feature Request, Bug Report, Improvement, General)
 - **Star Rating** (1–5 stars)
 - **Title** and **Description** fields
-- Submissions are stored in Splunk's **summary index** using `| makeresults | collect` with sourcetype `ccc:feedback`, enabling the team to search and analyze feedback directly within Splunk.
+- Submissions are stored in Splunk's **summary index** using `| makeresults | collect` with sourcetype `scan:feedback`, enabling the team to search and analyze feedback directly within Splunk.
 
 ---
 
@@ -299,7 +309,7 @@ The `.conf` format means products.conf is **layerable** — customers or admins 
 
 | Component             | Responsibility                                             |
 |-----------------------|------------------------------------------------------------|
-| `CCCProductsPage`     | Main orchestrator — state management, data loading, filtering, rendering |
+| `SCANProductsPage`     | Main orchestrator — state management, data loading, filtering, rendering |
 | `ProductCard`         | Individual card — icon, name, badges, dependencies, footer buttons |
 | `IntelligenceBadges`  | Real-time status badges (TA, viz app, data flow, legacy)   |
 | `UniversalFinderBar`  | Keyword search with result counter and suggestions         |
@@ -323,7 +333,7 @@ The `.conf` format means products.conf is **layerable** — customers or admins 
 
 ### Separation of Concerns
 
-The CCC stores only one customer-editable configuration — the custom dashboard path — in `local/products.conf`. All other data is read-only or browser-local:
+The SCAN stores only one customer-editable configuration — the custom dashboard path — in `local/products.conf`. All other data is read-only or browser-local:
 
 - Product metadata → `products.conf` (read from `default/`, layered with `local/`)
 - Custom dashboard → `local/products.conf` (written via Splunk REST, survives upgrades)
@@ -336,26 +346,64 @@ The CCC stores only one customer-editable configuration — the custom dashboard
 
 ## 5. UI/UX Design (IS4S-Inspired)
 
-The interface follows the design language of the **Insights Suite for Splunk (IS4S)** — clean white background with section-based visual hierarchy.
+The interface follows the design language of the **Insights Suite for Splunk (IS4S)** — clean white background with section-based visual hierarchy and a configurable card appearance system.
 
 ### Design Principles
 
-- **IS4S green color scheme** — Primary accent `#1a7f3d` (dark mode: `#66bb6a`/`#2e9e56`). Green buttons, links, and accents throughout.
+- **IS4S-inspired card design** — 3D box shadows, gradient bottom borders color-coded by add-on family, and configurable card appearance.
 - **Typography** — `'Splunk Platform Sans', 'Proxima Nova', 'Helvetica Neue', Helvetica, Arial, sans-serif`.
 - **White page background** — Sections and cards provide hierarchy, not the page background.
-- **Collapsible section panels** — Clean toggle with uniform styling. No colored accent borders — panels use a clean, minimal design.
-- **Uniform card styling** — Cards have a subtle 2px top accent stripe using the border color. No colored bottom borders — all cards share a consistent, clean look.
-- **Subtle card lift on hover** — Light shadow elevation.
+- **Collapsible section panels** — Clean toggle with uniform styling.
+- **Configurable card appearance** — Per-product control via `products.conf`:
+  - `card_banner` — Diagonal translucent watermark (e.g., "Powered by Cisco Security Cloud")
+  - `card_banner_color` — Named presets (blue, green, gold, red, purple, teal, cisco) or hex
+  - `card_banner_size` — small (11px, default), medium (13px), large (16px)
+  - `card_banner_opacity` — Float 0.0–1.0 (default `0.12` — subtle, readable watermark)
+  - `card_accent` — Bold 4px left-border stripe. **All 57 products** now have accent colors assigned by family (Cisco blue, blue, green, teal, purple, amber, gray for deprecated)
+  - `card_bg_color` — Named presets (ice, mint, lavender, rose, cream, smoke, sky, pearl) or hex. Set per add-on family (security → ice, catalyst → mint, dc-networking → sky, etc.)
+  - `is_new` — Orange gradient "NEW!" corner ribbon
+- **Gradient bottom border** — IS4S-inspired 3px gradient bar at card bottom, color-coded: cisco blue (firewalls, security), security green (networking), neutral gray (other).
+- **3D card shadows** — Multi-layer box-shadow for depth effect on hover.
 - **Compact icon buttons** — Emoji-based icons with full-text tooltips to maximize footer space and maintain uniform card heights.
 - **SVG badge icons** — ITSI, SOAR, Enterprise, and Cloud badges use custom SVG icons from a unified design system (41×40px, orange-pink gradient). Dark mode applies a CSS `filter: invert(0.85) hue-rotate(180deg)`.
 - **Split-button Launch** — Green "Launch" button with a dropdown caret for dashboard selection (Cisco default + custom).
 - **Fluid responsive grid** — `grid-template-columns: repeat(auto-fill, minmax(420px, 1fr))` auto-flows from 1 to 3+ columns based on viewport width (max 1500px).
-- **Dark/light mode support** — Full CSS variable system with 30+ dark-mode overrides. Theme detection uses three signals:
+- **Utility Strip** — A slim rounded toolbar bar between the header and search bar, containing:
+  - Platform pill with icon and full label ("Splunk Enterprise" / "Splunk Cloud")
+  - Version pill (e.g., "v1.0.1")
+  - Update pill (orange gradient, animated pulse when an app update is available)
+  - Theme toggle pill with label ("☀️ Light" / "🌙 Dark" / "🔄 Auto") — click to cycle
+- **Cisco hero logo** — Clean SVG bridge mark displayed alone in the top-right header area, separated from functional controls for a professional, uncluttered look.
+
+### Theme System
+
+- **Three-state theme toggle** — ☀️ Light → 🌙 Dark → 🔄 Auto (system). Toggle cycles through states with a compact button in the header.
+- **30+ CSS variable overrides** — Full dark-mode support for cards, tooltips, badges, modals, and all UI elements.
+- **Theme detection** uses three signals:
   1. DOM `data-theme` attributes on ancestor elements
   2. Body CSS classes (`.dark`, `.theme-dark`)
   3. Splunk REST API (`/servicesNS/-/-/data/user-prefs/general`) for async theme preference
-  - Defaults to light mode; no `prefers-color-scheme` (avoids OS dark-mode override when Splunk is set to light).
-  - Dark mode class: `:root.dce-dark` applied via `MutationObserver` for dynamic switching.
+- Defaults to light mode; no `prefers-color-scheme` (avoids OS dark-mode override when Splunk is set to light).
+- Theme preference stored in `localStorage` (`scan_theme_preference`).
+- Dark mode class: `:root.dce-dark` applied via `MutationObserver` for dynamic switching.
+
+### Saved Searches & Reports Menu
+
+The app ships with **11 pre-built saved searches** accessible from the navigation Reports menu:
+
+| Saved Search | Purpose |
+|---|---|
+| SCAN - Ecosystem Summary | Overview of catalog by category, status, and add-on family |
+| SCAN - Product Catalog - Full Dump | Complete product catalog dump |
+| SCAN - Product Catalog - By Category | Products grouped by category |
+| SCAN - Product Catalog - By Add-on Family | Products grouped by add-on family |
+| SCAN - Sourcetype Coverage | All monitored sourcetypes and their product mappings |
+| SCAN - SOAR Connector Inventory | All SOAR connector mappings |
+| SCAN - Legacy App Inventory | All legacy app mappings for debt detection |
+| SCAN - Data Quality - Missing Fields Audit | Products with missing or incomplete fields |
+| SCAN - Products with Prerequisites | Products that require companion apps |
+| SCAN - Installed Apps vs Catalog | Cross-reference installed apps against catalog |
+| SCAN - Gap Analysis - CSV vs Catalog | Gap analysis between reference CSV and catalog |
 
 ---
 
@@ -365,13 +413,13 @@ The interface follows the design language of the **Insights Suite for Splunk (IS
 
 2. **Cross-Portfolio Visibility:** All four Cisco domains (Security, Observability, Networking, Collaboration) are represented in a single catalog. A customer with "Networking" data but no "Security" products sees available Security cards, providing a natural cross-sell path.
 
-3. **Reduced Support (TAC) Burden:** By combining version intelligence with one-click upgrade buttons, the CCC ensures customers are always on the latest validated version. Data validation badges eliminate "empty dashboard" support tickets by immediately surfacing whether the issue is the TA (not installed), the data (not flowing), or a legacy conflict.
+3. **Reduced Support (TAC) Burden:** By combining version intelligence with one-click upgrade buttons, the SCAN ensures customers are always on the latest validated version. Data validation badges eliminate "empty dashboard" support tickets by immediately surfacing whether the issue is the TA (not installed), the data (not flowing), or a legacy conflict.
 
-4. **Unified Engineer Experience:** Network, security, and platform engineers can use CCC as their single launch point to all Cisco-related dashboards. Instead of navigating Splunk's app menu to find the right app, they start at CCC and click 🚀 Launch. The **custom dashboard feature** allows each team to configure their preferred dashboard per product.
+4. **Unified Engineer Experience:** Network, security, and platform engineers can use SCAN as their single launch point to all Cisco-related dashboards. Instead of navigating Splunk's app menu to find the right app, they start at SCAN and click 🚀 Launch. The **custom dashboard feature** allows each team to configure their preferred dashboard per product.
 
 5. **Feedback Loop:** The built-in feedback mechanism stores user input directly in Splunk's summary index, enabling the team to query, analyze, and trend feedback without any external tooling.
 
-6. **Customer Personalization:** The custom dashboard launch feature lets customers tailor CCC to their environment. Security teams can point to their custom threat dashboards, network teams to their custom topology views — all without modifying app code.
+6. **Customer Personalization:** The custom dashboard launch feature lets customers tailor SCAN to their environment. Security teams can point to their custom threat dashboards, network teams to their custom topology views — all without modifying app code.
 
 ---
 
@@ -466,17 +514,36 @@ The interface follows the design language of the **Insights Suite for Splunk (IS
 
 ---
 
-## 8. Roadmap (Planned)
+## 8. Roadmap
+
+### Completed
 
 | Item | Description | Status |
 |------|-------------|--------|
-| Real product icons | Replace remaining emoji icons with official Cisco product SVGs/PNGs | In Progress (ITSI, SOAR, Enterprise, Cloud done) |
+| Dashboard deep-links | Direct links to specific dashboards within installed apps | ✅ Done — Custom Dashboard Launch (split-button) |
+| Dark/Light theme toggle | Three-state theme toggle (Light → Dark → Auto) in header | ✅ Done |
+| Card appearance system | Configurable banner, accent, bg_color, opacity, is_new per product | ✅ Done |
+| Optimised data validation | Single SPL search validates 321 sourcetypes (was 52 individual searches) | ✅ Done |
+| Secure Networking GTM filter | Cross-cutting 🔐 Secure Networking pill (31 products tagged) | ✅ Done |
+| Saved searches & Reports menu | 11 pre-built saved searches in the nav Reports menu | ✅ Done |
+| IS4S card design | 3D shadows, gradient bottom borders, hero logo, compact header | ✅ Done |
+| Uniform card styling | Consistent card_accent, banner_size (small), opacity (0.12), bg_color across all 57 products | ✅ Done |
+| Utility strip header | Platform/version/theme controls moved to dedicated toolbar below header | ✅ Done |
+| Deprecated card banners | Gray accent + red "Deprecated" watermark on all 10 deprecated products | ✅ Done |
+| Rename to SCAN | Renamed from "Cisco Control Center" to "Splunk Cisco App Navigator" everywhere | ✅ Done |
+| SVG badge icons | ITSI, SOAR, Enterprise, and Cloud badges use custom SVG icons | ✅ Done |
+
+### Planned
+
+| Item | Description | Status |
+|------|-------------|--------|
+| Real product icons | Replace remaining emoji icons with official Cisco product SVGs/PNGs | In Progress |
 | Splunkbase version sync | Query Splunkbase API for latest published version numbers | Planned |
 | Onboarding wizard | Step-by-step setup flow for first-time users per product | Planned |
 | Multiple custom dashboards | Allow multiple custom dashboards per product (comma-separated or indexed fields) | Planned |
 | REST API expansion | Custom REST endpoints for external integrations | Planned |
 | RBAC-aware cards | Tailor card visibility based on Splunk user roles | Planned |
-| Dashboard deep-links | ~~Direct links to specific dashboards within installed apps~~ | ✅ Done (Custom Dashboard Launch) |
+| Splunkbase certification | AppInspect compliance & Splunkbase publishing | Planned |
 
 ---
 

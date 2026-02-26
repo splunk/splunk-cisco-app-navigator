@@ -1,8 +1,8 @@
 # products.conf.spec
 #
-# Cisco Control Center — Product Catalog Configuration
+# Splunk Cisco App Navigator — Product Catalog Configuration
 #
-# Each stanza defines a product card in the CCC Products page.
+# Each stanza defines a product card in the SCAN Products page.
 # Stanza name = product_id (e.g. [cisco_asa])
 #
 
@@ -55,8 +55,10 @@ addon_troubleshoot_url = <string>
 * Links to diagnostic steps, common issues, and resolution procedures.
 
 addon_install_url = <string>
-* Relative Splunk manager URL to install the required add-on from inside Splunk.
-* Example: /manager/cisco-control-center-app/appsremote?order=relevance&query="Cisco+Security+Cloud"
+* Relative Splunk manager URL to install the required add-on from inside Splunk
+* via Browse More Apps. Example: /manager/cisco-control-center-app/appsremote?order=relevance&query="Cisco+Security+Cloud"
+* When empty, the UI falls back to addon_splunkbase_url and opens Splunkbase directly.
+* Leave empty for archived apps or apps not available in Browse More Apps.
 
 app_viz = <string>
 * Optional. The Splunk app_id of the visualization / dashboard app (e.g. "cisco-catalyst-app").
@@ -77,6 +79,7 @@ app_viz_troubleshoot_url = <string>
 
 app_viz_install_url = <string>
 * Relative Splunk manager URL to install the visualization app from inside Splunk.
+* When empty, the UI falls back to app_viz_splunkbase_url and opens Splunkbase directly.
 
 app_viz_2 = <string>
 * Optional. A second visualization / dashboard app (e.g. an ITSI content pack).
@@ -223,6 +226,64 @@ itsi_content_pack_label = <string>
 
 itsi_content_pack_docs_url = <string>
 * Documentation URL for the ITSI Content Pack.
+
+card_banner = <string>
+* Optional. Translucent text overlaid on the product card background.
+* Used to indicate which platform powers this product.
+* Examples: "Powered by Cisco Security Cloud", "Powered by Cisco Catalyst".
+
+card_banner_color = <string>
+* Named preset or hex colour for the card banner text.
+*   Named presets: blue, green, gold, red, purple, teal, cisco (Cisco blue #049fd9).
+*   Hex example: #049fd9
+* When empty, the default translucent grey is used.
+
+card_banner_size = small | medium | large
+* Controls the font-size of the diagonal banner text.
+*   small  — 11px (subtle watermark)
+*   medium — 13px (default)
+*   large  — 16px (prominent)
+* Default: medium.
+
+card_banner_opacity = <float>
+* Opacity for the banner text, between 0.0 (invisible) and 1.0 (fully opaque).
+* When set, overrides the default translucent value (approx 0.055).
+* Useful for making some cards' banners more or less prominent.
+* Examples: 0.08, 0.15, 0.25
+* Default: (empty) — uses the CSS default.
+
+card_accent = <string>
+* Hex colour for a bold left-border accent stripe on the card.
+* Draws the eye to highlighted products. Examples: #049fd9, #6abf4b.
+* When empty, no accent stripe is shown.
+
+card_bg_color = <string>
+* Background colour or shade name for the product card.
+*   Named shades: ice, mint, lavender, rose, cream, smoke, sky, pearl.
+*   Hex example: #f0f8ff
+* Overrides the default card background (white in light mode).
+* Pairs well with card_accent and card_banner_color for visual grouping.
+* Default: (empty) — uses the theme default.
+
+is_new = true | false
+* When true, a bright "NEW!" corner ribbon is shown on the card.
+* Use this to highlight recently added or released products.
+* Default: false.
+
+secure_networking_gtm = true | false
+* When true, this product appears in the "Secure Networking" filter pill.
+* Driven by the Cisco Secure Networking GTM strategy.
+* Reference CSV: docs/Secure_Networking_gtm.csv
+* Default: false.
+
+support_level = cisco_supported | splunk_supported | developer_supported | community_supported | not_supported
+* Support tier for the add-on, shown as a badge in the detail modal.
+*   cisco_supported    — Officially developed and supported by Cisco.
+*   splunk_supported   — Developed or supported by Splunk / Splunkbase.
+*   developer_supported — Developed by a third-party developer on Splunkbase.
+*   community_supported — Community-maintained; no formal support agreement.
+*   not_supported       — Archived, deprecated, or no longer maintained.
+* Default: (empty). When empty, no support badge is shown.
 
 sort_order = <integer>
 * Numeric sort weight. Lower values appear first. Default 100.

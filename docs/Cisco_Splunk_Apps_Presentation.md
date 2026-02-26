@@ -14,7 +14,7 @@ February 19, 2026
 1. **The Current State** — The Systemic Mess
 2. **The Vision** — The Two Super Apps Model
 3. **Technical Innovation** — The Dynamic Configuration Engine (DCE)
-4. **The Cisco Control Center (CCC)** — The Customer-Facing Control Plane
+4. **The Splunk Cisco App Navigator (SCAN)** — The Customer-Facing Control Plane
 5. **Strategic Alignment & Data Fabric**
 6. **Tactical Roadmap** (The 3/6/12 Month Plan)
 7. **Conclusion & Next Steps**
@@ -152,9 +152,9 @@ A customer searching Splunkbase for Cisco Firewall visibility today encounters *
 
 ---
 
-## Slide 4: The CCC Product Catalog — By the Numbers
+## Slide 4: The SCAN Product Catalog — By the Numbers
 
-The **Cisco Control Center (CCC)** provides a single "Glass Pane" that catalogs every Cisco product, maps it to the correct add-on, and actively audits the customer's Splunk environment.
+The **Splunk Cisco App Navigator (SCAN)** provides a single "Glass Pane" that catalogs every Cisco product, maps it to the correct add-on, and actively audits the customer's Splunk environment.
 
 ### Product Catalog Overview
 
@@ -171,12 +171,14 @@ The **Cisco Control Center (CCC)** provides a single "Glass Pane" that catalogs 
 
 | Intelligence Layer | Coverage | Detail |
 |---|:---:|---|
-| **Sourcetype validation** (MTTI) | 52 of 57 (91%) | 321 sourcetypes monitored for data flow |
+| **Sourcetype validation** (MTTI) | 52 of 57 (91%) | 321 sourcetypes validated via single optimised SPL search |
 | **Search keywords** | 57 of 57 (100%) | 408 keywords for instant product discovery |
 | **Legacy debt detection** | 29 of 57 (51%) | 93 legacy apps auto-detected at runtime |
 | **Learn More links** | 57 of 57 (100%) | Every product links to official Cisco docs |
-| **Dashboard launch** | 26 products | One-click launch to the right dashboard |
+| **Dashboard launch** | 26 products | One-click launch to the right dashboard (split-button with custom option) |
 | **Product aliases** | 9 products | "Formerly: StealthWatch" → helps search |
+| **Secure Networking GTM** | 31 of 57 (54%) | Tagged for Cisco's Secure Networking go-to-market strategy |
+| **Card appearance** | 57 of 57 (100%) | Configurable banner, accent, bg_color per add-on family |
 
 ### Cross-Platform Integration
 
@@ -187,6 +189,20 @@ The **Cisco Control Center (CCC)** provides a single "Glass Pane" that catalogs 
 | **Custom Alert Actions** | 3 | Companion alert action add-ons on Splunkbase |
 | **Community TA detection** | 5 | Warns when a 3rd-party TA shadows the official one |
 | **Prerequisite app tracking** | 13 | Companion apps auto-detected (e.g., Splunk App for Stream) |
+| **Secure Networking GTM** | 31 | Cross-cutting filter pill for GTM strategy alignment |
+
+### Additional Capabilities (Since v1.0.0)
+
+| Feature | Description |
+|---|---|
+| **Optimised data validation** | Single `\| tstats` search validates all 321 sourcetypes in one sub-second query (was 52 individual searches) |
+| **Dark/Light/Auto theme** | Three-state toggle (☀️→🌙→🔄) in compact header with 30+ CSS variable overrides |
+| **IS4S-inspired card design** | 3D shadows, gradient bottom borders, configurable card appearance (banner, accent, bg_color, opacity, is_new) |
+| **Secure Networking GTM pill** | Teal-green cross-cutting filter for Cisco's Secure Networking go-to-market products |
+| **11 saved searches** | Pre-built reports (ecosystem summary, sourcetype coverage, legacy inventory, gap analysis) in nav Reports menu |
+| **Utility strip** | Slim toolbar below header with platform label pill, version pill, theme toggle pill (☀️ Light / 🌙 Dark / 🔄 Auto). Cisco logo stands alone in top-right |
+| **Uniform card appearance** | All 57 products have card_accent (color-coded by family), opacity 0.12, banner_size small, deprecated cards have red "Deprecated" watermark |
+| **Custom dashboard launch** | Split-button with per-product custom dashboard (persists in `local/products.conf` — survives upgrades) |
 
 ---
 
@@ -201,9 +217,9 @@ The **Cisco Control Center (CCC)** provides a single "Glass Pane" that catalogs 
 | **Default deny policy** | Prevents lookup replication bloat and indexer crashes |
 | **Platform awareness** | Automatic detection of Splunk Cloud vs. On-Premise |
 
-### How CCC Complements the DCE
+### How SCAN Complements the DCE
 
-| CCC Capability | DCE Benefit |
+| SCAN Capability | DCE Benefit |
 |---|---|
 | 57 products cataloged with correct add-on mappings | Customers know *what* to install; DCE handles *how* |
 | 321 sourcetypes monitored | Validates the DCE is delivering data correctly |
@@ -226,7 +242,7 @@ The **Cisco Control Center (CCC)** provides a single "Glass Pane" that catalogs 
 | Legacy apps customers may install by mistake | **72+** |
 | Worst case: Firewall alone | **13 wrong choices** |
 
-### AFTER (Unified Super App Strategy + CCC)
+### AFTER (Unified Super App Strategy + SCAN)
 
 | Metric | Value |
 |--------|------:|
@@ -276,7 +292,7 @@ A customer with Cisco ASA/FTD firewalls searching Splunkbase today sees:
 12. ~~Cisco Security Suite~~ — community
 13. ~~Cisco Suite for Splunk~~ — community
 
-**→ The CCC shows one card: "Cisco Secure Firewall" → Install: Cisco Security Cloud. Done.**
+**→ The SCAN shows one card: "Cisco Secure Firewall" → Install: Cisco Security Cloud. Done.**
 
 ---
 
@@ -295,14 +311,14 @@ A customer with Cisco ASA/FTD firewalls searching Splunkbase today sees:
 ### Phase 1: Stabilization (0–3 months)
 
 - Harden the top 20 TAs; establish credibility
-- CCC product catalog at 57 products (✅ done)
+- SCAN product catalog at 57 products (✅ done)
 - Legacy debt detection for 93 legacy apps (✅ done)
 - SOAR + ITSI + Alert Action mappings (✅ done)
 
 ### Phase 2: Systematization (3–6 months)
 
 - Ship the DCE SDK and align with OpenTelemetry (OTel)
-- Expand CCC to track real-time Splunkbase version data
+- Expand SCAN to track real-time Splunkbase version data
 - Onboarding wizard for first-time product setup
 
 ### Phase 3: Differentiation (6–12 months)
@@ -393,4 +409,4 @@ A customer with Cisco ASA/FTD firewalls searching Splunkbase today sees:
 
 ---
 
-*Data sourced from `cisco_apps.csv` (100 Splunkbase apps) and CCC `products.conf` (57 product catalog). All stats as of February 2026.*
+*Data sourced from `cisco_apps.csv` (100 Splunkbase apps) and SCAN `products.conf` (57 product catalog). All stats as of February 2026.*

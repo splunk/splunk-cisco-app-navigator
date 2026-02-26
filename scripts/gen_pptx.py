@@ -173,7 +173,7 @@ agenda_items = [
     "2.  Stakeholder Feedback — Top 10 Challenges & The Magic 6 Best Practices",
     "3.  Why We Can't Hire Our Way Out — Option 1: Traditional TA Development",
     "4.  Why Bundling Alone Isn't Enough — Option 2: The Super App",
-    "5.  Two Deliverables — Quick Win (CCC) + Strategic Play (Super App + DCE)",
+    "5.  Two Deliverables — Quick Win (SCAN) + Strategic Play (Super App + DCE)",
     "6.  The AI-Powered Path Forward — Lower Cost, Increase Speed & Quality",
     "7.  Next Steps & Roadmap",
 ]
@@ -556,9 +556,9 @@ add_text_box(slide, 0.8, 0.3, 11, 0.7,
              "6. Two Deliverables — Quick Win + Strategic Play",
              font_size=32, bold=True, color=CISCO_BLUE)
 
-# CCC box (left)
+# SCAN box (left)
 add_rounded_rect(slide, 0.5, 1.3, 5.8, 1.0, WARN_AMBER,
-                 'DELIVERABLE 1: Cisco Control Center (CCC)\n"The Front Door"  •  Ships in Weeks', 14, BLACK)
+                 'DELIVERABLE 1: Splunk Cisco App Navigator (SCAN)\n"The Front Door"  •  Ships in Weeks', 14, BLACK)
 
 ccc_items = [
     "✅  Catalog 57 products with correct add-on for each",
@@ -569,7 +569,7 @@ ccc_items = [
     "✅  Platform-aware guidance (Cloud vs Enterprise)",
     "",
     '\"The network is innocent until proven guilty —',
-    'CCC provides the proof in seconds.\"',
+    'SCAN provides the proof in seconds.\"',
     "Lightweight: no conf generation, no data collection",
     "Splunkbase in 2–3 weeks (AppInspect + packaging)",
 ]
@@ -596,7 +596,7 @@ add_bullet_list(slide, 7.0, 2.5, 5.5, 3.5, sa_items, font_size=11, color=DARK_TE
 
 # Comparison table
 compare_data = [
-    ["", "CCC (Quick Win)", "Super App (Strategic)"],
+    ["", "SCAN (Quick Win)", "Super App (Strategic)"],
     ["Purpose", "Guide to the right TA", "Replace legacy TAs entirely"],
     ["Ships", "2–3 weeks", "3–6 months (v1)"],
     ["Customer value", "What do I install?", "One app, activate what I need"],
@@ -611,7 +611,7 @@ add_table(slide, 1.5, 6.0, 10, compare_data, col_widths=[2.5, 3.5, 3.5],
 
 # Aspirin / Cure tagline — draw across the bottom
 add_text_box(slide, 0.5, 5.4, 12, 0.5,
-             'CCC is the aspirin.  The Super App is the cure.',
+             'SCAN is the aspirin.  The Super App is the cure.',
              font_size=20, bold=True, color=CISCO_BLUE, alignment=PP_ALIGN.CENTER)
 
 
@@ -676,7 +676,7 @@ for i, color in enumerate(ap_colors):
 options_data = [
     ["", "Option 1: Hire", "Option 2: Static", "Our Approach"],
     ["Architecture", "1 TA per product", "Bundled, static", "Dynamic Super App + DCE"],
-    ["Intelligence", "None", "None", "CCC + MTTI"],
+    ["Intelligence", "None", "None", "SCAN + MTTI"],
     ["AI authoring", "No", "No", "AI drafts, humans validate"],
     ["Cost", "$$$$$ (100+ eng-yrs)", "$$$ (6–8 eng-yrs)", "$ (<1 eng-yr)"],
     ["Speed", "3–4 months/TA", "2–3 months", "2–3 weeks"],
@@ -699,7 +699,7 @@ add_text_box(slide, 0.8, 0.3, 11, 0.7,
 # Immediate actions
 actions_data = [
     ["#", "Action", "Owner", "Timeline"],
-    ["1", "Ship CCC to Splunkbase — package, AppInspect, certify", "AK", "2–3 weeks"],
+    ["1", "Ship SCAN to Splunkbase — package, AppInspect, certify", "AK", "2–3 weeks"],
     ["2", "Expand Super App Master Library (next 5 products)", "AK + HCL", "0–3 months"],
     ["3", "Pilot AI-assisted TA authoring on 3 products", "AK + HCL", "0–3 months"],
     ["4", "⚠️ DECISION: Approve FDSE partnership (Rafal Piekarz) — dedicated AI-driven TA maintenance cycles", "Alan / Exec", "This quarter"],
@@ -720,7 +720,7 @@ add_text_box(slide, 0.5, 4.5, 3.4, 0.4, 'Phase 1: "Stop the Bleeding"',
 add_text_box(slide, 0.5, 4.9, 3.4, 0.3, '0–3 months  •  Immediate Visibility',
              font_size=10, color=RGBColor(0x55, 0x55, 0x55))
 phase1_items = [
-    "Ship CCC to Splunkbase",
+    "Ship SCAN to Splunkbase",
     "Expand Master Library to 12+",
     "Pilot AI authoring w/ FDSE",
     "Migrate top 10 legacy offenders",
@@ -751,7 +751,7 @@ phase3_items = [
     "Full CDF/MDL integration",
     "MCP-driven AI features",
     "200+ data sources covered",
-    'CCC + Super App = "One Cisco"',
+    'SCAN + Super App = "One Cisco"',
 ]
 add_bullet_list(slide, 8.9, 5.3, 3.8, 1.5, phase3_items, font_size=10, color=WHITE, spacing=Pt(3))
 
@@ -777,8 +777,8 @@ add_text_box(slide, 0.8, 0.3, 11, 0.7, "Summary",
 summary_data = [
     ["The Problem", "Our Answer"],
     ["110 apps, customers confused", "CCC: ships in weeks, shows the right answer"],
-    ["Blank dashboards, no validation", "CCC monitors 321 sourcetypes; Super App activates what has data"],
-    ["Legacy apps cause conflicts", "CCC detects 93 legacy; Super App replaces entirely"],
+    ["Blank dashboards, no validation", "SCAN monitors 321 sourcetypes; Super App activates what has data"],
+    ["Legacy apps cause conflicts", "SCAN detects 93 legacy; Super App replaces entirely"],
     ["TAs cost 3–4 months each", "AI authoring: 2–3 weeks per product"],
     ["Can't hire (400 = 133 eng-yrs)", "AI drafts, humans validate, Super App scales"],
     ["Static Super Apps have regression risk", "DCE: each product is an isolated mini-TA"],
@@ -801,7 +801,7 @@ shape.fill.fore_color.rgb = MED_GRAY
 shape.line.fill.background()
 
 add_rounded_rect(slide, 5.1, 5.4, 3.5, 1.2, WARN_AMBER,
-                 'QUICK WIN: CCC\n"The Front Door"\nShips in weeks', 13, BLACK)
+                 'QUICK WIN: SCAN\n"The Front Door"\nShips in weeks', 13, BLACK)
 
 shape2 = slide.shapes.add_shape(
     MSO_SHAPE.RIGHT_ARROW, Inches(8.7), Inches(5.7), Inches(0.6), Inches(0.4)
@@ -845,11 +845,11 @@ add_table(slide, 0.3, 1.1, 12.5, endorse_data, col_widths=[2.0, 3.5, 7.0],
           header_color=CISCO_BLUE, font_size=10)
 
 add_text_box(slide, 0.5, 5.8, 12, 0.5,
-             "Feedback unanimously supports the CCC + Dynamic Super App strategy.",
+             "Feedback unanimously supports the SCAN + Dynamic Super App strategy.",
              font_size=16, bold=True, color=SPLUNK_GREEN, alignment=PP_ALIGN.CENTER)
 
 add_text_box(slide, 0.5, 6.3, 12, 0.5,
-             'Strategy: CCC is the aspirin. The Super App is the cure.',
+             'Strategy: SCAN is the aspirin. The Super App is the cure.',
              font_size=22, bold=True, color=CISCO_BLUE, alignment=PP_ALIGN.CENTER)
 
 

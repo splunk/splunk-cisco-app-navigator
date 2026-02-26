@@ -1,4 +1,12 @@
 <?xml version="1.0"?>
-<view template="cisco-control-center-app:/templates/products.html" type="html">
-        <label>Home</label>
-</view>
+<dashboard version="1.1" hideEdit="true" hideExport="true" hideTitle="true"
+           stylesheet="products.css" script="products_bootstrap.js">
+    <label>Cisco Products</label>
+    <row>
+        <panel>
+            <html>
+                <div id="scan-root"></div>
+            </html>
+        </panel>
+    </row>
+</dashboard>

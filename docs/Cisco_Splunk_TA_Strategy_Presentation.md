@@ -15,7 +15,7 @@ February 2026 — 45-Minute Presentation
 2. **Stakeholder Feedback** — Top 10 Challenges & The Magic 6 Best Practices
 3. **Why We Can't Hire Our Way Out** — Option 1: Traditional TA Development
 4. **Why Bundling Alone Isn't Enough** — Option 2: The Super App (Cisco Security Cloud)
-5. **Two Deliverables** — Quick Win (CCC) + Strategic Play (Cisco Enterprise Networking Super App)
+5. **Two Deliverables** — Quick Win (SCAN) + Strategic Play (Cisco Enterprise Networking Super App)
 6. **The AI-Powered Path Forward** — Lower Cost, Increase Speed & Quality
 7. **Next Steps & Roadmap**
 
@@ -49,7 +49,7 @@ We audited **every** Cisco-related app and add-on on Splunkbase — 125 listings
 | 7 | **Developer-supported > Cisco + Splunk combined** | 39 developer-supported vs. 19 Cisco+Splunk-supported (2×) | Community volunteers carry more of Cisco's brand than Cisco does |
 | 8 | **Only 17% are Cisco+Splunk backed** | Cisco: 13, Splunk: 6, everyone else: 91 | For a $28B acquisition, we back fewer than 1 in 5 of our own integrations |
 
-> **The punchline:** 74% of Cisco's Splunkbase ecosystem is non-functional, unsupported, or flagged. Customers searching for "Cisco Firewall" encounter 13 results and have no way to tell which is the right one. **CCC is the aspirin. The Super App is the cure.**
+> **The punchline:** 74% of Cisco's Splunkbase ecosystem is non-functional, unsupported, or flagged. Customers searching for "Cisco Firewall" encounter 13 results and have no way to tell which is the right one. **SCAN is the aspirin. The Super App is the cure.**
 
 ### Splunkbase Audit: 110 Cisco Apps & Add-ons
 
@@ -336,7 +336,7 @@ We have **two solutions**, not one. They serve different purposes and different 
   ┌──────────────────────────────────┐    ┌──────────────────────────────────┐
   │  DELIVERABLE 1: Quick Win        │    │  DELIVERABLE 2: Strategic Play   │
   │                                  │    │                                  │
-  │  Cisco Control Center (CCC)      │    │  Cisco Enterprise Networking     │
+  │  Splunk Cisco App Navigator (SCAN)      │    │  Cisco Enterprise Networking     │
   │  "The Intelligence Layer"        │    │  Super App + DCE                 │
   │                                  │    │  "The Engineering Solution"      │
   │  • What should I install?        │    │  • Replace all legacy TAs        │
@@ -350,21 +350,31 @@ We have **two solutions**, not one. They serve different purposes and different 
                          The "One Cisco" Experience
 ```
 
-### Deliverable 1: Cisco Control Center (CCC) — "The Front Door" — Ship Now
+### Deliverable 1: Splunk Cisco App Navigator (SCAN) — "The Front Door" — Ship Now
 
 **What it does:** A Splunkbase app that serves as **the primary entry point** for all Cisco-Splunk customers. It does not replace TAs — it **guides customers to the right ones**, validates that data is flowing, and provides **Proof of Innocence** when the network is blamed.
 
-> *The network is innocent until proven guilty — and CCC provides the proof in seconds.* When the network is blamed, CCC delivers immediate telemetry validation to reduce **Mean Time to Innocence (MTTI)**. If sourcetypes are flowing and parsed correctly, the network is proven innocent — not in hours of war-room finger-pointing, but in seconds of objective data. **MTTI is a uniquely Cisco value proposition** that no other vendor can deliver across this breadth of products.
+> *The network is innocent until proven guilty — and SCAN provides the proof in seconds.* When the network is blamed, SCAN delivers immediate telemetry validation to reduce **Mean Time to Innocence (MTTI)**. If sourcetypes are flowing and parsed correctly, the network is proven innocent — not in hours of war-room finger-pointing, but in seconds of objective data. **MTTI is a uniquely Cisco value proposition** that no other vendor can deliver across this breadth of products.
 
 | Capability | Status |
 |---|:---:|
 | Catalog 57 products with the correct add-on for each | ✅ Built |
 | Monitor 321 sourcetypes — prove data is flowing (MTTI) | ✅ Built |
+| Optimised single-search data validation (1 query, not 52) | ✅ Built |
 | Auto-detect 93 legacy apps and warn what to remove | ✅ Built |
 | Map SOAR connectors (10), ITSI packs (4), alert actions (3) | ✅ Built |
 | Detect community TAs that shadow official ones | ✅ Built |
-| One-click dashboard launch for 26 products | ✅ Built |
+| One-click dashboard launch for 26 products (split-button + custom) | ✅ Built |
 | Platform-aware guidance (Cloud vs. Enterprise) | ✅ Built |
+| Secure Networking GTM filter (31 products tagged) | ✅ Built |
+| IS4S-inspired card design (3D shadows, gradient borders, banners) | ✅ Built |
+| Dark/Light/Auto three-state theme toggle | ✅ Built |
+| 11 saved searches + Reports nav menu | ✅ Built |
+| Card appearance system (banner, accent, bg_color, opacity, is_new) | ✅ Built |
+| Configurable card bg_color by add-on family (ice/mint/sky/lavender/cream/pearl/smoke) | ✅ Built |
+| Uniform card_accent across all 57 products (7 color families) | ✅ Built |
+| Utility strip header (platform/version/theme separated from branding) | ✅ Built |
+| Deprecated card banners (gray accent + red "Deprecated" watermark) | ✅ Built |
 
 **Why it's a quick win:**
 - Already functional — built and tested
@@ -409,7 +419,7 @@ We have **two solutions**, not one. They serve different purposes and different 
 
 ### Two Deliverables, One Strategy
 
-| | CCC (Quick Win) | Super App (Strategic) |
+| | SCAN (Quick Win) | Super App (Strategic) |
 |---|:---:|:---:|
 | **Purpose** | Guide customers to the right TA | **Replace** legacy TAs entirely |
 | **Ships** | 2–3 weeks | 3–6 months (v1) |
@@ -421,15 +431,15 @@ We have **two solutions**, not one. They serve different purposes and different 
 | **Solves blank dashboards** | ✅ Detects missing data | ✅ Only shows dashboards for active products |
 | **Solves legacy debt** | ✅ Warns about legacy apps | ✅ Replaces them entirely |
 
-> **CCC is the aspirin. The Super App is the cure.**
+> **SCAN is the aspirin. The Super App is the cure.**
 
-### Visual: How CCC + Super App Complement Each Other
+### Visual: How SCAN + Super App Complement Each Other
 
 ```mermaid
 graph TB
-    subgraph "CCC + SUPER APP — Two Deliverables, One Strategy"
+    subgraph "SCAN + SUPER APP — Two Deliverables, One Strategy"
         direction TB
-        subgraph CCC["CCC — The Front Door"]
+        subgraph SCAN["SCAN — The Front Door"]
             C1["Catalog & Discovery"]
             C2["MTTI / Proof of Innocence"]
             C3["Legacy Debt Detection"]
@@ -447,9 +457,9 @@ graph TB
             S4["Tier-Aware Activation"]
         end
     end
-    CCC --> BOTH
+    SCAN --> BOTH
     SA --> BOTH
-    style CCC fill:#f9a825,stroke:#f57f17,color:#000
+    style SCAN fill:#f9a825,stroke:#f57f17,color:#000
     style SA fill:#2e7d32,stroke:#1b5e20,color:#fff
     style BOTH fill:#1565c0,stroke:#0d47a1,color:#fff
 ```
@@ -505,7 +515,7 @@ The two deliverables above define **what** we're building. This section is about
 │  OUTPUT: Gold-standard mini-TA → added to Super App Master      │
 │          Library → customer activates via DCE                    │
 │                                                                 │
-│  AK's POC (CCC) provides the intelligence layer on top:         │
+│  AK's POC (SCAN) provides the intelligence layer on top:         │
 │  catalog, health monitoring, legacy detection, SOAR/ITSI maps   │
 └─────────────────────────────────────────────────────────────────┘
 ```
@@ -523,7 +533,7 @@ xychart-beta
 | | Option 1: Hire | Option 2: Static Super App | **Our Approach** |
 |---|:---:|:---:|:---:|
 | **Architecture** | 1 TA per product | Bundled but static | **Dynamic Super App + DCE** |
-| **Intelligence** | None | None | **CCC catalog + MTTI** |
+| **Intelligence** | None | None | **SCAN catalog + MTTI** |
 | **AI-assisted authoring** | No | No | **Yes — AI drafts, humans validate** |
 | **Cost** | $$$$$ (100+ eng-yrs) | $$$ (6–8 eng-yrs) | **$ (<1 eng-yr to scale)** |
 | **Speed** | 3–4 months/TA | 2–3 months/product | **2–3 weeks/product** |
@@ -538,7 +548,7 @@ xychart-beta
 
 | # | Action | Owner | Timeline |
 |:-:|--------|-------|----------|
-| 1 | **Ship CCC to Splunkbase** — package, AppInspect, certify | AK | 2–3 weeks |
+| 1 | **Ship SCAN to Splunkbase** — package, AppInspect, certify | AK | 2–3 weeks |
 | 2 | Expand Super App Master Library (next 5 products) | AK + HCL | 0–3 months |
 | 3 | Pilot AI-assisted TA authoring on 3 products | AK + HCL | 0–3 months |
 | 4 | **⚠️ DECISION REQUIRED:** Approve FDSE partnership (Rafal Piekarz) for AI-driven TA maintenance — dedicated FDSE cycles this quarter | Alan / Exec | This quarter |
@@ -555,7 +565,7 @@ graph LR
         M["🔴 110 Apps on Splunkbase<br/>60% dead or dying · 47% unsupported<br/>50% community-built"]
     end
     subgraph "PHASE 1: Stop the Bleeding<br/>(0–3 months)"
-        C["🟡 CCC — The Front Door<br/>57 products cataloged<br/>321 sourcetypes monitored<br/>93 legacy apps detected<br/>Ships in weeks"]
+        C["🟡 SCAN — The Front Door<br/>57 products cataloged<br/>321 sourcetypes monitored<br/>93 legacy apps detected<br/>Ships in weeks"]
     end
     subgraph "PHASE 2: Scale the Portfolio<br/>(3–6 months)"
         S["🟢 Super App + DCE<br/>Dynamic activation<br/>Zero-footprint<br/>AI-authored mini-TAs<br/>Logically isolated"]
@@ -573,7 +583,7 @@ graph LR
 ```
 
 **Phase 1 — "Stop the Bleeding" (0–3 months)** — *Immediate Visibility*
-- Ship CCC ("The Front Door") to Splunkbase — immediate customer value
+- Ship SCAN ("The Front Door") to Splunkbase — immediate customer value
 - Harden Super App DCE; expand Master Library to 12+ products
 - Pilot AI-assisted authoring with FDSE (Rafal Piekarz); validate speed claims
 - Legacy debt reduction: migrate top 10 worst offenders
@@ -582,13 +592,13 @@ graph LR
 - Ship Cisco Enterprise Networking Super App v1 to Splunkbase
 - AI pipeline producing 5–10 new product mini-TAs per month
 - NetFlow/IPFIX integration hardened as foundational signal
-- CCC tracks real-time Splunkbase version data; HCL validation cadence established
+- SCAN tracks real-time Splunkbase version data; HCL validation cadence established
 
 **Phase 3 — "Own the Data Fabric" (6–12 months)** — *Strategic Differentiation*
 - Full CDF/MDL contract integration — DCE mini-TAs become canonical Data Products
 - MCP-driven AI features — Cisco telemetry is AI-ready for autonomous agents
 - 200+ data sources covered in the Super App
-- CCC + Super App = "One Cisco" platform experience; GTM fully enabled
+- SCAN + Super App = "One Cisco" platform experience; GTM fully enabled
 
 ---
 
@@ -597,8 +607,8 @@ graph LR
 | The Problem | Our Answer |
 |---|---|
 | 110 apps, customers confused | **CCC: ships in weeks, shows the right answer for every product** |
-| Blank dashboards, no data validation | **CCC monitors 321 sourcetypes; Super App only activates what has data** |
-| Legacy apps cause conflicts | **CCC auto-detects 93 legacy apps; Super App replaces them entirely** |
+| Blank dashboards, no data validation | **SCAN monitors 321 sourcetypes; Super App only activates what has data** |
+| Legacy apps cause conflicts | **SCAN auto-detects 93 legacy apps; Super App replaces them entirely** |
 | TAs are expensive to build (3–4 mo each) | **AI-assisted authoring: 2–3 weeks per product** |
 | Can't hire our way out (400 = 133 eng-years) | **AI drafts, humans validate, Super App scales** |
 | Static Super Apps still have regression risk | **DCE architecture: each product is an isolated mini-TA** |
@@ -606,7 +616,7 @@ graph LR
 ```
             TODAY                    QUICK WIN               STRATEGIC
          ┌──────────┐           ┌──────────────┐        ┌──────────────┐
-         │ 110 apps │   ───►    │     CCC      │  ───►  │  Super App   │
+         │ 110 apps │   ───►    │     SCAN      │  ───►  │  Super App   │
          │ 60% dead │           │  "Use this"  │        │  "Just this" │
          │ No guide │           │  Ships: wks  │        │  Ships: 3-6m │
          └──────────┘           └──────────────┘        └──────────────┘
@@ -617,7 +627,7 @@ graph LR
 
 ```mermaid
 graph TB
-    A["110 Apps on Splunkbase"] --> B["57 Products Cataloged in CCC"]
+    A["110 Apps on Splunkbase"] --> B["57 Products Cataloged in SCAN"]
     B --> C["3 Super Add-on Families"]
     C --> D["1 Super App with DCE<br/>Activate Only What You Need"]
     D --> E["🎯 One Cisco Platform Experience"]
@@ -696,9 +706,9 @@ graph TB
 - **Slide 3 (Stakeholder Feedback):** Two-column layout — Top 10 left, Magic 6 right
 - **Slide 4 (Option 1):** Stacked domain diagram as visual; math table as supporting data
 - **Slide 5 (Option 2):** Before/After split; consolidation ratios as infographic
-- **Slide 6 (Two Deliverables):** Side-by-side layout — CCC "Quick Win" left, Super App "Strategic" right; "Aspirin vs Cure" framing
+- **Slide 6 (Two Deliverables):** Side-by-side layout — SCAN "Quick Win" left, Super App "Strategic" right; "Aspirin vs Cure" framing
 - **Slide 7 (AI Path):** Pipeline diagram; Traditional vs AI comparison table
-- **Slide 8 (Next Steps):** Timeline graphic with Phase 1/2/3 swimlanes; emphasize CCC ships first
+- **Slide 8 (Next Steps):** Timeline graphic with Phase 1/2/3 swimlanes; emphasize SCAN ships first
 - **Summary:** "Today → Quick Win → Strategic" three-panel flow with the ASCII visual
 - **Color scheme:** Cisco blue (#049fd9) + Splunk green (#65a637) accent; red for legacy/debt; gold for quick win
 - **Fonts:** Cisco Sans or Inter; large numbers in bold for callout stats
@@ -723,8 +733,8 @@ graph TB
 | **Steven Moore** | Cisco Solutions Architect | "The network is a black box — infrastructure is first point of blame"; coined MTTI concept |
 | **Kunal Mukerjee** | SVP Engineering | "TA Flywheel" vision; Master Library + DCE = CDF Data Products; Activation Telemetry for ROI proof |
 
-> **20+ SMEs consulted** — feedback unanimously supports the CCC + Dynamic Super App strategy.
+> **20+ SMEs consulted** — feedback unanimously supports the SCAN + Dynamic Super App strategy.
 
 ---
 
-*Data sourced from `cisco_apps.csv` (125 Splunkbase listings; 110 apps & add-ons after excluding 13 SOAR connectors and 2 prerequisites) and CCC `products.conf` (57 products). Strategic audit synthesized from 20+ SME consultations. All statistics as of February 2026.*
+*Data sourced from `cisco_apps.csv` (125 Splunkbase listings; 110 apps & add-ons after excluding 13 SOAR connectors and 2 prerequisites) and SCAN `products.conf` (57 products). Strategic audit synthesized from 20+ SME consultations. All statistics as of February 2026.*

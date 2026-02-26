@@ -12,7 +12,7 @@ DB_PATH = os.path.expanduser(
 
 SESSION_ENTRY = {
     "sessionId": "1414a323-9f62-4746-b35c-464fbc994304",
-    "title": "Creating a Splunk React UI App: Cisco Control Center",
+    "title": "Creating a Splunk React UI App: Splunk Cisco App Navigator",
     "lastMessageDate": 1771857598750,
     "timing": {
         "created": 1771639304888,

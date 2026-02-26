@@ -2,8 +2,8 @@
 /**
  * AUTO-GENERATED from products.conf — DO NOT EDIT BY HAND.
  * Regenerate:  node bin/generate-catalog.js
- * Generated:   2026-02-23T22:39:05.201Z
- * Products:    56
+ * Generated:   2026-02-26T03:26:02.417Z
+ * Products:    54
  */
 
 export const PRODUCT_CATALOG = [
@@ -125,25 +125,26 @@ export const PRODUCT_CATALOG = [
     ],
     "sourcetypes": [
       "cisco:asa",
+      "cisco:esa:textmail",
+      "cisco:estreamer:clean",
+      "cisco:estreamer:data",
+      "cisco:estreamer:log",
+      "cisco:estreamer:status",
+      "cisco:firepower:syslog",
+      "cisco:ftd",
       "cisco:ftd:syslog",
+      "cisco:fwsm",
+      "cisco:ise:syslog",
+      "cisco:pix",
       "cisco:sfw:estreamer",
       "cisco:sourcefire",
       "cisco:sourcefire:appliance:syslog",
       "cisco:sourcefire:defencecenter:syslog",
+      "cisco:wsa:squid",
       "estreamer",
-      "snort",
-      "sourcefire",
-      "cisco:estreamer:data",
-      "cisco:estreamer:log",
-      "cisco:firepower:syslog",
-      "cisco:ftd",
-      "cisco:fwsm",
-      "cisco:pix"
+      "snort"
     ],
-    "dashboards": [
-      "secure_firewall_dashboard",
-      "asa_dashboard"
-    ],
+    "dashboard": "secure_firewall_dashboard",
     "custom_dashboard": "",
     "icon_emoji": "fire",
     "aliases": [
@@ -175,6 +176,15 @@ export const PRODUCT_CATALOG = [
       }
     ],
     "itsi_content_pack": null,
+    "card_banner": "Powered by Cisco Security Cloud",
+    "card_banner_color": "cisco",
+    "card_banner_size": "small",
+    "card_banner_opacity": "0.12",
+    "card_accent": "#049fd9",
+    "card_bg_color": "ice",
+    "is_new": false,
+    "secure_networking_gtm": true,
+    "support_level": "cisco_supported",
     "sort_order": 10
   },
   {
@@ -233,9 +243,7 @@ export const PRODUCT_CATALOG = [
       "cisco:stealthwatch:alert",
       "stealthwatch:fc:flow"
     ],
-    "dashboards": [
-      "sna_dashboard"
-    ],
+    "dashboard": "sna_dashboard",
     "custom_dashboard": "",
     "icon_emoji": "chart",
     "aliases": [
@@ -254,6 +262,15 @@ export const PRODUCT_CATALOG = [
     "alert_actions": [],
     "soar_connectors": [],
     "itsi_content_pack": null,
+    "card_banner": "Powered by Cisco Security Cloud",
+    "card_banner_color": "cisco",
+    "card_banner_size": "small",
+    "card_banner_opacity": "0.12",
+    "card_accent": "#049fd9",
+    "card_bg_color": "ice",
+    "is_new": false,
+    "secure_networking_gtm": true,
+    "support_level": "cisco_supported",
     "sort_order": 11
   },
   {
@@ -306,9 +323,7 @@ export const PRODUCT_CATALOG = [
       "cisco:multicloud:defense:valtix_internal",
       "cisco:multicloud:defense:waf"
     ],
-    "dashboards": [
-      "mcd_dashboard"
-    ],
+    "dashboard": "mcd_dashboard",
     "custom_dashboard": "",
     "icon_emoji": "cloud",
     "aliases": [],
@@ -325,6 +340,15 @@ export const PRODUCT_CATALOG = [
     "alert_actions": [],
     "soar_connectors": [],
     "itsi_content_pack": null,
+    "card_banner": "Powered by Cisco Security Cloud",
+    "card_banner_color": "cisco",
+    "card_banner_size": "small",
+    "card_banner_opacity": "0.12",
+    "card_accent": "#049fd9",
+    "card_bg_color": "ice",
+    "is_new": false,
+    "secure_networking_gtm": true,
+    "support_level": "cisco_supported",
     "sort_order": 12
   },
   {
@@ -377,22 +401,20 @@ export const PRODUCT_CATALOG = [
     "prereq_apps": [],
     "community_apps": [],
     "sourcetypes": [
-      "cisco:nvm:eve:v2",
-      "cisco:nvm:flowdata:v2",
-      "cisco:nvm:ifdata:v2",
-      "cisco:nvm:osquery:v2",
-      "cisco:nvm:processinfodata:v2",
-      "cisco:nvm:sysdata:v2",
       "cisco:nvm:eve",
+      "cisco:nvm:eve:v2",
       "cisco:nvm:flowdata",
+      "cisco:nvm:flowdata:v2",
       "cisco:nvm:ifdata",
+      "cisco:nvm:ifdata:v2",
       "cisco:nvm:osquery",
+      "cisco:nvm:osquery:v2",
       "cisco:nvm:processinfodata",
-      "cisco:nvm:sysdata"
+      "cisco:nvm:processinfodata:v2",
+      "cisco:nvm:sysdata",
+      "cisco:nvm:sysdata:v2"
     ],
-    "dashboards": [
-      "nvm_dashboard"
-    ],
+    "dashboard": "nvm_dashboard",
     "custom_dashboard": "",
     "icon_emoji": "satellite",
     "aliases": [],
@@ -407,6 +429,15 @@ export const PRODUCT_CATALOG = [
     "alert_actions": [],
     "soar_connectors": [],
     "itsi_content_pack": null,
+    "card_banner": "Powered by Cisco Security Cloud",
+    "card_banner_color": "cisco",
+    "card_banner_size": "small",
+    "card_banner_opacity": "0.12",
+    "card_accent": "#049fd9",
+    "card_bg_color": "ice",
+    "is_new": false,
+    "secure_networking_gtm": true,
+    "support_level": "cisco_supported",
     "sort_order": 13
   },
   {
@@ -460,15 +491,17 @@ export const PRODUCT_CATALOG = [
       }
     ],
     "sourcetypes": [
+      "cisco:duo:account",
+      "cisco:duo:activity",
+      "cisco:duo:administrator",
       "cisco:duo:authentication",
       "cisco:duo:authentication_v2",
-      "cisco:duo:admin",
-      "cisco:duo:telephony",
-      "cisco:duo:trustmonitor"
+      "cisco:duo:endpoint",
+      "cisco:duo:user",
+      "duo",
+      "duo:authentication"
     ],
-    "dashboards": [
-      "duo_overview"
-    ],
+    "dashboard": "duo_overview",
     "custom_dashboard": "",
     "icon_emoji": "lock",
     "aliases": [],
@@ -486,6 +519,15 @@ export const PRODUCT_CATALOG = [
     "alert_actions": [],
     "soar_connectors": [],
     "itsi_content_pack": null,
+    "card_banner": "Powered by Cisco Security Cloud",
+    "card_banner_color": "cisco",
+    "card_banner_size": "small",
+    "card_banner_opacity": "0.12",
+    "card_accent": "#049fd9",
+    "card_bg_color": "ice",
+    "is_new": false,
+    "secure_networking_gtm": true,
+    "support_level": "cisco_supported",
     "sort_order": 15
   },
   {
@@ -521,9 +563,7 @@ export const PRODUCT_CATALOG = [
     "sourcetypes": [
       "cisco:cii"
     ],
-    "dashboards": [
-      "cii_dashboard"
-    ],
+    "dashboard": "cii_dashboard",
     "custom_dashboard": "",
     "icon_emoji": "badge",
     "aliases": [],
@@ -539,6 +579,15 @@ export const PRODUCT_CATALOG = [
     "alert_actions": [],
     "soar_connectors": [],
     "itsi_content_pack": null,
+    "card_banner": "Powered by Cisco Security Cloud",
+    "card_banner_color": "cisco",
+    "card_banner_size": "small",
+    "card_banner_opacity": "0.12",
+    "card_accent": "#049fd9",
+    "card_bg_color": "ice",
+    "is_new": false,
+    "secure_networking_gtm": true,
+    "support_level": "cisco_supported",
     "sort_order": 16
   },
   {
@@ -582,14 +631,9 @@ export const PRODUCT_CATALOG = [
       "cisco:cloud_security:ravpn",
       "cisco:cloud_security:ztna",
       "cisco:cloud_security:ztnaenrollment",
-      "cisco:cloud_security:ztnaflow",
-      "cisco:cloud_security:appdiscovery",
-      "cisco:cloud_security:cloudlock",
-      "cisco:cloud_security:investigated",
-      "cisco:cloud_security:ip",
-      "cisco:cloud_security:privateapps"
+      "cisco:cloud_security:ztnaflow"
     ],
-    "dashboards": [],
+    "dashboard": "",
     "custom_dashboard": "",
     "icon_emoji": "lock_globe",
     "aliases": [],
@@ -607,6 +651,15 @@ export const PRODUCT_CATALOG = [
     "alert_actions": [],
     "soar_connectors": [],
     "itsi_content_pack": null,
+    "card_banner": "Powered by Cisco Cloud Security",
+    "card_banner_color": "blue",
+    "card_banner_size": "small",
+    "card_banner_opacity": "0.12",
+    "card_accent": "#1976d2",
+    "card_bg_color": "sky",
+    "is_new": false,
+    "secure_networking_gtm": true,
+    "support_level": "cisco_supported",
     "sort_order": 17
   },
   {
@@ -660,12 +713,15 @@ export const PRODUCT_CATALOG = [
       }
     ],
     "sourcetypes": [
+      "cisco:amp:event",
       "cisco:se",
-      "cisco:amp:event"
+      "cisco:secureendpoint",
+      "cisco:secureendpoint:alerts",
+      "cisco:secureendpoint:audit",
+      "cisco:secureendpoint:threat",
+      "cisco:secureendpoint:vuln"
     ],
-    "dashboards": [
-      "cse_dashboard"
-    ],
+    "dashboard": "cse_dashboard",
     "custom_dashboard": "",
     "icon_emoji": "shield",
     "aliases": [
@@ -689,6 +745,15 @@ export const PRODUCT_CATALOG = [
       }
     ],
     "itsi_content_pack": null,
+    "card_banner": "Powered by Cisco Security Cloud",
+    "card_banner_color": "cisco",
+    "card_banner_size": "small",
+    "card_banner_opacity": "0.12",
+    "card_accent": "#049fd9",
+    "card_bg_color": "ice",
+    "is_new": false,
+    "secure_networking_gtm": true,
+    "support_level": "cisco_supported",
     "sort_order": 20
   },
   {
@@ -724,9 +789,7 @@ export const PRODUCT_CATALOG = [
     "sourcetypes": [
       "cisco:secure:workload"
     ],
-    "dashboards": [
-      "csw_dashboard"
-    ],
+    "dashboard": "csw_dashboard",
     "custom_dashboard": "",
     "icon_emoji": "building",
     "aliases": [
@@ -743,6 +806,15 @@ export const PRODUCT_CATALOG = [
     "alert_actions": [],
     "soar_connectors": [],
     "itsi_content_pack": null,
+    "card_banner": "Powered by Cisco Security Cloud",
+    "card_banner_color": "cisco",
+    "card_banner_size": "small",
+    "card_banner_opacity": "0.12",
+    "card_accent": "#049fd9",
+    "card_bg_color": "ice",
+    "is_new": false,
+    "secure_networking_gtm": true,
+    "support_level": "cisco_supported",
     "sort_order": 21
   },
   {
@@ -789,12 +861,11 @@ export const PRODUCT_CATALOG = [
     "prereq_apps": [],
     "community_apps": [],
     "sourcetypes": [
+      "cisco:sma:data",
       "cisco:sma:submissions",
       "cisco:tg:data"
     ],
-    "dashboards": [
-      "sma_dashboard"
-    ],
+    "dashboard": "sma_dashboard",
     "custom_dashboard": "",
     "icon_emoji": "microscope",
     "aliases": [
@@ -821,6 +892,15 @@ export const PRODUCT_CATALOG = [
       }
     ],
     "itsi_content_pack": null,
+    "card_banner": "Powered by Cisco Security Cloud",
+    "card_banner_color": "cisco",
+    "card_banner_size": "small",
+    "card_banner_opacity": "0.12",
+    "card_accent": "#049fd9",
+    "card_bg_color": "ice",
+    "is_new": false,
+    "secure_networking_gtm": true,
+    "support_level": "cisco_supported",
     "sort_order": 22
   },
   {
@@ -863,9 +943,7 @@ export const PRODUCT_CATALOG = [
     "sourcetypes": [
       "cisco:etd"
     ],
-    "dashboards": [
-      "etd_dashboard"
-    ],
+    "dashboard": "etd_dashboard",
     "custom_dashboard": "",
     "icon_emoji": "email",
     "aliases": [],
@@ -881,6 +959,15 @@ export const PRODUCT_CATALOG = [
     "alert_actions": [],
     "soar_connectors": [],
     "itsi_content_pack": null,
+    "card_banner": "Powered by Cisco Security Cloud",
+    "card_banner_color": "cisco",
+    "card_banner_size": "small",
+    "card_banner_opacity": "0.12",
+    "card_accent": "#049fd9",
+    "card_bg_color": "ice",
+    "is_new": false,
+    "secure_networking_gtm": true,
+    "support_level": "cisco_supported",
     "sort_order": 25
   },
   {
@@ -921,7 +1008,6 @@ export const PRODUCT_CATALOG = [
     "prereq_apps": [],
     "community_apps": [],
     "sourcetypes": [
-      "cisco:esa",
       "cisco:esa:amp",
       "cisco:esa:antispam",
       "cisco:esa:authentication",
@@ -933,10 +1019,9 @@ export const PRODUCT_CATALOG = [
       "cisco:esa:http",
       "cisco:esa:legacy",
       "cisco:esa:system_logs",
-      "cisco:esa:textmail",
-      "cisco_esa"
+      "cisco:esa:textmail"
     ],
-    "dashboards": [],
+    "dashboard": "",
     "custom_dashboard": "",
     "icon_emoji": "email",
     "aliases": [
@@ -966,6 +1051,15 @@ export const PRODUCT_CATALOG = [
       }
     ],
     "itsi_content_pack": null,
+    "card_banner": "Cisco Supported",
+    "card_banner_color": "blue",
+    "card_banner_size": "small",
+    "card_banner_opacity": "0.12",
+    "card_accent": "#1976d2",
+    "card_bg_color": "pearl",
+    "is_new": false,
+    "secure_networking_gtm": true,
+    "support_level": "splunk_supported",
     "sort_order": 26
   },
   {
@@ -1003,9 +1097,7 @@ export const PRODUCT_CATALOG = [
       "cisco:xdr:incidents-summary",
       "cisco:xdr:incidents-summary:notable"
     ],
-    "dashboards": [
-      "xdr_dashboard"
-    ],
+    "dashboard": "xdr_dashboard",
     "custom_dashboard": "",
     "icon_emoji": "search",
     "aliases": [],
@@ -1021,6 +1113,15 @@ export const PRODUCT_CATALOG = [
     "alert_actions": [],
     "soar_connectors": [],
     "itsi_content_pack": null,
+    "card_banner": "Powered by Cisco Security Cloud",
+    "card_banner_color": "cisco",
+    "card_banner_size": "small",
+    "card_banner_opacity": "0.12",
+    "card_accent": "#049fd9",
+    "card_bg_color": "ice",
+    "is_new": false,
+    "secure_networking_gtm": true,
+    "support_level": "cisco_supported",
     "sort_order": 30
   },
   {
@@ -1053,8 +1154,10 @@ export const PRODUCT_CATALOG = [
     "legacy_apps": [],
     "prereq_apps": [],
     "community_apps": [],
-    "sourcetypes": [],
-    "dashboards": [],
+    "sourcetypes": [
+      "cisco:talos"
+    ],
+    "dashboard": "",
     "custom_dashboard": "",
     "icon_emoji": "skull",
     "aliases": [],
@@ -1068,7 +1171,13 @@ export const PRODUCT_CATALOG = [
       "file reputation",
       "snort"
     ],
-    "alert_actions": [],
+    "alert_actions": [
+      {
+        "label": "Cisco Talos Intelligence for Enterprise Security Cloud",
+        "uid": "7557",
+        "url": "https://splunkbase.splunk.com/app/7557"
+      }
+    ],
     "soar_connectors": [
       {
         "label": "Cisco Talos Intelligence SOAR Connector",
@@ -1077,6 +1186,15 @@ export const PRODUCT_CATALOG = [
       }
     ],
     "itsi_content_pack": null,
+    "card_banner": "Cisco Supported",
+    "card_banner_color": "blue",
+    "card_banner_size": "small",
+    "card_banner_opacity": "0.12",
+    "card_accent": "#1976d2",
+    "card_bg_color": "pearl",
+    "is_new": false,
+    "secure_networking_gtm": true,
+    "support_level": "splunk_supported",
     "sort_order": 31
   },
   {
@@ -1110,9 +1228,9 @@ export const PRODUCT_CATALOG = [
     "prereq_apps": [],
     "community_apps": [],
     "sourcetypes": [
-      "cisco:vulnerability:intelligence"
+      "cisco:cvi"
     ],
-    "dashboards": [],
+    "dashboard": "cvi_dashboard",
     "custom_dashboard": "",
     "icon_emoji": "eye",
     "aliases": [],
@@ -1127,6 +1245,15 @@ export const PRODUCT_CATALOG = [
     "alert_actions": [],
     "soar_connectors": [],
     "itsi_content_pack": null,
+    "card_banner": "Powered by Cisco Security Cloud",
+    "card_banner_color": "cisco",
+    "card_banner_size": "small",
+    "card_banner_opacity": "0.12",
+    "card_accent": "#049fd9",
+    "card_bg_color": "ice",
+    "is_new": false,
+    "secure_networking_gtm": false,
+    "support_level": "cisco_supported",
     "sort_order": 32
   },
   {
@@ -1163,9 +1290,7 @@ export const PRODUCT_CATALOG = [
       "cisco:ai:defense",
       "cisco:ai:defense:notable"
     ],
-    "dashboards": [
-      "aid_dashboard"
-    ],
+    "dashboard": "aid_dashboard",
     "custom_dashboard": "",
     "icon_emoji": "robot",
     "aliases": [],
@@ -1179,6 +1304,15 @@ export const PRODUCT_CATALOG = [
     "alert_actions": [],
     "soar_connectors": [],
     "itsi_content_pack": null,
+    "card_banner": "Powered by Cisco Security Cloud",
+    "card_banner_color": "cisco",
+    "card_banner_size": "small",
+    "card_banner_opacity": "0.12",
+    "card_accent": "#049fd9",
+    "card_bg_color": "ice",
+    "is_new": false,
+    "secure_networking_gtm": true,
+    "support_level": "cisco_supported",
     "sort_order": 35
   },
   {
@@ -1255,14 +1389,19 @@ export const PRODUCT_CATALOG = [
       "cisco:umbrella:ip",
       "cisco:umbrella:proxy",
       "opendns:auditlogs",
+      "opendns:dnslog",
       "opendns:dnslogs",
       "opendns:firewalllogs",
       "opendns:iplogs",
       "opendns:proxylogs",
-      "opendns:dnslog",
+      "opendns:s3",
       "opendns_investigate"
     ],
-    "dashboards": [
+    "dashboard": "overview",
+    "custom_dashboard": "",
+    "icon_emoji": "umbrella",
+    "aliases": [],
+    "keywords": [
       "opendns",
       "dns security",
       "dns layer",
@@ -1270,11 +1409,13 @@ export const PRODUCT_CATALOG = [
       "secure internet gateway",
       "sig"
     ],
-    "custom_dashboard": "",
-    "icon_emoji": "umbrella",
-    "aliases": [],
-    "keywords": [],
-    "alert_actions": [],
+    "alert_actions": [
+      {
+        "label": "Cisco Secure Access App for Splunk",
+        "uid": "5558",
+        "url": "https://splunkbase.splunk.com/app/5558"
+      }
+    ],
     "soar_connectors": [
       {
         "label": "Cisco Umbrella Investigate SOAR Connector",
@@ -1293,6 +1434,15 @@ export const PRODUCT_CATALOG = [
       }
     ],
     "itsi_content_pack": null,
+    "card_banner": "Powered by Cisco Cloud Security",
+    "card_banner_color": "blue",
+    "card_banner_size": "small",
+    "card_banner_opacity": "0.12",
+    "card_accent": "#1976d2",
+    "card_bg_color": "sky",
+    "is_new": false,
+    "secure_networking_gtm": true,
+    "support_level": "cisco_supported",
     "sort_order": 36
   },
   {
@@ -1328,7 +1478,11 @@ export const PRODUCT_CATALOG = [
     "sourcetypes": [
       "incident"
     ],
-    "dashboards": [
+    "dashboard": "cloudlock_incidents_overview",
+    "custom_dashboard": "",
+    "icon_emoji": "cloud_lock",
+    "aliases": [],
+    "keywords": [
       "casb",
       "cloud access security broker",
       "saas security",
@@ -1337,13 +1491,18 @@ export const PRODUCT_CATALOG = [
       "dlp",
       "data loss prevention"
     ],
-    "custom_dashboard": "",
-    "icon_emoji": "cloud_lock",
-    "aliases": [],
-    "keywords": [],
     "alert_actions": [],
     "soar_connectors": [],
     "itsi_content_pack": null,
+    "card_banner": "Cisco Supported",
+    "card_banner_color": "blue",
+    "card_banner_size": "small",
+    "card_banner_opacity": "0.12",
+    "card_accent": "#1976d2",
+    "card_bg_color": "pearl",
+    "is_new": false,
+    "secure_networking_gtm": false,
+    "support_level": "splunk_supported",
     "sort_order": 37
   },
   {
@@ -1379,14 +1538,12 @@ export const PRODUCT_CATALOG = [
     "sourcetypes": [
       "cisco:isovalent",
       "cisco:isovalent:alert",
-      "cisco:isovalent:processConnect",
-      "cisco:isovalent:processExec",
+      "cisco:isovalent:processconnect",
+      "cisco:isovalent:processexec",
       "cisco:isovalent:telemetry:network",
       "cisco:isovalent:telemetry:process"
     ],
-    "dashboards": [
-      "irs_dashboard"
-    ],
+    "dashboard": "irs_dashboard",
     "custom_dashboard": "",
     "icon_emoji": "bee",
     "aliases": [],
@@ -1403,6 +1560,15 @@ export const PRODUCT_CATALOG = [
     "alert_actions": [],
     "soar_connectors": [],
     "itsi_content_pack": null,
+    "card_banner": "Powered by Cisco Security Cloud",
+    "card_banner_color": "cisco",
+    "card_banner_size": "small",
+    "card_banner_opacity": "0.12",
+    "card_accent": "#049fd9",
+    "card_bg_color": "ice",
+    "is_new": false,
+    "secure_networking_gtm": true,
+    "support_level": "cisco_supported",
     "sort_order": 38
   },
   {
@@ -1438,12 +1604,12 @@ export const PRODUCT_CATALOG = [
     "sourcetypes": [
       "cisco:isovalent:edge_processor",
       "cisco:isovalent:edge_processor:alert",
-      "cisco:isovalent:edge_processor:processConnect",
-      "cisco:isovalent:edge_processor:processExec",
+      "cisco:isovalent:edge_processor:processconnect",
+      "cisco:isovalent:edge_processor:processexec",
       "cisco:isovalent:edge_processor:telemetry:network",
       "cisco:isovalent:edge_processor:telemetry:process"
     ],
-    "dashboards": [],
+    "dashboard": "irs_dashboard",
     "custom_dashboard": "",
     "icon_emoji": "zap",
     "aliases": [],
@@ -1457,6 +1623,15 @@ export const PRODUCT_CATALOG = [
     "alert_actions": [],
     "soar_connectors": [],
     "itsi_content_pack": null,
+    "card_banner": "Powered by Cisco Security Cloud",
+    "card_banner_color": "cisco",
+    "card_banner_size": "small",
+    "card_banner_opacity": "0.12",
+    "card_accent": "#049fd9",
+    "card_bg_color": "ice",
+    "is_new": true,
+    "secure_networking_gtm": true,
+    "support_level": "cisco_supported",
     "sort_order": 39
   },
   {
@@ -1490,9 +1665,13 @@ export const PRODUCT_CATALOG = [
     "prereq_apps": [],
     "community_apps": [],
     "sourcetypes": [
-      "splunk_ta_cisco_ucs"
+      "cisco:ucs"
     ],
-    "dashboards": [
+    "dashboard": "dashboard",
+    "custom_dashboard": "",
+    "icon_emoji": "server",
+    "aliases": [],
+    "keywords": [
       "unified computing system",
       "blade server",
       "fabric interconnect",
@@ -1502,13 +1681,18 @@ export const PRODUCT_CATALOG = [
       "c-series",
       "b-series"
     ],
-    "custom_dashboard": "",
-    "icon_emoji": "server",
-    "aliases": [],
-    "keywords": [],
     "alert_actions": [],
     "soar_connectors": [],
     "itsi_content_pack": null,
+    "card_banner": "Cisco Supported",
+    "card_banner_color": "blue",
+    "card_banner_size": "small",
+    "card_banner_opacity": "0.12",
+    "card_accent": "#1976d2",
+    "card_bg_color": "pearl",
+    "is_new": false,
+    "secure_networking_gtm": false,
+    "support_level": "splunk_supported",
     "sort_order": 45
   },
   {
@@ -1549,27 +1733,49 @@ export const PRODUCT_CATALOG = [
     "prereq_apps": [],
     "community_apps": [],
     "sourcetypes": [
+      "cisco:intersight:aaaauditrecords",
       "cisco:intersight:advisories",
       "cisco:intersight:alarms",
+      "cisco:intersight:assetdevicecontractinformations",
+      "cisco:intersight:assettargets",
       "cisco:intersight:auditrecords",
       "cisco:intersight:compute",
-      "cisco:intersight:contract",
+      "cisco:intersight:computephysicalsummaries",
+      "cisco:intersight:condalarms",
+      "cisco:intersight:condhclstatuses",
       "cisco:intersight:contracts",
+      "cisco:intersight:convergedinfrapods",
       "cisco:intersight:custom:inventory",
       "cisco:intersight:custom:metrics",
-      "cisco:intersight:fabric",
-      "cisco:intersight:license",
+      "cisco:intersight:default",
+      "cisco:intersight:equipmentchassis",
+      "cisco:intersight:hyperflexclusters",
+      "cisco:intersight:hyperflexlicenses",
+      "cisco:intersight:hyperflexnodes",
+      "cisco:intersight:hyperflexstoragecontainers",
+      "cisco:intersight:licenseaccountlicensedata",
+      "cisco:intersight:licenselicenseinfos",
       "cisco:intersight:licenses",
       "cisco:intersight:metrics",
-      "cisco:intersight:network",
       "cisco:intersight:networkelements",
+      "cisco:intersight:networkelementsummaries",
       "cisco:intersight:networkobjects",
       "cisco:intersight:pools",
       "cisco:intersight:profiles",
-      "cisco:intersight:target",
+      "cisco:intersight:storagehitachiarrays",
+      "cisco:intersight:storagehitachicontrollers",
+      "cisco:intersight:storagehitachivolumes",
+      "cisco:intersight:storagenetappclusters",
+      "cisco:intersight:storagenetappnodes",
+      "cisco:intersight:storagenetappstoragevms",
+      "cisco:intersight:storagenetappvolumes",
+      "cisco:intersight:storagepurearrays",
+      "cisco:intersight:storagepurecontrollers",
+      "cisco:intersight:storagepurevolumes",
+      "cisco:intersight:tamadvisoryinstances",
       "cisco:intersight:targets"
     ],
-    "dashboards": [],
+    "dashboard": "activity_monitor",
     "custom_dashboard": "",
     "icon_emoji": "satellite",
     "aliases": [],
@@ -1584,6 +1790,15 @@ export const PRODUCT_CATALOG = [
     "alert_actions": [],
     "soar_connectors": [],
     "itsi_content_pack": null,
+    "card_banner": "Cisco Supported",
+    "card_banner_color": "blue",
+    "card_banner_size": "small",
+    "card_banner_opacity": "0.12",
+    "card_accent": "#1976d2",
+    "card_bg_color": "pearl",
+    "is_new": false,
+    "secure_networking_gtm": false,
+    "support_level": "splunk_supported",
     "sort_order": 46
   },
   {
@@ -1625,16 +1840,15 @@ export const PRODUCT_CATALOG = [
     "community_apps": [],
     "sourcetypes": [
       "cisco:wsa:l4tm",
-      "cisco:wsa:squid",
-      "cisco:wsa:squid:new",
-      "cisco:wsa:syslog",
-      "cisco:wsa:w3c",
-      "cisco:wsa:w3c:recommended",
       "cisco:wsa:prox_track",
       "cisco:wsa:shd",
-      "cisco:wsa:systemlogs"
+      "cisco:wsa:squid",
+      "cisco:wsa:syslog",
+      "cisco:wsa:systemlogs",
+      "cisco:wsa:w3c",
+      "cisco:wsa:w3c:recommended"
     ],
-    "dashboards": [],
+    "dashboard": "",
     "custom_dashboard": "",
     "icon_emoji": "web",
     "aliases": [],
@@ -1657,6 +1871,15 @@ export const PRODUCT_CATALOG = [
       }
     ],
     "itsi_content_pack": null,
+    "card_banner": "Cisco Supported",
+    "card_banner_color": "blue",
+    "card_banner_size": "small",
+    "card_banner_opacity": "0.12",
+    "card_accent": "#1976d2",
+    "card_bg_color": "pearl",
+    "is_new": false,
+    "secure_networking_gtm": false,
+    "support_level": "splunk_supported",
     "sort_order": 47
   },
   {
@@ -1668,13 +1891,13 @@ export const PRODUCT_CATALOG = [
     "tagline": "Endpoint Flow Telemetry",
     "category": "security",
     "version": "1.0.0",
-    "status": "under_development",
-    "addon": "",
-    "addon_label": "",
-    "addon_family": "default",
-    "addon_splunkbase_url": "",
-    "addon_docs_url": "",
-    "addon_install_url": "",
+    "status": "active",
+    "addon": "CiscoSecurityCloud",
+    "addon_label": "Cisco Security Cloud",
+    "addon_family": "security-cloud",
+    "addon_splunkbase_url": "https://splunkbase.splunk.com/app/7404",
+    "addon_docs_url": "https://www.cisco.com/c/en/us/td/docs/security/cisco-secure-cloud-app/user-guide/cisco-security-cloud-user-guide/m_configure_cisco_products_in_cisco_security_cloud.html#configure-an-application",
+    "addon_install_url": "/manager/cisco-control-center-app/appsremote?order=relevance&query=\"Security+Cloud\"&offset=0&support=cisco&type=addon&category=security_compliance&category=firewall",
     "app_viz": "",
     "app_viz_label": "",
     "app_viz_splunkbase_url": "",
@@ -1690,7 +1913,7 @@ export const PRODUCT_CATALOG = [
     "prereq_apps": [],
     "community_apps": [],
     "sourcetypes": [],
-    "dashboards": [],
+    "dashboard": "",
     "custom_dashboard": "",
     "icon_emoji": "mag",
     "aliases": [],
@@ -1705,105 +1928,16 @@ export const PRODUCT_CATALOG = [
     "alert_actions": [],
     "soar_connectors": [],
     "itsi_content_pack": null,
+    "card_banner": "Under Development",
+    "card_banner_color": "gold",
+    "card_banner_size": "small",
+    "card_banner_opacity": "0.12",
+    "card_accent": "#049fd9",
+    "card_bg_color": "pearl",
+    "is_new": true,
+    "secure_networking_gtm": true,
+    "support_level": "cisco_supported",
     "sort_order": 80
-  },
-  {
-    "product_id": "cisco_secure_endpoint_edr",
-    "display_name": "Cisco Secure Endpoint EDR Agent (CSE EDR)",
-    "description": "Next-generation endpoint detection and response (EDR) solution, offering advanced threat protection, endpoint telemetry, and automated response capabilities for organizations of all sizes.",
-    "value_proposition": "Surface endpoint detections, file trajectories, and one-click response actions directly inside the Splunk SOC workflow.",
-    "vendor": "Cisco",
-    "tagline": "Host-Level EDR Agent",
-    "category": "security",
-    "version": "1.0.0",
-    "status": "under_development",
-    "addon": "",
-    "addon_label": "",
-    "addon_family": "default",
-    "addon_splunkbase_url": "",
-    "addon_docs_url": "",
-    "addon_install_url": "",
-    "app_viz": "",
-    "app_viz_label": "",
-    "app_viz_splunkbase_url": "",
-    "app_viz_docs_url": "",
-    "app_viz_install_url": "",
-    "app_viz_2": "",
-    "app_viz_2_label": "",
-    "app_viz_2_splunkbase_url": "",
-    "app_viz_2_docs_url": "",
-    "app_viz_2_install_url": "",
-    "learn_more_url": "https://www.cisco.com/site/us/en/products/security/endpoint-security/secure-endpoint/index.html",
-    "legacy_apps": [],
-    "prereq_apps": [],
-    "community_apps": [],
-    "sourcetypes": [],
-    "dashboards": [],
-    "custom_dashboard": "",
-    "icon_emoji": "detective",
-    "aliases": [],
-    "keywords": [
-      "secure endpoint edr",
-      "edr agent",
-      "endpoint detection and response",
-      "threat hunting",
-      "host isolation",
-      "orbital",
-      "containment"
-    ],
-    "alert_actions": [],
-    "soar_connectors": [],
-    "itsi_content_pack": null,
-    "sort_order": 81
-  },
-  {
-    "product_id": "cisco_radware",
-    "display_name": "Cisco Radware (DDoS and Application Security)",
-    "description": "DDoS mitigation, bot management, WAF, and API protection powered by Radware.",
-    "value_proposition": "Correlate DDoS attack telemetry and application-layer threat data with the broader Cisco security stack.",
-    "vendor": "Cisco",
-    "tagline": "DDoS & App Protection",
-    "category": "security",
-    "version": "1.0.0",
-    "status": "under_development",
-    "addon": "",
-    "addon_label": "",
-    "addon_family": "default",
-    "addon_splunkbase_url": "",
-    "addon_docs_url": "",
-    "addon_install_url": "",
-    "app_viz": "",
-    "app_viz_label": "",
-    "app_viz_splunkbase_url": "",
-    "app_viz_docs_url": "",
-    "app_viz_install_url": "",
-    "app_viz_2": "",
-    "app_viz_2_label": "",
-    "app_viz_2_splunkbase_url": "",
-    "app_viz_2_docs_url": "",
-    "app_viz_2_install_url": "",
-    "learn_more_url": "https://www.radware.com",
-    "legacy_apps": [],
-    "prereq_apps": [],
-    "community_apps": [],
-    "sourcetypes": [],
-    "dashboards": [],
-    "custom_dashboard": "",
-    "icon_emoji": "stop_sign",
-    "aliases": [],
-    "keywords": [
-      "radware",
-      "ddos",
-      "anti-ddos",
-      "bot management",
-      "waf",
-      "web application firewall",
-      "api protection"
-    ],
-    "alert_actions": [],
-    "soar_connectors": [],
-    "itsi_content_pack": null,
-    "sort_order": 82
   },
   {
     "product_id": "cisco_catalyst_center",
@@ -1880,6 +2014,13 @@ export const PRODUCT_CATALOG = [
     ],
     "community_apps": [],
     "sourcetypes": [
+      "cisco:catalyst:client",
+      "cisco:catalyst:clienthealth",
+      "cisco:catalyst:compliance",
+      "cisco:catalyst:devicehealth",
+      "cisco:catalyst:issue",
+      "cisco:catalyst:networkhealth",
+      "cisco:catalyst:securityadvisory",
       "cisco:catalyst:syslog",
       "cisco:dnac:audit:logs",
       "cisco:dnac:client",
@@ -1891,7 +2032,7 @@ export const PRODUCT_CATALOG = [
       "cisco:dnac:securityadvisory",
       "cisco:dnac:site:topology"
     ],
-    "dashboards": [],
+    "dashboard": "",
     "custom_dashboard": "",
     "icon_emoji": "globe",
     "aliases": [
@@ -1914,6 +2055,15 @@ export const PRODUCT_CATALOG = [
       "label": "Content Pack for Cisco Enterprise Networks",
       "docs_url": "https://help.splunk.com/en/splunk-it-service-intelligence/content-packs-for-itsi-and-ite/cisco-enterprise-networks/1.1/about-the-content-pack-for-cisco-enterprise-networks"
     },
+    "card_banner": "Powered by Cisco Catalyst",
+    "card_banner_color": "green",
+    "card_banner_size": "small",
+    "card_banner_opacity": "0.12",
+    "card_accent": "#6abf4b",
+    "card_bg_color": "mint",
+    "is_new": false,
+    "secure_networking_gtm": true,
+    "support_level": "cisco_supported",
     "sort_order": 100
   },
   {
@@ -1980,9 +2130,10 @@ export const PRODUCT_CATALOG = [
     "community_apps": [],
     "sourcetypes": [
       "cisco:ios",
-      "cisco:ios:syslog"
+      "cisco:ios:traceback",
+      "cisco:telemetry"
     ],
-    "dashboards": [],
+    "dashboard": "",
     "custom_dashboard": "",
     "icon_emoji": "switch",
     "aliases": [],
@@ -1999,6 +2150,15 @@ export const PRODUCT_CATALOG = [
     "alert_actions": [],
     "soar_connectors": [],
     "itsi_content_pack": null,
+    "card_banner": "Powered by Cisco Catalyst",
+    "card_banner_color": "green",
+    "card_banner_size": "small",
+    "card_banner_opacity": "0.12",
+    "card_accent": "#6abf4b",
+    "card_bg_color": "mint",
+    "is_new": false,
+    "secure_networking_gtm": true,
+    "support_level": "cisco_supported",
     "sort_order": 101
   },
   {
@@ -2064,6 +2224,7 @@ export const PRODUCT_CATALOG = [
     ],
     "community_apps": [],
     "sourcetypes": [
+      "cisco:firewall:logs",
       "cisco:sdwan:acl:logs",
       "cisco:sdwan:alert:off",
       "cisco:sdwan:alert:on",
@@ -2078,7 +2239,6 @@ export const PRODUCT_CATALOG = [
       "cisco:sdwan:session:audit:trail",
       "cisco:sdwan:session:audit:trail:start",
       "cisco:sdwan:sessions:maximum",
-      "cisco:sdwan:sgacl:logs",
       "cisco:sdwan:sitehealth",
       "cisco:sdwan:smart:lic:platform:error",
       "cisco:sdwan:ssetunnels",
@@ -2086,9 +2246,11 @@ export const PRODUCT_CATALOG = [
       "cisco:sdwan:tunnelhealth",
       "cisco:sdwan:unblock:host",
       "cisco:sdwan:utd:logs",
-      "cisco:sdwan:utdhealth"
+      "cisco:sdwan:utdhealth",
+      "cisco:sgacl:logs",
+      "stream:netflow"
     ],
-    "dashboards": [],
+    "dashboard": "",
     "custom_dashboard": "",
     "icon_emoji": "highway",
     "aliases": [
@@ -2106,6 +2268,15 @@ export const PRODUCT_CATALOG = [
     "alert_actions": [],
     "soar_connectors": [],
     "itsi_content_pack": null,
+    "card_banner": "Powered by Cisco Catalyst",
+    "card_banner_color": "green",
+    "card_banner_size": "small",
+    "card_banner_opacity": "0.12",
+    "card_accent": "#6abf4b",
+    "card_bg_color": "mint",
+    "is_new": false,
+    "secure_networking_gtm": true,
+    "support_level": "cisco_supported",
     "sort_order": 102
   },
   {
@@ -2178,7 +2349,6 @@ export const PRODUCT_CATALOG = [
       }
     ],
     "sourcetypes": [
-      "cisco:ise",
       "cisco:ise:radius:authz:policy",
       "cisco:ise:radius:policyset",
       "cisco:ise:securitygroups",
@@ -2187,7 +2357,7 @@ export const PRODUCT_CATALOG = [
       "cisco:ise:tacacs:authz:policy",
       "cisco:ise:tacacs:policyset"
     ],
-    "dashboards": [],
+    "dashboard": "",
     "custom_dashboard": "",
     "icon_emoji": "key",
     "aliases": [],
@@ -2218,6 +2388,15 @@ export const PRODUCT_CATALOG = [
       }
     ],
     "itsi_content_pack": null,
+    "card_banner": "Powered by Cisco Catalyst",
+    "card_banner_color": "green",
+    "card_banner_size": "small",
+    "card_banner_opacity": "0.12",
+    "card_accent": "#6abf4b",
+    "card_bg_color": "mint",
+    "is_new": false,
+    "secure_networking_gtm": true,
+    "support_level": "cisco_supported",
     "sort_order": 103
   },
   {
@@ -2283,9 +2462,11 @@ export const PRODUCT_CATALOG = [
     ],
     "community_apps": [],
     "sourcetypes": [
-      "cisco:ap:syslog"
+      "cisco:ios",
+      "cisco:ios:traceback",
+      "cisco:telemetry"
     ],
-    "dashboards": [],
+    "dashboard": "",
     "custom_dashboard": "",
     "icon_emoji": "satellite",
     "aliases": [],
@@ -2302,6 +2483,15 @@ export const PRODUCT_CATALOG = [
     "alert_actions": [],
     "soar_connectors": [],
     "itsi_content_pack": null,
+    "card_banner": "Powered by Cisco Catalyst",
+    "card_banner_color": "green",
+    "card_banner_size": "small",
+    "card_banner_opacity": "0.12",
+    "card_accent": "#6abf4b",
+    "card_bg_color": "mint",
+    "is_new": false,
+    "secure_networking_gtm": true,
+    "support_level": "cisco_supported",
     "sort_order": 104
   },
   {
@@ -2367,9 +2557,11 @@ export const PRODUCT_CATALOG = [
     ],
     "community_apps": [],
     "sourcetypes": [
-      "cisco:wlc:syslog"
+      "cisco:ios",
+      "cisco:ios:traceback",
+      "cisco:telemetry"
     ],
-    "dashboards": [],
+    "dashboard": "",
     "custom_dashboard": "",
     "icon_emoji": "wifi",
     "aliases": [],
@@ -2385,6 +2577,15 @@ export const PRODUCT_CATALOG = [
     "alert_actions": [],
     "soar_connectors": [],
     "itsi_content_pack": null,
+    "card_banner": "Powered by Cisco Catalyst",
+    "card_banner_color": "green",
+    "card_banner_size": "small",
+    "card_banner_opacity": "0.12",
+    "card_accent": "#6abf4b",
+    "card_bg_color": "mint",
+    "is_new": false,
+    "secure_networking_gtm": true,
+    "support_level": "cisco_supported",
     "sort_order": 105
   },
   {
@@ -2469,9 +2670,53 @@ export const PRODUCT_CATALOG = [
       }
     ],
     "sourcetypes": [
-      "cisco:meraki:syslog"
+      "meraki:accesspoints",
+      "meraki:airmarshal",
+      "meraki:apirequestshistory",
+      "meraki:apirequestsoverview",
+      "meraki:apirequestsresponsecodes",
+      "meraki:appliancesdwanstatistics",
+      "meraki:appliancesdwanstatuses",
+      "meraki:assurancealerts",
+      "meraki:audit",
+      "meraki:cameras",
+      "meraki:devices",
+      "meraki:devicesavailabilitieschangehistory",
+      "meraki:devicesuplinksaddressesbydevice",
+      "meraki:firmwareupgrades",
+      "meraki:licensescotermlicenses",
+      "meraki:licensesoverview",
+      "meraki:licensessubscriptionentitlements",
+      "meraki:licensessubscriptions",
+      "meraki:networkdevices",
+      "meraki:organizations",
+      "meraki:organizationsecurity",
+      "meraki:organizationsnetworks",
+      "meraki:portstransceiversreadingshistorybyswitch",
+      "meraki:powermodulesstatusesbydevice",
+      "meraki:securityappliances",
+      "meraki:sensorreadingshistory",
+      "meraki:summaryswitchpowerhistory",
+      "meraki:summarytopappliancesbyutilization",
+      "meraki:summarytopclientsbyusage",
+      "meraki:summarytopdevicesbyusage",
+      "meraki:summarytopswitchesbyenergyusage",
+      "meraki:switches",
+      "meraki:switchportsbyswitch",
+      "meraki:switchportsoverview",
+      "meraki:syslog",
+      "meraki:uplinks",
+      "meraki:uplinkslossandlatency",
+      "meraki:webhook",
+      "meraki:webhooklogs:api",
+      "meraki:wirelesscontrolleravailabilitieschangehistory",
+      "meraki:wirelesscontrollerdevicesinterfacespacketsoverviewbydevice",
+      "meraki:wirelesscontrollerdevicesinterfacesusagehistorybyinterval",
+      "meraki:wirelessdevicesethernetstatuses",
+      "meraki:wirelessdevicespacketlossbydevice",
+      "meraki:wirelessdeviceswirelesscontrollersbydevice"
     ],
-    "dashboards": [],
+    "dashboard": "",
     "custom_dashboard": "",
     "icon_emoji": "cloud_network",
     "aliases": [],
@@ -2497,6 +2742,15 @@ export const PRODUCT_CATALOG = [
       "label": "Content Pack for Cisco Enterprise Networks",
       "docs_url": "https://help.splunk.com/en/splunk-it-service-intelligence/content-packs-for-itsi-and-ite/cisco-enterprise-networks/1.1/about-the-content-pack-for-cisco-enterprise-networks"
     },
+    "card_banner": "Powered by Cisco Catalyst",
+    "card_banner_color": "green",
+    "card_banner_size": "small",
+    "card_banner_opacity": "0.12",
+    "card_accent": "#6abf4b",
+    "card_bg_color": "mint",
+    "is_new": false,
+    "secure_networking_gtm": true,
+    "support_level": "cisco_supported",
     "sort_order": 106
   },
   {
@@ -2562,11 +2816,15 @@ export const PRODUCT_CATALOG = [
     ],
     "community_apps": [],
     "sourcetypes": [
-      "cisco:cvi"
+      "cisco:cybervision:activities",
+      "cisco:cybervision:components",
+      "cisco:cybervision:devices",
+      "cisco:cybervision:events",
+      "cisco:cybervision:flows",
+      "cisco:cybervision:syslog",
+      "cisco:cybervision:vulnerabilities"
     ],
-    "dashboards": [
-      "cvi_dashboard"
-    ],
+    "dashboard": "cvi_dashboard",
     "custom_dashboard": "",
     "icon_emoji": "factory",
     "aliases": [],
@@ -2584,6 +2842,15 @@ export const PRODUCT_CATALOG = [
     "alert_actions": [],
     "soar_connectors": [],
     "itsi_content_pack": null,
+    "card_banner": "Powered by Cisco Catalyst",
+    "card_banner_color": "green",
+    "card_banner_size": "small",
+    "card_banner_opacity": "0.12",
+    "card_accent": "#6abf4b",
+    "card_bg_color": "mint",
+    "is_new": false,
+    "secure_networking_gtm": true,
+    "support_level": "cisco_supported",
     "sort_order": 107
   },
   {
@@ -2650,9 +2917,10 @@ export const PRODUCT_CATALOG = [
     "community_apps": [],
     "sourcetypes": [
       "cisco:ios",
-      "cisco:ios:syslog"
+      "cisco:ios:traceback",
+      "cisco:telemetry"
     ],
-    "dashboards": [],
+    "dashboard": "",
     "custom_dashboard": "",
     "icon_emoji": "router",
     "aliases": [],
@@ -2669,6 +2937,15 @@ export const PRODUCT_CATALOG = [
     "alert_actions": [],
     "soar_connectors": [],
     "itsi_content_pack": null,
+    "card_banner": "Powered by Cisco Catalyst",
+    "card_banner_color": "green",
+    "card_banner_size": "small",
+    "card_banner_opacity": "0.12",
+    "card_accent": "#6abf4b",
+    "card_bg_color": "mint",
+    "is_new": false,
+    "secure_networking_gtm": false,
+    "support_level": "cisco_supported",
     "sort_order": 108
   },
   {
@@ -2735,9 +3012,10 @@ export const PRODUCT_CATALOG = [
     "community_apps": [],
     "sourcetypes": [
       "cisco:ios",
-      "cisco:ios:syslog"
+      "cisco:ios:traceback",
+      "cisco:telemetry"
     ],
-    "dashboards": [],
+    "dashboard": "",
     "custom_dashboard": "",
     "icon_emoji": "router",
     "aliases": [],
@@ -2753,6 +3031,15 @@ export const PRODUCT_CATALOG = [
     "alert_actions": [],
     "soar_connectors": [],
     "itsi_content_pack": null,
+    "card_banner": "Powered by Cisco Catalyst",
+    "card_banner_color": "green",
+    "card_banner_size": "small",
+    "card_banner_opacity": "0.12",
+    "card_accent": "#6abf4b",
+    "card_bg_color": "mint",
+    "is_new": false,
+    "secure_networking_gtm": false,
+    "support_level": "cisco_supported",
     "sort_order": 109
   },
   {
@@ -2818,9 +3105,11 @@ export const PRODUCT_CATALOG = [
     ],
     "community_apps": [],
     "sourcetypes": [
-      "cisco:ios:syslog"
+      "cisco:ios",
+      "cisco:ios:traceback",
+      "cisco:telemetry"
     ],
-    "dashboards": [],
+    "dashboard": "",
     "custom_dashboard": "",
     "icon_emoji": "globe",
     "aliases": [],
@@ -2835,6 +3124,15 @@ export const PRODUCT_CATALOG = [
     "alert_actions": [],
     "soar_connectors": [],
     "itsi_content_pack": null,
+    "card_banner": "Powered by Cisco Catalyst",
+    "card_banner_color": "green",
+    "card_banner_size": "small",
+    "card_banner_opacity": "0.12",
+    "card_accent": "#6abf4b",
+    "card_bg_color": "mint",
+    "is_new": false,
+    "secure_networking_gtm": false,
+    "support_level": "cisco_supported",
     "sort_order": 110
   },
   {
@@ -2912,11 +3210,13 @@ export const PRODUCT_CATALOG = [
     ],
     "community_apps": [],
     "sourcetypes": [
-      "cisco:dc:nexus9k",
-      "cisco:dc:nexus9k:syslog",
-      "ciscodcn9k:log"
+      "cisco:app:nexus:9k:collect",
+      "cisco:nexus:json",
+      "cisco:ni",
+      "cisco:ni:advisories",
+      "cisco:ni:anomalies"
     ],
-    "dashboards": [],
+    "dashboard": "",
     "custom_dashboard": "",
     "icon_emoji": "switch",
     "aliases": [],
@@ -2934,6 +3234,15 @@ export const PRODUCT_CATALOG = [
     "alert_actions": [],
     "soar_connectors": [],
     "itsi_content_pack": null,
+    "card_banner": "Powered by Cisco Catalyst",
+    "card_banner_color": "green",
+    "card_banner_size": "small",
+    "card_banner_opacity": "0.12",
+    "card_accent": "#6abf4b",
+    "card_bg_color": "mint",
+    "is_new": false,
+    "secure_networking_gtm": true,
+    "support_level": "cisco_supported",
     "sort_order": 111
   },
   {
@@ -2980,20 +3289,20 @@ export const PRODUCT_CATALOG = [
     "prereq_apps": [],
     "community_apps": [],
     "sourcetypes": [
-      "cisco:dc:aci:authentication",
-      "cisco:dc:aci:class",
-      "cisco:dc:aci:health",
-      "cisco:dc:aci:stats",
-      "cisco:dc:aci:syslog",
-      "ciscodcaci:log",
       "cisco:apic:authentication",
       "cisco:apic:class",
       "cisco:apic:cloud",
       "cisco:apic:health",
       "cisco:apic:stats",
-      "cisco:mso"
+      "cisco:dc:aci:authentication",
+      "cisco:dc:aci:class",
+      "cisco:dc:aci:health",
+      "cisco:dc:aci:stats",
+      "cisco:dc:aci:syslog",
+      "cisco:mso",
+      "ciscodcaci:log"
     ],
-    "dashboards": [],
+    "dashboard": "",
     "custom_dashboard": "",
     "icon_emoji": "jigsaw",
     "aliases": [],
@@ -3009,6 +3318,15 @@ export const PRODUCT_CATALOG = [
     "alert_actions": [],
     "soar_connectors": [],
     "itsi_content_pack": null,
+    "card_banner": "Powered by Cisco DC Networking",
+    "card_banner_color": "teal",
+    "card_banner_size": "small",
+    "card_banner_opacity": "0.12",
+    "card_accent": "#00897b",
+    "card_bg_color": "ice",
+    "is_new": false,
+    "secure_networking_gtm": false,
+    "support_level": "cisco_supported",
     "sort_order": 120
   },
   {
@@ -3054,7 +3372,7 @@ export const PRODUCT_CATALOG = [
       "cisco:dc:nd:syslog",
       "ciscodcnd:log"
     ],
-    "dashboards": [],
+    "dashboard": "",
     "custom_dashboard": "",
     "icon_emoji": "dashboard",
     "aliases": [],
@@ -3070,6 +3388,15 @@ export const PRODUCT_CATALOG = [
     "alert_actions": [],
     "soar_connectors": [],
     "itsi_content_pack": null,
+    "card_banner": "Powered by Cisco DC Networking",
+    "card_banner_color": "teal",
+    "card_banner_size": "small",
+    "card_banner_opacity": "0.12",
+    "card_accent": "#00897b",
+    "card_bg_color": "ice",
+    "is_new": false,
+    "secure_networking_gtm": false,
+    "support_level": "cisco_supported",
     "sort_order": 121
   },
   {
@@ -3105,7 +3432,7 @@ export const PRODUCT_CATALOG = [
     "sourcetypes": [
       "cisco:dc:hyperfabric"
     ],
-    "dashboards": [],
+    "dashboard": "",
     "custom_dashboard": "",
     "icon_emoji": "cloud",
     "aliases": [],
@@ -3119,6 +3446,15 @@ export const PRODUCT_CATALOG = [
     "alert_actions": [],
     "soar_connectors": [],
     "itsi_content_pack": null,
+    "card_banner": "Powered by Cisco DC Networking",
+    "card_banner_color": "teal",
+    "card_banner_size": "small",
+    "card_banner_opacity": "0.12",
+    "card_accent": "#00897b",
+    "card_bg_color": "ice",
+    "is_new": false,
+    "secure_networking_gtm": true,
+    "support_level": "cisco_supported",
     "sort_order": 122
   },
   {
@@ -3189,11 +3525,15 @@ export const PRODUCT_CATALOG = [
       "cisco:thousandeyes:event",
       "cisco:thousandeyes:metric",
       "cisco:thousandeyes:path-vis",
+      "cisco:thousandeyes:refresh-tokens",
       "cisco:thousandeyes:trace",
+      "ciscothousandeyes:log",
+      "snmptrap",
+      "snow:incident",
       "thousandeyes:alerts",
       "thousandeyes:enriched_alerts"
     ],
-    "dashboards": [],
+    "dashboard": "",
     "custom_dashboard": "",
     "icon_emoji": "eye",
     "aliases": [],
@@ -3220,6 +3560,15 @@ export const PRODUCT_CATALOG = [
       "label": "Content Pack for Cisco ThousandEyes",
       "docs_url": "https://help.splunk.com/en/splunk-it-service-intelligence/content-packs-for-itsi-and-ite/cisco-thousandeyes/1.0/overview/about-the-content-pack-for-cisco-thousandeyes"
     },
+    "card_banner": "Powered by Cisco Catalyst",
+    "card_banner_color": "green",
+    "card_banner_size": "small",
+    "card_banner_opacity": "0.12",
+    "card_accent": "#6abf4b",
+    "card_bg_color": "mint",
+    "is_new": false,
+    "secure_networking_gtm": true,
+    "support_level": "cisco_supported",
     "sort_order": 200
   },
   {
@@ -3266,8 +3615,6 @@ export const PRODUCT_CATALOG = [
     "prereq_apps": [],
     "community_apps": [],
     "sourcetypes": [
-      "appdynamics:health:violation",
-      "appdynamics:policy:violation",
       "appdynamics_analytics",
       "appdynamics_audit",
       "appdynamics_custom_metrics",
@@ -3279,7 +3626,7 @@ export const PRODUCT_CATALOG = [
       "appdynamics_snapshots",
       "appdynamics_status"
     ],
-    "dashboards": [],
+    "dashboard": "dashboard",
     "custom_dashboard": "",
     "icon_emoji": "chart",
     "aliases": [],
@@ -3298,6 +3645,15 @@ export const PRODUCT_CATALOG = [
       "label": "Content Pack for Splunk AppDynamics",
       "docs_url": "https://help.splunk.com/en/splunk-it-service-intelligence/content-packs-for-itsi-and-ite/content-pack-for-splunk-appdynamics/1.0/overview/about-the-content-pack-for-splunk-appdynamics"
     },
+    "card_banner": "Cisco Supported",
+    "card_banner_color": "gold",
+    "card_banner_size": "small",
+    "card_banner_opacity": "0.12",
+    "card_accent": "#ff6f00",
+    "card_bg_color": "cream",
+    "is_new": false,
+    "secure_networking_gtm": false,
+    "support_level": "splunk_supported",
     "sort_order": 201
   },
   {
@@ -3377,7 +3733,14 @@ export const PRODUCT_CATALOG = [
         "addon_splunkbase_url": "https://splunkbase.splunk.com/app/4870"
       }
     ],
-    "prereq_apps": [],
+    "prereq_apps": [
+      {
+        "app_id": "canary",
+        "display_name": "Canary",
+        "uid": "4697",
+        "addon_splunkbase_url": "https://splunkbase.splunk.com/app/4697"
+      }
+    ],
     "community_apps": [],
     "sourcetypes": [
       "cisco:webex:admin:audit:events",
@@ -3400,7 +3763,7 @@ export const PRODUCT_CATALOG = [
       "webex:teams:adminaudit:events",
       "webex:teams:events"
     ],
-    "dashboards": [],
+    "dashboard": "",
     "custom_dashboard": "",
     "icon_emoji": "video",
     "aliases": [],
@@ -3428,6 +3791,15 @@ export const PRODUCT_CATALOG = [
       }
     ],
     "itsi_content_pack": null,
+    "card_banner": "Powered by Cisco Collaboration",
+    "card_banner_color": "purple",
+    "card_banner_size": "small",
+    "card_banner_opacity": "0.12",
+    "card_accent": "#7b1fa2",
+    "card_bg_color": "lavender",
+    "is_new": false,
+    "secure_networking_gtm": false,
+    "support_level": "cisco_supported",
     "sort_order": 300
   },
   {
@@ -3471,7 +3843,14 @@ export const PRODUCT_CATALOG = [
         "addon_splunkbase_url": "https://splunkbase.splunk.com/app/2997"
       }
     ],
-    "prereq_apps": [],
+    "prereq_apps": [
+      {
+        "app_id": "canary",
+        "display_name": "Canary",
+        "uid": "4697",
+        "addon_splunkbase_url": "https://splunkbase.splunk.com/app/4697"
+      }
+    ],
     "community_apps": [],
     "sourcetypes": [
       "cube_cdr",
@@ -3479,11 +3858,9 @@ export const PRODUCT_CATALOG = [
       "cube_syslog",
       "cucm_audit",
       "cucm_cdr",
-      "cucm_cmr",
-      "cucm_kiwi_syslog",
-      "cvp_log"
+      "cucm_cmr"
     ],
-    "dashboards": [],
+    "dashboard": "",
     "custom_dashboard": "",
     "icon_emoji": "phone",
     "aliases": [
@@ -3502,6 +3879,15 @@ export const PRODUCT_CATALOG = [
     "alert_actions": [],
     "soar_connectors": [],
     "itsi_content_pack": null,
+    "card_banner": "Powered by Cisco Collaboration",
+    "card_banner_color": "purple",
+    "card_banner_size": "small",
+    "card_banner_opacity": "0.12",
+    "card_accent": "#7b1fa2",
+    "card_bg_color": "lavender",
+    "is_new": false,
+    "secure_networking_gtm": false,
+    "support_level": "cisco_supported",
     "sort_order": 301
   },
   {
@@ -3532,12 +3918,19 @@ export const PRODUCT_CATALOG = [
     "app_viz_2_install_url": "",
     "learn_more_url": "https://www.cisco.com/c/en/us/products/conferencing/meeting-server/index.html",
     "legacy_apps": [],
-    "prereq_apps": [],
+    "prereq_apps": [
+      {
+        "app_id": "canary",
+        "display_name": "Canary",
+        "uid": "4697",
+        "addon_splunkbase_url": "https://splunkbase.splunk.com/app/4697"
+      }
+    ],
     "community_apps": [],
     "sourcetypes": [
       "cms_cdr"
     ],
-    "dashboards": [],
+    "dashboard": "",
     "custom_dashboard": "",
     "icon_emoji": "video",
     "aliases": [],
@@ -3554,6 +3947,15 @@ export const PRODUCT_CATALOG = [
     "alert_actions": [],
     "soar_connectors": [],
     "itsi_content_pack": null,
+    "card_banner": "Powered by Cisco Collaboration",
+    "card_banner_color": "purple",
+    "card_banner_size": "small",
+    "card_banner_opacity": "0.12",
+    "card_accent": "#7b1fa2",
+    "card_bg_color": "lavender",
+    "is_new": false,
+    "secure_networking_gtm": false,
+    "support_level": "cisco_supported",
     "sort_order": 302
   },
   {
@@ -3589,7 +3991,7 @@ export const PRODUCT_CATALOG = [
     "sourcetypes": [
       "ciscocws"
     ],
-    "dashboards": [],
+    "dashboard": "",
     "custom_dashboard": "",
     "icon_emoji": "archive",
     "aliases": [],
@@ -3603,6 +4005,15 @@ export const PRODUCT_CATALOG = [
     "alert_actions": [],
     "soar_connectors": [],
     "itsi_content_pack": null,
+    "card_banner": "Deprecated",
+    "card_banner_color": "red",
+    "card_banner_size": "small",
+    "card_banner_opacity": "0.12",
+    "card_accent": "#9e9e9e",
+    "card_bg_color": "smoke",
+    "is_new": false,
+    "secure_networking_gtm": true,
+    "support_level": "not_supported",
     "sort_order": 900
   },
   {
@@ -3636,6 +4047,7 @@ export const PRODUCT_CATALOG = [
     "prereq_apps": [],
     "community_apps": [],
     "sourcetypes": [
+      "cisco:app:events",
       "cisco:app:messages",
       "cisco:app:policy_events",
       "cisco:app:status",
@@ -3644,7 +4056,7 @@ export const PRODUCT_CATALOG = [
       "cisco:dp:status",
       "cisco:dp:threatfeeds"
     ],
-    "dashboards": [],
+    "dashboard": "",
     "custom_dashboard": "",
     "icon_emoji": "archive",
     "aliases": [],
@@ -3661,6 +4073,15 @@ export const PRODUCT_CATALOG = [
     "alert_actions": [],
     "soar_connectors": [],
     "itsi_content_pack": null,
+    "card_banner": "Deprecated",
+    "card_banner_color": "red",
+    "card_banner_size": "small",
+    "card_banner_opacity": "0.12",
+    "card_accent": "#9e9e9e",
+    "card_bg_color": "smoke",
+    "is_new": false,
+    "secure_networking_gtm": false,
+    "support_level": "not_supported",
     "sort_order": 901
   },
   {
@@ -3696,7 +4117,7 @@ export const PRODUCT_CATALOG = [
     "sourcetypes": [
       "cisco:candid:events"
     ],
-    "dashboards": [],
+    "dashboard": "",
     "custom_dashboard": "",
     "icon_emoji": "archive",
     "aliases": [],
@@ -3712,6 +4133,15 @@ export const PRODUCT_CATALOG = [
     "alert_actions": [],
     "soar_connectors": [],
     "itsi_content_pack": null,
+    "card_banner": "Deprecated",
+    "card_banner_color": "red",
+    "card_banner_size": "small",
+    "card_banner_opacity": "0.12",
+    "card_accent": "#9e9e9e",
+    "card_bg_color": "smoke",
+    "is_new": false,
+    "secure_networking_gtm": false,
+    "support_level": "not_supported",
     "sort_order": 902
   },
   {
@@ -3753,7 +4183,7 @@ export const PRODUCT_CATALOG = [
       "cisco:pi:data:events",
       "cisco:pi:data:inventorydetails"
     ],
-    "dashboards": [],
+    "dashboard": "",
     "custom_dashboard": "",
     "icon_emoji": "archive",
     "aliases": [],
@@ -3769,6 +4199,15 @@ export const PRODUCT_CATALOG = [
     "alert_actions": [],
     "soar_connectors": [],
     "itsi_content_pack": null,
+    "card_banner": "Deprecated",
+    "card_banner_color": "red",
+    "card_banner_size": "small",
+    "card_banner_opacity": "0.12",
+    "card_accent": "#9e9e9e",
+    "card_bg_color": "smoke",
+    "is_new": false,
+    "secure_networking_gtm": false,
+    "support_level": "not_supported",
     "sort_order": 903
   },
   {
@@ -3808,7 +4247,7 @@ export const PRODUCT_CATALOG = [
       "cisco:vuln:advisories:cvrf:summary",
       "cisco:vuln:advisories:cvrf:vuln"
     ],
-    "dashboards": [],
+    "dashboard": "",
     "custom_dashboard": "",
     "icon_emoji": "archive",
     "aliases": [],
@@ -3826,6 +4265,15 @@ export const PRODUCT_CATALOG = [
     "alert_actions": [],
     "soar_connectors": [],
     "itsi_content_pack": null,
+    "card_banner": "Deprecated",
+    "card_banner_color": "red",
+    "card_banner_size": "small",
+    "card_banner_opacity": "0.12",
+    "card_accent": "#9e9e9e",
+    "card_bg_color": "smoke",
+    "is_new": false,
+    "secure_networking_gtm": false,
+    "support_level": "not_supported",
     "sort_order": 904
   },
   {
@@ -3861,7 +4309,7 @@ export const PRODUCT_CATALOG = [
     "sourcetypes": [
       "cisco:acs"
     ],
-    "dashboards": [],
+    "dashboard": "",
     "custom_dashboard": "",
     "icon_emoji": "archive",
     "aliases": [],
@@ -3879,6 +4327,15 @@ export const PRODUCT_CATALOG = [
     "alert_actions": [],
     "soar_connectors": [],
     "itsi_content_pack": null,
+    "card_banner": "Deprecated",
+    "card_banner_color": "red",
+    "card_banner_size": "small",
+    "card_banner_opacity": "0.12",
+    "card_accent": "#9e9e9e",
+    "card_bg_color": "smoke",
+    "is_new": false,
+    "secure_networking_gtm": false,
+    "support_level": "not_supported",
     "sort_order": 905
   },
   {
@@ -3912,10 +4369,9 @@ export const PRODUCT_CATALOG = [
     "prereq_apps": [],
     "community_apps": [],
     "sourcetypes": [
-      "cisco:tr:data",
-      "ta:cisco:threat:response:log"
+      "cisco:tr:data"
     ],
-    "dashboards": [],
+    "dashboard": "",
     "custom_dashboard": "",
     "icon_emoji": "archive",
     "aliases": [],
@@ -3933,6 +4389,15 @@ export const PRODUCT_CATALOG = [
     "alert_actions": [],
     "soar_connectors": [],
     "itsi_content_pack": null,
+    "card_banner": "Deprecated",
+    "card_banner_color": "red",
+    "card_banner_size": "small",
+    "card_banner_opacity": "0.12",
+    "card_accent": "#9e9e9e",
+    "card_bg_color": "smoke",
+    "is_new": false,
+    "secure_networking_gtm": false,
+    "support_level": "not_supported",
     "sort_order": 906
   },
   {
@@ -3966,11 +4431,11 @@ export const PRODUCT_CATALOG = [
     "prereq_apps": [],
     "community_apps": [],
     "sourcetypes": [
+      "cisco:ips:input",
       "cisco:ips:syslog",
-      "cisco_ips_syslog",
       "sdee_connection"
     ],
-    "dashboards": [],
+    "dashboard": "",
     "custom_dashboard": "",
     "icon_emoji": "archive",
     "aliases": [],
@@ -3989,6 +4454,15 @@ export const PRODUCT_CATALOG = [
     "alert_actions": [],
     "soar_connectors": [],
     "itsi_content_pack": null,
+    "card_banner": "Deprecated",
+    "card_banner_color": "red",
+    "card_banner_size": "small",
+    "card_banner_opacity": "0.12",
+    "card_accent": "#9e9e9e",
+    "card_bg_color": "smoke",
+    "is_new": false,
+    "secure_networking_gtm": false,
+    "support_level": "not_supported",
     "sort_order": 907
   },
   {
@@ -4029,9 +4503,13 @@ export const PRODUCT_CATALOG = [
     "prereq_apps": [],
     "community_apps": [],
     "sourcetypes": [
-      "cisco:cmx"
+      "cmxactive",
+      "cmxanalytics",
+      "cmxfloor",
+      "cmxhttp",
+      "cmxmap"
     ],
-    "dashboards": [],
+    "dashboard": "",
     "custom_dashboard": "",
     "icon_emoji": "archive",
     "aliases": [],
@@ -4048,6 +4526,15 @@ export const PRODUCT_CATALOG = [
     "alert_actions": [],
     "soar_connectors": [],
     "itsi_content_pack": null,
+    "card_banner": "Deprecated",
+    "card_banner_color": "red",
+    "card_banner_size": "small",
+    "card_banner_opacity": "0.12",
+    "card_accent": "#9e9e9e",
+    "card_bg_color": "smoke",
+    "is_new": false,
+    "secure_networking_gtm": false,
+    "support_level": "not_supported",
     "sort_order": 908
   },
   {
@@ -4084,7 +4571,7 @@ export const PRODUCT_CATALOG = [
       "cisco:bugs:csv",
       "cisco:bugs:json"
     ],
-    "dashboards": [],
+    "dashboard": "",
     "custom_dashboard": "",
     "icon_emoji": "archive",
     "aliases": [],
@@ -4101,6 +4588,15 @@ export const PRODUCT_CATALOG = [
     "alert_actions": [],
     "soar_connectors": [],
     "itsi_content_pack": null,
+    "card_banner": "Deprecated",
+    "card_banner_color": "red",
+    "card_banner_size": "small",
+    "card_banner_opacity": "0.12",
+    "card_accent": "#9e9e9e",
+    "card_bg_color": "smoke",
+    "is_new": false,
+    "secure_networking_gtm": false,
+    "support_level": "not_supported",
     "sort_order": 909
   }
 ];

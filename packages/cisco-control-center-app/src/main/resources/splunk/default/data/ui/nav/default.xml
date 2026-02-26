@@ -1,4 +1,20 @@
 <nav search_view="search" color="#049fd9">
     <view name="products" default="true" label="Cisco Products" />
-    <a href="search">Search</a>
+    <collection label="Reports">
+      <saved name="SCAN - Ecosystem Summary" />
+      <saved name="SCAN - Product Catalog - Full Dump" />
+      <saved name="SCAN - Product Catalog - By Category" />
+      <saved name="SCAN - Product Catalog - By Add-on Family" />
+      <saved name="SCAN - Sourcetype Coverage" />
+      <saved name="SCAN - SOAR Connector Inventory" />
+      <saved name="SCAN - Legacy App Inventory" />
+      <saved name="SCAN - Data Quality - Missing Fields Audit" />
+      <saved name="SCAN - Products with Prerequisites" />
+      <saved name="SCAN - Installed Apps vs Catalog" />
+      <saved name="SCAN - Gap Analysis - CSV vs Catalog" />
+      <divider />
+      <a href="/app/cisco-control-center-app/reports" target="_blank">All Reports ↗</a>
+    </collection>
+    <a href="search" target="_blank" rel="noopener"></a>
+    <view name="datasets" />
 </nav>
