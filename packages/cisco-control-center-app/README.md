@@ -32,7 +32,7 @@ ln -s "$(pwd)/stage" /opt/splunk/etc/apps/cisco-control-center-app
 
 ## Architecture
 
-- **Product catalog:** `default/products.conf` — 57 product stanzas with 60+ fields each
+- **Product catalog:** `default/products.conf` — 57 product stanzas (only populated fields; see header comment for all available fields)
 - **React UI:** Single-page app mounted via Simple XML → RequireJS → webpack React bundle
 - **Build:** `node bin/build.js build` runs `generate-catalog.js` (static fallback) + webpack (~1s)
 - **Deploy:** `stage/` folder symlinked to Splunk's `etc/apps/` directory

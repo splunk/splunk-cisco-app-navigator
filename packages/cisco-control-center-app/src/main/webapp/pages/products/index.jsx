@@ -284,7 +284,7 @@ async function detectAllSourcetypeData(products) {
         const res = await splunkFetch(SEARCH_ENDPOINT, {
             method: 'POST',
             headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-            body: `search=${encodeURIComponent(searchStr)}&output_mode=json&exec_mode=oneshot`,
+            body: `search=${encodeURIComponent(searchStr)}&output_mode=json&exec_mode=oneshot&count=0&timeout=120`,
         });
         const data = await res.json();
         const rows = data.results || []; // [{ sourcetype: '...', totalCount: '123' }, ...]

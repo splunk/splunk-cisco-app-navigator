@@ -29,8 +29,12 @@ category = security | networking | collaboration | infrastructure | observabilit
 version = <string>
 * Current version of this product module (e.g. "1.0.0").
 
-status = active | under_development | deprecated
-* Product lifecycle status. "under_development" shows a Preview badge.
+status = active | under_development | deprecated | archived
+* Product lifecycle status.
+*   active             — Live product shown in the main grid.
+*   under_development  — Shows a Preview badge (use sparingly).
+*   deprecated         — Moved to the Deprecated category.
+*   archived           — Hidden from the UI (disabled = 1).
 
 addon = <string>
 * The Splunk app_id of the add-on / TA this card is associated with (e.g. "CiscoSecurityCloud").

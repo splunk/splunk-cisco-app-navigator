@@ -796,6 +796,7 @@ html.dce-dark [data-view="views/shared/Page"] {
         rgba(0, 0, 0, 0.22) 0px 6px 20px,
         rgba(0, 0, 0, 0.15) 0px 0px 2px;
     transform: translateY(-2px);
+    z-index: 50;
 }
 
 /* ── IS4S-inspired gradient bottom border ── */
@@ -1777,6 +1778,7 @@ html.dce-dark [data-view="views/shared/Page"] {
 .csc-badge-legacy {
     color: #c62828;
     cursor: help;
+    position: relative;
 }
 :root.dce-dark .csc-badge-legacy {
     color: #ef9a9a;
@@ -1856,9 +1858,10 @@ html.dce-dark [data-view="views/shared/Page"] {
     top: 100%;
     left: 0;
     padding-top: 6px;           /* visual gap handled by padding (keeps hover zone) */
-    z-index: 100;
-    min-width: 300px;
-    max-width: 400px;
+    z-index: 9999;
+    min-width: 320px;
+    width: max-content;
+    max-width: min(500px, 90vw);
     white-space: normal;
     color: var(--page-color, #333);
     text-align: left;
@@ -1869,8 +1872,10 @@ html.dce-dark [data-view="views/shared/Page"] {
     background: var(--card-bg, #ffffff);
     border: 1px solid var(--card-border, #e0e0e0);
     border-radius: 8px;
-    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.18);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.22), 0 0 0 1px rgba(0, 0, 0, 0.05);
     padding: 12px;
+    max-height: 60vh;
+    overflow-y: auto;
 }
 
 .csc-badge-legacy:hover .csc-legacy-tooltip {

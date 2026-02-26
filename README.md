@@ -44,7 +44,7 @@ cisco_control_center_app/
         │   ├── resources/splunk/      # Splunk app resources (copied to stage/)
         │   │   ├── default/
         │   │   │   ├── app.conf       # App identity & version
-        │   │   │   ├── products.conf  # Product catalog (57 stanzas, 4500+ lines)
+        │   │   │   ├── products.conf  # Product catalog (57 stanzas, ~2300 lines)
         │   │   │   ├── savedsearches.conf  # 11 saved searches
         │   │   │   ├── server.conf    # SHC replication settings
         │   │   │   └── data/ui/       # Navigation & views
