@@ -2,7 +2,7 @@
 /**
  * AUTO-GENERATED from products.conf — DO NOT EDIT BY HAND.
  * Regenerate:  node bin/generate-catalog.js
- * Generated:   2026-02-26T03:26:02.417Z
+ * Generated:   2026-02-26T03:37:28.227Z
  * Products:    54
  */
 
@@ -1913,7 +1913,7 @@ export const PRODUCT_CATALOG = [
     "prereq_apps": [],
     "community_apps": [],
     "sourcetypes": [],
-    "dashboard": "",
+    "dashboard": "cse_dashboard",
     "custom_dashboard": "",
     "icon_emoji": "mag",
     "aliases": [],
