@@ -154,6 +154,9 @@ function buildProduct(name, c) {
         is_new: c.is_new === 'true' || c.is_new === '1',
         secure_networking_gtm: c.secure_networking_gtm === 'true' || c.secure_networking_gtm === '1',
         support_level: c.support_level || '',
+        sc4s_url: c.sc4s_url || '',
+        sc4s_label: c.sc4s_label || '',
+        best_practices: (c.best_practices || '').split('|').map(s => s.trim()).filter(Boolean),
         sort_order: parseInt(c.sort_order || '100', 10),
     };
 }

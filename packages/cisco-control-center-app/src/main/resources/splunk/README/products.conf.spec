@@ -291,3 +291,20 @@ support_level = cisco_supported | splunk_supported | developer_supported | commu
 
 sort_order = <integer>
 * Numeric sort weight. Lower values appear first. Default 100.
+
+sc4s_url = <url>
+* URL to the SC4S (Splunk Connect for Syslog) documentation page for this product.
+* When set, an "SC4S" pill appears next to the add-on links in the expanded card,
+* and a dedicated SC4S recommendation appears in the Best Practices modal.
+* Default: (empty).
+
+sc4s_label = <string>
+* Display label for the SC4S link (e.g. "SC4S: Cisco ISE").
+* Default: "SC4S documentation".
+
+best_practices = <pipe-delimited string>
+* Custom per-product best-practice tips shown in the Best Practices modal.
+* Multiple tips are separated by the pipe character (|).
+* These appear after the auto-generated generic tips (platform, add-on, sourcetypes, legacy).
+* Example: Tip one goes here|Tip two goes here|Third tip
+* Default: (empty).

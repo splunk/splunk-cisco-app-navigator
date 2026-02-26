@@ -203,6 +203,9 @@ async function loadProductsFromConf() {
             is_new: c.is_new === 'true' || c.is_new === '1',
             secure_networking_gtm: c.secure_networking_gtm === 'true' || c.secure_networking_gtm === '1',
             support_level: c.support_level || '',
+            sc4s_url: c.sc4s_url || '',
+            sc4s_label: c.sc4s_label || '',
+            best_practices: (c.best_practices || '').split('|').map(s => s.trim()).filter(Boolean),
             sort_order: parseInt(c.sort_order || '100', 10),
         };
     }).sort((a, b) => a.sort_order - b.sort_order || a.display_name.localeCompare(b.display_name))
@@ -361,26 +364,53 @@ function getBestPractices(product, platformType) {
     const viz = product.app_viz_label || product.app_viz || null;
     const tips = [];
 
-    if (isCloud) {
-        tips.push(`Since you are running Splunk Cloud, data for ${pn} is best ingested using a cloud-compatible input method such as an HTTP Event Collector (HEC) endpoint or the Splunk Cloud Data Manager.`);
+    // ── Platform / data-collection tip ──────────────────────────────────
+    if (product.sc4s_url) {
+        // Product has a specific SC4S page — show a targeted recommendation with link
+        const sc4sLabel = product.sc4s_label || 'SC4S documentation';
+        if (isCloud) {
+            tips.push({
+                text: `Since you are running Splunk Cloud, we highly recommend using SC4S (Splunk Connect for Syslog) for data collection. While the TA can be installed on an on-prem Heavy Forwarder to listen on a UDP port, this approach is only advisable for very small environments or single-integration use cases.`,
+                linkLabel: sc4sLabel,
+                linkUrl: product.sc4s_url,
+                icon: '🔗',
+            });
+        } else {
+            tips.push({
+                text: `For data collection, we highly recommend using SC4S (Splunk Connect for Syslog) to reliably ingest data for ${pn}. While the TA can be installed on a Heavy Forwarder to listen directly on a UDP port, this approach is only advisable for very small environments or single-integration use cases.`,
+                linkLabel: sc4sLabel,
+                linkUrl: product.sc4s_url,
+                icon: '🔗',
+            });
+        }
+    } else if (isCloud) {
+        tips.push({ text: `Since you are running Splunk Cloud, data for ${pn} is best ingested using a cloud-compatible input method such as an HTTP Event Collector (HEC) endpoint or the Splunk Cloud Data Manager.` });
     } else {
-        tips.push(`On Splunk Enterprise, consider using Splunk Connect for Syslog (SC4S) to reliably ingest data for ${pn}. SC4S handles syslog parsing and routes events to the correct sourcetype automatically.`);
+        tips.push({ text: `On Splunk Enterprise, consider using Splunk Connect for Syslog (SC4S) to reliably ingest data for ${pn}. SC4S handles syslog parsing and routes events to the correct sourcetype automatically.` });
     }
 
-    tips.push(`The required add-on for data ingestion is "${ta}". Make sure it is installed and enabled on your search heads and heavy forwarders.`);
+    tips.push({ text: `The required add-on for data ingestion is "${ta}". Make sure it is installed and enabled on your search heads and heavy forwarders.` });
 
     if (viz) {
-        tips.push(`To visualise dashboards and reports, install "${viz}" on your search heads.`);
+        tips.push({ text: `To visualise dashboards and reports, install "${viz}" on your search heads.` });
     }
 
     if (product.sourcetypes && product.sourcetypes.length > 0) {
-        tips.push(`Expected sourcetypes: ${product.sourcetypes.join(', ')}. Verify these appear in your environment after configuring the data input.`);
+        tips.push({ text: `Expected sourcetypes: ${product.sourcetypes.join(', ')}. Verify these appear in your environment after configuring the data input.` });
     }
 
     if (product.legacy_apps && product.legacy_apps.length > 0) {
         const names = product.legacy_apps.map(la => la.display_name || la.app_id).join(', ');
-        tips.push(`⚠ Disable and remove these deprecated apps before using the recommended add-on: ${names}`);
+        tips.push({ text: `⚠ Disable and remove these deprecated apps before using the recommended add-on: ${names}`, icon: '⚠' });
     }
+
+    // ── Custom per-product tips ────────────────────────────────────────
+    if (product.best_practices && product.best_practices.length > 0) {
+        product.best_practices.forEach(tip => {
+            tips.push({ text: tip, icon: '💡', custom: true });
+        });
+    }
+
     return tips;
 }
 
@@ -473,8 +503,23 @@ function BestPracticesModal({ open, onClose, product, platformType }) {
             <Modal.Body>
                 <div style={{ fontSize: '13px', lineHeight: '1.7' }}>
                     {tips.map((tip, i) => (
-                        <div key={i} style={{ padding: '10px 14px', marginBottom: '8px', background: 'var(--section-alt-bg, #f7f7f7)', borderRadius: '6px', borderLeft: '3px solid #049fd9' }}>
-                            {tip}
+                        <div key={i} style={{
+                            padding: '10px 14px',
+                            marginBottom: '8px',
+                            background: tip.custom ? 'var(--custom-tip-bg, #e8f5e9)' : 'var(--section-alt-bg, #f7f7f7)',
+                            borderRadius: '6px',
+                            borderLeft: `3px solid ${tip.custom ? '#43a047' : '#049fd9'}`,
+                        }}>
+                            {tip.icon && <span style={{ marginRight: '6px' }}>{tip.icon}</span>}
+                            {tip.text}
+                            {tip.linkUrl && (
+                                <div style={{ marginTop: '6px' }}>
+                                    <a href={tip.linkUrl} target="_blank" rel="noopener noreferrer"
+                                       style={{ color: '#049fd9', fontWeight: 600, textDecoration: 'underline' }}>
+                                        {tip.linkLabel || tip.linkUrl} ↗
+                                    </a>
+                                </div>
+                            )}
                         </div>
                     ))}
                 </div>
@@ -735,6 +780,7 @@ function ProductCard({ product, installedApps, appStatuses, sourcetypeData, isCo
         app_viz_2, app_viz_2_label, app_viz_2_splunkbase_url, app_viz_2_docs_url, app_viz_2_troubleshoot_url, app_viz_2_install_url,
         legacy_apps, prereq_apps, soar_connectors, alert_actions, community_apps, itsi_content_pack,
         card_banner, card_banner_color, card_banner_size, card_banner_opacity, card_accent, card_bg_color, is_new, support_level,
+        sc4s_url,
     } = product;
 
     const appStatus = appStatuses[addon] || null;
@@ -984,7 +1030,7 @@ function ProductCard({ product, installedApps, appStatuses, sourcetypeData, isCo
                             {addon && (
                                 <div className="csc-dep-detail">
                                     <span className="csc-dep-name">{addon_label || addon}</span>
-                                    {(addon_splunkbase_url || addon_docs_url || addon_troubleshoot_url) && (
+                                    {(addon_splunkbase_url || addon_docs_url || addon_troubleshoot_url || sc4s_url) && (
                                         <span className="csc-split-pill">
                                             {addon_splunkbase_url && (
                                                 <a href={addon_splunkbase_url} target="_blank" rel="noopener noreferrer" className="csc-split-pill-seg" title="View on Splunkbase">
@@ -999,6 +1045,11 @@ function ProductCard({ product, installedApps, appStatuses, sourcetypeData, isCo
                                             {addon_troubleshoot_url && (
                                                 <a href={addon_troubleshoot_url} target="_blank" rel="noopener noreferrer" className="csc-split-pill-seg" title="Troubleshooting Guide">
                                                     Troubleshoot 🔧
+                                                </a>
+                                            )}
+                                            {sc4s_url && (
+                                                <a href={sc4s_url} target="_blank" rel="noopener noreferrer" className="csc-split-pill-seg csc-split-pill-sc4s" title="SC4S — Splunk Connect for Syslog">
+                                                    SC4S 📡
                                                 </a>
                                             )}
                                         </span>

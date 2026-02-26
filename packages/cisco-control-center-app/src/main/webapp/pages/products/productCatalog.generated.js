@@ -2,7 +2,7 @@
 /**
  * AUTO-GENERATED from products.conf — DO NOT EDIT BY HAND.
  * Regenerate:  node bin/generate-catalog.js
- * Generated:   2026-02-26T05:17:02.643Z
+ * Generated:   2026-02-26T17:17:09.123Z
  * Products:    57
  */
 
@@ -185,6 +185,9 @@ export const PRODUCT_CATALOG = [
     "is_new": false,
     "secure_networking_gtm": true,
     "support_level": "cisco_supported",
+    "sc4s_url": "",
+    "sc4s_label": "",
+    "best_practices": [],
     "sort_order": 10
   },
   {
@@ -278,6 +281,9 @@ export const PRODUCT_CATALOG = [
     "is_new": false,
     "secure_networking_gtm": true,
     "support_level": "cisco_supported",
+    "sc4s_url": "",
+    "sc4s_label": "",
+    "best_practices": [],
     "sort_order": 11
   },
   {
@@ -356,6 +362,9 @@ export const PRODUCT_CATALOG = [
     "is_new": false,
     "secure_networking_gtm": true,
     "support_level": "cisco_supported",
+    "sc4s_url": "",
+    "sc4s_label": "",
+    "best_practices": [],
     "sort_order": 12
   },
   {
@@ -445,6 +454,9 @@ export const PRODUCT_CATALOG = [
     "is_new": false,
     "secure_networking_gtm": true,
     "support_level": "cisco_supported",
+    "sc4s_url": "",
+    "sc4s_label": "",
+    "best_practices": [],
     "sort_order": 13
   },
   {
@@ -535,6 +547,9 @@ export const PRODUCT_CATALOG = [
     "is_new": false,
     "secure_networking_gtm": true,
     "support_level": "cisco_supported",
+    "sc4s_url": "",
+    "sc4s_label": "",
+    "best_practices": [],
     "sort_order": 15
   },
   {
@@ -595,6 +610,9 @@ export const PRODUCT_CATALOG = [
     "is_new": false,
     "secure_networking_gtm": true,
     "support_level": "cisco_supported",
+    "sc4s_url": "",
+    "sc4s_label": "",
+    "best_practices": [],
     "sort_order": 16
   },
   {
@@ -667,6 +685,9 @@ export const PRODUCT_CATALOG = [
     "is_new": false,
     "secure_networking_gtm": true,
     "support_level": "cisco_supported",
+    "sc4s_url": "",
+    "sc4s_label": "",
+    "best_practices": [],
     "sort_order": 17
   },
   {
@@ -761,6 +782,9 @@ export const PRODUCT_CATALOG = [
     "is_new": false,
     "secure_networking_gtm": true,
     "support_level": "cisco_supported",
+    "sc4s_url": "",
+    "sc4s_label": "",
+    "best_practices": [],
     "sort_order": 20
   },
   {
@@ -822,6 +846,9 @@ export const PRODUCT_CATALOG = [
     "is_new": false,
     "secure_networking_gtm": true,
     "support_level": "cisco_supported",
+    "sc4s_url": "",
+    "sc4s_label": "",
+    "best_practices": [],
     "sort_order": 21
   },
   {
@@ -908,6 +935,9 @@ export const PRODUCT_CATALOG = [
     "is_new": false,
     "secure_networking_gtm": true,
     "support_level": "cisco_supported",
+    "sc4s_url": "",
+    "sc4s_label": "",
+    "best_practices": [],
     "sort_order": 22
   },
   {
@@ -975,6 +1005,9 @@ export const PRODUCT_CATALOG = [
     "is_new": false,
     "secure_networking_gtm": true,
     "support_level": "cisco_supported",
+    "sc4s_url": "",
+    "sc4s_label": "",
+    "best_practices": [],
     "sort_order": 25
   },
   {
@@ -1067,6 +1100,9 @@ export const PRODUCT_CATALOG = [
     "is_new": false,
     "secure_networking_gtm": true,
     "support_level": "splunk_supported",
+    "sc4s_url": "",
+    "sc4s_label": "",
+    "best_practices": [],
     "sort_order": 26
   },
   {
@@ -1129,6 +1165,9 @@ export const PRODUCT_CATALOG = [
     "is_new": false,
     "secure_networking_gtm": true,
     "support_level": "cisco_supported",
+    "sc4s_url": "",
+    "sc4s_label": "",
+    "best_practices": [],
     "sort_order": 30
   },
   {
@@ -1202,6 +1241,9 @@ export const PRODUCT_CATALOG = [
     "is_new": false,
     "secure_networking_gtm": true,
     "support_level": "splunk_supported",
+    "sc4s_url": "",
+    "sc4s_label": "",
+    "best_practices": [],
     "sort_order": 31
   },
   {
@@ -1261,6 +1303,9 @@ export const PRODUCT_CATALOG = [
     "is_new": false,
     "secure_networking_gtm": false,
     "support_level": "cisco_supported",
+    "sc4s_url": "",
+    "sc4s_label": "",
+    "best_practices": [],
     "sort_order": 32
   },
   {
@@ -1320,6 +1365,9 @@ export const PRODUCT_CATALOG = [
     "is_new": false,
     "secure_networking_gtm": true,
     "support_level": "cisco_supported",
+    "sc4s_url": "",
+    "sc4s_label": "",
+    "best_practices": [],
     "sort_order": 35
   },
   {
@@ -1450,6 +1498,9 @@ export const PRODUCT_CATALOG = [
     "is_new": false,
     "secure_networking_gtm": true,
     "support_level": "cisco_supported",
+    "sc4s_url": "",
+    "sc4s_label": "",
+    "best_practices": [],
     "sort_order": 36
   },
   {
@@ -1510,6 +1561,9 @@ export const PRODUCT_CATALOG = [
     "is_new": false,
     "secure_networking_gtm": false,
     "support_level": "splunk_supported",
+    "sc4s_url": "",
+    "sc4s_label": "",
+    "best_practices": [],
     "sort_order": 37
   },
   {
@@ -1576,6 +1630,9 @@ export const PRODUCT_CATALOG = [
     "is_new": false,
     "secure_networking_gtm": true,
     "support_level": "cisco_supported",
+    "sc4s_url": "",
+    "sc4s_label": "",
+    "best_practices": [],
     "sort_order": 38
   },
   {
@@ -1639,6 +1696,9 @@ export const PRODUCT_CATALOG = [
     "is_new": true,
     "secure_networking_gtm": true,
     "support_level": "cisco_supported",
+    "sc4s_url": "",
+    "sc4s_label": "",
+    "best_practices": [],
     "sort_order": 39
   },
   {
@@ -1700,6 +1760,9 @@ export const PRODUCT_CATALOG = [
     "is_new": false,
     "secure_networking_gtm": false,
     "support_level": "splunk_supported",
+    "sc4s_url": "",
+    "sc4s_label": "",
+    "best_practices": [],
     "sort_order": 45
   },
   {
@@ -1806,6 +1869,9 @@ export const PRODUCT_CATALOG = [
     "is_new": false,
     "secure_networking_gtm": false,
     "support_level": "splunk_supported",
+    "sc4s_url": "",
+    "sc4s_label": "",
+    "best_practices": [],
     "sort_order": 46
   },
   {
@@ -1891,6 +1957,9 @@ export const PRODUCT_CATALOG = [
     "is_new": false,
     "secure_networking_gtm": false,
     "support_level": "splunk_supported",
+    "sc4s_url": "",
+    "sc4s_label": "",
+    "best_practices": [],
     "sort_order": 47
   },
   {
@@ -1948,6 +2017,9 @@ export const PRODUCT_CATALOG = [
     "is_new": true,
     "secure_networking_gtm": true,
     "support_level": "cisco_supported",
+    "sc4s_url": "",
+    "sc4s_label": "",
+    "best_practices": [],
     "sort_order": 80
   },
   {
@@ -2006,6 +2078,9 @@ export const PRODUCT_CATALOG = [
     "is_new": false,
     "secure_networking_gtm": false,
     "support_level": "cisco_supported",
+    "sc4s_url": "",
+    "sc4s_label": "",
+    "best_practices": [],
     "sort_order": 81
   },
   {
@@ -2064,6 +2139,9 @@ export const PRODUCT_CATALOG = [
     "is_new": false,
     "secure_networking_gtm": false,
     "support_level": "cisco_supported",
+    "sc4s_url": "",
+    "sc4s_label": "",
+    "best_practices": [],
     "sort_order": 82
   },
   {
@@ -2122,6 +2200,9 @@ export const PRODUCT_CATALOG = [
     "is_new": false,
     "secure_networking_gtm": false,
     "support_level": "cisco_supported",
+    "sc4s_url": "",
+    "sc4s_label": "",
+    "best_practices": [],
     "sort_order": 83
   },
   {
@@ -2249,6 +2330,9 @@ export const PRODUCT_CATALOG = [
     "is_new": false,
     "secure_networking_gtm": true,
     "support_level": "cisco_supported",
+    "sc4s_url": "",
+    "sc4s_label": "",
+    "best_practices": [],
     "sort_order": 100
   },
   {
@@ -2344,6 +2428,9 @@ export const PRODUCT_CATALOG = [
     "is_new": false,
     "secure_networking_gtm": true,
     "support_level": "cisco_supported",
+    "sc4s_url": "",
+    "sc4s_label": "",
+    "best_practices": [],
     "sort_order": 101
   },
   {
@@ -2462,6 +2549,9 @@ export const PRODUCT_CATALOG = [
     "is_new": false,
     "secure_networking_gtm": true,
     "support_level": "cisco_supported",
+    "sc4s_url": "",
+    "sc4s_label": "",
+    "best_practices": [],
     "sort_order": 102
   },
   {
@@ -2582,6 +2672,12 @@ export const PRODUCT_CATALOG = [
     "is_new": false,
     "secure_networking_gtm": true,
     "support_level": "cisco_supported",
+    "sc4s_url": "https://splunk.github.io/splunk-connect-for-syslog/main/sources/vendor/Cisco/cisco_ise/",
+    "sc4s_label": "SC4S: Cisco ISE",
+    "best_practices": [
+      "On Splunk Cloud, the Cisco Catalyst Add-on cannot configure inputs directly — install it on an on-prem Heavy Forwarder instead, or use SC4S for seamless syslog ingestion.",
+      "ISE pxGrid integration requires a dedicated pxGrid node and the Splunk Stream app as a prerequisite — see the prereq apps listed on this card."
+    ],
     "sort_order": 103
   },
   {
@@ -2677,6 +2773,9 @@ export const PRODUCT_CATALOG = [
     "is_new": false,
     "secure_networking_gtm": true,
     "support_level": "cisco_supported",
+    "sc4s_url": "",
+    "sc4s_label": "",
+    "best_practices": [],
     "sort_order": 104
   },
   {
@@ -2771,6 +2870,9 @@ export const PRODUCT_CATALOG = [
     "is_new": false,
     "secure_networking_gtm": true,
     "support_level": "cisco_supported",
+    "sc4s_url": "",
+    "sc4s_label": "",
+    "best_practices": [],
     "sort_order": 105
   },
   {
@@ -2936,6 +3038,9 @@ export const PRODUCT_CATALOG = [
     "is_new": false,
     "secure_networking_gtm": true,
     "support_level": "cisco_supported",
+    "sc4s_url": "",
+    "sc4s_label": "",
+    "best_practices": [],
     "sort_order": 106
   },
   {
@@ -3036,6 +3141,9 @@ export const PRODUCT_CATALOG = [
     "is_new": false,
     "secure_networking_gtm": true,
     "support_level": "cisco_supported",
+    "sc4s_url": "",
+    "sc4s_label": "",
+    "best_practices": [],
     "sort_order": 107
   },
   {
@@ -3131,6 +3239,9 @@ export const PRODUCT_CATALOG = [
     "is_new": false,
     "secure_networking_gtm": false,
     "support_level": "cisco_supported",
+    "sc4s_url": "",
+    "sc4s_label": "",
+    "best_practices": [],
     "sort_order": 108
   },
   {
@@ -3225,6 +3336,9 @@ export const PRODUCT_CATALOG = [
     "is_new": false,
     "secure_networking_gtm": false,
     "support_level": "cisco_supported",
+    "sc4s_url": "",
+    "sc4s_label": "",
+    "best_practices": [],
     "sort_order": 109
   },
   {
@@ -3318,6 +3432,9 @@ export const PRODUCT_CATALOG = [
     "is_new": false,
     "secure_networking_gtm": false,
     "support_level": "cisco_supported",
+    "sc4s_url": "",
+    "sc4s_label": "",
+    "best_practices": [],
     "sort_order": 110
   },
   {
@@ -3428,6 +3545,9 @@ export const PRODUCT_CATALOG = [
     "is_new": false,
     "secure_networking_gtm": true,
     "support_level": "cisco_supported",
+    "sc4s_url": "",
+    "sc4s_label": "",
+    "best_practices": [],
     "sort_order": 111
   },
   {
@@ -3512,6 +3632,9 @@ export const PRODUCT_CATALOG = [
     "is_new": false,
     "secure_networking_gtm": false,
     "support_level": "cisco_supported",
+    "sc4s_url": "",
+    "sc4s_label": "",
+    "best_practices": [],
     "sort_order": 120
   },
   {
@@ -3582,6 +3705,9 @@ export const PRODUCT_CATALOG = [
     "is_new": false,
     "secure_networking_gtm": false,
     "support_level": "cisco_supported",
+    "sc4s_url": "",
+    "sc4s_label": "",
+    "best_practices": [],
     "sort_order": 121
   },
   {
@@ -3640,6 +3766,9 @@ export const PRODUCT_CATALOG = [
     "is_new": false,
     "secure_networking_gtm": true,
     "support_level": "cisco_supported",
+    "sc4s_url": "",
+    "sc4s_label": "",
+    "best_practices": [],
     "sort_order": 122
   },
   {
@@ -3754,6 +3883,9 @@ export const PRODUCT_CATALOG = [
     "is_new": false,
     "secure_networking_gtm": true,
     "support_level": "cisco_supported",
+    "sc4s_url": "",
+    "sc4s_label": "",
+    "best_practices": [],
     "sort_order": 200
   },
   {
@@ -3839,6 +3971,9 @@ export const PRODUCT_CATALOG = [
     "is_new": false,
     "secure_networking_gtm": false,
     "support_level": "splunk_supported",
+    "sc4s_url": "",
+    "sc4s_label": "",
+    "best_practices": [],
     "sort_order": 201
   },
   {
@@ -3985,6 +4120,9 @@ export const PRODUCT_CATALOG = [
     "is_new": false,
     "secure_networking_gtm": false,
     "support_level": "cisco_supported",
+    "sc4s_url": "",
+    "sc4s_label": "",
+    "best_practices": [],
     "sort_order": 300
   },
   {
@@ -4073,6 +4211,9 @@ export const PRODUCT_CATALOG = [
     "is_new": false,
     "secure_networking_gtm": false,
     "support_level": "cisco_supported",
+    "sc4s_url": "",
+    "sc4s_label": "",
+    "best_practices": [],
     "sort_order": 301
   },
   {
@@ -4141,6 +4282,9 @@ export const PRODUCT_CATALOG = [
     "is_new": false,
     "secure_networking_gtm": false,
     "support_level": "cisco_supported",
+    "sc4s_url": "",
+    "sc4s_label": "",
+    "best_practices": [],
     "sort_order": 302
   },
   {
@@ -4199,6 +4343,9 @@ export const PRODUCT_CATALOG = [
     "is_new": false,
     "secure_networking_gtm": true,
     "support_level": "not_supported",
+    "sc4s_url": "",
+    "sc4s_label": "",
+    "best_practices": [],
     "sort_order": 900
   },
   {
@@ -4267,6 +4414,9 @@ export const PRODUCT_CATALOG = [
     "is_new": false,
     "secure_networking_gtm": false,
     "support_level": "not_supported",
+    "sc4s_url": "",
+    "sc4s_label": "",
+    "best_practices": [],
     "sort_order": 901
   },
   {
@@ -4327,6 +4477,9 @@ export const PRODUCT_CATALOG = [
     "is_new": false,
     "secure_networking_gtm": false,
     "support_level": "not_supported",
+    "sc4s_url": "",
+    "sc4s_label": "",
+    "best_practices": [],
     "sort_order": 902
   },
   {
@@ -4393,6 +4546,9 @@ export const PRODUCT_CATALOG = [
     "is_new": false,
     "secure_networking_gtm": false,
     "support_level": "not_supported",
+    "sc4s_url": "",
+    "sc4s_label": "",
+    "best_practices": [],
     "sort_order": 903
   },
   {
@@ -4459,6 +4615,9 @@ export const PRODUCT_CATALOG = [
     "is_new": false,
     "secure_networking_gtm": false,
     "support_level": "not_supported",
+    "sc4s_url": "",
+    "sc4s_label": "",
+    "best_practices": [],
     "sort_order": 904
   },
   {
@@ -4521,6 +4680,9 @@ export const PRODUCT_CATALOG = [
     "is_new": false,
     "secure_networking_gtm": false,
     "support_level": "not_supported",
+    "sc4s_url": "",
+    "sc4s_label": "",
+    "best_practices": [],
     "sort_order": 905
   },
   {
@@ -4583,6 +4745,9 @@ export const PRODUCT_CATALOG = [
     "is_new": false,
     "secure_networking_gtm": false,
     "support_level": "not_supported",
+    "sc4s_url": "",
+    "sc4s_label": "",
+    "best_practices": [],
     "sort_order": 906
   },
   {
@@ -4648,6 +4813,9 @@ export const PRODUCT_CATALOG = [
     "is_new": false,
     "secure_networking_gtm": false,
     "support_level": "not_supported",
+    "sc4s_url": "",
+    "sc4s_label": "",
+    "best_practices": [],
     "sort_order": 907
   },
   {
@@ -4726,6 +4894,9 @@ export const PRODUCT_CATALOG = [
     "is_new": false,
     "secure_networking_gtm": false,
     "support_level": "not_supported",
+    "sc4s_url": "",
+    "sc4s_label": "",
+    "best_practices": [],
     "sort_order": 908
   },
   {
@@ -4788,6 +4959,9 @@ export const PRODUCT_CATALOG = [
     "is_new": false,
     "secure_networking_gtm": false,
     "support_level": "not_supported",
+    "sc4s_url": "",
+    "sc4s_label": "",
+    "best_practices": [],
     "sort_order": 909
   }
 ];

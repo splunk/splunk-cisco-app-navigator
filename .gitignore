@@ -26,6 +26,9 @@ __pycache__/
 **/local/
 **/local.meta
 ~$*
-docs/chat_history_recovered.md
-# backups/
+
+# Backups
 backups/
+
+# Docs — generated presentations, chat history, binaries
+docs/

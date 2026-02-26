@@ -63,6 +63,7 @@
     --card-desc-color: #555555;
     --section-bg: #f5f6f8;
     --section-alt-bg: #e8ebee;
+    --custom-tip-bg: #e8f5e9;
     --section-border: #d0d4d8;
     --panel-toggle-bg: linear-gradient(180deg, #f5f6f8, #e4e7ea);
     --panel-toggle-color: #333333;
@@ -128,6 +129,7 @@
     --card-desc-color: #b0b0b0;
     --section-bg: #1e262c;
     --section-alt-bg: #1a2228;
+    --custom-tip-bg: #1b3a1f;
     --section-border: #333d44;
     --panel-toggle-bg: linear-gradient(180deg, #232d34, #1a2228);
     --panel-toggle-color: #d4d4d4;
@@ -1651,6 +1653,14 @@ html.dce-dark [data-view="views/shared/Page"] {
 }
 .csc-split-pill-seg + .csc-split-pill-seg {
     border-left: 1px solid var(--card-border, #dce0e4);
+}
+.csc-split-pill-sc4s {
+    color: #0277bd;
+    font-weight: 600;
+}
+.csc-split-pill-sc4s:hover {
+    background: #0277bd;
+    color: #fff;
 }
 
 .csc-dep-version {

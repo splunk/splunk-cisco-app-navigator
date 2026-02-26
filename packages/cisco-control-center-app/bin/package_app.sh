@@ -20,6 +20,8 @@ TMP_DIR="$(mktemp -d)"
 trap 'rm -rf "$TMP_DIR"' EXIT
 cp -R "$STAGE_DIR" "${TMP_DIR}/${APP_NAME}"
 find "${TMP_DIR}" -name ".DS_Store" -delete
+# Remove Splunk-generated local/ directory — it should never ship in the package
+rm -rf "${TMP_DIR}/${APP_NAME}/local"
 # Strip macOS extended attributes to keep archive clean
 xattr -cr "${TMP_DIR}/${APP_NAME}" 2>/dev/null || true
 
