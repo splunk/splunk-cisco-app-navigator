@@ -10,7 +10,7 @@
  * immediately after app install on Splunk Cloud (no restart required).
  */
 require([
-    '/static/app/cisco-control-center-app/pages/products.js'
+    '/static/app/splunk-cisco-app-navigator/pages/products.js'
 ], function () {
     // The React bundle self-initialises on load — nothing else to do here.
 });

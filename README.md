@@ -33,7 +33,7 @@ cisco_control_center_app/
 │   ├── gen_pptx.py                   # PowerPoint generator (generic)
 │   └── ...                            # Additional analysis scripts
 └── packages/
-    └── cisco-control-center-app/      # Main Splunk app package
+    └── splunk-cisco-app-navigator/      # Main Splunk app package
         ├── bin/
         │   ├── build.js               # Build orchestrator (catalog + webpack)
         │   ├── generate-catalog.js    # Static catalog generator from products.conf
@@ -68,11 +68,11 @@ cisco_control_center_app/
 yarn install
 
 # 2. Build
-cd packages/cisco-control-center-app
+cd packages/splunk-cisco-app-navigator
 node bin/build.js build
 
 # 3. Deploy (symlink stage/ to Splunk)
-ln -s "$(pwd)/stage" /opt/splunk/etc/apps/cisco-control-center-app
+ln -s "$(pwd)/stage" /opt/splunk/etc/apps/splunk-cisco-app-navigator
 
 # 4. Clear cache & refresh
 rm -f /opt/splunk/var/run/splunk/appserver/i18n/products*.cache
@@ -114,4 +114,4 @@ curl -sk -u admin:changeme https://localhost:8089/services/debug/refresh \
 - [Executive Brief](docs/Executive_Brief.md) — Feature-complete product brief with full catalog reference
 - [Apps Presentation](docs/Cisco_Splunk_Apps_Presentation.md) — Strategic blueprint for Cisco-Splunk app consolidation
 - [TA Strategy](docs/Cisco_Splunk_TA_Strategy_Presentation.md) — Engineering strategy for TA quality & scale
-- [App README](packages/cisco-control-center-app/src/main/resources/splunk/README.md) — Detailed feature documentation
+- [App README](packages/splunk-cisco-app-navigator/src/main/resources/splunk/README.md) — Detailed feature documentation

@@ -9,11 +9,11 @@ The **Splunk Cisco App Navigator** is the unified "Glass Pane" for the Cisco-Spl
 yarn install
 
 # Build the app
-cd packages/cisco-control-center-app
+cd packages/splunk-cisco-app-navigator
 node bin/build.js build
 
 # The built app lives in stage/ — symlink to your Splunk apps directory:
-ln -s "$(pwd)/stage" /opt/splunk/etc/apps/cisco-control-center-app
+ln -s "$(pwd)/stage" /opt/splunk/etc/apps/splunk-cisco-app-navigator
 ```
 
 ## Key Features

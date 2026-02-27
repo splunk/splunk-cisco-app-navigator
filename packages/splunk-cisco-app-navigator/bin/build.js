@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /**
- * Minimal build.js for cisco-control-center-app: run webpack to build UI
+ * Minimal build.js for splunk-cisco-app-navigator: run webpack to build UI
  * and copy src/main/resources/splunk -> stage.
  */
 const { spawnSync } = require('child_process');

@@ -1,5 +1,5 @@
 {
-  "name": "cisco-control-center-workspace",
+  "name": "splunk-cisco-app-navigator-workspace",
   "version": "1.0.0",
   "private": true,
   "workspaces": [
@@ -8,7 +8,7 @@
   "scripts": {
     "build": "lerna run build",
     "setup": "yarn && lerna run build",
-    "start": "cd packages/cisco-control-center-app && yarn start",
+    "start": "cd packages/splunk-cisco-app-navigator && yarn start",
     "lint": "lerna run lint",
     "clean": "lerna run clean --parallel"
   },

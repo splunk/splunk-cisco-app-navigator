@@ -6,7 +6,7 @@ set -e
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 PKG_ROOT="${SCRIPT_DIR}/.."
 STAGE_DIR="${PKG_ROOT}/stage"
-APP_NAME="cisco-control-center-app"
+APP_NAME="splunk-cisco-app-navigator"
 PKG_PATH="${PKG_ROOT}/${APP_NAME}.tar.gz"
 
 if [[ ! -d "$STAGE_DIR" ]]; then

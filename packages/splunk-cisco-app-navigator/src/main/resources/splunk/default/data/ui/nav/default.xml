@@ -13,7 +13,7 @@
       <saved name="SCAN - Installed Apps vs Catalog" />
       <saved name="SCAN - Gap Analysis - CSV vs Catalog" />
       <divider />
-      <a href="/app/cisco-control-center-app/reports" target="_blank">All Reports ↗</a>
+      <a href="/app/splunk-cisco-app-navigator/reports" target="_blank">All Reports ↗</a>
     </collection>
     <a href="search" target="_blank" rel="noopener"></a>
     <view name="datasets" />

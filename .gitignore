@@ -1,7 +1,7 @@
 # Build outputs
-packages/cisco-control-center-app/stage/
-packages/cisco-control-center-app/cisco-control-center-app/
-packages/cisco-control-center-app/*.tar.gz
+packages/splunk-cisco-app-navigator/stage/
+packages/splunk-cisco-app-navigator/splunk-cisco-app-navigator/
+packages/splunk-cisco-app-navigator/*.tar.gz
 
 # Dependencies
 node_modules/
@@ -28,6 +28,7 @@ __pycache__/
 ~$*
 
 # Backups
+backup/
 backups/
 
 # Docs — generated presentations, chat history, binaries

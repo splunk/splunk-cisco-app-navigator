@@ -1,5 +1,5 @@
 {
-  "name": "@splunk/cisco-control-center-app",
+  "name": "@splunk/splunk-cisco-app-navigator",
   "version": "0.0.1",
   "license": "UNLICENSED",
   "scripts": {

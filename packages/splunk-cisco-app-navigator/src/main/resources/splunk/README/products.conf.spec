@@ -60,7 +60,7 @@ addon_troubleshoot_url = <string>
 
 addon_install_url = <string>
 * Relative Splunk manager URL to install the required add-on from inside Splunk
-* via Browse More Apps. Example: /manager/cisco-control-center-app/appsremote?order=relevance&query="Cisco+Security+Cloud"
+* via Browse More Apps. Example: /manager/splunk-cisco-app-navigator/appsremote?order=relevance&query="Cisco+Security+Cloud"
 * When empty, the UI falls back to addon_splunkbase_url and opens Splunkbase directly.
 * Leave empty for archived apps or apps not available in Browse More Apps.
 
