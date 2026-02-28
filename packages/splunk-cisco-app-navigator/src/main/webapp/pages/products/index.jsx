@@ -12,10 +12,12 @@
  *   • Whether the expected sourcetypes are already arriving
  *   • Platform-aware best-practice guidance (Cloud vs Enterprise)
  *
- * Three sections:
- *   1. Configured Products  — products the admin has added to their workspace
- *   2. Available Products   — active products ready to configure
- *   3. Coming Soon          — products under development
+ * Five sections:
+ *   1. Configured Products    — products the admin has added to their workspace
+ *   2. Available Products     — active products ready to configure
+ *   3. Unsupported Products   — products with no official support (not_supported)
+ *   4. Coming Soon            — products under development
+ *   5. Deprecated / Archived  — archived products no longer on Splunkbase
  *
  * All product metadata lives in products.conf.  A static PRODUCT_CATALOG
  * array mirrors that file so cards always render even outside Splunk.
@@ -120,6 +122,26 @@ const CATEGORIES = [
 // set (e.g. alert_actions) are metadata-only and excluded from the UI grid.
 const CATEGORY_IDS = new Set(CATEGORIES.map(c => c.id));
 
+// Sub-categories within main categories, keyed by subcategory field value.
+// Based on official Cisco product taxonomy.
+const SUB_CATEGORIES = {
+    security: [
+        { id: 'cloud_security', name: 'Cloud Security', icon: '☁️' },
+        { id: 'network_security', name: 'Network Security', icon: '🔥' },
+        { id: 'identity_access', name: 'Identity & Access', icon: '🔑' },
+        { id: 'email_security', name: 'Email Security', icon: '📧' },
+        { id: 'endpoint_security', name: 'Endpoint Security', icon: '🖥️' },
+        { id: 'workload_security', name: 'Workload Security', icon: '🐝' },
+        { id: 'threat_response', name: 'Threat Intel & Response', icon: '🔍' },
+        { id: 'compute_infra', name: 'Compute & Infra', icon: '🏢' },
+    ],
+    networking: [
+        { id: 'campus_wireless', name: 'Campus & Wireless', icon: '📡' },
+        { id: 'routing_wan', name: 'Routing & WAN', icon: '🛣️' },
+        { id: 'data_center_net', name: 'Data Center', icon: '🏢' },
+    ],
+};
+
 const ICON_EMOJI_MAP = {
     robot: '🤖', lock: '🔒', email: '📧', search: '🔍', badge: '🪪',
     bee: '🐝', zap: '⚡', cloud: '☁️', satellite: '📡', shield: '🛡️',
@@ -218,6 +240,7 @@ async function loadProductsFromConf() {
             addon: c.addon || '',
             addon_label: c.addon_label || '',
             addon_family: c.addon_family || 'default',
+            subcategory: c.subcategory || '',
             addon_splunkbase_url: c.addon_splunkbase_url || '',
             addon_docs_url: c.addon_docs_url || '',
             addon_troubleshoot_url: c.addon_troubleshoot_url || '',
@@ -258,6 +281,7 @@ async function loadProductsFromConf() {
             dashboard: (c.dashboards || '').trim(),
             custom_dashboard: c.custom_dashboard || '',
             icon_emoji: c.icon_emoji || '',
+            icon_svg: c.icon_svg || '',
             aliases: csvToArray(c.aliases),
             keywords: csvToArray(c.keywords),
             alert_actions: [
@@ -660,10 +684,11 @@ function IntelligenceBadges({ appStatus, vizAppStatus, vizApp2Status, sourcetype
 // ────────────────────  SC4S INFO MODAL  ───────────────────────
 
 function SC4SInfoModal({ open, onClose }) {
+    const returnFocusRef = useRef(null);
     if (!open) return null;
     return (
-        <Modal open returnFocus={false} onRequestClose={onClose} style={{ maxWidth: '820px', width: '92vw' }}>
-            <Modal.Header title="📡 Splunk Connect for Syslog (SC4S)" onRequestClose={onClose} />
+        <Modal open returnFocus={returnFocusRef} onRequestClose={onClose} style={{ maxWidth: '820px', width: '92vw' }}>
+            <Modal.Header title="📡 Splunk Connect for Syslog (SC4S)" />
             <Modal.Body>
                 <div className="csc-sc4s-info">
                     <div className="csc-sc4s-info-hero">
@@ -807,10 +832,11 @@ function SC4SInfoModal({ open, onClose }) {
 // ────────────────────  BEST PRACTICES MODAL  ───────────────────────
 
 function BestPracticesModal({ open, onClose, product, platformType }) {
+    const returnFocusRef = useRef(null);
     if (!open || !product) return null;
     const tips = getBestPractices(product, platformType);
     return (
-        <Modal open={true} returnFocus={false} onRequestClose={onClose} style={{ maxWidth: '640px' }}>
+        <Modal open={true} returnFocus={returnFocusRef} onRequestClose={onClose} style={{ maxWidth: '640px' }}>
             <Modal.Header title={`Best Practices — ${product.display_name}`} />
             <Modal.Body>
                 <div style={{ fontSize: '13px', lineHeight: '1.7' }}>
@@ -846,6 +872,7 @@ function BestPracticesModal({ open, onClose, product, platformType }) {
 // ────────────────────  LEGACY AUDIT MODAL  ───────────────────────
 
 function LegacyAuditModal({ open, onClose, legacyApps, onMigrate }) {
+    const returnFocusRef = useRef(null);
     if (!open) return null;
 
     const activeApps = (legacyApps || []).filter(a => a.status !== 'archived');
@@ -873,7 +900,7 @@ function LegacyAuditModal({ open, onClose, legacyApps, onMigrate }) {
     );
 
     return (
-        <Modal open={true} returnFocus={false} onRequestClose={onClose} style={{ maxWidth: '720px' }}>
+        <Modal open={true} returnFocus={returnFocusRef} onRequestClose={onClose} style={{ maxWidth: '720px' }}>
             <Modal.Header title="Legacy Debt Audit Report" />
             <Modal.Body>
                 {!legacyApps || legacyApps.length === 0
@@ -1118,7 +1145,7 @@ function InfoTooltip({ placement = 'bottom', width = 500, delay = 400, content, 
 function ProductCard({ product, installedApps, appStatuses, sourcetypeData, isConfigured, isComingSoon, platformType, onToggleConfigured, onShowBestPractices, onViewLegacy, onSetCustomDashboard, devMode, onViewConfig }) {
     const {
         product_id, display_name, version, description, value_proposition, vendor, tagline,
-        icon_emoji, learn_more_url, addon_splunkbase_url, addon_docs_url, addon_troubleshoot_url, addon_install_url,
+        icon_emoji, icon_svg, learn_more_url, addon_splunkbase_url, addon_docs_url, addon_troubleshoot_url, addon_install_url,
         addon, addon_label,
         app_viz, app_viz_label, app_viz_splunkbase_url, app_viz_docs_url, app_viz_troubleshoot_url, app_viz_install_url,
         app_viz_2, app_viz_2_label, app_viz_2_splunkbase_url, app_viz_2_docs_url, app_viz_2_troubleshoot_url, app_viz_2_install_url,
@@ -1289,7 +1316,17 @@ function ProductCard({ product, installedApps, appStatuses, sourcetypeData, isCo
             <div className="csc-card-header">
                 <div className="csc-card-icon">
                     <span className="csc-icon-placeholder">
-                        {ICON_EMOJI_MAP[icon_emoji] || icon_emoji || (display_name || 'C')[0]}
+                        {icon_svg ? (
+                            <img
+                                src={createURL(`/static/app/${APP_ID}/icons/${icon_svg}${document.documentElement.classList.contains('dce-dark') ? '_white' : ''}.svg`)}
+                                alt=""
+                                className="csc-product-icon-svg"
+                                onError={(e) => { e.target.style.display = 'none'; if (e.target.nextSibling) e.target.nextSibling.style.display = 'inline'; }}
+                            />
+                        ) : null}
+                        <span className="csc-icon-fallback" style={icon_svg ? {display:'none'} : undefined}>
+                            {ICON_EMOJI_MAP[icon_emoji] || icon_emoji || (display_name || 'C')[0]}
+                        </span>
                     </span>
                 </div>
                 <div className="csc-card-title-block">
@@ -2484,6 +2521,7 @@ function JsonTreeView({ data, searchQuery }) {
 }
 
 function ConfigViewerModal({ open, onClose, products, initialProductId, installedApps, appStatuses, sourcetypeData }) {
+    const returnFocusRef = useRef(null);
     const [selectedProduct, setSelectedProduct] = useState(initialProductId || '__all__');
     const [viewMode, setViewMode] = useState('tree'); // 'tree' | 'json' | 'yaml' | 'conf'
     const [copied, setCopied] = useState(false);
@@ -2560,8 +2598,8 @@ function ConfigViewerModal({ open, onClose, products, initialProductId, installe
     };
 
     return (
-        <Modal open returnFocus={false} onRequestClose={onClose} style={{ maxWidth: '900px', width: '92vw' }}>
-            <Modal.Header title="⚙️ Config Viewer — Developer Mode" onRequestClose={onClose} />
+        <Modal open returnFocus={returnFocusRef} onRequestClose={onClose} style={{ maxWidth: '900px', width: '92vw' }}>
+            <Modal.Header title="⚙️ Config Viewer — Developer Mode" />
             <Modal.Body>
                 <div className="csc-devmode-controls">
                     <select
@@ -2816,6 +2854,7 @@ function AddonFilterBar({ selectedAddon, onSelectAddon, products }) {
 // ──────────────────────  PERSONA QUICK START MODAL  ────────────────────
 
 function PersonaModal({ open, onClose, onSelectPersona, products }) {
+    const returnFocusRef = useRef(null);
     if (!open) return null;
 
     const handleSelect = (preset) => {
@@ -2827,8 +2866,8 @@ function PersonaModal({ open, onClose, onSelectPersona, products }) {
     const productIds = new Set(products.map(p => p.product_id));
 
     return (
-        <Modal open returnFocus={false} onRequestClose={onClose} style={{ maxWidth: '780px', width: '92vw' }}>
-            <Modal.Header title="👤 Quick Start — Choose Your Role" onRequestClose={onClose} />
+        <Modal open returnFocus={returnFocusRef} onRequestClose={onClose} style={{ maxWidth: '780px', width: '92vw' }}>
+            <Modal.Header title="👤 Quick Start — Choose Your Role" />
             <Modal.Body>
                 <div className="csc-persona-intro">
                     Select your primary role to personalize your view. We'll filter to the most relevant products
@@ -2867,7 +2906,7 @@ function PersonaModal({ open, onClose, onSelectPersona, products }) {
 
 // ──────────────────────  CATEGORY FILTER  ────────────────────
 
-function CategoryFilterBar({ selectedCategory, onSelectCategory, categoryCounts }) {
+function CategoryFilterBar({ selectedCategory, onSelectCategory, selectedSubCategory, onSelectSubCategory, categoryCounts, products }) {
     const iconMap = { shield: '🛡️', chart: '📊', globe: '🌐', headset: '🎧', archive: '📦' };
     const btnStyle = (active, variant) => {
         const isAmber = variant === 'soar';
@@ -2899,7 +2938,7 @@ function CategoryFilterBar({ selectedCategory, onSelectCategory, categoryCounts 
     const alertCount = categoryCounts?.alert_actions || 0;
     const secNetCount = categoryCounts?.secure_networking || 0;
 
-    return (
+    return (<>
         <div style={{ display: 'flex', gap: '8px', overflowX: 'auto', paddingBottom: '4px', scrollBehavior: 'smooth', alignItems: 'center' }}>
             <button onClick={() => onSelectCategory(null)} style={btnStyle(!selectedCategory)}>
                 📋 All
@@ -2993,7 +3032,44 @@ function CategoryFilterBar({ selectedCategory, onSelectCategory, categoryCounts 
                 </>
             )}
         </div>
-    );
+        {/* ── Sub-category pills ── */}
+        {selectedCategory && SUB_CATEGORIES[selectedCategory] && (() => {
+            const subs = SUB_CATEGORIES[selectedCategory];
+            const base = products || [];
+            const catProducts = base.filter(p => p.category === selectedCategory);
+            const subCounts = {};
+            subs.forEach(s => { subCounts[s.id] = catProducts.filter(p => p.subcategory === s.id).length; });
+            const unassigned = catProducts.filter(p => !p.subcategory || !subs.some(s => s.id === p.subcategory)).length;
+            const hasAnySubs = subs.some(s => subCounts[s.id] > 0);
+            if (!hasAnySubs) return null;
+            return (
+                <div className="csc-subcategory-bar" style={{ display: 'flex', gap: '6px', marginTop: '8px', paddingLeft: '8px', flexWrap: 'wrap', alignItems: 'center' }}>
+                    <span style={{ fontSize: '11px', color: 'var(--faint-color, #888)', fontWeight: 500, marginRight: '4px' }}>Sub:</span>
+                    <button onClick={() => onSelectSubCategory(null)} className={`csc-subcategory-pill ${!selectedSubCategory ? 'csc-subcategory-pill-active' : ''}`}>
+                        All <span className="csc-subcategory-count">{catProducts.length}</span>
+                    </button>
+                    {subs.map(sub => {
+                        const count = subCounts[sub.id];
+                        if (count === 0) return null;
+                        const active = selectedSubCategory === sub.id;
+                        return (
+                            <button key={sub.id} onClick={() => onSelectSubCategory(active ? null : sub.id)}
+                                className={`csc-subcategory-pill ${active ? 'csc-subcategory-pill-active' : ''}`}
+                                title={`Filter by ${sub.name}`}>
+                                {sub.icon} {sub.name} <span className="csc-subcategory-count">{count}</span>
+                            </button>
+                        );
+                    })}
+                    {unassigned > 0 && (
+                        <button onClick={() => onSelectSubCategory(selectedSubCategory === '__other__' ? null : '__other__')}
+                            className={`csc-subcategory-pill ${selectedSubCategory === '__other__' ? 'csc-subcategory-pill-active' : ''}`}>
+                            📦 Other <span className="csc-subcategory-count">{unassigned}</span>
+                        </button>
+                    )}
+                </div>
+            );
+        })()}
+    </>);
 }
 
 // ─────────────────────────  MAIN PAGE  ───────────────────────
@@ -3008,6 +3084,7 @@ function SCANProductsPage() {
     const [error, setError] = useState(null);
     const [searchQuery, setSearchQuery] = useState('');
     const [selectedCategory, setSelectedCategory] = useState(null);
+    const [selectedSubCategory, setSelectedSubCategory] = useState(null);
     const [selectedAddon, setSelectedAddon] = useState(null);
     const [legacyModalOpen, setLegacyModalOpen] = useState(false);
     const [legacyModalApps, setLegacyModalApps] = useState([]);
@@ -3015,6 +3092,7 @@ function SCANProductsPage() {
     const [bpProduct, setBpProduct] = useState(null);
     // const [feedbackOpen, setFeedbackOpen] = useState(false); // TODO: re-enable with feedback backend
     const [removeAllModalOpen, setRemoveAllModalOpen] = useState(false);
+    const removeAllReturnRef = useRef(null);
     const [appVersion, setAppVersion] = useState('');
     const [appUpdateVersion, setAppUpdateVersion] = useState('');
     const [platformType, setPlatformType] = useState('');
@@ -3333,6 +3411,15 @@ function SCANProductsPage() {
         } else if (selectedCategory) {
             filtered = filtered.filter((p) => p.category === selectedCategory);
         }
+        if (selectedSubCategory) {
+            if (selectedSubCategory === '__other__') {
+                const subs = SUB_CATEGORIES[selectedCategory] || [];
+                const knownSubcats = new Set(subs.map(s => s.id));
+                filtered = filtered.filter((p) => !p.subcategory || !knownSubcats.has(p.subcategory));
+            } else {
+                filtered = filtered.filter((p) => p.subcategory === selectedSubCategory);
+            }
+        }
         if (selectedAddon) {
             if (selectedAddon === '__standalone__') {
                 filtered = filtered.filter((p) => !p.addon);
@@ -3351,12 +3438,13 @@ function SCANProductsPage() {
             });
         }
         return filtered;
-    }, [products, selectedCategory, selectedAddon, searchQuery, showFullPortfolio]);
+    }, [products, selectedCategory, selectedSubCategory, selectedAddon, searchQuery, showFullPortfolio]);
 
     const configuredProducts = filteredProducts.filter((p) => p.status !== 'under_development' && configuredIds.includes(p.product_id));
-    const availableProducts = filteredProducts.filter((p) => p.status !== 'under_development' && p.status !== 'deprecated' && !configuredIds.includes(p.product_id));
+    const availableProducts = filteredProducts.filter((p) => p.status !== 'under_development' && p.status !== 'deprecated' && p.support_level !== 'not_supported' && !configuredIds.includes(p.product_id));
+    const unsupportedProducts = filteredProducts.filter((p) => p.status !== 'under_development' && p.support_level === 'not_supported' && !configuredIds.includes(p.product_id));
     const comingSoonProducts = filteredProducts.filter((p) => p.status === 'under_development');
-    const deprecatedProducts = filteredProducts.filter((p) => p.status === 'deprecated' && !configuredIds.includes(p.product_id));
+    const deprecatedProducts = filteredProducts.filter((p) => p.status === 'deprecated' && p.support_level !== 'not_supported' && !configuredIds.includes(p.product_id));
 
     const categoryCounts = useMemo(() => {
         const base = showFullPortfolio ? products : products.filter((p) => SUPPORTED_LEVELS.has(p.support_level));
@@ -3517,8 +3605,11 @@ function SCANProductsPage() {
             <div style={{ marginBottom: '20px' }}>
                 <CategoryFilterBar
                     selectedCategory={selectedCategory}
-                    onSelectCategory={setSelectedCategory}
+                    onSelectCategory={(cat) => { setSelectedCategory(cat); setSelectedSubCategory(null); }}
+                    selectedSubCategory={selectedSubCategory}
+                    onSelectSubCategory={setSelectedSubCategory}
                     categoryCounts={categoryCounts}
+                    products={showFullPortfolio ? products : products.filter((p) => SUPPORTED_LEVELS.has(p.support_level))}
                 />
             </div>
 
@@ -3593,7 +3684,33 @@ function SCANProductsPage() {
             </CollapsiblePanel>
             </div>
 
-            {/* Section 3: Coming Soon */}
+            {/* Section 3: Unsupported */}
+            {unsupportedProducts.length > 0 && (
+                <div id="unsupported_products">
+                <CollapsiblePanel title={`Unsupported Products (${unsupportedProducts.length})`} defaultOpen={false} panelId="unsupported_products">
+                    <div style={{ padding: '8px 12px', marginBottom: '12px', background: 'var(--warning-bg, #fff3e0)', borderLeft: '4px solid #bf360c', borderRadius: '4px', fontSize: '13px', color: 'var(--page-color, #333)' }}>
+                        ⊘ These products have a <strong>Not Supported</strong> support level — there is no official Cisco or Splunk support commitment. They may still function correctly but use at your own discretion.
+                    </div>
+                    <div className="csc-card-grid">
+                        {unsupportedProducts.map((p) => (
+                            <ProductCard
+                                key={p.product_id} product={p}
+                                installedApps={installedApps} appStatuses={appStatuses}
+                                sourcetypeData={sourcetypeData} isConfigured={false} isComingSoon={false}
+                                platformType={platformType}
+                                onToggleConfigured={handleToggleConfigured}
+                                onShowBestPractices={handleShowBestPractices}
+                                onViewLegacy={handleViewLegacy}
+                                onSetCustomDashboard={handleSetCustomDashboard}
+                                devMode={devMode} onViewConfig={handleOpenConfigViewer}
+                            />
+                        ))}
+                    </div>
+                </CollapsiblePanel>
+                </div>
+            )}
+
+            {/* Section 4: Coming Soon */}
             <div id="coming_soon_products">
             <CollapsiblePanel title={`Coming Soon (${comingSoonProducts.length})`} defaultOpen panelId="coming_soon_products">
                 {comingSoonProducts.length > 0 ? (
@@ -3618,7 +3735,7 @@ function SCANProductsPage() {
             </CollapsiblePanel>
             </div>
 
-            {/* Section 4: Deprecated / Archived */}
+            {/* Section 5: Deprecated / Archived */}
             {deprecatedProducts.length > 0 && (
                 <div id="deprecated_products">
                 <CollapsiblePanel title={`Deprecated / Archived (${deprecatedProducts.length})`} defaultOpen={false} panelId="deprecated_products">
@@ -3677,7 +3794,7 @@ function SCANProductsPage() {
 
             {/* Remove All Confirmation Modal */}
             {removeAllModalOpen && (
-                <Modal open returnFocus={false} onRequestClose={() => setRemoveAllModalOpen(false)} style={{ maxWidth: '520px' }}>
+                <Modal open returnFocus={removeAllReturnRef} onRequestClose={() => setRemoveAllModalOpen(false)} style={{ maxWidth: '520px' }}>
                     <Modal.Header
                         title="Remove All Configured Products"
                     />
@@ -3695,7 +3812,7 @@ function SCANProductsPage() {
                             </div>
                             <p style={{ margin: 0 }}>
                                 All products will be moved back to their original sections
-                                (<em>Available Products</em> or <em>Coming Soon</em>). No data
+                                (<em>Available Products</em>, <em>Unsupported Products</em>, or <em>Coming Soon</em>). No data
                                 will be lost — you can re-add products at any time.
                             </p>
                         </div>

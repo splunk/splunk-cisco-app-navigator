@@ -98,6 +98,7 @@ function buildProduct(name, c) {
         addon: c.addon || '',
         addon_label: c.addon_label || '',
         addon_family: c.addon_family || 'default',
+        subcategory: c.subcategory || '',
         addon_splunkbase_url: c.addon_splunkbase_url || '',
         addon_docs_url: c.addon_docs_url || '',
         addon_install_url: c.addon_install_url || '',
@@ -135,6 +136,7 @@ function buildProduct(name, c) {
         dashboard: (c.dashboards || '').trim(),
         custom_dashboard: c.custom_dashboard || '',
         icon_emoji: c.icon_emoji || '',
+        icon_svg: c.icon_svg || '',
         aliases: csvToArray(c.aliases),
         keywords: csvToArray(c.keywords),
         alert_actions: [

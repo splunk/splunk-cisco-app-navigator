@@ -4,6 +4,32 @@
    Those are Splunk chrome elements (nav, menus). Only style our content.
    ===================================================================== */
 
+/* ── Cisco Sans Font Family ── */
+@font-face {
+    font-family: 'CiscoSansTT';
+    src: url('fonts/CiscoSansTTRegular.woff2') format('woff2'),
+         url('fonts/CiscoSansTTRegular.ttf') format('truetype');
+    font-weight: 400;
+    font-style: normal;
+    font-display: swap;
+}
+@font-face {
+    font-family: 'CiscoSansTT';
+    src: url('fonts/CiscoSansTT-Medium.woff2') format('woff2'),
+         url('fonts/CiscoSansTT-Medium.ttf') format('truetype');
+    font-weight: 500;
+    font-style: normal;
+    font-display: swap;
+}
+@font-face {
+    font-family: 'CiscoSansTT';
+    src: url('fonts/CiscoSansTTBold.woff2') format('woff2'),
+         url('fonts/CiscoSansTTBold.ttf') format('truetype');
+    font-weight: 700;
+    font-style: normal;
+    font-display: swap;
+}
+
 /* --- Simple XML panel chrome reset ---------------------------------
    Strip the white box, padding, borders, and shadows that Simple XML
    wraps around our <html> panel so the React app fills the content
@@ -203,9 +229,18 @@ html.dce-dark [data-view="views/shared/Page"] {
     margin: 0;
     padding: 8px 24px 20px;
     background-color: var(--page-bg) !important;
+    background-image: url('bg-cisco.jpg');
+    background-size: cover;
+    background-position: center top;
+    background-repeat: no-repeat;
+    background-attachment: fixed;
+    background-blend-mode: soft-light;
     color: var(--page-color);
     min-height: calc(100vh - 44px);
-    font-family: 'Splunk Platform Sans', 'Proxima Nova', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+    font-family: 'CiscoSansTT', 'Splunk Platform Sans', 'Proxima Nova', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
 }
 
 /* Page header */
@@ -224,21 +259,22 @@ html.dce-dark [data-view="views/shared/Page"] {
 
 .products-page .page-title {
     margin: 0 !important;
-    font-size: 22px !important;
-    font-weight: 700 !important;
+    font-size: 24px !important;
+    font-weight: 800 !important;
     color: var(--heading-color) !important;
-    letter-spacing: -0.3px;
+    letter-spacing: -0.5px;
     line-height: 1.15;
-    font-family: 'Splunk Platform Sans', 'Proxima Nova', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+    font-family: 'CiscoSansTT', 'Splunk Platform Sans', 'Proxima Nova', 'Helvetica Neue', Helvetica, Arial, sans-serif;
 }
 
 .products-page-subtitle {
-    margin: 1px 0 0 0;
-    font-size: 13px;
+    margin: 2px 0 0 0;
+    font-size: 13.5px;
     font-weight: 600;
     color: var(--subtitle-color);
-    letter-spacing: 0.2px;
-    line-height: 1.2;
+    letter-spacing: 0.3px;
+    line-height: 1.3;
+    opacity: 0.85;
 }
 
 .products-page-instructions {
@@ -281,7 +317,7 @@ html.dce-dark [data-view="views/shared/Page"] {
     box-shadow: 0 4px 16px rgba(0,0,0,0.18);
     border-radius: 8px;
     overflow: hidden;
-    font-family: 'Splunk Platform Sans', Roboto, 'Helvetica Neue', Helvetica, Arial, sans-serif;
+    font-family: 'CiscoSansTT', 'Splunk Platform Sans', Roboto, 'Helvetica Neue', Helvetica, Arial, sans-serif;
 }
 .scan-tooltip-header {
     padding: 10px 14px;
@@ -545,7 +581,7 @@ html.dce-dark [data-view="views/shared/Page"] {
     display: flex;
     align-items: center;
     gap: 12px;
-    margin-bottom: 20px;
+    margin-bottom: 16px;
 }
 
 .products-search-input {
@@ -555,8 +591,10 @@ html.dce-dark [data-view="views/shared/Page"] {
 
 .search-result-count {
     font-size: 13px;
+    font-weight: 500;
     color: var(--faint-color);
     white-space: nowrap;
+    letter-spacing: 0.2px;
 }
 
 /* Addon "Powered by" dropdown */
@@ -716,29 +754,36 @@ html.dce-dark [data-view="views/shared/Page"] {
 #configured_products,
 #available_products,
 #coming_soon_products,
+#unsupported_products,
 #deprecated_products {
     margin-bottom: 24px;
     border-top: 1px solid var(--section-border);
     border-bottom: 1px solid var(--section-border);
     min-height: 42px !important;
     background: var(--section-bg) !important;
+    border-radius: 8px;
+    overflow: hidden;
 }
 
 #configured_products > div,
 #available_products > div,
 #coming_soon_products > div,
+#unsupported_products > div,
 #deprecated_products > div,
 #configured_products > div > div,
 #available_products > div > div,
 #coming_soon_products > div > div,
+#unsupported_products > div > div,
 #deprecated_products > div > div,
 #configured_products [data-test='body'],
 #available_products [data-test='body'],
 #coming_soon_products [data-test='body'],
+#unsupported_products [data-test='body'],
 #deprecated_products [data-test='body'],
 #configured_products [data-test='body'] > div,
 #available_products [data-test='body'] > div,
 #coming_soon_products [data-test='body'] > div,
+#unsupported_products [data-test='body'] > div,
 #deprecated_products [data-test='body'] > div {
     background: var(--section-bg) !important;
 }
@@ -747,19 +792,21 @@ html.dce-dark [data-view="views/shared/Page"] {
 #configured_products button[data-test='toggle'],
 #available_products button[data-test='toggle'],
 #coming_soon_products button[data-test='toggle'],
+#unsupported_products button[data-test='toggle'],
 #deprecated_products button[data-test='toggle'] {
-    padding: 9px 10px 9px 44px;
+    padding: 11px 14px 11px 44px;
     background: var(--panel-toggle-bg) !important;
     border: none;
     border-left: 12px solid;
     color: var(--panel-toggle-color) !important;
     filter: drop-shadow(2px 2px 2px var(--panel-shadow));
-    transition: filter 0.15s;
+    transition: filter 0.2s, background 0.2s;
 }
 
 #configured_products button[data-test='toggle']:hover,
 #available_products button[data-test='toggle']:hover,
 #coming_soon_products button[data-test='toggle']:hover,
+#unsupported_products button[data-test='toggle']:hover,
 #deprecated_products button[data-test='toggle']:hover {
     filter: drop-shadow(3px 3px 4px var(--panel-shadow));
 }
@@ -767,10 +814,12 @@ html.dce-dark [data-view="views/shared/Page"] {
 #configured_products button[data-test='toggle'] span,
 #available_products button[data-test='toggle'] span,
 #coming_soon_products button[data-test='toggle'] span,
+#unsupported_products button[data-test='toggle'] span,
 #deprecated_products button[data-test='toggle'] span {
     color: var(--heading-color, var(--panel-toggle-color)) !important;
-    font-weight: 600 !important;
+    font-weight: 700 !important;
     font-size: 14px !important;
+    letter-spacing: -0.1px;
 }
 
 /* Configured: rainbow accent */
@@ -808,6 +857,17 @@ html.dce-dark [data-view="views/shared/Page"] {
     ) 1;
 }
 
+/* Unsupported: muted orange accent */
+#unsupported_products button[data-test='toggle'] {
+    border-image: linear-gradient(
+        to bottom,
+        #bf360c 0%,
+        #e64a19 30%,
+        #ff8a65 60%,
+        #ffccbc 100%
+    ) 1;
+}
+
 /* Deprecated: red accent */
 #deprecated_products button[data-test='toggle'] {
     border-image: linear-gradient(
@@ -830,38 +890,43 @@ html.dce-dark [data-view="views/shared/Page"] {
     max-width: 1500px;  /* ~3 cards + gaps */
 }
 
-/* ===== CSC Card (IS4S-inspired 3D depth) ===== */
+/* ===== CSC Card (premium 3D depth + glass) ===== */
 .csc-card {
     position: relative;
     overflow: visible;
     background: var(--card-bg);
     border: 1px solid var(--card-border);
-    border-radius: 10px;
+    border-radius: 14px;
     display: flex;
     flex-direction: column;
     box-shadow:
-        rgba(0, 0, 0, 0.15) 0px 2px 8px,
-        rgba(0, 0, 0, 0.12) 0px 0px 1px;
-    transition: box-shadow 0.25s ease, transform 0.25s ease;
+        0 1px 2px rgba(0, 0, 0, 0.04),
+        0 4px 12px rgba(0, 0, 0, 0.08),
+        0 0 0 1px rgba(0, 0, 0, 0.03);
+    transition: box-shadow 0.35s cubic-bezier(0.22, 0.61, 0.36, 1),
+                transform 0.35s cubic-bezier(0.22, 0.61, 0.36, 1),
+                border-color 0.35s ease;
 }
 
 .csc-card:hover {
     box-shadow:
-        rgba(0, 0, 0, 0.22) 0px 6px 20px,
-        rgba(0, 0, 0, 0.15) 0px 0px 2px;
-    transform: translateY(-2px);
+        0 4px 8px rgba(0, 0, 0, 0.06),
+        0 12px 32px rgba(0, 0, 0, 0.12),
+        0 0 0 1px rgba(4, 159, 217, 0.08);
+    transform: translateY(-4px);
+    border-color: rgba(4, 159, 217, 0.2);
     z-index: 50;
 }
 
 /* ── IS4S-inspired gradient bottom border ── */
 .csc-card-bottom-border {
     position: relative;
-    height: 6px;
+    height: 5px;
     width: calc(100% + 2px);
     left: -1px;
     bottom: -1px;
-    border-bottom-left-radius: 10px;
-    border-bottom-right-radius: 10px;
+    border-bottom-left-radius: 14px;
+    border-bottom-right-radius: 14px;
     margin-top: auto;
 }
 /* Cisco teal-to-blue gradient (default for cards with accent) */
@@ -925,7 +990,7 @@ html.dce-dark [data-view="views/shared/Page"] {
     font-weight: 800;
     letter-spacing: 0.8px;
     padding: 3px 10px 3px 8px;
-    border-radius: 0 8px 0 8px;
+    border-radius: 0 14px 0 10px;
     z-index: 3;
     box-shadow: 0 2px 6px rgba(255, 111, 0, 0.35);
     text-transform: uppercase;
@@ -943,9 +1008,13 @@ html.dce-dark [data-view="views/shared/Page"] {
     top: 0;
     left: 0;
     right: 0;
-    height: 2px;
-    border-radius: 10px 10px 0 0;
-    background: var(--card-border);
+    height: 3px;
+    border-radius: 14px 14px 0 0;
+    background: linear-gradient(90deg, var(--card-border) 0%, rgba(4, 159, 217, 0.15) 50%, var(--card-border) 100%);
+    transition: background 0.35s ease;
+}
+.csc-card:hover::before {
+    background: linear-gradient(90deg, #049fd9 0%, #6abf4b 50%, #049fd9 100%);
 }
 
 /* ── ITSI Content Pack badge ── */
@@ -975,8 +1044,8 @@ html.dce-dark [data-view="views/shared/Page"] {
 .csc-card-header {
     display: flex;
     align-items: center;
-    gap: 12px;
-    padding: 18px 20px 10px;
+    gap: 14px;
+    padding: 20px 22px 10px;
 }
 
 .csc-card-icon {
@@ -987,13 +1056,31 @@ html.dce-dark [data-view="views/shared/Page"] {
 }
 
 .csc-icon-placeholder {
-    width: 40px;
-    height: 40px;
+    width: 44px;
+    height: 44px;
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 26px;
+    font-size: 28px;
     color: rgb(58, 135, 173);
+    background: var(--icon-fill, #e8f4fd);
+    border-radius: 12px;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+    transition: transform 0.25s ease;
+    overflow: hidden;
+}
+.csc-card:hover .csc-icon-placeholder {
+    transform: scale(1.05);
+}
+/* SVG product icon inside the placeholder */
+.csc-product-icon-svg {
+    width: 34px;
+    height: 34px;
+    object-fit: contain;
+    display: block;
+}
+.csc-icon-fallback {
+    line-height: 1;
 }
 
 .csc-card-title-block {
@@ -1004,11 +1091,11 @@ html.dce-dark [data-view="views/shared/Page"] {
 }
 
 .csc-card-name {
-    font-size: 16px;
+    font-size: 16.5px;
     font-weight: 700;
     color: var(--heading-color);
     line-height: 1.3;
-    letter-spacing: -0.1px;
+    letter-spacing: -0.2px;
 }
 
 .csc-card-subtitle {
@@ -1033,9 +1120,9 @@ html.dce-dark [data-view="views/shared/Page"] {
 /* ===== CSC Card Description ===== */
 .csc-card-description {
     flex: 1;
-    padding: 0 20px;
+    padding: 0 22px;
     font-size: 13px;
-    line-height: 1.6;
+    line-height: 1.65;
     color: var(--card-desc-color);
 }
 
@@ -1054,9 +1141,11 @@ html.dce-dark [data-view="views/shared/Page"] {
     justify-content: flex-end;
     flex-wrap: wrap;
     gap: 8px;
-    padding: 14px 20px;
+    padding: 14px 22px;
     border-top: 1px solid var(--card-footer-border);
     margin-top: auto;
+    background: var(--card-footer-bg);
+    border-radius: 0 0 14px 14px;
 }
 
 /* ===== Split Launch Button & Dropdown ===== */
@@ -1561,6 +1650,71 @@ html.dce-dark [data-view="views/shared/Page"] {
 }
 :root.dce-dark .csc-soar-filter-active .csc-soar-filter-count {
     background: rgba(251, 191, 36, 0.2) !important;
+}
+
+/* ── Sub-category pills ── */
+.csc-subcategory-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 4px 12px;
+    border-radius: 14px;
+    border: 1.5px solid var(--card-border, #ddd);
+    background: var(--card-bg, #f5f5f5);
+    color: var(--page-color, #555);
+    cursor: pointer;
+    font-size: 11px;
+    font-weight: 500;
+    transition: all 0.2s;
+    white-space: nowrap;
+    font-family: 'CiscoSansTT', 'Splunk Platform Sans', sans-serif;
+}
+.csc-subcategory-pill:hover {
+    border-color: #049fd9;
+    background: rgba(4, 159, 217, 0.06);
+}
+.csc-subcategory-pill-active {
+    background: #049fd9 !important;
+    border-color: #049fd9 !important;
+    color: #fff !important;
+    font-weight: 600;
+}
+.csc-subcategory-count {
+    font-size: 10px;
+    padding: 0 5px;
+    border-radius: 8px;
+    background: var(--version-bg, #e8e8e8);
+    font-weight: 600;
+}
+.csc-subcategory-pill-active .csc-subcategory-count {
+    background: rgba(255, 255, 255, 0.3);
+}
+.csc-subcategory-bar {
+    animation: subcatSlideIn 0.2s ease-out;
+}
+@keyframes subcatSlideIn {
+    from { opacity: 0; transform: translateY(-6px); }
+    to   { opacity: 1; transform: translateY(0); }
+}
+:root.dce-dark .csc-subcategory-pill {
+    border-color: var(--card-border, #444);
+    background: var(--card-bg, #1e1e1e);
+    color: var(--page-color, #ccc);
+}
+:root.dce-dark .csc-subcategory-pill:hover {
+    border-color: #02c8ff;
+    background: rgba(2, 200, 255, 0.1);
+}
+:root.dce-dark .csc-subcategory-pill-active {
+    background: #02c8ff !important;
+    border-color: #02c8ff !important;
+    color: #07182D !important;
+}
+:root.dce-dark .csc-subcategory-count {
+    background: rgba(255, 255, 255, 0.1);
+}
+:root.dce-dark .csc-subcategory-pill-active .csc-subcategory-count {
+    background: rgba(7, 24, 45, 0.25);
 }
 
 /* Alert Action badge — blue pill next to product name */
@@ -3402,6 +3556,34 @@ a.csc-dep-name-link:hover {
         0 0 30px rgba(0, 212, 255, 0.05);
 }
 
+/* ─── Dark mode card enhancements ─── */
+:root.dce-dark .csc-card {
+    box-shadow:
+        0 1px 2px rgba(0, 0, 0, 0.12),
+        0 4px 16px rgba(0, 0, 0, 0.25),
+        0 0 0 1px rgba(255, 255, 255, 0.04);
+}
+:root.dce-dark .csc-card:hover {
+    box-shadow:
+        0 6px 16px rgba(0, 0, 0, 0.2),
+        0 16px 40px rgba(0, 0, 0, 0.35),
+        0 0 0 1px rgba(4, 159, 217, 0.15);
+    border-color: rgba(4, 159, 217, 0.3);
+}
+:root.dce-dark .csc-card::before {
+    background: linear-gradient(90deg, var(--card-border) 0%, rgba(4, 159, 217, 0.2) 50%, var(--card-border) 100%);
+}
+:root.dce-dark .csc-card:hover::before {
+    background: linear-gradient(90deg, #049fd9 0%, #6abf4b 50%, #049fd9 100%);
+}
+:root.dce-dark .csc-icon-placeholder {
+    background: rgba(4, 159, 217, 0.08);
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+}
+:root.dce-dark .csc-card-footer {
+    background: var(--card-footer-bg);
+}
+
 /* ─── Persona Quick Start Modal ─── */
 .csc-persona-intro {
     text-align: center;
@@ -3425,6 +3607,9 @@ a.csc-dep-name-link:hover {
 }
 .csc-persona-card {
     position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
     border: 2px solid #e0e0e0;
     border-radius: 12px;
     padding: 24px 18px 18px;
@@ -3454,17 +3639,20 @@ a.csc-dep-name-link:hover {
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
 }
 .csc-persona-icon {
+    display: block;
     font-size: 40px;
     margin-bottom: 12px;
     line-height: 1;
 }
 .csc-persona-title {
+    display: block;
     font-size: 16px;
     font-weight: 700;
     margin-bottom: 8px;
     color: #1a1a1a;
 }
 .csc-persona-desc {
+    display: block;
     font-size: 13px;
     color: #666;
     line-height: 1.5;

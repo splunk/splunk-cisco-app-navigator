@@ -55,6 +55,14 @@ addon_family = <string>
 * "catalyst", "dc-networking", "cloud-security", "collaboration",
 * "observability", "standalone", "deprecated").
 
+subcategory = <string>
+* Sub-category within the main category, used for sub-category filter pills.
+* Based on official Cisco product taxonomy.
+* Security: cloud_security | network_security | identity_access | email_security
+*           endpoint_security | workload_security | threat_response | compute_infra
+* Networking: campus_wireless | routing_wan | data_center_net
+* Omit for categories with too few products (collaboration, observability, deprecated).
+
 addon_label = <string>
 * Human-readable label for the required add-on (e.g. "Cisco Security Cloud").
 
