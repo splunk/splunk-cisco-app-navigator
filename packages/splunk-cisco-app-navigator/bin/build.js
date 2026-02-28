@@ -36,12 +36,21 @@ function postBuildRefresh() {
     console.warn(`\x1b[33m[post-build]\x1b[0m Could not clear cache: ${err.message}`);
   }
 
-  // 2. Trigger Splunk UI refresh (non-fatal if Splunk isn't running)
+  // 2. Trigger Splunk reload (non-fatal if Splunk isn't running)
+  //    debug/refresh was removed in Splunk 10.x — use _reload endpoints instead
   try {
+    // Reload products.conf so REST API picks up changes without restart
     execSync(
       `curl -sk -u "${adminUser}:${adminPass}" ` +
-        `https://localhost:${splunkPort}/services/debug/refresh ` +
-        `-X POST -d "entity=data/ui/views"`,
+        `https://localhost:${splunkPort}/servicesNS/nobody/splunk-cisco-app-navigator/configs/conf-products/_reload ` +
+        `-X POST`,
+      { stdio: 'pipe', timeout: 5000 }
+    );
+    // Reload views so UI dashboard picks up changes
+    execSync(
+      `curl -sk -u "${adminUser}:${adminPass}" ` +
+        `https://localhost:${splunkPort}/servicesNS/nobody/splunk-cisco-app-navigator/data/ui/views/_reload ` +
+        `-X POST`,
       { stdio: 'pipe', timeout: 5000 }
     );
     console.log('\x1b[36m[post-build]\x1b[0m Splunk UI refresh triggered');

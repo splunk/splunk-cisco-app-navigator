@@ -41,6 +41,72 @@ const SERVER_INFO_ENDPOINT = '/splunkd/__raw/services/server/info';
 const SEARCH_ENDPOINT = '/splunkd/__raw/services/search/jobs';
 const CONFIGURED_STORAGE_KEY = 'scan_configured_products';
 const THEME_STORAGE_KEY = 'scan_theme_preference'; // 'light' | 'dark' | 'auto'
+const PORTFOLIO_STORAGE_KEY = 'scan_show_full_portfolio'; // 'true' | 'false'
+const DEVMODE_STORAGE_KEY = 'scan_developer_mode'; // 'true' | 'false'
+const PERSONA_STORAGE_KEY = 'scan_persona_shown'; // 'true' once persona modal dismissed
+const SUPPORTED_LEVELS = new Set(['cisco_supported', 'splunk_supported']);
+
+/** Persona presets — each maps a role to a category filter + suggested product IDs */
+const PERSONA_PRESETS = [
+    {
+        id: 'security',
+        icon: '🛡️',
+        title: 'Security Analyst',
+        description: 'Firewalls, threat detection, identity, XDR, and endpoint protection',
+        category: 'security',
+        color: '#e53935',
+        suggested: [
+            'cisco_secure_firewall', 'cisco_secure_endpoint', 'cisco_xdr',
+            'cisco_duo', 'cisco_umbrella', 'cisco_ise', 'cisco_secure_network_analytics',
+            'cisco_secure_access', 'cisco_talos',
+        ],
+    },
+    {
+        id: 'networking',
+        icon: '🌐',
+        title: 'Network Engineer',
+        description: 'Campus, SD-WAN, switches, routers, Meraki, and data center networking',
+        category: 'networking',
+        color: '#00897b',
+        suggested: [
+            'cisco_catalyst_center', 'cisco_catalyst_sdwan', 'cisco_meraki',
+            'cisco_nexus', 'cisco_aci', 'cisco_ise', 'cisco_wlc',
+            'cisco_access_points', 'cisco_catalyst_switches',
+        ],
+    },
+    {
+        id: 'collaboration',
+        icon: '🎧',
+        title: 'Collaboration Admin',
+        description: 'Webex, CUCM, video conferencing, and meeting infrastructure',
+        category: 'collaboration',
+        color: '#5e35b1',
+        suggested: [
+            'cisco_webex', 'cisco_cucm', 'cisco_meeting_server',
+            'cisco_meeting_management', 'cisco_tvcs',
+        ],
+    },
+    {
+        id: 'observability',
+        icon: '📊',
+        title: 'Observability Engineer',
+        description: 'APM, monitoring, ThousandEyes, and full-stack telemetry',
+        category: 'observability',
+        color: '#1565c0',
+        suggested: [
+            'cisco_thousandeyes', 'cisco_appdynamics',
+        ],
+    },
+    {
+        id: 'explorer',
+        icon: '🧭',
+        title: 'Explorer',
+        description: 'Browse the full Cisco portfolio — all categories, all products',
+        category: null,
+        color: '#049fd9',
+        suggested: [],
+    },
+];
 
 const CATEGORIES = [
     { id: 'security', name: 'Security', icon: 'shield', description: 'Firewalls, identity, threat detection, and secure access' },
@@ -91,6 +157,14 @@ function saveThemePreference(pref) {
     try { localStorage.setItem(THEME_STORAGE_KEY, pref); }
     catch (e) { /* quota */ }
 }
+function getPortfolioPreference() {
+    try { return localStorage.getItem(PORTFOLIO_STORAGE_KEY) === 'true'; }
+    catch (e) { return false; }
+}
+function savePortfolioPreference(show) {
+    try { localStorage.setItem(PORTFOLIO_STORAGE_KEY, show ? 'true' : 'false'); }
+    catch (e) { /* quota */ }
+}
 
 function splunkFetch(url, options = {}) {
     const headers = {
@@ -122,6 +196,7 @@ async function loadProductsFromConf() {
         const laLabels = csvToArray(c.legacy_labels);
         const laUids   = csvToArray(c.legacy_uids);
         const laUrls   = csvToArray(c.legacy_urls);
+        const laStatuses = csvToArray(c.legacy_statuses);
         const paIds    = csvToArray(c.prereq_apps);
         const paLabels = csvToArray(c.prereq_labels);
         const paUids   = csvToArray(c.prereq_uids);
@@ -165,6 +240,7 @@ async function loadProductsFromConf() {
                 display_name: laLabels[i] || appId,
                 uid: laUids[i] || '',
                 addon_splunkbase_url: laUrls[i] || '',
+                status: laStatuses[i] || 'active',
             })),
             prereq_apps: paIds.map((appId, i) => ({
                 app_id: appId,
@@ -205,6 +281,13 @@ async function loadProductsFromConf() {
             support_level: c.support_level || '',
             sc4s_url: c.sc4s_url || '',
             sc4s_label: c.sc4s_label || '',
+            sc4s_supported: c.sc4s_supported === 'true' || c.sc4s_supported === '1' || c.sc4s_supported === true,
+            sc4s_search_head_ta: c.sc4s_search_head_ta || '',
+            sc4s_search_head_ta_label: c.sc4s_search_head_ta_label || '',
+            sc4s_search_head_ta_splunkbase_url: c.sc4s_search_head_ta_splunkbase_url || '',
+            sc4s_search_head_ta_splunkbase_id: c.sc4s_search_head_ta_splunkbase_id || '',
+            sc4s_search_head_ta_install_url: c.sc4s_search_head_ta_install_url || '',
+            sc4s_config_notes: (c.sc4s_config_notes || '').split('|').map(s => s.trim()).filter(Boolean),
             best_practices: (c.best_practices || '').split('|').map(s => s.trim()).filter(Boolean),
             sort_order: parseInt(c.sort_order || '100', 10),
         };
@@ -355,6 +438,81 @@ async function saveCustomDashboard(productId, value) {
     return true;
 }
 
+// ─────────────────  RICH TEXT RENDERER  ─────────────────────────
+
+/**
+ * Renders a plain-text string with lightweight markup into React elements.
+ *
+ * Supported markup (usable directly in products.conf fields like `description`):
+ *   **bold text**       → <strong>
+ *   *italic text*       → <em>
+ *   `code`              → <code>
+ *   [link text](url)    → <a href>
+ *   \n  or  |            → <br/> (line break)
+ *   {small}text{/small} → smaller text (11px)
+ *   {large}text{/large} → larger text (15px)
+ *   {h}text{/h}         → heading-style text (16px bold)
+ */
+function renderFormattedText(text) {
+    if (!text) return null;
+
+    // Split on pipe or literal \n to create paragraphs/line breaks
+    const lines = text.replace(/\\n/g, '|').split('|');
+
+    return lines.map((line, lineIdx) => {
+        // Tokenize inline markup using regex
+        // Order matters: ** before *, and [link](url) before others
+        const tokens = [];
+        const regex = /\{(small|large|h)\}(.*?)\{\/\1\}|\*\*(.+?)\*\*|\*(.+?)\*|`(.+?)`|\[([^\]]+)\]\(([^)]+)\)/g;
+        let lastIndex = 0;
+        let match;
+
+        while ((match = regex.exec(line)) !== null) {
+            // Push plain text before this match
+            if (match.index > lastIndex) {
+                tokens.push(<span key={`t${lineIdx}-${lastIndex}`}>{line.slice(lastIndex, match.index)}</span>);
+            }
+
+            if (match[1]) {
+                // {small}, {large}, {h} tags
+                const tag = match[1];
+                const inner = match[2];
+                const cls = tag === 'small' ? 'csc-fmt-small' : tag === 'large' ? 'csc-fmt-large' : 'csc-fmt-heading';
+                tokens.push(<span key={`sz${lineIdx}-${match.index}`} className={cls}>{inner}</span>);
+            } else if (match[3]) {
+                // **bold**
+                tokens.push(<strong key={`b${lineIdx}-${match.index}`}>{match[3]}</strong>);
+            } else if (match[4]) {
+                // *italic*
+                tokens.push(<em key={`i${lineIdx}-${match.index}`}>{match[4]}</em>);
+            } else if (match[5]) {
+                // `code`
+                tokens.push(<code key={`c${lineIdx}-${match.index}`} className="csc-fmt-code">{match[5]}</code>);
+            } else if (match[6]) {
+                // [text](url)
+                tokens.push(
+                    <a key={`a${lineIdx}-${match.index}`} href={match[7]} target="_blank" rel="noopener noreferrer" className="csc-fmt-link">
+                        {match[6]}
+                    </a>
+                );
+            }
+            lastIndex = match.index + match[0].length;
+        }
+
+        // Remaining plain text
+        if (lastIndex < line.length) {
+            tokens.push(<span key={`e${lineIdx}-${lastIndex}`}>{line.slice(lastIndex)}</span>);
+        }
+
+        return (
+            <React.Fragment key={lineIdx}>
+                {lineIdx > 0 && <br />}
+                {tokens.length > 0 ? tokens : line}
+            </React.Fragment>
+        );
+    });
+}
+
 // ──────────────────  BEST PRACTICES for each product  ──────────────────
 
 function getBestPractices(product, platformType) {
@@ -416,7 +574,7 @@ function getBestPractices(product, platformType) {
 
 // ───────────────────  INTELLIGENCE BADGES COMPONENT  ────────────────
 
-function IntelligenceBadges({ appStatus, vizAppStatus, vizApp2Status, sourcetypeInfo, legacyInstalled, sourcetypeSearchUrl, isArchived }) {
+function IntelligenceBadges({ appStatus, vizAppStatus, vizApp2Status, sourcetypeInfo, legacyInstalled, allLegacyApps, sourcetypeSearchUrl, isArchived, onViewLegacy }) {
     const items = [];
 
     if (isArchived) {
@@ -457,10 +615,17 @@ function IntelligenceBadges({ appStatus, vizAppStatus, vizApp2Status, sourcetype
         items.push({ cls: 'legacy', label: `${legacyInstalled.length} legacy app${legacyInstalled.length > 1 ? 's' : ''}`, key: 'legacy', legacyApps: legacyInstalled });
     }
     if (items.length === 0) return null;
+
+    const handleLegacyClick = (e) => {
+        e.stopPropagation();
+        if (onViewLegacy && allLegacyApps) onViewLegacy(allLegacyApps);
+    };
+
     return (
         <div className="csc-intelligence-badges">
             {items.map(b => (
-                <span key={b.key} className={`csc-badge-item csc-badge-${b.cls}`}>
+                <span key={b.key} className={`csc-badge-item csc-badge-${b.cls}`}
+                      {...(b.key === 'legacy' ? { onClick: handleLegacyClick, style: { cursor: 'pointer' } } : {})}>
                     {b.url ? (
                         <a href={b.url} target="_blank" rel="noopener noreferrer" className="csc-badge-link" onClick={e => e.stopPropagation()}>
                             {b.label}
@@ -470,19 +635,19 @@ function IntelligenceBadges({ appStatus, vizAppStatus, vizApp2Status, sourcetype
                         <div className="csc-legacy-tooltip">
                             <div className="csc-legacy-tooltip-inner">
                                 <div className="csc-legacy-tooltip-title">Legacy Apps Detected</div>
-                                {b.legacyApps.map((la, i) => (
+                                {b.legacyApps.slice(0, 5).map((la, i) => (
                                     <div key={i} className="csc-legacy-tooltip-item">
+                                        <span className={`csc-legacy-tooltip-status ${la.status === 'archived' ? 'csc-lt-archived' : 'csc-lt-active'}`}>
+                                            {la.status === 'archived' ? '📦' : '⚠️'}
+                                        </span>
                                         <strong>{la.display_name}</strong>
                                         <span className="csc-legacy-tooltip-appid">{la.app_id}</span>
-                                        {la.addon_splunkbase_url && (
-                                            <a href={la.addon_splunkbase_url} target="_blank" rel="noopener noreferrer"
-                                               className="csc-legacy-tooltip-link" onClick={e => e.stopPropagation()}>
-                                                Splunkbase ↗
-                                            </a>
-                                        )}
                                     </div>
                                 ))}
-                                <div className="csc-legacy-tooltip-hint">These may be archived or deprecated on Splunkbase.</div>
+                                {b.legacyApps.length > 5 && (
+                                    <div className="csc-legacy-tooltip-more">…and {b.legacyApps.length - 5} more</div>
+                                )}
+                                <div className="csc-legacy-tooltip-hint">Click badge to view full audit report</div>
                             </div>
                         </div>
                     )}
@@ -492,13 +657,160 @@ function IntelligenceBadges({ appStatus, vizAppStatus, vizApp2Status, sourcetype
     );
 }
 
+// ────────────────────  SC4S INFO MODAL  ───────────────────────
+
+function SC4SInfoModal({ open, onClose }) {
+    if (!open) return null;
+    return (
+        <Modal open returnFocus={false} onRequestClose={onClose} style={{ maxWidth: '820px', width: '92vw' }}>
+            <Modal.Header title="📡 Splunk Connect for Syslog (SC4S)" onRequestClose={onClose} />
+            <Modal.Body>
+                <div className="csc-sc4s-info">
+                    <div className="csc-sc4s-info-hero">
+                        <div className="csc-sc4s-info-hero-icon">📡</div>
+                        <div className="csc-sc4s-info-hero-text">
+                            <h3>Technical Overview</h3>
+                            <p>SC4S is an open-source, containerized solution designed to streamline the ingestion of syslog data into Splunk. Built on the <strong>syslog-ng Open Source Edition (OSE)</strong> engine, SC4S shifts the paradigm from traditional disk-based collection to a high-performance, streaming architecture.</p>
+                        </div>
+                    </div>
+
+                    <div className="csc-sc4s-info-section">
+                        <h4>🔧 What is SC4S?</h4>
+                        <p>SC4S is a "turnkey" solution that replaces the traditional method of using a Universal Forwarder (UF) to monitor flat files written by a syslog daemon. Instead, SC4S receives syslog traffic directly, parses it in memory using pre-defined vendor filters, and transmits the events to Splunk via the <strong>HTTP Event Collector (HEC)</strong>.</p>
+                    </div>
+
+                    <div className="csc-sc4s-info-section">
+                        <h4>⚡ Key Technical Benefits</h4>
+                        <div className="csc-sc4s-info-grid">
+                            <div className="csc-sc4s-info-card">
+                                <span className="csc-sc4s-info-card-icon">📋</span>
+                                <strong>Prescriptive & Repeatable</strong>
+                                <span>Standardized "Splunk-best-practice" approach to syslog, reducing "snowflake" configurations.</span>
+                            </div>
+                            <div className="csc-sc4s-info-card">
+                                <span className="csc-sc4s-info-card-icon">🚀</span>
+                                <strong>Reduced Overhead</strong>
+                                <span>Eliminates the need for a Universal Forwarder on the syslog server, simplifying architecture and reducing disk I/O.</span>
+                            </div>
+                            <div className="csc-sc4s-info-card">
+                                <span className="csc-sc4s-info-card-icon">🐳</span>
+                                <strong>Containerized Agility</strong>
+                                <span>Deployed via Docker or Podman for easy updates and consistent Dev/Test/Prod behavior.</span>
+                            </div>
+                            <div className="csc-sc4s-info-card">
+                                <span className="csc-sc4s-info-card-icon">🔍</span>
+                                <strong>Optimized Search</strong>
+                                <span>Natively balances traffic across all Splunk Indexers via HEC, preventing "hot indexers."</span>
+                            </div>
+                            <div className="csc-sc4s-info-card">
+                                <span className="csc-sc4s-info-card-icon">🏷️</span>
+                                <strong>Metadata Enrichment</strong>
+                                <span>Injects rich metadata (vendor, product, geo info) at the point of ingestion, beyond standard host and sourcetype.</span>
+                            </div>
+                            <div className="csc-sc4s-info-card">
+                                <span className="csc-sc4s-info-card-icon">📚</span>
+                                <strong>Extensive Library</strong>
+                                <span>Out-of-the-box support for 100+ common technology platforms (Cisco, Palo Alto, Checkpoint, etc.).</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div className="csc-sc4s-info-section">
+                        <h4>🏗️ Architecture & Design</h4>
+                        <table className="csc-sc4s-info-table">
+                            <tbody>
+                                <tr>
+                                    <td className="csc-sc4s-info-table-label">Engine</td>
+                                    <td><strong>syslog-ng OSE</strong> — high-performance message routing and template-based parsing</td>
+                                </tr>
+                                <tr>
+                                    <td className="csc-sc4s-info-table-label">Transport</td>
+                                    <td><strong>HEC (HTTP Event Collector)</strong> — supports Splunk Cloud & Enterprise equally, no need for port 8089 or 9997</td>
+                                </tr>
+                                <tr>
+                                    <td className="csc-sc4s-info-table-label">Deployment</td>
+                                    <td><strong>Containerized application</strong> — Linux host (RHEL/CentOS/Ubuntu) with Docker or Podman, managed by <code>systemd</code> for HA</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <div className="csc-sc4s-info-section">
+                        <h4>✅ Best Practices & Recommendations</h4>
+                        <div className="csc-sc4s-info-bp">
+                            <div className="csc-sc4s-info-bp-item csc-sc4s-info-bp-warn">
+                                <span className="csc-sc4s-info-bp-marker">⛔</span>
+                                <div>
+                                    <strong>Avoid Direct "514" Ingestion</strong>
+                                    <p>Sending raw UDP/514 traffic directly to a Splunk Heavy Forwarder or Indexer is a deprecated practice. It lacks buffering, creates load-balancing issues, and often results in malformed data.</p>
+                                </div>
+                            </div>
+                            <div className="csc-sc4s-info-bp-item csc-sc4s-info-bp-good">
+                                <span className="csc-sc4s-info-bp-marker">📡</span>
+                                <div>
+                                    <strong>Use SC4S</strong>
+                                    <p>For all enterprise-grade syslog requirements, especially for high-volume sources like Cisco ISE, ASA, and Firepower.</p>
+                                </div>
+                            </div>
+                            <div className="csc-sc4s-info-bp-item csc-sc4s-info-bp-alt">
+                                <span className="csc-sc4s-info-bp-marker">🔀</span>
+                                <div>
+                                    <strong>Use a TA on a Heavy Forwarder</strong>
+                                    <p>Only for "micro" environments or single-integration POCs where the overhead of a container runtime is not feasible.</p>
+                                </div>
+                            </div>
+                            <div className="csc-sc4s-info-bp-item">
+                                <span className="csc-sc4s-info-bp-marker">⚖️</span>
+                                <div>
+                                    <strong>Load Balancing</strong>
+                                    <p>For HA environments, place a Load Balancer (F5 or HAProxy) in front of multiple SC4S instances to ensure zero data loss during maintenance.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div className="csc-sc4s-info-section">
+                        <h4>⚙️ Configuration & Customization</h4>
+                        <ul className="csc-sc4s-info-list">
+                            <li><strong>Core Requirements:</strong> Dedicated HEC Token, HEC URL (Load Balancer or Indexer Cluster), and a default index.</li>
+                            <li><strong>Cisco-Specific Tuning:</strong> Supports flags like <code>SC4S_ENABLE_CISCO_IOS_RAW_MSG=yes</code> to preserve original message format for audit compliance.</li>
+                            <li><strong>Custom Parsers:</strong> Developers can create bespoke "app-parsers" to handle proprietary or legacy syslog formats.</li>
+                        </ul>
+                    </div>
+
+                    <div className="csc-sc4s-info-section csc-sc4s-info-section-notes">
+                        <h4>📌 Important Notes</h4>
+                        <ul className="csc-sc4s-info-list csc-sc4s-info-list-notes">
+                            <li>SC4S is a <strong>container image</strong>, not a monolithic OVA/Virtual Appliance. While it <em>can</em> be packaged as an appliance, its native form is a container.</li>
+                            <li>SC4S <em>can</em> buffer to disk (Disk-Assisted Queues) if the HEC endpoint is down, preventing data loss during network outages.</li>
+                            <li>SC4S's primary goal is <strong>data integrity and performance</strong>, which indirectly supports license efficiency and search performance.</li>
+                        </ul>
+                    </div>
+
+                    <div className="csc-sc4s-info-footer">
+                        <a href="https://splunk.github.io/splunk-connect-for-syslog/main/" target="_blank" rel="noopener noreferrer" className="csc-sc4s-info-link">
+                            📖 SC4S Official Documentation ↗
+                        </a>
+                        <a href="https://github.com/splunk/splunk-connect-for-syslog" target="_blank" rel="noopener noreferrer" className="csc-sc4s-info-link csc-sc4s-info-link-gh">
+                            🐙 GitHub Repository ↗
+                        </a>
+                    </div>
+                </div>
+            </Modal.Body>
+            <Modal.Footer>
+                <Button appearance="secondary" label="Close" onClick={onClose} />
+            </Modal.Footer>
+        </Modal>
+    );
+}
+
 // ────────────────────  BEST PRACTICES MODAL  ───────────────────────
 
 function BestPracticesModal({ open, onClose, product, platformType }) {
     if (!open || !product) return null;
     const tips = getBestPractices(product, platformType);
     return (
-        <Modal open={true} onRequestClose={onClose} style={{ maxWidth: '640px' }}>
+        <Modal open={true} returnFocus={false} onRequestClose={onClose} style={{ maxWidth: '640px' }}>
             <Modal.Header title={`Best Practices — ${product.display_name}`} />
             <Modal.Body>
                 <div style={{ fontSize: '13px', lineHeight: '1.7' }}>
@@ -535,8 +847,33 @@ function BestPracticesModal({ open, onClose, product, platformType }) {
 
 function LegacyAuditModal({ open, onClose, legacyApps, onMigrate }) {
     if (!open) return null;
+
+    const activeApps = (legacyApps || []).filter(a => a.status !== 'archived');
+    const archivedApps = (legacyApps || []).filter(a => a.status === 'archived');
+
+    const renderCard = (app, isArchived) => (
+        <div key={app.app_id} className={isArchived ? 'csc-legacy-card csc-legacy-archived' : 'csc-legacy-card csc-legacy-active'}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                <strong>{app.display_name || app.app_id}</strong>
+                <span className={isArchived ? 'csc-legacy-status-badge csc-legacy-status-archived' : 'csc-legacy-status-badge csc-legacy-status-active'}>
+                    {isArchived ? '📦 Archived' : '⚠️ Active'}
+                </span>
+            </div>
+            <div style={{ fontSize: '12px', marginTop: '4px' }}>
+                <code style={{ background: 'var(--legacy-enabled-code-bg, #f5f5f5)', padding: '1px 4px', borderRadius: '3px' }}>{app.app_id}</code>
+            </div>
+            {app.addon_splunkbase_url && (
+                <div style={{ marginTop: '6px' }}>
+                    <a href={app.addon_splunkbase_url} target="_blank" rel="noopener noreferrer" style={{ fontSize: '12px' }}>
+                        {isArchived ? 'View on Splunkbase (archived) →' : 'View on Splunkbase →'}
+                    </a>
+                </div>
+            )}
+        </div>
+    );
+
     return (
-        <Modal open={true} onRequestClose={onClose} style={{ maxWidth: '720px' }}>
+        <Modal open={true} returnFocus={false} onRequestClose={onClose} style={{ maxWidth: '720px' }}>
             <Modal.Header title="Legacy Debt Audit Report" />
             <Modal.Body>
                 {!legacyApps || legacyApps.length === 0
@@ -551,21 +888,28 @@ function LegacyAuditModal({ open, onClose, legacyApps, onMigrate }) {
                             <p style={{ fontSize: '13px', color: 'var(--muted-color, #666)', marginBottom: '16px' }}>
                                 The following legacy Cisco apps were detected. Disable and remove them before using the recommended add-on.
                             </p>
-                            {legacyApps.map(app => (
-                                <div key={app.app_id} style={{ padding: '12px 16px', marginBottom: '10px', background: 'var(--legacy-enabled-bg, #fff3e0)', border: '1px solid var(--legacy-enabled-border, #ffe0b2)', borderRadius: '6px' }}>
-                                    <strong>{app.display_name || app.app_id}</strong>
-                                    <div style={{ fontSize: '12px', marginTop: '4px' }}>
-                                        <code style={{ background: 'var(--legacy-enabled-code-bg, #f5f5f5)', padding: '1px 4px', borderRadius: '3px' }}>{app.app_id}</code>
+
+                            {/* ── Active Legacy Apps ── */}
+                            {activeApps.length > 0 && (
+                                <div className="csc-legacy-section">
+                                    <div className="csc-legacy-section-header csc-legacy-section-active">
+                                        <span>⚠️ Still Active on Splunkbase ({activeApps.length})</span>
+                                        <span className="csc-legacy-section-hint">These apps are still downloadable but should be replaced</span>
                                     </div>
-                                    {app.addon_splunkbase_url && (
-                                        <div style={{ marginTop: '6px' }}>
-                                            <a href={app.addon_splunkbase_url} target="_blank" rel="noopener noreferrer" style={{ fontSize: '12px' }}>
-                                                View on Splunkbase →
-                                            </a>
-                                        </div>
-                                    )}
+                                    {activeApps.map(app => renderCard(app, false))}
                                 </div>
-                            ))}
+                            )}
+
+                            {/* ── Archived Legacy Apps ── */}
+                            {archivedApps.length > 0 && (
+                                <div className="csc-legacy-section" style={{ marginTop: activeApps.length > 0 ? '20px' : '0' }}>
+                                    <div className="csc-legacy-section-header csc-legacy-section-archived">
+                                        <span>📦 Archived on Splunkbase ({archivedApps.length})</span>
+                                        <span className="csc-legacy-section-hint">No longer available for download — remove if still installed</span>
+                                    </div>
+                                    {archivedApps.map(app => renderCard(app, true))}
+                                </div>
+                            )}
                         </div>
                     )
                 }
@@ -771,7 +1115,7 @@ function InfoTooltip({ placement = 'bottom', width = 500, delay = 400, content, 
 
 // ────────────────────────  PRODUCT CARD  ─────────────────────
 
-function ProductCard({ product, installedApps, appStatuses, sourcetypeData, isConfigured, isComingSoon, platformType, onToggleConfigured, onShowBestPractices, onViewLegacy, onSetCustomDashboard }) {
+function ProductCard({ product, installedApps, appStatuses, sourcetypeData, isConfigured, isComingSoon, platformType, onToggleConfigured, onShowBestPractices, onViewLegacy, onSetCustomDashboard, devMode, onViewConfig }) {
     const {
         product_id, display_name, version, description, value_proposition, vendor, tagline,
         icon_emoji, learn_more_url, addon_splunkbase_url, addon_docs_url, addon_troubleshoot_url, addon_install_url,
@@ -780,7 +1124,8 @@ function ProductCard({ product, installedApps, appStatuses, sourcetypeData, isCo
         app_viz_2, app_viz_2_label, app_viz_2_splunkbase_url, app_viz_2_docs_url, app_viz_2_troubleshoot_url, app_viz_2_install_url,
         legacy_apps, prereq_apps, soar_connectors, alert_actions, community_apps, itsi_content_pack,
         card_banner, card_banner_color, card_banner_size, card_banner_opacity, card_accent, card_bg_color, is_new, support_level,
-        sc4s_url,
+        sc4s_url, sc4s_supported, sc4s_search_head_ta, sc4s_search_head_ta_label,
+        sc4s_search_head_ta_splunkbase_url, sc4s_search_head_ta_install_url, sc4s_config_notes,
     } = product;
 
     const appStatus = appStatuses[addon] || null;
@@ -791,7 +1136,12 @@ function ProductCard({ product, installedApps, appStatuses, sourcetypeData, isCo
     const legacyInstalled = hasLegacy ? legacy_apps.filter(la => installedApps[la.app_id]) : [];
     const communityInstalled = (community_apps || []).filter(ca => installedApps[ca.app_id]);
 
+    const sc4sShTaStatus = sc4s_search_head_ta ? (appStatuses[sc4s_search_head_ta] || null) : null;
+    const hasDifferentSc4sTa = sc4s_supported && sc4s_search_head_ta && sc4s_search_head_ta !== addon;
+
     const [depsExpanded, setDepsExpanded] = useState(false);
+    const [depTab, setDepTab] = useState('standard');            // 'standard' | 'sc4s'
+    const [sc4sInfoOpen, setSc4sInfoOpen] = useState(false);
     const [dataWarnExpanded, setDataWarnExpanded] = useState(false);
     const [stExpanded, setStExpanded] = useState(false);
     const [communityExpanded, setCommunityExpanded] = useState(false);
@@ -815,7 +1165,7 @@ function ProductCard({ product, installedApps, appStatuses, sourcetypeData, isCo
     }));
     const allDeps = [...depItems, ...prereqItems];
     const depsMissing = allDeps.filter(d => !d.installed).length;
-    const hasDeps = allDeps.length > 0;
+    const hasDeps = allDeps.length > 0 || sc4s_supported;
 
     // Launch handlers
     const handleLaunchDefault = () => {
@@ -952,10 +1302,10 @@ function ProductCard({ product, installedApps, appStatuses, sourcetypeData, isCo
                             <Tooltip
                                 content={
                                     <div className="csc-tooltip-content">
-                                        <div className="csc-tooltip-desc">{description}</div>
+                                        <div className="csc-tooltip-desc">{renderFormattedText(description)}</div>
                                         {value_proposition && (
                                             <div className="csc-tooltip-vp">
-                                                <strong>Value:</strong> {value_proposition}
+                                                <strong>Value:</strong> {renderFormattedText(value_proposition)}
                                             </div>
                                         )}
                                     </div>
@@ -981,8 +1331,10 @@ function ProductCard({ product, installedApps, appStatuses, sourcetypeData, isCo
                 vizApp2Status={vizApp2Status}
                 sourcetypeInfo={sourcetypeInfo}
                 legacyInstalled={legacyInstalled}
+                allLegacyApps={legacy_apps}
                 sourcetypeSearchUrl={sourcetypeSearchUrl}
                 isArchived={!!(!addon_install_url && addon_splunkbase_url)}
+                onViewLegacy={onViewLegacy}
             />
 
 
@@ -1015,8 +1367,53 @@ function ProductCard({ product, installedApps, appStatuses, sourcetypeData, isCo
                     {/* Expanded detail rows */}
                     {depsExpanded && (
                         <div className="csc-dep-expanded">
-                            {/* ── Support Level Badge ── */}
-                            {support_level && (
+                            {/* ── Support Level Badge (non-SC4S products only — SC4S products show it inside the tab) ── */}
+                            {support_level && !sc4s_supported && (
+                                <div className={`csc-support-badge csc-support-${support_level}`}>
+                                    {support_level === 'cisco_supported' && '🛡️ Cisco Supported'}
+                                    {support_level === 'splunk_supported' && '✦ Splunk Supported'}
+                                    {support_level === 'developer_supported' && '👨‍💻 Developer Supported'}
+                                    {support_level === 'community_supported' && '🌐 Community Supported'}
+                                    {support_level === 'not_supported' && '⊘ Not Supported'}
+                                </div>
+                            )}
+
+                            {/* ── Tab bar (SC4S products only) ── */}
+                            {sc4s_supported && (
+                                <>
+                                <div className="csc-dep-tabs">
+                                    <button
+                                        className={`csc-dep-tab ${depTab === 'standard' ? 'csc-dep-tab-active csc-dep-tab-standard' : ''}`}
+                                        onClick={() => setDepTab('standard')}
+                                        type="button"
+                                    >
+                                        🟢 Standard
+                                    </button>
+                                    <button
+                                        className={`csc-dep-tab ${depTab === 'sc4s' ? 'csc-dep-tab-active csc-dep-tab-sc4s' : ''}`}
+                                        onClick={() => setDepTab('sc4s')}
+                                        type="button"
+                                    >
+                                        📡 SC4S / High-Scale
+                                    </button>
+                                    <button
+                                        className="csc-sc4s-info-trigger"
+                                        onClick={(e) => { e.stopPropagation(); setSc4sInfoOpen(true); }}
+                                        type="button"
+                                        title="What is SC4S? — Learn about Splunk Connect for Syslog"
+                                    >
+                                        ℹ️
+                                    </button>
+                                </div>
+                                <SC4SInfoModal open={sc4sInfoOpen} onClose={() => setSc4sInfoOpen(false)} />
+                                </>
+                            )}
+
+                            {/* ── Tab content: Standard (always shown for non-SC4S; tab 1 for SC4S) ── */}
+                            {(!sc4s_supported || depTab === 'standard') && (
+                                <>
+                            {/* Support badge inside Standard tab for SC4S products */}
+                            {sc4s_supported && support_level && (
                                 <div className={`csc-support-badge csc-support-${support_level}`}>
                                     {support_level === 'cisco_supported' && '🛡️ Cisco Supported'}
                                     {support_level === 'splunk_supported' && '✦ Splunk Supported'}
@@ -1027,10 +1424,21 @@ function ProductCard({ product, installedApps, appStatuses, sourcetypeData, isCo
                             )}
                             <hr className="csc-dep-divider" />
                             <span className="csc-dep-label">Required</span>
+                            {sc4s_supported && !addon && (
+                                <div className="csc-dep-detail csc-no-addon-notice">
+                                    <span className="csc-dep-status-missing">⚠️ No add-on available yet</span>
+                                    <span className="csc-no-addon-hint">Use the <strong>SC4S / High-Scale</strong> tab to bring in data for this product</span>
+                                </div>
+                            )}
                             {addon && (
                                 <div className="csc-dep-detail">
-                                    <span className="csc-dep-name">{addon_label || addon}</span>
-                                    {(addon_splunkbase_url || addon_docs_url || addon_troubleshoot_url || sc4s_url) && (
+                                    {appStatus?.installed ? (
+                                        <a href={createURL(`/app/${addon}/`)} target="_blank" rel="noopener noreferrer" className="csc-dep-name csc-dep-name-link" title={`Open ${addon_label || addon}`}>{addon_label || addon}</a>
+                                    ) : (
+                                        <span className="csc-dep-name">{addon_label || addon}</span>
+                                    )}
+                                    {addon_label && addon_label !== addon && <span className="csc-dep-appid" title="Splunk folder name">{addon}</span>}
+                                    {(addon_splunkbase_url || addon_docs_url || addon_troubleshoot_url) && (
                                         <span className="csc-split-pill">
                                             {addon_splunkbase_url && (
                                                 <a href={addon_splunkbase_url} target="_blank" rel="noopener noreferrer" className="csc-split-pill-seg" title="View on Splunkbase">
@@ -1045,11 +1453,6 @@ function ProductCard({ product, installedApps, appStatuses, sourcetypeData, isCo
                                             {addon_troubleshoot_url && (
                                                 <a href={addon_troubleshoot_url} target="_blank" rel="noopener noreferrer" className="csc-split-pill-seg" title="Troubleshooting Guide">
                                                     Troubleshoot 🔧
-                                                </a>
-                                            )}
-                                            {sc4s_url && (
-                                                <a href={sc4s_url} target="_blank" rel="noopener noreferrer" className="csc-split-pill-seg csc-split-pill-sc4s" title="SC4S — Splunk Connect for Syslog">
-                                                    SC4S 📡
                                                 </a>
                                             )}
                                         </span>
@@ -1067,7 +1470,12 @@ function ProductCard({ product, installedApps, appStatuses, sourcetypeData, isCo
                             )}
                             {app_viz && (
                                 <div className="csc-dep-detail">
-                                    <span className="csc-dep-name">{app_viz_label || app_viz}</span>
+                                    {vizAppStatus?.installed ? (
+                                        <a href={createURL(`/app/${app_viz}/`)} target="_blank" rel="noopener noreferrer" className="csc-dep-name csc-dep-name-link" title={`Open ${app_viz_label || app_viz}`}>{app_viz_label || app_viz}</a>
+                                    ) : (
+                                        <span className="csc-dep-name">{app_viz_label || app_viz}</span>
+                                    )}
+                                    {app_viz_label && app_viz_label !== app_viz && <span className="csc-dep-appid" title="Splunk folder name">{app_viz}</span>}
                                     {(app_viz_splunkbase_url || app_viz_docs_url || app_viz_troubleshoot_url) && (
                                         <span className="csc-split-pill">
                                             {app_viz_splunkbase_url && (
@@ -1100,7 +1508,12 @@ function ProductCard({ product, installedApps, appStatuses, sourcetypeData, isCo
                             )}
                             {app_viz_2 && (
                                 <div className="csc-dep-detail">
-                                    <span className="csc-dep-name">{app_viz_2_label || app_viz_2}</span>
+                                    {vizApp2Status?.installed ? (
+                                        <a href={createURL(`/app/${app_viz_2}/`)} target="_blank" rel="noopener noreferrer" className="csc-dep-name csc-dep-name-link" title={`Open ${app_viz_2_label || app_viz_2}`}>{app_viz_2_label || app_viz_2}</a>
+                                    ) : (
+                                        <span className="csc-dep-name">{app_viz_2_label || app_viz_2}</span>
+                                    )}
+                                    {app_viz_2_label && app_viz_2_label !== app_viz_2 && <span className="csc-dep-appid" title="Splunk folder name">{app_viz_2}</span>}
                                     {(app_viz_2_splunkbase_url || app_viz_2_docs_url || app_viz_2_troubleshoot_url) && (
                                         <span className="csc-split-pill">
                                             {app_viz_2_splunkbase_url && (
@@ -1159,7 +1572,12 @@ function ProductCard({ product, installedApps, appStatuses, sourcetypeData, isCo
                                         const prereqInstalled = !!installedApps[pa.app_id];
                                         return (
                                             <div className="csc-dep-detail" key={pa.app_id}>
-                                                <span className="csc-dep-name">{pa.display_name}</span>
+                                                {prereqInstalled ? (
+                                                    <a href={createURL(`/app/${pa.app_id}/`)} target="_blank" rel="noopener noreferrer" className="csc-dep-name csc-dep-name-link" title={`Open ${pa.display_name}`}>{pa.display_name}</a>
+                                                ) : (
+                                                    <span className="csc-dep-name">{pa.display_name}</span>
+                                                )}
+                                                {pa.display_name !== pa.app_id && <span className="csc-dep-appid" title="Splunk folder name">{pa.app_id}</span>}
                                                 {pa.addon_splunkbase_url && (
                                                     <span className="csc-split-pill">
                                                         <a href={pa.addon_splunkbase_url} target="_blank" rel="noopener noreferrer" className="csc-split-pill-seg" title="View on Splunkbase">
@@ -1178,64 +1596,199 @@ function ProductCard({ product, installedApps, appStatuses, sourcetypeData, isCo
                                     })}
                                 </>
                             )}
-                            {soar_connectors && soar_connectors.length > 0 && (
-                                <>
+                            {/* ── Secondary integrations (collapsible) ── */}
+                            {((soar_connectors && soar_connectors.length > 0) || (alert_actions && alert_actions.length > 0) || (community_apps && community_apps.length > 0)) && (() => {
+                                const intCount = (soar_connectors?.length || 0) + (alert_actions?.length || 0);
+                                // Never suggest third-party alternatives for products that are Cisco or Splunk supported
+                                const isOfficiallySupported = support_level === 'cisco_supported' || support_level === 'splunk_supported';
+                                const hasCommunity = community_apps && community_apps.length > 0 && !isOfficiallySupported;
+                                return (
+                                    <>
                                     <hr className="csc-dep-divider" />
-                                    <span className="csc-dep-label csc-dep-label-soar"><img src={createURL(`/static/app/${APP_ID}/icon-soar.svg`)} alt="" className="badge-icon" /> SOAR Connectors</span>
-                                    {soar_connectors.map((sc) => (
-                                        <div className="csc-dep-detail" key={sc.uid || sc.label}>
-                                            <span className="csc-dep-name">{sc.label}</span>
-                                            {sc.url && (
-                                                <span className="csc-split-pill">
-                                                    <a href={sc.url} target="_blank" rel="noopener noreferrer" className="csc-split-pill-seg" title="View SOAR connector on Splunkbase">
-                                                        Splunkbase ↗
-                                                    </a>
-                                                </span>
-                                            )}
-                                        </div>
-                                    ))}
+                                    {intCount > 0 && (
+                                        <details className="csc-dep-details">
+                                            <summary className="csc-dep-details-summary">
+                                                Integrations ({intCount})
+                                            </summary>
+                                            <div className="csc-dep-details-body">
+                                                {soar_connectors && soar_connectors.length > 0 && (
+                                                    <>
+                                                        <span className="csc-dep-label csc-dep-label-soar"><img src={createURL(`/static/app/${APP_ID}/icon-soar.svg`)} alt="" className="badge-icon" /> SOAR Connectors</span>
+                                                        {soar_connectors.map((sc) => (
+                                                            <div className="csc-dep-detail" key={sc.uid || sc.label}>
+                                                                <span className="csc-dep-name">{sc.label}</span>
+                                                                {sc.url && (
+                                                                    <span className="csc-split-pill">
+                                                                        <a href={sc.url} target="_blank" rel="noopener noreferrer" className="csc-split-pill-seg" title="View SOAR connector on Splunkbase">
+                                                                            Splunkbase ↗
+                                                                        </a>
+                                                                    </span>
+                                                                )}
+                                                            </div>
+                                                        ))}
+                                                    </>
+                                                )}
+                                                {alert_actions && alert_actions.length > 0 && (
+                                                    <>
+                                                        <span className="csc-dep-label csc-dep-label-alert">🔔 Alert Actions</span>
+                                                        {alert_actions.map((aa) => (
+                                                            <div className="csc-dep-detail" key={aa.uid || aa.label}>
+                                                                <span className="csc-dep-name">{aa.label}</span>
+                                                                {aa.url && (
+                                                                    <span className="csc-split-pill">
+                                                                        <a href={aa.url} target="_blank" rel="noopener noreferrer" className="csc-split-pill-seg" title="View alert action on Splunkbase">
+                                                                            Splunkbase ↗
+                                                                        </a>
+                                                                    </span>
+                                                                )}
+                                                            </div>
+                                                        ))}
+                                                    </>
+                                                )}
+                                            </div>
+                                        </details>
+                                    )}
+                                    {hasCommunity && (
+                                        <details className="csc-dep-details">
+                                            <summary className="csc-dep-details-summary csc-dep-details-community">
+                                                ⚠️ Third-Party Alternatives ({community_apps.length})
+                                            </summary>
+                                            {/* Only shown for non-Cisco/Splunk-supported products */}
+                                            <div className="csc-dep-details-body">
+                                                {community_apps.map((ca) => {
+                                                    const caInstalled = !!installedApps[ca.app_id];
+                                                    return (
+                                                        <div className="csc-dep-detail" key={ca.uid || ca.app_id}>
+                                                            <span className="csc-dep-name">{ca.display_name}</span>
+                                                            {ca.url && (
+                                                                <span className="csc-split-pill">
+                                                                    <a href={ca.url} target="_blank" rel="noopener noreferrer" className="csc-split-pill-seg" title="View on Splunkbase">
+                                                                        Splunkbase ↗
+                                                                    </a>
+                                                                </span>
+                                                            )}
+                                                            {caInstalled && (
+                                                                <span className="csc-dep-status-community">⚠ installed</span>
+                                                            )}
+                                                        </div>
+                                                    );
+                                                })}
+                                            </div>
+                                        </details>
+                                    )}
+                                    </>
+                                );
+                            })()}
                                 </>
                             )}
-                            {alert_actions && alert_actions.length > 0 && (
+
+                            {/* ── Tab content: SC4S / High-Scale (tab 2 for SC4S products) ── */}
+                            {sc4s_supported && depTab === 'sc4s' && (
                                 <>
+                                    {/* SC4S is always Splunk Supported */}
+                                    <div className="csc-support-badge csc-support-splunk_supported">
+                                        ✦ Splunk Supported
+                                    </div>
                                     <hr className="csc-dep-divider" />
-                                    <span className="csc-dep-label csc-dep-label-alert">🔔 Alert Actions</span>
-                                    {alert_actions.map((aa) => (
-                                        <div className="csc-dep-detail" key={aa.uid || aa.label}>
-                                            <span className="csc-dep-name">{aa.label}</span>
-                                            {aa.url && (
-                                                <span className="csc-split-pill">
-                                                    <a href={aa.url} target="_blank" rel="noopener noreferrer" className="csc-split-pill-seg" title="View alert action on Splunkbase">
-                                                        Splunkbase ↗
-                                                    </a>
-                                                </span>
-                                            )}
-                                        </div>
-                                    ))}
-                                </>
-                            )}
-                            {community_apps && community_apps.length > 0 && (
-                                <>
-                                    <hr className="csc-dep-divider" />
-                                    <span className="csc-dep-label csc-dep-label-community">⚠️ Third-Party Alternatives</span>
-                                    {community_apps.map((ca) => {
-                                        const caInstalled = !!installedApps[ca.app_id];
-                                        return (
-                                            <div className="csc-dep-detail" key={ca.uid || ca.app_id}>
-                                                <span className="csc-dep-name">{ca.display_name}</span>
-                                                {ca.url && (
+                                    {sc4s_search_head_ta ? (
+                                        <>
+                                            <span className="csc-dep-label csc-dep-label-sc4s">Search Head TA</span>
+                                            <div className="csc-dep-detail">
+                                                {sc4sShTaStatus?.installed ? (
+                                                    <a href={createURL(`/app/${sc4s_search_head_ta}/`)} target="_blank" rel="noopener noreferrer" className="csc-dep-name csc-dep-name-link" title={`Open ${sc4s_search_head_ta_label || sc4s_search_head_ta}`}>{sc4s_search_head_ta_label || sc4s_search_head_ta}</a>
+                                                ) : (
+                                                    <span className="csc-dep-name">{sc4s_search_head_ta_label || sc4s_search_head_ta}</span>
+                                                )}
+                                                {sc4s_search_head_ta_label && sc4s_search_head_ta_label !== sc4s_search_head_ta && <span className="csc-dep-appid" title="Splunk folder name">{sc4s_search_head_ta}</span>}
+                                                {(sc4s_search_head_ta_splunkbase_url || sc4s_url) && (
                                                     <span className="csc-split-pill">
-                                                        <a href={ca.url} target="_blank" rel="noopener noreferrer" className="csc-split-pill-seg" title="View on Splunkbase">
-                                                            Splunkbase ↗
+                                                        {sc4s_search_head_ta_splunkbase_url && (
+                                                            <a href={sc4s_search_head_ta_splunkbase_url} target="_blank" rel="noopener noreferrer" className="csc-split-pill-seg" title="View on Splunkbase">
+                                                                Splunkbase ↗
+                                                            </a>
+                                                        )}
+                                                        {sc4s_url && (
+                                                            <a href={sc4s_url} target="_blank" rel="noopener noreferrer" className="csc-split-pill-seg csc-split-pill-sc4s" title="SC4S setup documentation">
+                                                                SC4S Docs 📖
+                                                            </a>
+                                                        )}
+                                                    </span>
+                                                )}
+                                                {sc4sShTaStatus?.version && (
+                                                    <span className="csc-dep-version">v{sc4sShTaStatus.version}</span>
+                                                )}
+                                                {sc4sShTaStatus?.updateVersion && (
+                                                    <span className="csc-dep-update">⬆ v{sc4sShTaStatus.updateVersion}</span>
+                                                )}
+                                                {!sc4sShTaStatus?.installed && (
+                                                    <span className="csc-dep-status-missing">not installed</span>
+                                                )}
+                                            </div>
+                                            {hasDifferentSc4sTa && (
+                                                <div className="csc-sc4s-note-compact">
+                                                    ⚠️ Uses a <em>different</em> TA than standard path
+                                                </div>
+                                            )}
+                                            {sc4s_search_head_ta_install_url && !sc4sShTaStatus?.installed && (
+                                                <a href={createURL(sc4s_search_head_ta_install_url)} target="_blank" rel="noopener noreferrer" className="csc-sc4s-install-btn" title="Install Search Head TA from Splunk App Manager">
+                                                    Install Search Head TA →
+                                                </a>
+                                            )}
+                                        </>
+                                    ) : (
+                                        <>
+                                            <span className="csc-dep-label csc-dep-label-sc4s">Search Head TA</span>
+                                            <div className="csc-dep-detail">
+                                                <span className="csc-dep-name" style={{fontStyle: 'italic', opacity: 0.7}}>None required</span>
+                                                {sc4s_url && (
+                                                    <span className="csc-split-pill">
+                                                        <a href={sc4s_url} target="_blank" rel="noopener noreferrer" className="csc-split-pill-seg csc-split-pill-sc4s" title="SC4S setup documentation">
+                                                            SC4S Docs 📖
                                                         </a>
                                                     </span>
                                                 )}
-                                                {caInstalled && (
-                                                    <span className="csc-dep-status-community">⚠ installed</span>
-                                                )}
                                             </div>
-                                        );
-                                    })}
+                                            <div className="csc-sc4s-note-compact csc-sc4s-note-compact-same">
+                                                ℹ️ No add-on needed on Search Heads — SC4S handles all parsing and indexing
+                                            </div>
+                                        </>
+                                    )}
+                                    {sc4s_config_notes && sc4s_config_notes.length > 0 && (
+                                        <details className="csc-dep-details">
+                                            <summary className="csc-dep-details-summary">
+                                                ⚙️ Configuration Notes ({sc4s_config_notes.length})
+                                            </summary>
+                                            <div className="csc-dep-details-body">
+                                                <ul className="csc-sc4s-config-list">
+                                                    {sc4s_config_notes.map((note, i) => (
+                                                        <li key={i}>{note}</li>
+                                                    ))}
+                                                </ul>
+                                            </div>
+                                        </details>
+                                    )}
+                                </>
+                            )}
+
+                            {/* ── Dashboard App (shared — shown below both tabs, or for non-SC4S products inside the standard flow) ── */}
+                            {sc4s_supported && app_viz && (
+                                <>
+                                    <hr className="csc-dep-divider" />
+                                    <span className="csc-dep-label">Dashboard App</span>
+                                    <div className="csc-dep-detail">
+                                        {vizAppStatus?.installed ? (
+                                            <a href={createURL(`/app/${app_viz}/`)} target="_blank" rel="noopener noreferrer" className="csc-dep-name csc-dep-name-link" title={`Open ${app_viz_label || app_viz}`}>{app_viz_label || app_viz}</a>
+                                        ) : (
+                                            <span className="csc-dep-name">{app_viz_label || app_viz}</span>
+                                        )}
+                                        {app_viz_label && app_viz_label !== app_viz && <span className="csc-dep-appid" title="Splunk folder name">{app_viz}</span>}
+                                        {vizAppStatus?.version && (
+                                            <span className="csc-dep-version">v{vizAppStatus.version}</span>
+                                        )}
+                                        {!vizAppStatus?.installed && (
+                                            <span className="csc-dep-status-missing">not installed</span>
+                                        )}
+                                    </div>
                                 </>
                             )}
                         </div>
@@ -1291,10 +1844,11 @@ function ProductCard({ product, installedApps, appStatuses, sourcetypeData, isCo
             )}
 
             {/* ── Community / third-party shadow app warning (collapsible) ── */}
+            {/* Only shown when unofficial third-party apps are already installed — migration warning */}
             {communityInstalled.length > 0 && (
                 <div className="csc-community-warning">
                     <div className="csc-community-summary" onClick={() => setCommunityExpanded((v) => !v)} role="button" tabIndex={0}>
-                        <span>⚠️ Third-party add-on detected ({communityInstalled.length})</span>
+                        <span>⚠️ Unofficial add-on installed ({communityInstalled.length})</span>
                         <span className="csc-dep-toggle">
                             {communityExpanded ? '− Hide' : '+ Details'}
                         </span>
@@ -1310,7 +1864,7 @@ function ProductCard({ product, installedApps, appStatuses, sourcetypeData, isCo
                                 </div>
                             ))}
                             <span className="csc-community-warning-hint">
-                                Not official Cisco add-ons. Consider migrating to <strong>{addon_label || addon}</strong> for full support.
+                                Not an official Cisco/Splunk add-on. Migrate to <strong>{addon_label || addon}</strong> for full support and compatibility.
                             </span>
                         </div>
                     )}
@@ -1440,6 +1994,14 @@ function ProductCard({ product, installedApps, appStatuses, sourcetypeData, isCo
                         ↗
                     </a>
                 )}
+                {/* Dev Mode — view config */}
+                {devMode && onViewConfig && (
+                    <button className="csc-btn csc-btn-icon csc-btn-outline csc-btn-devmode"
+                        onClick={() => onViewConfig(product_id)}
+                        title="View product config (Dev Mode)">
+                        &lt;/&gt;
+                    </button>
+                )}
                 {isComingSoon && (
                     <span className="csc-coming-soon-badge">Coming Soon</span>
                 )}
@@ -1498,6 +2060,575 @@ function ProductCard({ product, installedApps, appStatuses, sourcetypeData, isCo
                 'csc-bottom-neutral'
             }`} />
         </div>
+    );
+}
+
+// ─────────────────────  CONFIG VIEWER (Dev Mode)  ─────────────────
+
+/** Convert enriched product object(s) back to Splunk .conf INI format */
+function toSplunkConf(data) {
+    const products = Array.isArray(data) ? data : [data];
+    const sections = [];
+    for (const p of products) {
+        const lines = [`[${p.product_id}]`];
+        // Simple scalar fields — order matches products.conf convention
+        const SCALAR_FIELDS = [
+            'display_name', 'description', 'value_proposition', 'vendor', 'tagline',
+            'category', 'version', 'status',
+            'addon', 'addon_label', 'addon_family', 'addon_splunkbase_url',
+            'addon_docs_url', 'addon_troubleshoot_url', 'addon_install_url',
+            'app_viz', 'app_viz_label', 'app_viz_splunkbase_url', 'app_viz_docs_url',
+            'app_viz_troubleshoot_url', 'app_viz_install_url',
+            'app_viz_2', 'app_viz_2_label', 'app_viz_2_splunkbase_url',
+            'app_viz_2_docs_url', 'app_viz_2_install_url',
+            'learn_more_url',
+            'support_level', 'icon_emoji', 'sort_order',
+            'card_banner', 'card_banner_color', 'card_banner_size', 'card_banner_opacity',
+            'card_accent', 'card_bg_color',
+            'sc4s_url', 'sc4s_label', 'sc4s_search_head_ta', 'sc4s_search_head_ta_label',
+            'sc4s_search_head_ta_splunkbase_url', 'sc4s_search_head_ta_splunkbase_id',
+            'sc4s_search_head_ta_install_url',
+        ];
+        for (const f of SCALAR_FIELDS) {
+            const v = p[f];
+            if (v !== undefined && v !== null && v !== '' && v !== false) lines.push(`${f} = ${v}`);
+        }
+        // Boolean fields
+        if (p.is_new) lines.push('is_new = true');
+        if (p.secure_networking_gtm) lines.push('secure_networking_gtm = true');
+        if (p.sc4s_supported) lines.push('sc4s_supported = true');
+        // CSV array fields
+        if (p.sourcetypes && p.sourcetypes.length) lines.push(`sourcetypes = ${p.sourcetypes.join(',')}`);
+        if (p.dashboard) lines.push(`dashboards = ${p.dashboard}`);
+        if (p.custom_dashboard) lines.push(`custom_dashboard = ${p.custom_dashboard}`);
+        if (p.keywords && p.keywords.length) lines.push(`keywords = ${p.keywords.join(',')}`);
+        if (p.aliases && p.aliases.length) lines.push(`aliases = ${p.aliases.join(',')}`);
+        // Legacy apps (parallel CSV)
+        if (p.legacy_apps && p.legacy_apps.length) {
+            lines.push(`legacy_apps = ${p.legacy_apps.map(la => la.app_id).join(',')}`);
+            lines.push(`legacy_labels = ${p.legacy_apps.map(la => la.display_name).join(',')}`);
+            const uids = p.legacy_apps.map(la => la.uid).join(',');
+            if (uids.replace(/,/g, '')) lines.push(`legacy_uids = ${uids}`);
+            const urls = p.legacy_apps.map(la => la.addon_splunkbase_url).join(',');
+            if (urls.replace(/,/g, '')) lines.push(`legacy_urls = ${urls}`);
+            const statuses = p.legacy_apps.map(la => la.status || 'active').join(',');
+            lines.push(`legacy_statuses = ${statuses}`);
+        }
+        // Prereq apps
+        if (p.prereq_apps && p.prereq_apps.length) {
+            lines.push(`prereq_apps = ${p.prereq_apps.map(pa => pa.app_id).join(',')}`);
+            lines.push(`prereq_labels = ${p.prereq_apps.map(pa => pa.display_name).join(',')}`);
+            const uids = p.prereq_apps.map(pa => pa.uid).join(',');
+            if (uids.replace(/,/g, '')) lines.push(`prereq_uids = ${uids}`);
+            const urls = p.prereq_apps.map(pa => pa.addon_splunkbase_url).join(',');
+            if (urls.replace(/,/g, '')) lines.push(`prereq_urls = ${urls}`);
+        }
+        // Community apps
+        if (p.community_apps && p.community_apps.length) {
+            lines.push(`community_apps = ${p.community_apps.map(ca => ca.app_id).join(',')}`);
+            lines.push(`community_labels = ${p.community_apps.map(ca => ca.display_name).join(',')}`);
+            const uids = p.community_apps.map(ca => ca.uid).join(',');
+            if (uids.replace(/,/g, '')) lines.push(`community_uids = ${uids}`);
+            const urls = p.community_apps.map(ca => ca.url).join(',');
+            if (urls.replace(/,/g, '')) lines.push(`community_urls = ${urls}`);
+        }
+        // SOAR connectors
+        if (p.soar_connectors) {
+            p.soar_connectors.forEach((sc, i) => {
+                const sfx = i === 0 ? '' : `_${i + 1}`;
+                lines.push(`soar_connector${sfx}_label = ${sc.label}`);
+                if (sc.uid) lines.push(`soar_connector${sfx}_uid = ${sc.uid}`);
+                if (sc.url) lines.push(`soar_connector${sfx}_url = ${sc.url}`);
+            });
+        }
+        // Alert actions
+        if (p.alert_actions) {
+            p.alert_actions.forEach((aa, i) => {
+                const sfx = i === 0 ? '' : `_${i + 1}`;
+                lines.push(`alert_action${sfx}_label = ${aa.label}`);
+                if (aa.uid) lines.push(`alert_action${sfx}_uid = ${aa.uid}`);
+                if (aa.url) lines.push(`alert_action${sfx}_url = ${aa.url}`);
+            });
+        }
+        // ITSI
+        if (p.itsi_content_pack) {
+            lines.push(`itsi_content_pack_label = ${p.itsi_content_pack.label}`);
+            if (p.itsi_content_pack.docs_url) lines.push(`itsi_content_pack_docs_url = ${p.itsi_content_pack.docs_url}`);
+        }
+        // SC4S config notes / best practices (pipe-delimited)
+        if (p.sc4s_config_notes && p.sc4s_config_notes.length) lines.push(`sc4s_config_notes = ${p.sc4s_config_notes.join('|')}`);
+        if (p.best_practices && p.best_practices.length) lines.push(`best_practices = ${p.best_practices.join('|')}`);
+        sections.push(lines.join('\n'));
+    }
+    return sections.join('\n\n');
+}
+
+/** Syntax-highlight a JSON string → array of React spans */
+function highlightJson(text) {
+    // Tokenize JSON for syntax coloring
+    const parts = [];
+    const regex = /("(?:[^"\\]|\\.)*")\s*(:)|"(?:[^"\\]|\\.)*"|\b(true|false|null)\b|(-?\d+\.?\d*(?:[eE][+-]?\d+)?)|([{}\[\],])/g;
+    let last = 0;
+    let m;
+    while ((m = regex.exec(text)) !== null) {
+        if (m.index > last) parts.push(<span key={`w${last}`} className="sh-plain">{text.slice(last, m.index)}</span>);
+        if (m[1]) {
+            // key
+            parts.push(<span key={`k${m.index}`} className="sh-key">{m[1]}</span>);
+            parts.push(<span key={`c${m.index}`} className="sh-colon">{m[0].slice(m[1].length)}</span>);
+        } else if (m[3]) {
+            parts.push(<span key={`b${m.index}`} className="sh-bool">{m[0]}</span>);
+        } else if (m[4]) {
+            parts.push(<span key={`n${m.index}`} className="sh-number">{m[0]}</span>);
+        } else if (m[5]) {
+            parts.push(<span key={`p${m.index}`} className="sh-punct">{m[0]}</span>);
+        } else {
+            // string value
+            parts.push(<span key={`s${m.index}`} className="sh-string">{m[0]}</span>);
+        }
+        last = m.index + m[0].length;
+    }
+    if (last < text.length) parts.push(<span key={`e${last}`} className="sh-plain">{text.slice(last)}</span>);
+    return parts;
+}
+
+/** Syntax-highlight a YAML string → array of React spans */
+function highlightYaml(text) {
+    return text.split('\n').map((line, i) => {
+        const parts = [];
+        if (/^\s*#/.test(line)) {
+            // Comment line
+            parts.push(<span key={`c${i}`} className="sh-comment">{line}</span>);
+        } else if (/^(\s*-\s+)(.*)/.test(line)) {
+            // List item
+            const lm = line.match(/^(\s*-\s+)(.*)/);
+            parts.push(<span key={`d${i}`} className="sh-punct">{lm[1]}</span>);
+            // Check if the value part has a key: value
+            const valPart = lm[2];
+            const kvMatch = valPart.match(/^([\w._-]+)(:\s*)(.*)/);
+            if (kvMatch) {
+                parts.push(<span key={`k${i}`} className="sh-key">{kvMatch[1]}</span>);
+                parts.push(<span key={`co${i}`} className="sh-colon">{kvMatch[2]}</span>);
+                parts.push(highlightYamlValue(kvMatch[3], i));
+            } else {
+                parts.push(highlightYamlValue(valPart, i));
+            }
+        } else {
+            // Key: value or plain
+            const kvMatch = line.match(/^(\s*)([\w._-]+)(:\s*)(.*)?/);
+            if (kvMatch) {
+                parts.push(<span key={`sp${i}`} className="sh-plain">{kvMatch[1]}</span>);
+                parts.push(<span key={`k${i}`} className="sh-key">{kvMatch[2]}</span>);
+                parts.push(<span key={`co${i}`} className="sh-colon">{kvMatch[3]}</span>);
+                if (kvMatch[4]) parts.push(highlightYamlValue(kvMatch[4], i));
+            } else {
+                parts.push(<span key={`p${i}`} className="sh-plain">{line}</span>);
+            }
+        }
+        return <React.Fragment key={i}>{parts}{'\n'}</React.Fragment>;
+    });
+}
+function highlightYamlValue(val, lineIdx) {
+    if (!val) return null;
+    if (val === 'true' || val === 'false') return <span key={`bv${lineIdx}`} className="sh-bool">{val}</span>;
+    if (val === 'null') return <span key={`nv${lineIdx}`} className="sh-null">{val}</span>;
+    if (/^-?\d+\.?\d*$/.test(val)) return <span key={`nv${lineIdx}`} className="sh-number">{val}</span>;
+    if (/^".*"$/.test(val)) return <span key={`sv${lineIdx}`} className="sh-string">{val}</span>;
+    if (/^\[\]$|^\{\}$/.test(val)) return <span key={`ev${lineIdx}`} className="sh-punct">{val}</span>;
+    return <span key={`sv${lineIdx}`} className="sh-string">{val}</span>;
+}
+
+/** Syntax-highlight a Splunk .conf INI string → array of React spans */
+function highlightConf(text) {
+    return text.split('\n').map((line, i) => {
+        const parts = [];
+        if (/^\s*#/.test(line)) {
+            parts.push(<span key={`c${i}`} className="sh-comment">{line}</span>);
+        } else if (/^\[.+\]$/.test(line)) {
+            parts.push(<span key={`s${i}`} className="sh-stanza">{line}</span>);
+        } else {
+            const kvMatch = line.match(/^([\w._-]+)(\s*=\s*)(.*)/);
+            if (kvMatch) {
+                parts.push(<span key={`k${i}`} className="sh-key">{kvMatch[1]}</span>);
+                parts.push(<span key={`eq${i}`} className="sh-colon">{kvMatch[2]}</span>);
+                const val = kvMatch[3];
+                // Color URLs differently
+                if (/^https?:\/\//.test(val) || /^\/manager\//.test(val)) {
+                    parts.push(<span key={`u${i}`} className="sh-url">{val}</span>);
+                } else if (val === 'true' || val === 'false') {
+                    parts.push(<span key={`b${i}`} className="sh-bool">{val}</span>);
+                } else if (/^\d+\.?\d*$/.test(val)) {
+                    parts.push(<span key={`n${i}`} className="sh-number">{val}</span>);
+                } else {
+                    parts.push(<span key={`v${i}`} className="sh-string">{val}</span>);
+                }
+            } else if (line.trim() === '') {
+                parts.push(<span key={`e${i}`}>{line}</span>);
+            } else {
+                parts.push(<span key={`p${i}`} className="sh-plain">{line}</span>);
+            }
+        }
+        return <React.Fragment key={i}>{parts}{'\n'}</React.Fragment>;
+    });
+}
+
+/** Simple object → YAML serializer (no external dependencies) */
+function toYaml(obj, indent = 0) {
+    const pad = '  '.repeat(indent);
+    if (obj === null || obj === undefined) return `${pad}null`;
+    if (typeof obj === 'boolean' || typeof obj === 'number') return `${pad}${obj}`;
+    if (typeof obj === 'string') {
+        if (obj.includes('\n') || obj.includes(':') || obj.includes('#') || obj.includes('"') || obj.includes("'") || /^[\[\]{}&*!|>'"%@`]/.test(obj) || obj.trim() !== obj || obj === '')
+            return `${pad}"${obj.replace(/\\/g, '\\\\').replace(/"/g, '\\"')}"`;
+        return `${pad}${obj}`;
+    }
+    if (Array.isArray(obj)) {
+        if (obj.length === 0) return `${pad}[]`;
+        return obj.map(item => {
+            if (typeof item === 'object' && item !== null) {
+                const inner = toYaml(item, indent + 1).trimStart();
+                return `${pad}- ${inner}`;
+            }
+            return `${pad}- ${typeof item === 'string' && (item.includes(':') || item.includes('#')) ? `"${item}"` : item}`;
+        }).join('\n');
+    }
+    if (typeof obj === 'object') {
+        const entries = Object.entries(obj).filter(([, v]) => v !== undefined && v !== null && v !== '' && !(Array.isArray(v) && v.length === 0));
+        if (entries.length === 0) return `${pad}{}`;
+        return entries.map(([k, v]) => {
+            if (typeof v === 'object') {
+                const inner = toYaml(v, indent + 1);
+                return `${pad}${k}:\n${inner}`;
+            }
+            return `${pad}${k}: ${toYaml(v, 0).trimStart()}`;
+        }).join('\n');
+    }
+    return `${pad}${String(obj)}`;
+}
+
+/** Check if a value or any nested value matches a search query */
+function deepMatch(value, query) {
+    if (!query) return false;
+    const q = query.toLowerCase();
+    if (value === null || value === undefined) return 'null'.includes(q);
+    if (typeof value === 'boolean' || typeof value === 'number') return String(value).toLowerCase().includes(q);
+    if (typeof value === 'string') return value.toLowerCase().includes(q);
+    if (Array.isArray(value)) return value.some(item => deepMatch(item, query));
+    if (typeof value === 'object') {
+        return Object.entries(value).some(([k, v]) => k.toLowerCase().includes(q) || deepMatch(v, query));
+    }
+    return false;
+}
+
+/** Highlight matching text with a <mark> tag */
+function HighlightText({ text, query }) {
+    if (!query || !text) return <>{String(text)}</>;
+    const str = String(text);
+    const idx = str.toLowerCase().indexOf(query.toLowerCase());
+    if (idx === -1) return <>{str}</>;
+    return (
+        <>
+            {str.slice(0, idx)}
+            <mark className="csc-tree-highlight">{str.slice(idx, idx + query.length)}</mark>
+            {str.slice(idx + query.length)}
+        </>
+    );
+}
+
+/** Interactive tree node — recursively renders JSON with expand/collapse */
+function JsonTreeNode({ keyName, value, depth, defaultOpen, searchQuery, isArrayItem, arrayIndex }) {
+    const isObject = value !== null && typeof value === 'object' && !Array.isArray(value);
+    const isArray = Array.isArray(value);
+    const isExpandable = isObject || isArray;
+
+    // Auto-expand if search matches something inside, or if shallow depth
+    const matchesSearch = searchQuery && deepMatch(value, searchQuery);
+    const keyMatches = searchQuery && keyName && keyName.toLowerCase().includes(searchQuery.toLowerCase());
+    const shouldAutoOpen = defaultOpen || (searchQuery && (matchesSearch || keyMatches));
+
+    const [expanded, setExpanded] = useState(shouldAutoOpen);
+
+    // Re-expand when search changes
+    useEffect(() => {
+        if (searchQuery && (matchesSearch || keyMatches)) setExpanded(true);
+    }, [searchQuery, matchesSearch, keyMatches]);
+
+    const toggle = () => setExpanded(prev => !prev);
+
+    // Render the key label
+    const renderKey = () => {
+        if (keyName === undefined || keyName === null) return null;
+        const displayKey = isArrayItem ? `[${arrayIndex}]` : keyName;
+        return (
+            <span className="csc-tree-key">
+                <HighlightText text={displayKey} query={searchQuery} />
+            </span>
+        );
+    };
+
+    // Leaf node (string, number, boolean, null)
+    if (!isExpandable) {
+        const valClass = value === null || value === undefined ? 'csc-tree-null'
+            : typeof value === 'boolean' ? 'csc-tree-bool'
+            : typeof value === 'number' ? 'csc-tree-number'
+            : 'csc-tree-string';
+        const displayVal = value === null || value === undefined ? 'null'
+            : typeof value === 'string' ? `"${value}"`
+            : String(value);
+        return (
+            <div className="csc-tree-row" style={{ paddingLeft: `${depth * 18}px` }}>
+                {renderKey()}
+                {keyName !== undefined && <span className="csc-tree-colon">: </span>}
+                <span className={valClass}>
+                    <HighlightText text={displayVal} query={searchQuery} />
+                </span>
+            </div>
+        );
+    }
+
+    // Expandable node (object or array)
+    const entries = isArray ? value.map((v, i) => [i, v]) : Object.entries(value);
+    const count = entries.length;
+    const preview = isArray ? `Array(${count})` : `{${count} ${count === 1 ? 'key' : 'keys'}}`;
+
+    return (
+        <div className="csc-tree-branch">
+            <div
+                className={`csc-tree-row csc-tree-row-expandable ${expanded ? 'csc-tree-row-open' : ''}`}
+                style={{ paddingLeft: `${depth * 18}px` }}
+                onClick={toggle}
+                role="button"
+                tabIndex={0}
+            >
+                <span className={`csc-tree-arrow ${expanded ? 'csc-tree-arrow-open' : ''}`}>▶</span>
+                {renderKey()}
+                {keyName !== undefined && <span className="csc-tree-colon">: </span>}
+                {!expanded && <span className="csc-tree-preview">{preview}</span>}
+            </div>
+            {expanded && (
+                <div className="csc-tree-children">
+                    {entries.map(([k, v]) => (
+                        <JsonTreeNode
+                            key={k}
+                            keyName={isArray ? undefined : k}
+                            value={v}
+                            depth={depth + 1}
+                            defaultOpen={depth < 1}
+                            searchQuery={searchQuery}
+                            isArrayItem={isArray}
+                            arrayIndex={isArray ? k : undefined}
+                        />
+                    ))}
+                </div>
+            )}
+        </div>
+    );
+}
+
+/** Tree view for the "All Products" array — shows product names as top-level expandable items */
+function JsonTreeView({ data, searchQuery }) {
+    const [globalExpanded, setGlobalExpanded] = useState(null); // null = default, true = all, false = none
+    const [generation, setGeneration] = useState(0); // bumped on expand/collapse all to force remount
+
+    const handleExpandAll = () => { setGlobalExpanded(true); setGeneration(g => g + 1); };
+    const handleCollapseAll = () => { setGlobalExpanded(false); setGeneration(g => g + 1); };
+
+    if (Array.isArray(data)) {
+        // Render each product as a named top-level branch
+        const items = searchQuery
+            ? data.filter(p => deepMatch(p, searchQuery))
+            : data;
+        return (
+            <div className="csc-tree-root">
+                <div className="csc-tree-toolbar">
+                    <button className="csc-tree-toolbar-btn" onClick={handleExpandAll} title="Expand all">⊞ Expand All</button>
+                    <button className="csc-tree-toolbar-btn" onClick={handleCollapseAll} title="Collapse all">⊟ Collapse All</button>
+                    <span className="csc-tree-toolbar-count">
+                        {items.length} product{items.length !== 1 ? 's' : ''}{searchQuery ? ` matching "${searchQuery}"` : ''}
+                    </span>
+                </div>
+                <div className="csc-tree-container" key={generation}>
+                    {items.map((p, i) => (
+                        <JsonTreeNode
+                            key={p.product_id || i}
+                            keyName={p.display_name || p.product_id || `[${i}]`}
+                            value={p}
+                            depth={0}
+                            defaultOpen={globalExpanded === true}
+                            searchQuery={searchQuery}
+                        />
+                    ))}
+                </div>
+            </div>
+        );
+    }
+
+    // Single product
+    return (
+        <div className="csc-tree-root">
+            <div className="csc-tree-toolbar">
+                <button className="csc-tree-toolbar-btn" onClick={handleExpandAll} title="Expand all">⊞ Expand All</button>
+                <button className="csc-tree-toolbar-btn" onClick={handleCollapseAll} title="Collapse all">⊟ Collapse All</button>
+            </div>
+            <div className="csc-tree-container" key={generation}>
+                <JsonTreeNode
+                    keyName={data.display_name || data.product_id}
+                    value={data}
+                    depth={0}
+                    defaultOpen={globalExpanded !== false}
+                    searchQuery={searchQuery}
+                />
+            </div>
+        </div>
+    );
+}
+
+function ConfigViewerModal({ open, onClose, products, initialProductId, installedApps, appStatuses, sourcetypeData }) {
+    const [selectedProduct, setSelectedProduct] = useState(initialProductId || '__all__');
+    const [viewMode, setViewMode] = useState('tree'); // 'tree' | 'json' | 'yaml' | 'conf'
+    const [copied, setCopied] = useState(false);
+    const [treeSearch, setTreeSearch] = useState('');
+
+    useEffect(() => {
+        if (initialProductId) setSelectedProduct(initialProductId);
+    }, [initialProductId]);
+
+    if (!open) return null;
+
+    // Build enriched product data (what the card actually sees)
+    const enrichProduct = (p) => {
+        const appStatus = appStatuses[p.addon] || null;
+        const vizStatus = p.app_viz ? (appStatuses[p.app_viz] || null) : null;
+        const stData = sourcetypeData[p.product_id] || null;
+        return {
+            ...p,
+            _runtime: {
+                addon_installed: !!installedApps[p.addon],
+                addon_version: appStatus?.version || null,
+                addon_update_available: appStatus?.updateVersion || null,
+                app_viz_installed: p.app_viz ? !!installedApps[p.app_viz] : null,
+                app_viz_version: vizStatus?.version || null,
+                sourcetypes_flowing: stData?.hasData || false,
+                sourcetype_count: stData?.count || 0,
+                legacy_installed: (p.legacy_apps || []).filter(la => installedApps[la.app_id]).map(la => la.display_name),
+                community_installed: (p.community_apps || []).filter(ca => installedApps[ca.app_id]).map(ca => ca.display_name),
+            },
+        };
+    };
+
+    const data = selectedProduct === '__all__'
+        ? products.map(enrichProduct)
+        : enrichProduct(products.find(p => p.product_id === selectedProduct) || products[0]);
+
+    const rawOutput = viewMode === 'yaml'
+        ? (Array.isArray(data)
+            ? data.map((d) => `# ── ${d.display_name || d.product_id} ──\n- ${toYaml(d, 1).trimStart()}`).join('\n\n')
+            : `# ── ${data.display_name || data.product_id} ──\n${toYaml(data)}`)
+        : viewMode === 'conf'
+            ? toSplunkConf(data)
+            : JSON.stringify(data, null, 2);
+
+    const handleCopy = () => {
+        const text = viewMode === 'tree' ? JSON.stringify(data, null, 2) : rawOutput;
+        const onSuccess = () => {
+            setCopied(true);
+            setTimeout(() => setCopied(false), 2000);
+        };
+        // Try modern Clipboard API first, fall back to execCommand for non-HTTPS contexts
+        if (navigator.clipboard && window.isSecureContext) {
+            navigator.clipboard.writeText(text).then(onSuccess).catch(() => fallbackCopy(text, onSuccess));
+        } else {
+            fallbackCopy(text, onSuccess);
+        }
+    };
+
+    const fallbackCopy = (text, onSuccess) => {
+        const ta = document.createElement('textarea');
+        ta.value = text;
+        ta.style.position = 'fixed';
+        ta.style.left = '-9999px';
+        ta.style.opacity = '0';
+        document.body.appendChild(ta);
+        ta.select();
+        try {
+            document.execCommand('copy');
+            onSuccess();
+        } catch (e) {
+            console.warn('Copy failed:', e);
+        }
+        document.body.removeChild(ta);
+    };
+
+    return (
+        <Modal open returnFocus={false} onRequestClose={onClose} style={{ maxWidth: '900px', width: '92vw' }}>
+            <Modal.Header title="⚙️ Config Viewer — Developer Mode" onRequestClose={onClose} />
+            <Modal.Body>
+                <div className="csc-devmode-controls">
+                    <select
+                        className="csc-devmode-select"
+                        value={selectedProduct}
+                        onChange={(e) => setSelectedProduct(e.target.value)}
+                    >
+                        <option value="__all__">All Products ({products.length})</option>
+                        {products.map(p => (
+                            <option key={p.product_id} value={p.product_id}>
+                                {p.display_name || p.product_id}
+                            </option>
+                        ))}
+                    </select>
+                    <div className="csc-devmode-tabs">
+                        <button
+                            className={`csc-devmode-tab ${viewMode === 'tree' ? 'csc-devmode-tab-active' : ''}`}
+                            onClick={() => setViewMode('tree')}
+                        >🌳 Tree</button>
+                        <button
+                            className={`csc-devmode-tab ${viewMode === 'json' ? 'csc-devmode-tab-active' : ''}`}
+                            onClick={() => setViewMode('json')}
+                        >JSON</button>
+                        <button
+                            className={`csc-devmode-tab ${viewMode === 'yaml' ? 'csc-devmode-tab-active' : ''}`}
+                            onClick={() => setViewMode('yaml')}
+                        >YAML</button>
+                        <button
+                            className={`csc-devmode-tab ${viewMode === 'conf' ? 'csc-devmode-tab-active' : ''}`}
+                            onClick={() => setViewMode('conf')}
+                        >🔧 Splunk</button>
+                    </div>
+                    <button className="csc-devmode-copy" onClick={handleCopy}>
+                        {copied ? '✓ Copied!' : '📋 Copy'}
+                    </button>
+                </div>
+                {viewMode === 'tree' && (
+                    <div className="csc-devmode-search-wrap">
+                        <input
+                            type="text"
+                            className="csc-devmode-search"
+                            placeholder="Search keys or values…"
+                            value={treeSearch}
+                            onChange={(e) => setTreeSearch(e.target.value)}
+                        />
+                        {treeSearch && (
+                            <button className="csc-devmode-search-clear" onClick={() => setTreeSearch('')}>✕</button>
+                        )}
+                    </div>
+                )}
+                {viewMode === 'tree' ? (
+                    <div className="csc-devmode-output csc-devmode-tree-output">
+                        <JsonTreeView data={data} searchQuery={treeSearch} />
+                    </div>
+                ) : (
+                    <pre className="csc-devmode-output csc-devmode-highlighted">
+                        {viewMode === 'json' ? highlightJson(rawOutput)
+                            : viewMode === 'yaml' ? highlightYaml(rawOutput)
+                            : viewMode === 'conf' ? highlightConf(rawOutput)
+                            : rawOutput}
+                    </pre>
+                )}
+            </Modal.Body>
+            <Modal.Footer>
+                <Button appearance="secondary" label="Close" onClick={onClose} />
+            </Modal.Footer>
+        </Modal>
     );
 }
 
@@ -1682,6 +2813,58 @@ function AddonFilterBar({ selectedAddon, onSelectAddon, products }) {
     );
 }
 
+// ──────────────────────  PERSONA QUICK START MODAL  ────────────────────
+
+function PersonaModal({ open, onClose, onSelectPersona, products }) {
+    if (!open) return null;
+
+    const handleSelect = (preset) => {
+        onSelectPersona(preset);
+        onClose();
+    };
+
+    // Count how many suggested products actually exist in the catalog
+    const productIds = new Set(products.map(p => p.product_id));
+
+    return (
+        <Modal open returnFocus={false} onRequestClose={onClose} style={{ maxWidth: '780px', width: '92vw' }}>
+            <Modal.Header title="👤 Quick Start — Choose Your Role" onRequestClose={onClose} />
+            <Modal.Body>
+                <div className="csc-persona-intro">
+                    Select your primary role to personalize your view. We'll filter to the most relevant products
+                    and pre-add top recommendations to <strong>My Products</strong>.
+                    <span className="csc-persona-intro-hint">You can change this anytime via the 👤 button in the header.</span>
+                </div>
+                <div className="csc-persona-grid">
+                    {PERSONA_PRESETS.map((preset) => {
+                        const matchCount = preset.suggested.filter(id => productIds.has(id)).length;
+                        return (
+                            <button
+                                key={preset.id}
+                                className="csc-persona-card"
+                                onClick={() => handleSelect(preset)}
+                                style={{ '--persona-color': preset.color }}
+                            >
+                                <span className="csc-persona-icon">{preset.icon}</span>
+                                <span className="csc-persona-title">{preset.title}</span>
+                                <span className="csc-persona-desc">{preset.description}</span>
+                                {matchCount > 0 && (
+                                    <span className="csc-persona-count">
+                                        {matchCount} product{matchCount !== 1 ? 's' : ''} auto-added
+                                    </span>
+                                )}
+                            </button>
+                        );
+                    })}
+                </div>
+            </Modal.Body>
+            <Modal.Footer>
+                <Button appearance="secondary" label="Skip — I'll browse myself" onClick={onClose} />
+            </Modal.Footer>
+        </Modal>
+    );
+}
+
 // ──────────────────────  CATEGORY FILTER  ────────────────────
 
 function CategoryFilterBar({ selectedCategory, onSelectCategory, categoryCounts }) {
@@ -1837,6 +3020,16 @@ function SCANProductsPage() {
     const [platformType, setPlatformType] = useState('');
     const [themeOverride, setThemeOverride] = useState(getThemePreference); // 'auto' | 'light' | 'dark'
     const [splunkTheme, setSplunkTheme] = useState(null);                  // true = dark, false = light, null = unknown
+    const [showFullPortfolio, setShowFullPortfolio] = useState(getPortfolioPreference); // false = supported only
+    const [devMode, setDevMode] = useState(() => {
+        try { return localStorage.getItem(DEVMODE_STORAGE_KEY) === 'true'; } catch { return false; }
+    });
+    const [devToast, setDevToast] = useState(null);
+    const [configViewerOpen, setConfigViewerOpen] = useState(false);
+    const [configViewerProductId, setConfigViewerProductId] = useState(null);
+    const [personaModalOpen, setPersonaModalOpen] = useState(() => {
+        try { return localStorage.getItem(PERSONA_STORAGE_KEY) !== 'true'; } catch { return false; }
+    });
 
     // ── Theme detection — read Splunk's preference and store it ──
     useEffect(() => {
@@ -1959,6 +3152,55 @@ function SCANProductsPage() {
         ));
     }, []);
 
+    // ── Developer mode search intercept ──
+    const handleSearchInput = useCallback((value) => {
+        if (value.toLowerCase().trim() === 'devmode') {
+            setDevMode(prev => {
+                const next = !prev;
+                try { localStorage.setItem(DEVMODE_STORAGE_KEY, String(next)); } catch {}
+                setDevToast(next ? '🛠 Developer Mode ON' : '🛠 Developer Mode OFF');
+                setTimeout(() => setDevToast(null), 2500);
+                return next;
+            });
+            // Don't pass devmode as a search query
+            return;
+        }
+        setSearchQuery(value);
+    }, []);
+
+    // ── Persona selection handler ──
+    const handleSelectPersona = useCallback((preset) => {
+        // Set category filter
+        if (preset.category) {
+            setSelectedCategory(preset.category);
+        }
+        // Batch-add suggested products (merge with existing, don't duplicate)
+        if (preset.suggested.length > 0) {
+            setConfiguredIdsState((prev) => {
+                const existing = new Set(prev);
+                const validIds = new Set(products.map(p => p.product_id));
+                const toAdd = preset.suggested.filter(id => !existing.has(id) && validIds.has(id));
+                if (toAdd.length === 0) return prev;
+                const next = [...prev, ...toAdd];
+                saveConfiguredIds(next);
+                return next;
+            });
+        }
+        // Mark persona modal as shown
+        try { localStorage.setItem(PERSONA_STORAGE_KEY, 'true'); } catch { /* */ }
+    }, [products]);
+
+    const handleDismissPersona = useCallback(() => {
+        setPersonaModalOpen(false);
+        try { localStorage.setItem(PERSONA_STORAGE_KEY, 'true'); } catch { /* */ }
+    }, []);
+
+    // ── Config viewer handlers ──
+    const handleOpenConfigViewer = useCallback((productId) => {
+        setConfigViewerProductId(productId || null);
+        setConfigViewerOpen(true);
+    }, []);
+
     // ── Data loading ──
     const loadData = useCallback(async () => {
         setLoading(true);
@@ -2034,12 +3276,13 @@ function SCANProductsPage() {
             if (p.addon && installedApps[p.addon]) appIds.add(p.addon);
             if (p.app_viz && installedApps[p.app_viz]) appIds.add(p.app_viz);
             if (p.app_viz_2 && installedApps[p.app_viz_2]) appIds.add(p.app_viz_2);
+            if (p.sc4s_search_head_ta && installedApps[p.sc4s_search_head_ta]) appIds.add(p.sc4s_search_head_ta);
         });
         const checkAll = async () => {
             const statuses = {};
             // Pre-fill not-installed status for apps not in installedApps
             products.forEach((p) => {
-                [p.addon, p.app_viz, p.app_viz_2].forEach((aid) => {
+                [p.addon, p.app_viz, p.app_viz_2, p.sc4s_search_head_ta].forEach((aid) => {
                     if (aid && !appIds.has(aid) && !statuses[aid]) {
                         statuses[aid] = { installed: false, version: null, updateVersion: null, disabled: false };
                     }
@@ -2065,9 +3308,22 @@ function SCANProductsPage() {
         detect();
     }, [products, loading]);
 
+    // ── Portfolio toggle handler ──
+    const handlePortfolioToggle = useCallback(() => {
+        setShowFullPortfolio((prev) => {
+            const next = !prev;
+            savePortfolioPreference(next);
+            return next;
+        });
+    }, []);
+
     // ── Filtering ──
     const filteredProducts = useMemo(() => {
         let filtered = products;
+        // Support-level filter: default shows only Cisco/Splunk supported products
+        if (!showFullPortfolio) {
+            filtered = filtered.filter((p) => SUPPORTED_LEVELS.has(p.support_level));
+        }
         if (selectedCategory === 'soar') {
             filtered = filtered.filter((p) => p.soar_connectors && p.soar_connectors.length > 0);
         } else if (selectedCategory === 'alert_actions') {
@@ -2095,7 +3351,7 @@ function SCANProductsPage() {
             });
         }
         return filtered;
-    }, [products, selectedCategory, selectedAddon, searchQuery]);
+    }, [products, selectedCategory, selectedAddon, searchQuery, showFullPortfolio]);
 
     const configuredProducts = filteredProducts.filter((p) => p.status !== 'under_development' && configuredIds.includes(p.product_id));
     const availableProducts = filteredProducts.filter((p) => p.status !== 'under_development' && p.status !== 'deprecated' && !configuredIds.includes(p.product_id));
@@ -2103,13 +3359,14 @@ function SCANProductsPage() {
     const deprecatedProducts = filteredProducts.filter((p) => p.status === 'deprecated' && !configuredIds.includes(p.product_id));
 
     const categoryCounts = useMemo(() => {
+        const base = showFullPortfolio ? products : products.filter((p) => SUPPORTED_LEVELS.has(p.support_level));
         const counts = {};
-        CATEGORIES.forEach((c) => { counts[c.id] = products.filter((p) => p.category === c.id).length; });
-        counts.soar = products.filter((p) => p.soar_connectors && p.soar_connectors.length > 0).length;
-        counts.alert_actions = products.filter((p) => p.alert_actions && p.alert_actions.length > 0).length;
-        counts.secure_networking = products.filter((p) => p.secure_networking_gtm).length;
+        CATEGORIES.forEach((c) => { counts[c.id] = base.filter((p) => p.category === c.id).length; });
+        counts.soar = base.filter((p) => p.soar_connectors && p.soar_connectors.length > 0).length;
+        counts.alert_actions = base.filter((p) => p.alert_actions && p.alert_actions.length > 0).length;
+        counts.secure_networking = base.filter((p) => p.secure_networking_gtm).length;
         return counts;
-    }, [products]);
+    }, [products, showFullPortfolio]);
 
     // ── Render ──
     if (loading) {
@@ -2124,7 +3381,15 @@ function SCANProductsPage() {
     }
 
     return (
-        <div className="products-page">
+        <div className={`products-page ${devMode ? 'scan-devmode-active' : ''}`}>
+            {/* Dev Mode Banner */}
+            {devMode && (
+                <div className="scan-devmode-banner">
+                    <span className="scan-devmode-banner-pulse" />
+                    <span className="scan-devmode-banner-text">⚡ DEVELOPER MODE ⚡</span>
+                    <span className="scan-devmode-banner-pulse" />
+                </div>
+            )}
             {/* Header */}
             <div className="products-page-header">
                 <div className="header-left">
@@ -2169,6 +3434,16 @@ function SCANProductsPage() {
                             How do I get started?
                         </span>
                     </InfoTooltip>
+                    <button
+                        className={`scan-util-pill scan-util-portfolio ${showFullPortfolio ? 'scan-util-portfolio-on' : ''}`}
+                        onClick={handlePortfolioToggle}
+                        title={showFullPortfolio ? 'Showing full portfolio — click to show only Cisco & Splunk supported' : 'Showing Cisco & Splunk supported — click to show full portfolio'}
+                    >
+                        {showFullPortfolio ? '📂' : '✅'}
+                        <span className="scan-util-portfolio-label">
+                            {showFullPortfolio ? 'Full Portfolio' : 'Supported'}
+                        </span>
+                    </button>
                 </div>
                 <div className="scan-utility-right">
                     {platformType && (
@@ -2203,8 +3478,29 @@ function SCANProductsPage() {
                             {themeOverride === 'auto' ? 'Auto' : themeOverride === 'light' ? 'Light' : 'Dark'}
                         </span>
                     </button>
+                    <button
+                        className="scan-util-pill scan-util-persona"
+                        onClick={() => setPersonaModalOpen(true)}
+                        title="Quick Start — Choose or change your role"
+                    >
+                        👤 Role
+                    </button>
+                    {devMode && (
+                        <button
+                            className="scan-util-pill scan-util-devmode"
+                            onClick={() => handleOpenConfigViewer(null)}
+                            title="Config Viewer — Developer Mode"
+                        >
+                            &lt;/&gt;
+                        </button>
+                    )}
                 </div>
             </div>
+
+            {/* Developer mode toast */}
+            {devToast && (
+                <div className="csc-devmode-toast">{devToast}</div>
+            )}
 
             {error && (
                 <Message appearance="fill" type="warning" style={{ marginBottom: '16px' }}>
@@ -2213,9 +3509,9 @@ function SCANProductsPage() {
             )}
 
             <UniversalFinderBar
-                onSearch={setSearchQuery}
+                onSearch={handleSearchInput}
                 resultCount={filteredProducts.length}
-                totalCount={products.length}
+                totalCount={showFullPortfolio ? products.length : products.filter((p) => SUPPORTED_LEVELS.has(p.support_level)).length}
                 products={products}
             />
             <div style={{ marginBottom: '20px' }}>
@@ -2229,7 +3525,7 @@ function SCANProductsPage() {
             <AddonFilterBar
                 selectedAddon={selectedAddon}
                 onSelectAddon={setSelectedAddon}
-                products={products}
+                products={showFullPortfolio ? products : products.filter((p) => SUPPORTED_LEVELS.has(p.support_level))}
             />
 
             {/* Section 1: Configured */}
@@ -2258,6 +3554,7 @@ function SCANProductsPage() {
                                 onShowBestPractices={handleShowBestPractices}
                                 onViewLegacy={handleViewLegacy}
                                 onSetCustomDashboard={handleSetCustomDashboard}
+                                devMode={devMode} onViewConfig={handleOpenConfigViewer}
                             />
                         ))}
                     </div>
@@ -2284,6 +3581,7 @@ function SCANProductsPage() {
                                 onShowBestPractices={handleShowBestPractices}
                                 onViewLegacy={handleViewLegacy}
                                 onSetCustomDashboard={handleSetCustomDashboard}
+                                devMode={devMode} onViewConfig={handleOpenConfigViewer}
                             />
                         ))}
                     </div>
@@ -2310,6 +3608,7 @@ function SCANProductsPage() {
                                 onShowBestPractices={handleShowBestPractices}
                                 onViewLegacy={handleViewLegacy}
                                 onSetCustomDashboard={handleSetCustomDashboard}
+                                devMode={devMode} onViewConfig={handleOpenConfigViewer}
                             />
                         ))}
                     </div>
@@ -2337,6 +3636,7 @@ function SCANProductsPage() {
                                 onShowBestPractices={handleShowBestPractices}
                                 onViewLegacy={handleViewLegacy}
                                 onSetCustomDashboard={handleSetCustomDashboard}
+                                devMode={devMode} onViewConfig={handleOpenConfigViewer}
                             />
                         ))}
                     </div>
@@ -2356,11 +3656,28 @@ function SCANProductsPage() {
                 onClose={() => setLegacyModalOpen(false)}
                 legacyApps={legacyModalApps}
             />
+            {devMode && (
+                <ConfigViewerModal
+                    open={configViewerOpen}
+                    onClose={() => setConfigViewerOpen(false)}
+                    products={products}
+                    initialProductId={configViewerProductId}
+                    installedApps={installedApps}
+                    appStatuses={appStatuses}
+                    sourcetypeData={sourcetypeData}
+                />
+            )}
+            <PersonaModal
+                open={personaModalOpen}
+                onClose={handleDismissPersona}
+                onSelectPersona={handleSelectPersona}
+                products={products}
+            />
             {/* <FeedbackModal open={feedbackOpen} onClose={() => setFeedbackOpen(false)} /> */}
 
             {/* Remove All Confirmation Modal */}
             {removeAllModalOpen && (
-                <Modal open onRequestClose={() => setRemoveAllModalOpen(false)} style={{ maxWidth: '520px' }}>
+                <Modal open returnFocus={false} onRequestClose={() => setRemoveAllModalOpen(false)} style={{ maxWidth: '520px' }}>
                     <Modal.Header
                         title="Remove All Configured Products"
                     />

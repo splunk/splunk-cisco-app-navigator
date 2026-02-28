@@ -75,6 +75,7 @@ function buildProduct(name, c) {
     const laLabels = csvToArray(c.legacy_labels);
     const laUids = csvToArray(c.legacy_uids);
     const laUrls = csvToArray(c.legacy_urls);
+    const laStatuses = csvToArray(c.legacy_statuses);
     const paIds = csvToArray(c.prereq_apps);
     const paLabels = csvToArray(c.prereq_labels);
     const paUids = csvToArray(c.prereq_uids);
@@ -116,6 +117,7 @@ function buildProduct(name, c) {
             display_name: laLabels[i] || appId,
             uid: laUids[i] || '',
             addon_splunkbase_url: laUrls[i] || '',
+            status: laStatuses[i] || 'active',
         })),
         prereq_apps: paIds.map((appId, i) => ({
             app_id: appId,
@@ -156,6 +158,13 @@ function buildProduct(name, c) {
         support_level: c.support_level || '',
         sc4s_url: c.sc4s_url || '',
         sc4s_label: c.sc4s_label || '',
+        sc4s_supported: c.sc4s_supported === 'true' || c.sc4s_supported === '1',
+        sc4s_search_head_ta: c.sc4s_search_head_ta || '',
+        sc4s_search_head_ta_label: c.sc4s_search_head_ta_label || '',
+        sc4s_search_head_ta_splunkbase_url: c.sc4s_search_head_ta_splunkbase_url || '',
+        sc4s_search_head_ta_splunkbase_id: c.sc4s_search_head_ta_splunkbase_id || '',
+        sc4s_search_head_ta_install_url: c.sc4s_search_head_ta_install_url || '',
+        sc4s_config_notes: (c.sc4s_config_notes || '').split('|').map(s => s.trim()).filter(Boolean),
         best_practices: (c.best_practices || '').split('|').map(s => s.trim()).filter(Boolean),
         sort_order: parseInt(c.sort_order || '100', 10),
     };

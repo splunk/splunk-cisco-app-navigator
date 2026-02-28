@@ -22,6 +22,16 @@ cp -R "$STAGE_DIR" "${TMP_DIR}/${APP_NAME}"
 find "${TMP_DIR}" -name ".DS_Store" -delete
 # Remove Splunk-generated local/ directory — it should never ship in the package
 rm -rf "${TMP_DIR}/${APP_NAME}/local"
+
+# Revert export = system → export = none for Splunkbase packaging
+# (We use export = system in dev for REST conf-products refresh, but apps
+#  should never export system-wide on customer instances)
+META_FILE="${TMP_DIR}/${APP_NAME}/metadata/default.meta"
+if [[ -f "$META_FILE" ]]; then
+  sed -i '' 's/^export = system$/export = none/' "$META_FILE"
+  echo "[package] default.meta: reverted export to 'none' for Splunkbase"
+fi
+
 # Strip macOS extended attributes to keep archive clean
 xattr -cr "${TMP_DIR}/${APP_NAME}" 2>/dev/null || true
 

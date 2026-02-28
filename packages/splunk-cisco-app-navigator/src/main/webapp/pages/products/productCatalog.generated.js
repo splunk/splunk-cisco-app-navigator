@@ -2,7 +2,7 @@
 /**
  * AUTO-GENERATED from products.conf — DO NOT EDIT BY HAND.
  * Regenerate:  node bin/generate-catalog.js
- * Generated:   2026-02-27T05:19:37.208Z
+ * Generated:   2026-02-28T03:47:21.313Z
  * Products:    57
  */
 
@@ -39,79 +39,92 @@ export const PRODUCT_CATALOG = [
         "app_id": "Splunk_TA_sourcefire",
         "display_name": "Splunk Add-on for Cisco FireSIGHT",
         "uid": "1808",
-        "addon_splunkbase_url": "https://splunkbase.splunk.com/app/1808"
+        "addon_splunkbase_url": "https://splunkbase.splunk.com/app/1808",
+        "status": "archived"
       },
       {
         "app_id": "TA-eStreamer",
         "display_name": "Cisco Secure eStreamer Client Add-On for Splunk",
         "uid": "3662",
-        "addon_splunkbase_url": "https://splunkbase.splunk.com/app/3662"
+        "addon_splunkbase_url": "https://splunkbase.splunk.com/app/3662",
+        "status": "active"
       },
       {
         "app_id": "eStreamer-Dashboard",
         "display_name": "Cisco Firepower eNcore App for Splunk",
         "uid": "3663",
-        "addon_splunkbase_url": "https://splunkbase.splunk.com/app/3663"
+        "addon_splunkbase_url": "https://splunkbase.splunk.com/app/3663",
+        "status": "active"
       },
       {
         "app_id": "firepower_dashboard",
         "display_name": "Cisco Secure Firewall App for Splunk",
         "uid": "4388",
-        "addon_splunkbase_url": "https://splunkbase.splunk.com/app/4388"
+        "addon_splunkbase_url": "https://splunkbase.splunk.com/app/4388",
+        "status": "active"
       },
       {
         "app_id": "Splunk_TA_cisco-asa",
         "display_name": "Splunk Add-on for Cisco ASA",
         "uid": "1620",
-        "addon_splunkbase_url": "https://splunkbase.splunk.com/app/1620"
+        "addon_splunkbase_url": "https://splunkbase.splunk.com/app/1620",
+        "status": "active"
       },
       {
         "app_id": "Splunk_TA_cisco-estreamer_Enosys",
         "display_name": "Enosys Add-on for Cisco Firepower eStreamer",
         "uid": "4785",
-        "addon_splunkbase_url": "https://splunkbase.splunk.com/app/4785"
+        "addon_splunkbase_url": "https://splunkbase.splunk.com/app/4785",
+        "status": "archived"
       },
       {
         "app_id": "TA-cisco-firepower-threat-defense-ftd-sourcetype",
         "display_name": "Cisco Firepower Threat Defense FTD sourcetype",
         "uid": "3955",
-        "addon_splunkbase_url": "https://splunkbase.splunk.com/app/3955"
+        "addon_splunkbase_url": "https://splunkbase.splunk.com/app/3955",
+        "status": "archived"
       },
       {
         "app_id": "TA-cisco-firepower-threat-defense-ftd-dashboards",
         "display_name": "Cisco Firepower Threat Defense FTD Dashboards",
         "uid": "4010",
-        "addon_splunkbase_url": "https://splunkbase.splunk.com/app/4010"
+        "addon_splunkbase_url": "https://splunkbase.splunk.com/app/4010",
+        "status": "archived"
       },
       {
         "app_id": "TA-cisco-firepower-pcap-add-on",
         "display_name": "Cisco Firepower pcap Add-on",
         "uid": "5322",
-        "addon_splunkbase_url": "https://splunkbase.splunk.com/app/5322"
+        "addon_splunkbase_url": "https://splunkbase.splunk.com/app/5322",
+        "status": "archived"
       },
       {
         "app_id": "eStreamer",
         "display_name": "Cisco eStreamer Client for Splunk",
         "uid": "1629",
-        "addon_splunkbase_url": "https://splunkbase.splunk.com/app/1629"
+        "addon_splunkbase_url": "https://splunkbase.splunk.com/app/1629",
+        "status": "archived"
       },
       {
         "app_id": "firegen_cisco_asa",
         "display_name": "Firegen Log Analyzer for Cisco ASA",
         "uid": "3800",
-        "addon_splunkbase_url": "https://splunkbase.splunk.com/app/3800"
+        "addon_splunkbase_url": "https://splunkbase.splunk.com/app/3800",
+        "status": "archived"
       },
       {
         "app_id": "Splunk_CiscoSecuritySuite",
         "display_name": "Cisco Security Suite",
         "uid": "525",
-        "addon_splunkbase_url": "https://splunkbase.splunk.com/app/525"
+        "addon_splunkbase_url": "https://splunkbase.splunk.com/app/525",
+        "status": "archived"
       },
       {
         "app_id": "Cisco-suite-for-splunk",
         "display_name": "Cisco Suite for Splunk",
         "uid": "5743",
-        "addon_splunkbase_url": "https://splunkbase.splunk.com/app/5743"
+        "addon_splunkbase_url": "https://splunkbase.splunk.com/app/5743",
+        "status": "archived"
       }
     ],
     "prereq_apps": [],
@@ -149,7 +162,9 @@ export const PRODUCT_CATALOG = [
     "icon_emoji": "fire",
     "aliases": [
       "Cisco Firepower Next-Generation Firewall",
-      "Cisco Firepower Threat Defense"
+      "Cisco Firepower Threat Defense",
+      "Cisco ASA",
+      "Cisco Sourcefire"
     ],
     "keywords": [
       "asa",
@@ -160,7 +175,8 @@ export const PRODUCT_CATALOG = [
       "next-generation firewall",
       "intrusion prevention",
       "firesight",
-      "estreamer"
+      "estreamer",
+      "sc4s"
     ],
     "alert_actions": [],
     "soar_connectors": [
@@ -185,8 +201,18 @@ export const PRODUCT_CATALOG = [
     "is_new": false,
     "secure_networking_gtm": true,
     "support_level": "cisco_supported",
-    "sc4s_url": "",
-    "sc4s_label": "",
+    "sc4s_url": "https://splunk.github.io/splunk-connect-for-syslog/main/sources/vendor/Cisco/cisco_asa/",
+    "sc4s_label": "SC4S: Cisco ASA / FTD",
+    "sc4s_supported": true,
+    "sc4s_search_head_ta": "Splunk_TA_cisco-asa",
+    "sc4s_search_head_ta_label": "Splunk Add-on for Cisco ASA",
+    "sc4s_search_head_ta_splunkbase_url": "https://splunkbase.splunk.com/app/1620",
+    "sc4s_search_head_ta_splunkbase_id": "1620",
+    "sc4s_search_head_ta_install_url": "/manager/splunk-cisco-app-navigator/appsremote?order=relevance&query=%22Cisco+ASA%22&offset=0&support=splunk",
+    "sc4s_config_notes": [
+      "ASA/FTD syslog messages are auto-detected by SC4S via their message format.",
+      "Ensure all Cisco firewall devices are NTP-synced — SC4S requires clocks within +/- 30s of its system clock to properly parse timestamps."
+    ],
     "best_practices": [],
     "sort_order": 10
   },
@@ -222,19 +248,22 @@ export const PRODUCT_CATALOG = [
         "app_id": "TA-cisco-stealthwatch",
         "display_name": "Cisco StealthWatch Add-On",
         "uid": "3827",
-        "addon_splunkbase_url": "https://splunkbase.splunk.com/app/3827"
+        "addon_splunkbase_url": "https://splunkbase.splunk.com/app/3827",
+        "status": "archived"
       },
       {
         "app_id": "TA-stealthwatch_dataexporter",
         "display_name": "Technology Add-on for Cisco Stealthwatch Data Exporter",
         "uid": "3848",
-        "addon_splunkbase_url": "https://splunkbase.splunk.com/app/3848"
+        "addon_splunkbase_url": "https://splunkbase.splunk.com/app/3848",
+        "status": "archived"
       },
       {
         "app_id": "cisco_sna_app",
         "display_name": "Cisco Secure Network Analytics App for Splunk Enterprise",
         "uid": "6398",
-        "addon_splunkbase_url": "https://splunkbase.splunk.com/app/6398"
+        "addon_splunkbase_url": "https://splunkbase.splunk.com/app/6398",
+        "status": "archived"
       }
     ],
     "prereq_apps": [],
@@ -283,6 +312,13 @@ export const PRODUCT_CATALOG = [
     "support_level": "cisco_supported",
     "sc4s_url": "",
     "sc4s_label": "",
+    "sc4s_supported": false,
+    "sc4s_search_head_ta": "",
+    "sc4s_search_head_ta_label": "",
+    "sc4s_search_head_ta_splunkbase_url": "",
+    "sc4s_search_head_ta_splunkbase_id": "",
+    "sc4s_search_head_ta_install_url": "",
+    "sc4s_config_notes": [],
     "best_practices": [],
     "sort_order": 11
   },
@@ -364,6 +400,13 @@ export const PRODUCT_CATALOG = [
     "support_level": "cisco_supported",
     "sc4s_url": "",
     "sc4s_label": "",
+    "sc4s_supported": false,
+    "sc4s_search_head_ta": "",
+    "sc4s_search_head_ta_label": "",
+    "sc4s_search_head_ta_splunkbase_url": "",
+    "sc4s_search_head_ta_splunkbase_id": "",
+    "sc4s_search_head_ta_install_url": "",
+    "sc4s_config_notes": [],
     "best_practices": [],
     "sort_order": 12
   },
@@ -399,19 +442,22 @@ export const PRODUCT_CATALOG = [
         "app_id": "TA-Cisco-NVM",
         "display_name": "Cisco CESA Add-On for Splunk",
         "uid": "4221",
-        "addon_splunkbase_url": "https://splunkbase.splunk.com/app/4221"
+        "addon_splunkbase_url": "https://splunkbase.splunk.com/app/4221",
+        "status": "archived"
       },
       {
         "app_id": "CiscoNVM",
         "display_name": "Cisco Endpoint Security Analytics (CESA)",
         "uid": "2992",
-        "addon_splunkbase_url": "https://splunkbase.splunk.com/app/2992"
+        "addon_splunkbase_url": "https://splunkbase.splunk.com/app/2992",
+        "status": "archived"
       },
       {
         "app_id": "tr-splunk-relay",
         "display_name": "Cisco SecureX threat response - CESA Relay",
         "uid": "5420",
-        "addon_splunkbase_url": "https://splunkbase.splunk.com/app/5420"
+        "addon_splunkbase_url": "https://splunkbase.splunk.com/app/5420",
+        "status": "archived"
       }
     ],
     "prereq_apps": [],
@@ -456,6 +502,13 @@ export const PRODUCT_CATALOG = [
     "support_level": "cisco_supported",
     "sc4s_url": "",
     "sc4s_label": "",
+    "sc4s_supported": false,
+    "sc4s_search_head_ta": "",
+    "sc4s_search_head_ta_label": "",
+    "sc4s_search_head_ta_splunkbase_url": "",
+    "sc4s_search_head_ta_splunkbase_id": "",
+    "sc4s_search_head_ta_install_url": "",
+    "sc4s_config_notes": [],
     "best_practices": [],
     "sort_order": 13
   },
@@ -491,13 +544,15 @@ export const PRODUCT_CATALOG = [
         "app_id": "duo_splunkapp",
         "display_name": "Duo Splunk Connector",
         "uid": "3504",
-        "addon_splunkbase_url": "https://splunkbase.splunk.com/app/3504"
+        "addon_splunkbase_url": "https://splunkbase.splunk.com/app/3504",
+        "status": "archived"
       },
       {
         "app_id": "TA-DUOSecurity2FA",
         "display_name": "DUO Log Add-on for Splunk",
         "uid": "3194",
-        "addon_splunkbase_url": "https://splunkbase.splunk.com/app/3194"
+        "addon_splunkbase_url": "https://splunkbase.splunk.com/app/3194",
+        "status": "archived"
       }
     ],
     "prereq_apps": [],
@@ -523,7 +578,9 @@ export const PRODUCT_CATALOG = [
     "dashboard": "duo_overview",
     "custom_dashboard": "",
     "icon_emoji": "lock",
-    "aliases": [],
+    "aliases": [
+      "Duo Security"
+    ],
     "keywords": [
       "duo",
       "mfa",
@@ -549,6 +606,13 @@ export const PRODUCT_CATALOG = [
     "support_level": "cisco_supported",
     "sc4s_url": "",
     "sc4s_label": "",
+    "sc4s_supported": false,
+    "sc4s_search_head_ta": "",
+    "sc4s_search_head_ta_label": "",
+    "sc4s_search_head_ta_splunkbase_url": "",
+    "sc4s_search_head_ta_splunkbase_id": "",
+    "sc4s_search_head_ta_install_url": "",
+    "sc4s_config_notes": [],
     "best_practices": [],
     "sort_order": 15
   },
@@ -612,6 +676,13 @@ export const PRODUCT_CATALOG = [
     "support_level": "cisco_supported",
     "sc4s_url": "",
     "sc4s_label": "",
+    "sc4s_supported": false,
+    "sc4s_search_head_ta": "",
+    "sc4s_search_head_ta_label": "",
+    "sc4s_search_head_ta_splunkbase_url": "",
+    "sc4s_search_head_ta_splunkbase_id": "",
+    "sc4s_search_head_ta_install_url": "",
+    "sc4s_config_notes": [],
     "best_practices": [],
     "sort_order": 16
   },
@@ -687,6 +758,13 @@ export const PRODUCT_CATALOG = [
     "support_level": "cisco_supported",
     "sc4s_url": "",
     "sc4s_label": "",
+    "sc4s_supported": false,
+    "sc4s_search_head_ta": "",
+    "sc4s_search_head_ta_label": "",
+    "sc4s_search_head_ta_splunkbase_url": "",
+    "sc4s_search_head_ta_splunkbase_id": "",
+    "sc4s_search_head_ta_install_url": "",
+    "sc4s_config_notes": [],
     "best_practices": [],
     "sort_order": 17
   },
@@ -722,13 +800,15 @@ export const PRODUCT_CATALOG = [
         "app_id": "TA-cisco-amp4e",
         "display_name": "Cisco Secure Endpoint CIM Add-On",
         "uid": "3686",
-        "addon_splunkbase_url": "https://splunkbase.splunk.com/app/3686"
+        "addon_splunkbase_url": "https://splunkbase.splunk.com/app/3686",
+        "status": "archived"
       },
       {
         "app_id": "amp4e_events_input",
         "display_name": "Cisco Secure Endpoint App",
         "uid": "3670",
-        "addon_splunkbase_url": "https://splunkbase.splunk.com/app/3670"
+        "addon_splunkbase_url": "https://splunkbase.splunk.com/app/3670",
+        "status": "archived"
       }
     ],
     "prereq_apps": [],
@@ -784,6 +864,13 @@ export const PRODUCT_CATALOG = [
     "support_level": "cisco_supported",
     "sc4s_url": "",
     "sc4s_label": "",
+    "sc4s_supported": false,
+    "sc4s_search_head_ta": "",
+    "sc4s_search_head_ta_label": "",
+    "sc4s_search_head_ta_splunkbase_url": "",
+    "sc4s_search_head_ta_splunkbase_id": "",
+    "sc4s_search_head_ta_install_url": "",
+    "sc4s_config_notes": [],
     "best_practices": [],
     "sort_order": 20
   },
@@ -848,6 +935,13 @@ export const PRODUCT_CATALOG = [
     "support_level": "cisco_supported",
     "sc4s_url": "",
     "sc4s_label": "",
+    "sc4s_supported": false,
+    "sc4s_search_head_ta": "",
+    "sc4s_search_head_ta_label": "",
+    "sc4s_search_head_ta_splunkbase_url": "",
+    "sc4s_search_head_ta_splunkbase_id": "",
+    "sc4s_search_head_ta_install_url": "",
+    "sc4s_config_notes": [],
     "best_practices": [],
     "sort_order": 21
   },
@@ -883,13 +977,15 @@ export const PRODUCT_CATALOG = [
         "app_id": "TA-cisco-secure-malware-analytics",
         "display_name": "Cisco Secure Malware Analytics",
         "uid": "7219",
-        "addon_splunkbase_url": "https://splunkbase.splunk.com/app/7219"
+        "addon_splunkbase_url": "https://splunkbase.splunk.com/app/7219",
+        "status": "archived"
       },
       {
         "app_id": "TA-cisco-threat-grid",
         "display_name": "Cisco Threat Grid Add-On",
         "uid": "4251",
-        "addon_splunkbase_url": "https://splunkbase.splunk.com/app/4251"
+        "addon_splunkbase_url": "https://splunkbase.splunk.com/app/4251",
+        "status": "archived"
       }
     ],
     "prereq_apps": [],
@@ -937,6 +1033,13 @@ export const PRODUCT_CATALOG = [
     "support_level": "cisco_supported",
     "sc4s_url": "",
     "sc4s_label": "",
+    "sc4s_supported": false,
+    "sc4s_search_head_ta": "",
+    "sc4s_search_head_ta_label": "",
+    "sc4s_search_head_ta_splunkbase_url": "",
+    "sc4s_search_head_ta_splunkbase_id": "",
+    "sc4s_search_head_ta_install_url": "",
+    "sc4s_config_notes": [],
     "best_practices": [],
     "sort_order": 22
   },
@@ -972,7 +1075,8 @@ export const PRODUCT_CATALOG = [
         "app_id": "TA-cisco-etd-connector",
         "display_name": "Cisco Email Threat Defense connector for Splunk",
         "uid": "7243",
-        "addon_splunkbase_url": "https://splunkbase.splunk.com/app/7243"
+        "addon_splunkbase_url": "https://splunkbase.splunk.com/app/7243",
+        "status": "archived"
       }
     ],
     "prereq_apps": [],
@@ -1007,6 +1111,13 @@ export const PRODUCT_CATALOG = [
     "support_level": "cisco_supported",
     "sc4s_url": "",
     "sc4s_label": "",
+    "sc4s_supported": false,
+    "sc4s_search_head_ta": "",
+    "sc4s_search_head_ta_label": "",
+    "sc4s_search_head_ta_splunkbase_url": "",
+    "sc4s_search_head_ta_splunkbase_id": "",
+    "sc4s_search_head_ta_install_url": "",
+    "sc4s_config_notes": [],
     "best_practices": [],
     "sort_order": 25
   },
@@ -1042,7 +1153,8 @@ export const PRODUCT_CATALOG = [
         "app_id": "Alef_TA_MIMEDecoder",
         "display_name": "MIME Decoder Add-on for Cisco ESA",
         "uid": "5116",
-        "addon_splunkbase_url": "https://splunkbase.splunk.com/app/5116"
+        "addon_splunkbase_url": "https://splunkbase.splunk.com/app/5116",
+        "status": "archived"
       }
     ],
     "prereq_apps": [],
@@ -1065,7 +1177,8 @@ export const PRODUCT_CATALOG = [
     "custom_dashboard": "",
     "icon_emoji": "email",
     "aliases": [
-      "Cisco Email Security Appliance"
+      "Cisco Email Security Appliance",
+      "Cisco IronPort Email Security Appliance"
     ],
     "keywords": [
       "esa",
@@ -1075,7 +1188,8 @@ export const PRODUCT_CATALOG = [
       "email gateway",
       "dlp",
       "phishing",
-      "message tracking"
+      "message tracking",
+      "sc4s"
     ],
     "alert_actions": [],
     "soar_connectors": [
@@ -1100,8 +1214,18 @@ export const PRODUCT_CATALOG = [
     "is_new": false,
     "secure_networking_gtm": true,
     "support_level": "splunk_supported",
-    "sc4s_url": "",
-    "sc4s_label": "",
+    "sc4s_url": "https://splunk.github.io/splunk-connect-for-syslog/main/sources/vendor/Cisco/cisco_esa/",
+    "sc4s_label": "SC4S: Cisco ESA",
+    "sc4s_supported": true,
+    "sc4s_search_head_ta": "Splunk_TA_cisco-esa",
+    "sc4s_search_head_ta_label": "Splunk Add-on for Cisco ESA",
+    "sc4s_search_head_ta_splunkbase_url": "https://splunkbase.splunk.com/app/1761",
+    "sc4s_search_head_ta_splunkbase_id": "1761",
+    "sc4s_search_head_ta_install_url": "/manager/splunk-cisco-app-navigator/appsremote?order=relevance&query=%22Cisco+ESA%22&offset=0&support=splunk",
+    "sc4s_config_notes": [
+      "ESA mail logs are auto-detected by SC4S.",
+      "Ensure ESA and SC4S clocks are NTP-synced within +/- 30 seconds for proper timestamp parsing."
+    ],
     "best_practices": [],
     "sort_order": 26
   },
@@ -1167,6 +1291,13 @@ export const PRODUCT_CATALOG = [
     "support_level": "cisco_supported",
     "sc4s_url": "",
     "sc4s_label": "",
+    "sc4s_supported": false,
+    "sc4s_search_head_ta": "",
+    "sc4s_search_head_ta_label": "",
+    "sc4s_search_head_ta_splunkbase_url": "",
+    "sc4s_search_head_ta_splunkbase_id": "",
+    "sc4s_search_head_ta_install_url": "",
+    "sc4s_config_notes": [],
     "best_practices": [],
     "sort_order": 30
   },
@@ -1243,6 +1374,13 @@ export const PRODUCT_CATALOG = [
     "support_level": "splunk_supported",
     "sc4s_url": "",
     "sc4s_label": "",
+    "sc4s_supported": false,
+    "sc4s_search_head_ta": "",
+    "sc4s_search_head_ta_label": "",
+    "sc4s_search_head_ta_splunkbase_url": "",
+    "sc4s_search_head_ta_splunkbase_id": "",
+    "sc4s_search_head_ta_install_url": "",
+    "sc4s_config_notes": [],
     "best_practices": [],
     "sort_order": 31
   },
@@ -1301,10 +1439,17 @@ export const PRODUCT_CATALOG = [
     "card_accent": "#049fd9",
     "card_bg_color": "ice",
     "is_new": false,
-    "secure_networking_gtm": false,
+    "secure_networking_gtm": true,
     "support_level": "cisco_supported",
     "sc4s_url": "",
     "sc4s_label": "",
+    "sc4s_supported": false,
+    "sc4s_search_head_ta": "",
+    "sc4s_search_head_ta_label": "",
+    "sc4s_search_head_ta_splunkbase_url": "",
+    "sc4s_search_head_ta_splunkbase_id": "",
+    "sc4s_search_head_ta_install_url": "",
+    "sc4s_config_notes": [],
     "best_practices": [],
     "sort_order": 32
   },
@@ -1367,6 +1512,13 @@ export const PRODUCT_CATALOG = [
     "support_level": "cisco_supported",
     "sc4s_url": "",
     "sc4s_label": "",
+    "sc4s_supported": false,
+    "sc4s_search_head_ta": "",
+    "sc4s_search_head_ta_label": "",
+    "sc4s_search_head_ta_splunkbase_url": "",
+    "sc4s_search_head_ta_splunkbase_id": "",
+    "sc4s_search_head_ta_install_url": "",
+    "sc4s_config_notes": [],
     "best_practices": [],
     "sort_order": 35
   },
@@ -1402,25 +1554,29 @@ export const PRODUCT_CATALOG = [
         "app_id": "TA-Umbrella",
         "display_name": "Umbrella Add-on for Splunk Enterprise",
         "uid": "3629",
-        "addon_splunkbase_url": "https://splunkbase.splunk.com/app/3629"
+        "addon_splunkbase_url": "https://splunkbase.splunk.com/app/3629",
+        "status": "archived"
       },
       {
         "app_id": "TA-cisco-cloud-security-umbrella-addon",
         "display_name": "Cisco Cloud Security Umbrella Add-on for Splunk",
         "uid": "5557",
-        "addon_splunkbase_url": "https://splunkbase.splunk.com/app/5557"
+        "addon_splunkbase_url": "https://splunkbase.splunk.com/app/5557",
+        "status": "archived"
       },
       {
         "app_id": "TA-cisco_umbrella",
         "display_name": "Cisco Umbrella Add-On for Splunk",
         "uid": "3926",
-        "addon_splunkbase_url": "https://splunkbase.splunk.com/app/3926"
+        "addon_splunkbase_url": "https://splunkbase.splunk.com/app/3926",
+        "status": "archived"
       },
       {
         "app_id": "opendns_investigate",
         "display_name": "Cisco Umbrella Investigate Add-on",
         "uid": "3324",
-        "addon_splunkbase_url": "https://splunkbase.splunk.com/app/3324"
+        "addon_splunkbase_url": "https://splunkbase.splunk.com/app/3324",
+        "status": "archived"
       }
     ],
     "prereq_apps": [],
@@ -1455,7 +1611,9 @@ export const PRODUCT_CATALOG = [
     "dashboard": "overview",
     "custom_dashboard": "",
     "icon_emoji": "umbrella",
-    "aliases": [],
+    "aliases": [
+      "OpenDNS"
+    ],
     "keywords": [
       "opendns",
       "dns security",
@@ -1500,6 +1658,13 @@ export const PRODUCT_CATALOG = [
     "support_level": "cisco_supported",
     "sc4s_url": "",
     "sc4s_label": "",
+    "sc4s_supported": false,
+    "sc4s_search_head_ta": "",
+    "sc4s_search_head_ta_label": "",
+    "sc4s_search_head_ta_splunkbase_url": "",
+    "sc4s_search_head_ta_splunkbase_id": "",
+    "sc4s_search_head_ta_install_url": "",
+    "sc4s_config_notes": [],
     "best_practices": [],
     "sort_order": 36
   },
@@ -1513,27 +1678,36 @@ export const PRODUCT_CATALOG = [
     "category": "security",
     "version": "1.0.0",
     "status": "active",
-    "addon": "cloudlock",
-    "addon_label": "Cisco Cloudlock for Splunk",
-    "addon_family": "standalone",
-    "addon_splunkbase_url": "https://splunkbase.splunk.com/app/3043",
-    "addon_docs_url": "https://github.com/CiscoDevNet/cloud-security/tree/master/Cloudlock/Splunk/Cisco%20Cloudlock%20Splunk%20App",
-    "addon_install_url": "/manager/splunk-cisco-app-navigator/appsremote?order=relevance&query=Cloudlock&offset=0&support=cisco",
-    "app_viz": "",
-    "app_viz_label": "",
-    "app_viz_splunkbase_url": "",
-    "app_viz_docs_url": "",
-    "app_viz_install_url": "",
+    "addon": "TA-cisco-cloud-security-addon",
+    "addon_label": "Cisco Secure Access Add-on for Splunk",
+    "addon_family": "cloud-security",
+    "addon_splunkbase_url": "https://splunkbase.splunk.com/app/7569",
+    "addon_docs_url": "https://developer.cisco.com/docs/cloud-security/cisco-cloud-security-add-on-for-splunk",
+    "addon_install_url": "/manager/splunk-cisco-app-navigator/appsremote?order=relevance&query=Secure+Access&offset=0&support=cisco",
+    "app_viz": "cisco-cloud-security",
+    "app_viz_label": "Cisco Secure Access App for Splunk",
+    "app_viz_splunkbase_url": "https://splunkbase.splunk.com/app/5558",
+    "app_viz_docs_url": "https://developer.cisco.com/docs/cloud-security/cisco-cloud-security-app-for-splunk/#cisco-cloud-security-app-for-splunk",
+    "app_viz_install_url": "/manager/splunk-cisco-app-navigator/appsremote?order=relevance&query=Secure+Access&offset=0&support=cisco",
     "app_viz_2": "",
     "app_viz_2_label": "",
     "app_viz_2_splunkbase_url": "",
     "app_viz_2_docs_url": "",
     "app_viz_2_install_url": "",
     "learn_more_url": "https://www.cisco.com/c/en/us/products/security/cloudlock/index.html",
-    "legacy_apps": [],
+    "legacy_apps": [
+      {
+        "app_id": "cloudlock",
+        "display_name": "Cisco Cloudlock for Splunk",
+        "uid": "3043",
+        "addon_splunkbase_url": "https://splunkbase.splunk.com/app/3043",
+        "status": "archived"
+      }
+    ],
     "prereq_apps": [],
     "community_apps": [],
     "sourcetypes": [
+      "cisco:cloud_security:cloudlock",
       "incident"
     ],
     "dashboard": "cloudlock_incidents_overview",
@@ -1547,7 +1721,8 @@ export const PRODUCT_CATALOG = [
       "cloud security",
       "shadow it",
       "dlp",
-      "data loss prevention"
+      "data loss prevention",
+      "cloudlock"
     ],
     "alert_actions": [],
     "soar_connectors": [],
@@ -1557,12 +1732,19 @@ export const PRODUCT_CATALOG = [
     "card_banner_size": "small",
     "card_banner_opacity": "0.12",
     "card_accent": "#1976d2",
-    "card_bg_color": "pearl",
+    "card_bg_color": "sky",
     "is_new": false,
-    "secure_networking_gtm": false,
-    "support_level": "splunk_supported",
+    "secure_networking_gtm": true,
+    "support_level": "cisco_supported",
     "sc4s_url": "",
     "sc4s_label": "",
+    "sc4s_supported": false,
+    "sc4s_search_head_ta": "",
+    "sc4s_search_head_ta_label": "",
+    "sc4s_search_head_ta_splunkbase_url": "",
+    "sc4s_search_head_ta_splunkbase_id": "",
+    "sc4s_search_head_ta_install_url": "",
+    "sc4s_config_notes": [],
     "best_practices": [],
     "sort_order": 37
   },
@@ -1632,6 +1814,13 @@ export const PRODUCT_CATALOG = [
     "support_level": "cisco_supported",
     "sc4s_url": "",
     "sc4s_label": "",
+    "sc4s_supported": false,
+    "sc4s_search_head_ta": "",
+    "sc4s_search_head_ta_label": "",
+    "sc4s_search_head_ta_splunkbase_url": "",
+    "sc4s_search_head_ta_splunkbase_id": "",
+    "sc4s_search_head_ta_install_url": "",
+    "sc4s_config_notes": [],
     "best_practices": [],
     "sort_order": 38
   },
@@ -1698,6 +1887,13 @@ export const PRODUCT_CATALOG = [
     "support_level": "cisco_supported",
     "sc4s_url": "",
     "sc4s_label": "",
+    "sc4s_supported": false,
+    "sc4s_search_head_ta": "",
+    "sc4s_search_head_ta_label": "",
+    "sc4s_search_head_ta_splunkbase_url": "",
+    "sc4s_search_head_ta_splunkbase_id": "",
+    "sc4s_search_head_ta_install_url": "",
+    "sc4s_config_notes": [],
     "best_practices": [],
     "sort_order": 39
   },
@@ -1746,7 +1942,8 @@ export const PRODUCT_CATALOG = [
       "ucsm",
       "rack server",
       "c-series",
-      "b-series"
+      "b-series",
+      "sc4s"
     ],
     "alert_actions": [],
     "soar_connectors": [],
@@ -1760,8 +1957,18 @@ export const PRODUCT_CATALOG = [
     "is_new": false,
     "secure_networking_gtm": false,
     "support_level": "splunk_supported",
-    "sc4s_url": "",
-    "sc4s_label": "",
+    "sc4s_url": "https://splunk.github.io/splunk-connect-for-syslog/main/sources/vendor/Cisco/cisco_ucshx/",
+    "sc4s_label": "SC4S: Cisco UCS",
+    "sc4s_supported": true,
+    "sc4s_search_head_ta": "Splunk_TA_cisco-ucs",
+    "sc4s_search_head_ta_label": "Splunk Add-on for Cisco UCS",
+    "sc4s_search_head_ta_splunkbase_url": "https://splunkbase.splunk.com/app/2731",
+    "sc4s_search_head_ta_splunkbase_id": "2731",
+    "sc4s_search_head_ta_install_url": "/manager/splunk-cisco-app-navigator/appsremote?order=relevance&query=%22Cisco+UCS%22&offset=0&support=splunk",
+    "sc4s_config_notes": [
+      "UCS CIMC and fabric interconnect syslog messages are auto-detected by SC4S.",
+      "Ensure UCS devices and SC4S clocks are NTP-synced within +/- 30 seconds."
+    ],
     "best_practices": [],
     "sort_order": 45
   },
@@ -1797,7 +2004,8 @@ export const PRODUCT_CATALOG = [
         "app_id": "TA-intersight-addon",
         "display_name": "Cisco Intersight Add-on for Splunk (Deprecated)",
         "uid": "6482",
-        "addon_splunkbase_url": "https://splunkbase.splunk.com/app/6482"
+        "addon_splunkbase_url": "https://splunkbase.splunk.com/app/6482",
+        "status": "archived"
       }
     ],
     "prereq_apps": [],
@@ -1855,7 +2063,87 @@ export const PRODUCT_CATALOG = [
       "ucs management",
       "cloud operations",
       "workload optimization",
-      "infrastructure management"
+      "infrastructure management",
+      "sc4s"
+    ],
+    "alert_actions": [],
+    "soar_connectors": [],
+    "itsi_content_pack": null,
+    "card_banner": "Cisco Supported",
+    "card_banner_color": "blue",
+    "card_banner_size": "small",
+    "card_banner_opacity": "0.12",
+    "card_accent": "#1976d2",
+    "card_bg_color": "pearl",
+    "is_new": false,
+    "secure_networking_gtm": true,
+    "support_level": "cisco_supported",
+    "sc4s_url": "https://splunk.github.io/splunk-connect-for-syslog/main/sources/vendor/Cisco/cisco_ucshx/",
+    "sc4s_label": "SC4S: Cisco IMC",
+    "sc4s_supported": true,
+    "sc4s_search_head_ta": "TA_cisco_catalyst",
+    "sc4s_search_head_ta_label": "Cisco Catalyst Add-on for Splunk",
+    "sc4s_search_head_ta_splunkbase_url": "https://splunkbase.splunk.com/app/7538",
+    "sc4s_search_head_ta_splunkbase_id": "7538",
+    "sc4s_search_head_ta_install_url": "/manager/launcher/appsremote?order=relevance&query=Catalyst&offset=0&category=network_security&type=addon&support=cisco",
+    "sc4s_config_notes": [
+      "IMC syslog messages are auto-detected by SC4S via CIMC source filter.",
+      "Ensure UCS/IMC devices and SC4S clocks are NTP-synced within +/- 30 seconds."
+    ],
+    "best_practices": [],
+    "sort_order": 46
+  },
+  {
+    "product_id": "cisco_imc",
+    "display_name": "Cisco Integrated Management Controller (IMC)",
+    "description": "Embedded baseboard management controller for Cisco UCS C-Series and S-Series servers — hardware health monitoring, remote console, firmware management via Web UI, CLI, XML API, Redfish, and SNMPv3.",
+    "value_proposition": "Stream IMC hardware alerts, firmware events, and CIMC telemetry into Splunk for proactive server health monitoring across data center and branch deployments.",
+    "vendor": "Cisco",
+    "tagline": "Server Hardware Management",
+    "category": "security",
+    "version": "1.0.0",
+    "status": "active",
+    "addon": "Splunk_TA_cisco-ucs",
+    "addon_label": "Splunk Add-on for Cisco UCS",
+    "addon_family": "standalone",
+    "addon_splunkbase_url": "https://splunkbase.splunk.com/app/2731",
+    "addon_docs_url": "https://splunk.github.io/splunk-add-on-for-cisco-ucs",
+    "addon_install_url": "/manager/splunk-cisco-app-navigator/appsremote?order=relevance&query=UCS&offset=0",
+    "app_viz": "",
+    "app_viz_label": "",
+    "app_viz_splunkbase_url": "",
+    "app_viz_docs_url": "",
+    "app_viz_install_url": "",
+    "app_viz_2": "",
+    "app_viz_2_label": "",
+    "app_viz_2_splunkbase_url": "",
+    "app_viz_2_docs_url": "",
+    "app_viz_2_install_url": "",
+    "learn_more_url": "https://www.cisco.com/c/en/us/products/servers-unified-computing/integrated-management-controller-imc/index.html",
+    "legacy_apps": [],
+    "prereq_apps": [],
+    "community_apps": [],
+    "sourcetypes": [
+      "cisco:ucs",
+      "cisco:imc"
+    ],
+    "dashboard": "",
+    "custom_dashboard": "",
+    "icon_emoji": "wrench",
+    "aliases": [],
+    "keywords": [
+      "imc",
+      "cimc",
+      "baseboard management controller",
+      "bmc",
+      "ucs c-series",
+      "rack server",
+      "remote management",
+      "redfish",
+      "ipmi",
+      "firmware",
+      "server health",
+      "sc4s"
     ],
     "alert_actions": [],
     "soar_connectors": [],
@@ -1869,10 +2157,20 @@ export const PRODUCT_CATALOG = [
     "is_new": false,
     "secure_networking_gtm": false,
     "support_level": "splunk_supported",
-    "sc4s_url": "",
-    "sc4s_label": "",
+    "sc4s_url": "https://splunk.github.io/splunk-connect-for-syslog/main/sources/vendor/Cisco/cisco_ucshx/",
+    "sc4s_label": "SC4S: Cisco IMC",
+    "sc4s_supported": true,
+    "sc4s_search_head_ta": "Splunk_TA_cisco-ucs",
+    "sc4s_search_head_ta_label": "Splunk Add-on for Cisco UCS",
+    "sc4s_search_head_ta_splunkbase_url": "https://splunkbase.splunk.com/app/2731",
+    "sc4s_search_head_ta_splunkbase_id": "2731",
+    "sc4s_search_head_ta_install_url": "/manager/splunk-cisco-app-navigator/appsremote?order=relevance&query=%22Cisco+UCS%22&offset=0&support=splunk",
+    "sc4s_config_notes": [
+      "IMC/CIMC syslog messages are auto-detected by SC4S via CIMC source filter.",
+      "Ensure IMC devices and SC4S clocks are NTP-synced within +/- 30 seconds."
+    ],
     "best_practices": [],
-    "sort_order": 46
+    "sort_order": 47
   },
   {
     "product_id": "cisco_wsa",
@@ -1906,7 +2204,8 @@ export const PRODUCT_CATALOG = [
         "app_id": "Cisco_WSA_Insight",
         "display_name": "Cisco Web Security Appliance (WSA) Insight",
         "uid": "5524",
-        "addon_splunkbase_url": "https://splunkbase.splunk.com/app/5524"
+        "addon_splunkbase_url": "https://splunkbase.splunk.com/app/5524",
+        "status": "archived"
       }
     ],
     "prereq_apps": [],
@@ -1924,7 +2223,10 @@ export const PRODUCT_CATALOG = [
     "dashboard": "",
     "custom_dashboard": "",
     "icon_emoji": "web",
-    "aliases": [],
+    "aliases": [
+      "Cisco Web Security Appliance",
+      "Cisco IronPort Web Security Appliance"
+    ],
     "keywords": [
       "wsa",
       "secure web appliance",
@@ -1934,7 +2236,8 @@ export const PRODUCT_CATALOG = [
       "content filtering",
       "malware scanning",
       "wsa insight",
-      "itsi"
+      "itsi",
+      "sc4s"
     ],
     "alert_actions": [],
     "soar_connectors": [
@@ -1955,10 +2258,20 @@ export const PRODUCT_CATALOG = [
     "card_accent": "#1976d2",
     "card_bg_color": "pearl",
     "is_new": false,
-    "secure_networking_gtm": false,
+    "secure_networking_gtm": true,
     "support_level": "splunk_supported",
-    "sc4s_url": "",
-    "sc4s_label": "",
+    "sc4s_url": "https://splunk.github.io/splunk-connect-for-syslog/main/sources/vendor/Cisco/cisco_wsa/",
+    "sc4s_label": "SC4S: Cisco WSA",
+    "sc4s_supported": true,
+    "sc4s_search_head_ta": "Splunk_TA_cisco-wsa",
+    "sc4s_search_head_ta_label": "Splunk Add-on for Cisco WSA",
+    "sc4s_search_head_ta_splunkbase_url": "https://splunkbase.splunk.com/app/1622",
+    "sc4s_search_head_ta_splunkbase_id": "1622",
+    "sc4s_search_head_ta_install_url": "/manager/splunk-cisco-app-navigator/appsremote?order=relevance&query=%22Cisco+WSA%22&offset=0&support=splunk",
+    "sc4s_config_notes": [
+      "WSA access logs are auto-detected by SC4S through their syslog format.",
+      "Ensure WSA and SC4S clocks are NTP-synced within +/- 30 seconds."
+    ],
     "best_practices": [],
     "sort_order": 47
   },
@@ -2008,202 +2321,26 @@ export const PRODUCT_CATALOG = [
     "alert_actions": [],
     "soar_connectors": [],
     "itsi_content_pack": null,
-    "card_banner": "",
-    "card_banner_color": "gold",
-    "card_banner_size": "small",
-    "card_banner_opacity": "0.12",
-    "card_accent": "#049fd9",
-    "card_bg_color": "pearl",
-    "is_new": true,
-    "secure_networking_gtm": true,
-    "support_level": "cisco_supported",
-    "sc4s_url": "",
-    "sc4s_label": "",
-    "best_practices": [],
-    "sort_order": 80
-  },
-  {
-    "product_id": "cisco_secure_endpoint_edr",
-    "display_name": "Cisco Secure Endpoint EDR Agent (CSE EDR)",
-    "description": "Next-generation endpoint detection and response (EDR) solution, offering advanced threat protection, endpoint telemetry, and automated response capabilities for organizations of all sizes.",
-    "value_proposition": "Surface endpoint detections, file trajectories, and one-click response actions directly inside the Splunk SOC workflow.",
-    "vendor": "Cisco",
-    "tagline": "Host-Level EDR Agent",
-    "category": "security",
-    "version": "1.0.0",
-    "status": "active",
-    "addon": "",
-    "addon_label": "",
-    "addon_family": "default",
-    "addon_splunkbase_url": "",
-    "addon_docs_url": "",
-    "addon_install_url": "",
-    "app_viz": "",
-    "app_viz_label": "",
-    "app_viz_splunkbase_url": "",
-    "app_viz_docs_url": "",
-    "app_viz_install_url": "",
-    "app_viz_2": "",
-    "app_viz_2_label": "",
-    "app_viz_2_splunkbase_url": "",
-    "app_viz_2_docs_url": "",
-    "app_viz_2_install_url": "",
-    "learn_more_url": "https://www.cisco.com/site/us/en/products/security/endpoint-security/secure-endpoint/index.html",
-    "legacy_apps": [],
-    "prereq_apps": [],
-    "community_apps": [],
-    "sourcetypes": [],
-    "dashboard": "",
-    "custom_dashboard": "",
-    "icon_emoji": "detective",
-    "aliases": [],
-    "keywords": [
-      "secure endpoint edr",
-      "edr agent",
-      "endpoint detection and response",
-      "threat hunting",
-      "host isolation",
-      "orbital",
-      "containment"
-    ],
-    "alert_actions": [],
-    "soar_connectors": [],
-    "itsi_content_pack": null,
     "card_banner": "Powered by Cisco Security Cloud",
     "card_banner_color": "cisco",
     "card_banner_size": "small",
     "card_banner_opacity": "0.12",
     "card_accent": "#049fd9",
-    "card_bg_color": "pearl",
-    "is_new": false,
-    "secure_networking_gtm": false,
+    "card_bg_color": "ice",
+    "is_new": true,
+    "secure_networking_gtm": true,
     "support_level": "cisco_supported",
     "sc4s_url": "",
     "sc4s_label": "",
+    "sc4s_supported": false,
+    "sc4s_search_head_ta": "",
+    "sc4s_search_head_ta_label": "",
+    "sc4s_search_head_ta_splunkbase_url": "",
+    "sc4s_search_head_ta_splunkbase_id": "",
+    "sc4s_search_head_ta_install_url": "",
+    "sc4s_config_notes": [],
     "best_practices": [],
-    "sort_order": 81
-  },
-  {
-    "product_id": "cisco_radware",
-    "display_name": "Cisco Radware (DDoS and Application Security)",
-    "description": "DDoS mitigation, bot management, WAF, and API protection powered by Radware.",
-    "value_proposition": "Correlate DDoS attack telemetry and application-layer threat data with the broader Cisco security stack.",
-    "vendor": "Cisco",
-    "tagline": "DDoS & App Protection",
-    "category": "security",
-    "version": "1.0.0",
-    "status": "under_development",
-    "addon": "",
-    "addon_label": "",
-    "addon_family": "default",
-    "addon_splunkbase_url": "",
-    "addon_docs_url": "",
-    "addon_install_url": "",
-    "app_viz": "",
-    "app_viz_label": "",
-    "app_viz_splunkbase_url": "",
-    "app_viz_docs_url": "",
-    "app_viz_install_url": "",
-    "app_viz_2": "",
-    "app_viz_2_label": "",
-    "app_viz_2_splunkbase_url": "",
-    "app_viz_2_docs_url": "",
-    "app_viz_2_install_url": "",
-    "learn_more_url": "https://www.radware.com",
-    "legacy_apps": [],
-    "prereq_apps": [],
-    "community_apps": [],
-    "sourcetypes": [],
-    "dashboard": "",
-    "custom_dashboard": "",
-    "icon_emoji": "stop_sign",
-    "aliases": [],
-    "keywords": [
-      "radware",
-      "ddos",
-      "anti-ddos",
-      "bot management",
-      "waf",
-      "web application firewall",
-      "api protection"
-    ],
-    "alert_actions": [],
-    "soar_connectors": [],
-    "itsi_content_pack": null,
-    "card_banner": "Under Development",
-    "card_banner_color": "cisco",
-    "card_banner_size": "small",
-    "card_banner_opacity": "0.12",
-    "card_accent": "#049fd9",
-    "card_bg_color": "pearl",
-    "is_new": false,
-    "secure_networking_gtm": false,
-    "support_level": "cisco_supported",
-    "sc4s_url": "",
-    "sc4s_label": "",
-    "best_practices": [],
-    "sort_order": 82
-  },
-  {
-    "product_id": "cisco_appomni",
-    "display_name": "Cisco AppOmni (SaaS Security Posture)",
-    "description": "Provides SaaS Security Posture Management (SSPM) to help organizations secure SaaS applications by identifying configuration risks, monitoring user activity, and enforcing best practices.",
-    "value_proposition": "Continuously monitor SaaS app configurations and data access to eliminate shadow access and misconfigurations.",
-    "vendor": "Cisco",
-    "tagline": "SaaS Posture Management",
-    "category": "security",
-    "version": "1.0.0",
-    "status": "under_development",
-    "addon": "",
-    "addon_label": "",
-    "addon_family": "default",
-    "addon_splunkbase_url": "",
-    "addon_docs_url": "",
-    "addon_install_url": "",
-    "app_viz": "",
-    "app_viz_label": "",
-    "app_viz_splunkbase_url": "",
-    "app_viz_docs_url": "",
-    "app_viz_install_url": "",
-    "app_viz_2": "",
-    "app_viz_2_label": "",
-    "app_viz_2_splunkbase_url": "",
-    "app_viz_2_docs_url": "",
-    "app_viz_2_install_url": "",
-    "learn_more_url": "https://appomni.com",
-    "legacy_apps": [],
-    "prereq_apps": [],
-    "community_apps": [],
-    "sourcetypes": [],
-    "dashboard": "",
-    "custom_dashboard": "",
-    "icon_emoji": "cloud_lock",
-    "aliases": [],
-    "keywords": [
-      "appomni",
-      "sspm",
-      "saas security",
-      "saas posture management",
-      "configuration audit",
-      "data exposure",
-      "shadow access"
-    ],
-    "alert_actions": [],
-    "soar_connectors": [],
-    "itsi_content_pack": null,
-    "card_banner": "Under Development",
-    "card_banner_color": "cisco",
-    "card_banner_size": "small",
-    "card_banner_opacity": "0.12",
-    "card_accent": "#049fd9",
-    "card_bg_color": "pearl",
-    "is_new": false,
-    "secure_networking_gtm": false,
-    "support_level": "cisco_supported",
-    "sc4s_url": "",
-    "sc4s_label": "",
-    "best_practices": [],
-    "sort_order": 83
+    "sort_order": 80
   },
   {
     "product_id": "cisco_catalyst_center",
@@ -2237,31 +2374,36 @@ export const PRODUCT_CATALOG = [
         "app_id": "splunk_app_stream_ipfix_cisco_hsl",
         "display_name": "Cisco Catalyst Enhanced Netflow Add-on for Splunk",
         "uid": "6872",
-        "addon_splunkbase_url": "https://splunkbase.splunk.com/app/6872"
+        "addon_splunkbase_url": "https://splunkbase.splunk.com/app/6872",
+        "status": "active"
       },
       {
         "app_id": "Splunk-TA-cisco-dnacenter",
         "display_name": "Cisco DNA Center Add-on (flagged)",
         "uid": "6668",
-        "addon_splunkbase_url": "https://splunkbase.splunk.com/app/6668"
+        "addon_splunkbase_url": "https://splunkbase.splunk.com/app/6668",
+        "status": "active"
       },
       {
         "app_id": "Splunk_CiscoDNACenter",
         "display_name": "Cisco DNA Center App (archived)",
         "uid": "6669",
-        "addon_splunkbase_url": "https://splunkbase.splunk.com/app/6669"
+        "addon_splunkbase_url": "https://splunkbase.splunk.com/app/6669",
+        "status": "archived"
       },
       {
         "app_id": "Splunk-TA-cisco-catalyst-center",
         "display_name": "Catalyst Center Add-on",
         "uid": "7858",
-        "addon_splunkbase_url": "https://splunkbase.splunk.com/app/7858"
+        "addon_splunkbase_url": "https://splunkbase.splunk.com/app/7858",
+        "status": "active"
       },
       {
         "app_id": "Splunk-cisco-catalyst-center",
         "display_name": "Catalyst Center App",
         "uid": "7859",
-        "addon_splunkbase_url": "https://splunkbase.splunk.com/app/7859"
+        "addon_splunkbase_url": "https://splunkbase.splunk.com/app/7859",
+        "status": "active"
       }
     ],
     "prereq_apps": [
@@ -2313,7 +2455,8 @@ export const PRODUCT_CATALOG = [
       "sd-access",
       "network management",
       "cisco dna",
-      "itsi"
+      "itsi",
+      "sc4s"
     ],
     "alert_actions": [],
     "soar_connectors": [],
@@ -2330,8 +2473,18 @@ export const PRODUCT_CATALOG = [
     "is_new": false,
     "secure_networking_gtm": true,
     "support_level": "cisco_supported",
-    "sc4s_url": "",
-    "sc4s_label": "",
+    "sc4s_url": "https://splunk.github.io/splunk-connect-for-syslog/main/sources/vendor/Cisco/cisco_dna/",
+    "sc4s_label": "SC4S: Cisco Catalyst Center",
+    "sc4s_supported": true,
+    "sc4s_search_head_ta": "Splunk-TA-cisco-dnacenter",
+    "sc4s_search_head_ta_label": "Cisco DNA Center Add-on for Splunk",
+    "sc4s_search_head_ta_splunkbase_url": "https://splunkbase.splunk.com/app/6668",
+    "sc4s_search_head_ta_splunkbase_id": "6668",
+    "sc4s_search_head_ta_install_url": "/manager/splunk-cisco-app-navigator/appsremote?order=relevance&query=%22DNA+Center%22&offset=0&support=splunk",
+    "sc4s_config_notes": [
+      "Configure Catalyst Center to send syslog to the SC4S host.",
+      "Ensure Catalyst Center and SC4S clocks are NTP-synced within +/- 30 seconds."
+    ],
     "best_practices": [],
     "sort_order": 100
   },
@@ -2367,19 +2520,22 @@ export const PRODUCT_CATALOG = [
         "app_id": "splunk_app_stream_ipfix_cisco_hsl",
         "display_name": "Cisco Catalyst Enhanced Netflow Add-on for Splunk",
         "uid": "6872",
-        "addon_splunkbase_url": "https://splunkbase.splunk.com/app/6872"
+        "addon_splunkbase_url": "https://splunkbase.splunk.com/app/6872",
+        "status": "active"
       },
       {
         "app_id": "TA-cisco_ios",
         "display_name": "DEPRECATED Add-on for Cisco Network Data",
         "uid": "1467",
-        "addon_splunkbase_url": "https://splunkbase.splunk.com/app/1467"
+        "addon_splunkbase_url": "https://splunkbase.splunk.com/app/1467",
+        "status": "active"
       },
       {
         "app_id": "cisco_ios",
         "display_name": "App for Cisco Network Data",
         "uid": "1352",
-        "addon_splunkbase_url": "https://splunkbase.splunk.com/app/1352"
+        "addon_splunkbase_url": "https://splunkbase.splunk.com/app/1352",
+        "status": "active"
       }
     ],
     "prereq_apps": [
@@ -2414,7 +2570,8 @@ export const PRODUCT_CATALOG = [
       "catalyst 9500",
       "catalyst 9600",
       "campus switch",
-      "sd-access"
+      "sd-access",
+      "sc4s"
     ],
     "alert_actions": [],
     "soar_connectors": [],
@@ -2428,8 +2585,18 @@ export const PRODUCT_CATALOG = [
     "is_new": false,
     "secure_networking_gtm": true,
     "support_level": "cisco_supported",
-    "sc4s_url": "",
-    "sc4s_label": "",
+    "sc4s_url": "https://splunk.github.io/splunk-connect-for-syslog/main/sources/vendor/Cisco/cisco_ios/",
+    "sc4s_label": "SC4S: Cisco IOS / Networking",
+    "sc4s_supported": true,
+    "sc4s_search_head_ta": "Splunk_TA_cisco-networks",
+    "sc4s_search_head_ta_label": "Cisco Networks Add-on for Splunk",
+    "sc4s_search_head_ta_splunkbase_url": "https://splunkbase.splunk.com/app/1467",
+    "sc4s_search_head_ta_splunkbase_id": "1467",
+    "sc4s_search_head_ta_install_url": "/manager/splunk-cisco-app-navigator/appsremote?order=relevance&query=%22Cisco+Networks%22&offset=0&support=splunk",
+    "sc4s_config_notes": [
+      "SC4S auto-detects IOS syslog messages by their standard format.",
+      "Ensure all Cisco network devices are NTP-synced — SC4S requires clocks within +/- 30s for proper timestamp parsing."
+    ],
     "best_practices": [],
     "sort_order": 101
   },
@@ -2465,19 +2632,22 @@ export const PRODUCT_CATALOG = [
         "app_id": "splunk_app_stream_ipfix_cisco_hsl",
         "display_name": "Cisco Catalyst Enhanced Netflow Add-on for Splunk",
         "uid": "6872",
-        "addon_splunkbase_url": "https://splunkbase.splunk.com/app/6872"
+        "addon_splunkbase_url": "https://splunkbase.splunk.com/app/6872",
+        "status": "active"
       },
       {
         "app_id": "ta-cisco-sdwan",
         "display_name": "Cisco Catalyst SD-WAN Add-on for Splunk (Deprecated)",
         "uid": "6656",
-        "addon_splunkbase_url": "https://splunkbase.splunk.com/app/6656"
+        "addon_splunkbase_url": "https://splunkbase.splunk.com/app/6656",
+        "status": "active"
       },
       {
         "app_id": "cisco-sdwan-app",
         "display_name": "Cisco Catalyst SD-WAN App for Splunk (Deprecated)",
         "uid": "6657",
-        "addon_splunkbase_url": "https://splunkbase.splunk.com/app/6657"
+        "addon_splunkbase_url": "https://splunkbase.splunk.com/app/6657",
+        "status": "active"
       }
     ],
     "prereq_apps": [
@@ -2535,7 +2705,8 @@ export const PRODUCT_CATALOG = [
       "vmanage",
       "vedge",
       "catalyst sd-wan",
-      "wide area network"
+      "wide area network",
+      "sc4s"
     ],
     "alert_actions": [],
     "soar_connectors": [],
@@ -2549,8 +2720,18 @@ export const PRODUCT_CATALOG = [
     "is_new": false,
     "secure_networking_gtm": true,
     "support_level": "cisco_supported",
-    "sc4s_url": "",
-    "sc4s_label": "",
+    "sc4s_url": "https://splunk.github.io/splunk-connect-for-syslog/main/sources/vendor/Cisco/cisco_viptela/",
+    "sc4s_label": "SC4S: Cisco Viptela / SD-WAN",
+    "sc4s_supported": true,
+    "sc4s_search_head_ta": "TA-cisco_sdwan",
+    "sc4s_search_head_ta_label": "Cisco SD-WAN Add-on for Splunk",
+    "sc4s_search_head_ta_splunkbase_url": "https://splunkbase.splunk.com/app/5144",
+    "sc4s_search_head_ta_splunkbase_id": "5144",
+    "sc4s_search_head_ta_install_url": "/manager/splunk-cisco-app-navigator/appsremote?order=relevance&query=%22Cisco+SD-WAN%22&offset=0&support=splunk",
+    "sc4s_config_notes": [
+      "Viptela/SD-WAN syslog messages from vEdge and cEdge routers are auto-detected by SC4S.",
+      "Ensure SD-WAN devices and SC4S clocks are NTP-synced within +/- 30 seconds."
+    ],
     "best_practices": [],
     "sort_order": 102
   },
@@ -2586,19 +2767,22 @@ export const PRODUCT_CATALOG = [
         "app_id": "splunk_app_stream_ipfix_cisco_hsl",
         "display_name": "Cisco Catalyst Enhanced Netflow Add-on for Splunk",
         "uid": "6872",
-        "addon_splunkbase_url": "https://splunkbase.splunk.com/app/6872"
+        "addon_splunkbase_url": "https://splunkbase.splunk.com/app/6872",
+        "status": "active"
       },
       {
         "app_id": "Splunk_TA_cisco-ise",
         "display_name": "Splunk Add-on for Cisco Identity Services",
         "uid": "1915",
-        "addon_splunkbase_url": "https://splunkbase.splunk.com/app/1915"
+        "addon_splunkbase_url": "https://splunkbase.splunk.com/app/1915",
+        "status": "active"
       },
       {
         "app_id": "Splunk_CiscoISE",
         "display_name": "Splunk for Cisco Identity Services (ISE)",
         "uid": "1589",
-        "addon_splunkbase_url": "https://splunkbase.splunk.com/app/1589"
+        "addon_splunkbase_url": "https://splunkbase.splunk.com/app/1589",
+        "status": "active"
       }
     ],
     "prereq_apps": [
@@ -2646,7 +2830,8 @@ export const PRODUCT_CATALOG = [
       "802.1x",
       "trustsec",
       "sgacl",
-      "guest access"
+      "guest access",
+      "sc4s"
     ],
     "alert_actions": [
       {
@@ -2674,6 +2859,17 @@ export const PRODUCT_CATALOG = [
     "support_level": "cisco_supported",
     "sc4s_url": "https://splunk.github.io/splunk-connect-for-syslog/main/sources/vendor/Cisco/cisco_ise/",
     "sc4s_label": "SC4S: Cisco ISE",
+    "sc4s_supported": true,
+    "sc4s_search_head_ta": "Splunk_TA_cisco-ise",
+    "sc4s_search_head_ta_label": "Splunk Add-on for Cisco ISE",
+    "sc4s_search_head_ta_splunkbase_url": "https://splunkbase.splunk.com/app/1915",
+    "sc4s_search_head_ta_splunkbase_id": "1915",
+    "sc4s_search_head_ta_install_url": "/manager/splunk-cisco-app-navigator/appsremote?order=relevance&query=%22Cisco+ISE%22&offset=0&support=splunk",
+    "sc4s_config_notes": [
+      "Configure ISE with Log Level 6 (Informational) and use TCP/IP protocol for reliable syslog delivery.",
+      "Ensure ISE and SC4S clocks are NTP-synced within +/- 30 seconds for proper timestamp parsing.",
+      "If auto-discovery fails, use SC4S_LISTEN_CISCO_ISE_TCP_PORT or SC4S_LISTEN_CISCO_ISE_UDP_PORT environment variables to force identification."
+    ],
     "best_practices": [
       "On Splunk Cloud, the Cisco Catalyst Add-on cannot configure inputs directly — install it on an on-prem Heavy Forwarder instead, or use SC4S for seamless syslog ingestion.",
       "ISE pxGrid integration requires a dedicated pxGrid node and the Splunk Stream app as a prerequisite — see the prereq apps listed on this card."
@@ -2712,19 +2908,22 @@ export const PRODUCT_CATALOG = [
         "app_id": "splunk_app_stream_ipfix_cisco_hsl",
         "display_name": "Cisco Catalyst Enhanced Netflow Add-on for Splunk",
         "uid": "6872",
-        "addon_splunkbase_url": "https://splunkbase.splunk.com/app/6872"
+        "addon_splunkbase_url": "https://splunkbase.splunk.com/app/6872",
+        "status": "active"
       },
       {
         "app_id": "TA-cisco_ios",
         "display_name": "DEPRECATED Add-on for Cisco Network Data",
         "uid": "1467",
-        "addon_splunkbase_url": "https://splunkbase.splunk.com/app/1467"
+        "addon_splunkbase_url": "https://splunkbase.splunk.com/app/1467",
+        "status": "active"
       },
       {
         "app_id": "cisco_ios",
         "display_name": "App for Cisco Network Data",
         "uid": "1352",
-        "addon_splunkbase_url": "https://splunkbase.splunk.com/app/1352"
+        "addon_splunkbase_url": "https://splunkbase.splunk.com/app/1352",
+        "status": "active"
       }
     ],
     "prereq_apps": [
@@ -2775,6 +2974,13 @@ export const PRODUCT_CATALOG = [
     "support_level": "cisco_supported",
     "sc4s_url": "",
     "sc4s_label": "",
+    "sc4s_supported": false,
+    "sc4s_search_head_ta": "",
+    "sc4s_search_head_ta_label": "",
+    "sc4s_search_head_ta_splunkbase_url": "",
+    "sc4s_search_head_ta_splunkbase_id": "",
+    "sc4s_search_head_ta_install_url": "",
+    "sc4s_config_notes": [],
     "best_practices": [],
     "sort_order": 104
   },
@@ -2810,19 +3016,22 @@ export const PRODUCT_CATALOG = [
         "app_id": "splunk_app_stream_ipfix_cisco_hsl",
         "display_name": "Cisco Catalyst Enhanced Netflow Add-on for Splunk",
         "uid": "6872",
-        "addon_splunkbase_url": "https://splunkbase.splunk.com/app/6872"
+        "addon_splunkbase_url": "https://splunkbase.splunk.com/app/6872",
+        "status": "active"
       },
       {
         "app_id": "TA-cisco_ios",
         "display_name": "DEPRECATED Add-on for Cisco Network Data",
         "uid": "1467",
-        "addon_splunkbase_url": "https://splunkbase.splunk.com/app/1467"
+        "addon_splunkbase_url": "https://splunkbase.splunk.com/app/1467",
+        "status": "active"
       },
       {
         "app_id": "cisco_ios",
         "display_name": "App for Cisco Network Data",
         "uid": "1352",
-        "addon_splunkbase_url": "https://splunkbase.splunk.com/app/1352"
+        "addon_splunkbase_url": "https://splunkbase.splunk.com/app/1352",
+        "status": "active"
       }
     ],
     "prereq_apps": [
@@ -2872,6 +3081,13 @@ export const PRODUCT_CATALOG = [
     "support_level": "cisco_supported",
     "sc4s_url": "",
     "sc4s_label": "",
+    "sc4s_supported": false,
+    "sc4s_search_head_ta": "",
+    "sc4s_search_head_ta_label": "",
+    "sc4s_search_head_ta_splunkbase_url": "",
+    "sc4s_search_head_ta_splunkbase_id": "",
+    "sc4s_search_head_ta_install_url": "",
+    "sc4s_config_notes": [],
     "best_practices": [],
     "sort_order": 105
   },
@@ -2907,31 +3123,36 @@ export const PRODUCT_CATALOG = [
         "app_id": "splunk_app_stream_ipfix_cisco_hsl",
         "display_name": "Cisco Catalyst Enhanced Netflow Add-on for Splunk",
         "uid": "6872",
-        "addon_splunkbase_url": "https://splunkbase.splunk.com/app/6872"
+        "addon_splunkbase_url": "https://splunkbase.splunk.com/app/6872",
+        "status": "active"
       },
       {
         "app_id": "Splunk_TA_cisco_meraki",
         "display_name": "Cisco Meraki Add-on for Splunk",
         "uid": "5580",
-        "addon_splunkbase_url": "https://splunkbase.splunk.com/app/5580"
+        "addon_splunkbase_url": "https://splunkbase.splunk.com/app/5580",
+        "status": "active"
       },
       {
         "app_id": "TA-cisco_meraki_operations",
         "display_name": "Add On for Cisco Meraki Operations",
         "uid": "6201",
-        "addon_splunkbase_url": "https://splunkbase.splunk.com/app/6201"
+        "addon_splunkbase_url": "https://splunkbase.splunk.com/app/6201",
+        "status": "archived"
       },
       {
         "app_id": "TA-meraki",
         "display_name": "TA-meraki",
         "uid": "3018",
-        "addon_splunkbase_url": "https://splunkbase.splunk.com/app/3018"
+        "addon_splunkbase_url": "https://splunkbase.splunk.com/app/3018",
+        "status": "archived"
       },
       {
         "app_id": "TA_Meraki_SNMP_trap",
         "display_name": "Meraki SNMP trap Add-on for Splunk",
         "uid": "4838",
-        "addon_splunkbase_url": "https://splunkbase.splunk.com/app/4838"
+        "addon_splunkbase_url": "https://splunkbase.splunk.com/app/4838",
+        "status": "archived"
       }
     ],
     "prereq_apps": [
@@ -3006,7 +3227,9 @@ export const PRODUCT_CATALOG = [
     "dashboard": "",
     "custom_dashboard": "",
     "icon_emoji": "cloud_network",
-    "aliases": [],
+    "aliases": [
+      "Meraki"
+    ],
     "keywords": [
       "meraki",
       "meraki dashboard",
@@ -3015,7 +3238,8 @@ export const PRODUCT_CATALOG = [
       "sd-wan",
       "wireless networking",
       "client analytics",
-      "itsi"
+      "itsi",
+      "sc4s"
     ],
     "alert_actions": [],
     "soar_connectors": [
@@ -3038,8 +3262,18 @@ export const PRODUCT_CATALOG = [
     "is_new": false,
     "secure_networking_gtm": true,
     "support_level": "cisco_supported",
-    "sc4s_url": "",
-    "sc4s_label": "",
+    "sc4s_url": "https://splunk.github.io/splunk-connect-for-syslog/main/sources/vendor/Cisco/cisco_meraki/",
+    "sc4s_label": "SC4S: Cisco Meraki",
+    "sc4s_supported": true,
+    "sc4s_search_head_ta": "TA-meraki",
+    "sc4s_search_head_ta_label": "Cisco Meraki Add-on for Splunk",
+    "sc4s_search_head_ta_splunkbase_url": "https://splunkbase.splunk.com/app/3162",
+    "sc4s_search_head_ta_splunkbase_id": "3162",
+    "sc4s_search_head_ta_install_url": "/manager/splunk-cisco-app-navigator/appsremote?order=relevance&query=%22Cisco+Meraki%22&offset=0&support=splunk",
+    "sc4s_config_notes": [
+      "Configure Meraki Dashboard to send syslog to the SC4S host IP and port.",
+      "Meraki syslog format is auto-detected by SC4S — no unique port assignment needed in most cases."
+    ],
     "best_practices": [],
     "sort_order": 106
   },
@@ -3075,19 +3309,22 @@ export const PRODUCT_CATALOG = [
         "app_id": "splunk_app_stream_ipfix_cisco_hsl",
         "display_name": "Cisco Catalyst Enhanced Netflow Add-on for Splunk",
         "uid": "6872",
-        "addon_splunkbase_url": "https://splunkbase.splunk.com/app/6872"
+        "addon_splunkbase_url": "https://splunkbase.splunk.com/app/6872",
+        "status": "active"
       },
       {
         "app_id": "TA-cisco_cybervision",
         "display_name": "Cisco Cyber Vision Splunk Add On",
         "uid": "5748",
-        "addon_splunkbase_url": "https://splunkbase.splunk.com/app/5748"
+        "addon_splunkbase_url": "https://splunkbase.splunk.com/app/5748",
+        "status": "active"
       },
       {
         "app_id": "cisco_cybervision_app_for_splunk",
         "display_name": "Cisco Cyber Vision Splunk App",
         "uid": "5747",
-        "addon_splunkbase_url": "https://splunkbase.splunk.com/app/5747"
+        "addon_splunkbase_url": "https://splunkbase.splunk.com/app/5747",
+        "status": "active"
       }
     ],
     "prereq_apps": [
@@ -3143,6 +3380,13 @@ export const PRODUCT_CATALOG = [
     "support_level": "cisco_supported",
     "sc4s_url": "",
     "sc4s_label": "",
+    "sc4s_supported": false,
+    "sc4s_search_head_ta": "",
+    "sc4s_search_head_ta_label": "",
+    "sc4s_search_head_ta_splunkbase_url": "",
+    "sc4s_search_head_ta_splunkbase_id": "",
+    "sc4s_search_head_ta_install_url": "",
+    "sc4s_config_notes": [],
     "best_practices": [],
     "sort_order": 107
   },
@@ -3178,19 +3422,22 @@ export const PRODUCT_CATALOG = [
         "app_id": "splunk_app_stream_ipfix_cisco_hsl",
         "display_name": "Cisco Catalyst Enhanced Netflow Add-on for Splunk",
         "uid": "6872",
-        "addon_splunkbase_url": "https://splunkbase.splunk.com/app/6872"
+        "addon_splunkbase_url": "https://splunkbase.splunk.com/app/6872",
+        "status": "active"
       },
       {
         "app_id": "TA-cisco_ios",
         "display_name": "DEPRECATED Add-on for Cisco Network Data",
         "uid": "1467",
-        "addon_splunkbase_url": "https://splunkbase.splunk.com/app/1467"
+        "addon_splunkbase_url": "https://splunkbase.splunk.com/app/1467",
+        "status": "active"
       },
       {
         "app_id": "cisco_ios",
         "display_name": "App for Cisco Network Data",
         "uid": "1352",
-        "addon_splunkbase_url": "https://splunkbase.splunk.com/app/1352"
+        "addon_splunkbase_url": "https://splunkbase.splunk.com/app/1352",
+        "status": "active"
       }
     ],
     "prereq_apps": [
@@ -3241,6 +3488,13 @@ export const PRODUCT_CATALOG = [
     "support_level": "cisco_supported",
     "sc4s_url": "",
     "sc4s_label": "",
+    "sc4s_supported": false,
+    "sc4s_search_head_ta": "",
+    "sc4s_search_head_ta_label": "",
+    "sc4s_search_head_ta_splunkbase_url": "",
+    "sc4s_search_head_ta_splunkbase_id": "",
+    "sc4s_search_head_ta_install_url": "",
+    "sc4s_config_notes": [],
     "best_practices": [],
     "sort_order": 108
   },
@@ -3276,19 +3530,22 @@ export const PRODUCT_CATALOG = [
         "app_id": "splunk_app_stream_ipfix_cisco_hsl",
         "display_name": "Cisco Catalyst Enhanced Netflow Add-on for Splunk",
         "uid": "6872",
-        "addon_splunkbase_url": "https://splunkbase.splunk.com/app/6872"
+        "addon_splunkbase_url": "https://splunkbase.splunk.com/app/6872",
+        "status": "active"
       },
       {
         "app_id": "TA-cisco_ios",
         "display_name": "DEPRECATED Add-on for Cisco Network Data",
         "uid": "1467",
-        "addon_splunkbase_url": "https://splunkbase.splunk.com/app/1467"
+        "addon_splunkbase_url": "https://splunkbase.splunk.com/app/1467",
+        "status": "active"
       },
       {
         "app_id": "cisco_ios",
         "display_name": "App for Cisco Network Data",
         "uid": "1352",
-        "addon_splunkbase_url": "https://splunkbase.splunk.com/app/1352"
+        "addon_splunkbase_url": "https://splunkbase.splunk.com/app/1352",
+        "status": "active"
       }
     ],
     "prereq_apps": [
@@ -3334,10 +3591,17 @@ export const PRODUCT_CATALOG = [
     "card_accent": "#6abf4b",
     "card_bg_color": "mint",
     "is_new": false,
-    "secure_networking_gtm": false,
+    "secure_networking_gtm": true,
     "support_level": "cisco_supported",
     "sc4s_url": "",
     "sc4s_label": "",
+    "sc4s_supported": false,
+    "sc4s_search_head_ta": "",
+    "sc4s_search_head_ta_label": "",
+    "sc4s_search_head_ta_splunkbase_url": "",
+    "sc4s_search_head_ta_splunkbase_id": "",
+    "sc4s_search_head_ta_install_url": "",
+    "sc4s_config_notes": [],
     "best_practices": [],
     "sort_order": 109
   },
@@ -3373,19 +3637,22 @@ export const PRODUCT_CATALOG = [
         "app_id": "splunk_app_stream_ipfix_cisco_hsl",
         "display_name": "Cisco Catalyst Enhanced Netflow Add-on for Splunk",
         "uid": "6872",
-        "addon_splunkbase_url": "https://splunkbase.splunk.com/app/6872"
+        "addon_splunkbase_url": "https://splunkbase.splunk.com/app/6872",
+        "status": "active"
       },
       {
         "app_id": "TA-cisco_ios",
         "display_name": "DEPRECATED Add-on for Cisco Network Data",
         "uid": "1467",
-        "addon_splunkbase_url": "https://splunkbase.splunk.com/app/1467"
+        "addon_splunkbase_url": "https://splunkbase.splunk.com/app/1467",
+        "status": "active"
       },
       {
         "app_id": "cisco_ios",
         "display_name": "App for Cisco Network Data",
         "uid": "1352",
-        "addon_splunkbase_url": "https://splunkbase.splunk.com/app/1352"
+        "addon_splunkbase_url": "https://splunkbase.splunk.com/app/1352",
+        "status": "active"
       }
     ],
     "prereq_apps": [
@@ -3434,6 +3701,13 @@ export const PRODUCT_CATALOG = [
     "support_level": "cisco_supported",
     "sc4s_url": "",
     "sc4s_label": "",
+    "sc4s_supported": false,
+    "sc4s_search_head_ta": "",
+    "sc4s_search_head_ta_label": "",
+    "sc4s_search_head_ta_splunkbase_url": "",
+    "sc4s_search_head_ta_splunkbase_id": "",
+    "sc4s_search_head_ta_install_url": "",
+    "sc4s_config_notes": [],
     "best_practices": [],
     "sort_order": 110
   },
@@ -3469,31 +3743,36 @@ export const PRODUCT_CATALOG = [
         "app_id": "splunk_app_stream_ipfix_cisco_hsl",
         "display_name": "Cisco Catalyst Enhanced Netflow Add-on for Splunk",
         "uid": "6872",
-        "addon_splunkbase_url": "https://splunkbase.splunk.com/app/6872"
+        "addon_splunkbase_url": "https://splunkbase.splunk.com/app/6872",
+        "status": "active"
       },
       {
         "app_id": "TA_cisco-Nexus-9k",
         "display_name": "Cisco Nexus 9k Add-on for Splunk Enterprise (deprecated)",
         "uid": "1917",
-        "addon_splunkbase_url": "https://splunkbase.splunk.com/app/1917"
+        "addon_splunkbase_url": "https://splunkbase.splunk.com/app/1917",
+        "status": "active"
       },
       {
         "app_id": "TA_cisco-NI",
         "display_name": "Cisco Nexus Dashboard Insights Add-On for Splunk (deprecated)",
         "uid": "6118",
-        "addon_splunkbase_url": "https://splunkbase.splunk.com/app/6118"
+        "addon_splunkbase_url": "https://splunkbase.splunk.com/app/6118",
+        "status": "active"
       },
       {
         "app_id": "cisco-app-Nexus-9k",
         "display_name": "Cisco Nexus 9k App for Splunk Enterprise (deprecated)",
         "uid": "1916",
-        "addon_splunkbase_url": "https://splunkbase.splunk.com/app/1916"
+        "addon_splunkbase_url": "https://splunkbase.splunk.com/app/1916",
+        "status": "active"
       },
       {
         "app_id": "cisco-app-NI",
         "display_name": "Cisco Nexus Dashboard Insights App for Splunk (deprecated)",
         "uid": "6117",
-        "addon_splunkbase_url": "https://splunkbase.splunk.com/app/6117"
+        "addon_splunkbase_url": "https://splunkbase.splunk.com/app/6117",
+        "status": "active"
       }
     ],
     "prereq_apps": [
@@ -3547,6 +3826,13 @@ export const PRODUCT_CATALOG = [
     "support_level": "cisco_supported",
     "sc4s_url": "",
     "sc4s_label": "",
+    "sc4s_supported": false,
+    "sc4s_search_head_ta": "",
+    "sc4s_search_head_ta_label": "",
+    "sc4s_search_head_ta_splunkbase_url": "",
+    "sc4s_search_head_ta_splunkbase_id": "",
+    "sc4s_search_head_ta_install_url": "",
+    "sc4s_config_notes": [],
     "best_practices": [],
     "sort_order": 111
   },
@@ -3582,13 +3868,15 @@ export const PRODUCT_CATALOG = [
         "app_id": "TA_cisco-ACI",
         "display_name": "Cisco ACI Add-on for Splunk Enterprise (deprecated)",
         "uid": "1897",
-        "addon_splunkbase_url": "https://splunkbase.splunk.com/app/1897"
+        "addon_splunkbase_url": "https://splunkbase.splunk.com/app/1897",
+        "status": "active"
       },
       {
         "app_id": "cisco-app-ACI",
         "display_name": "Cisco ACI App for Splunk Enterprise (deprecated)",
         "uid": "1896",
-        "addon_splunkbase_url": "https://splunkbase.splunk.com/app/1896"
+        "addon_splunkbase_url": "https://splunkbase.splunk.com/app/1896",
+        "status": "active"
       }
     ],
     "prereq_apps": [],
@@ -3630,10 +3918,17 @@ export const PRODUCT_CATALOG = [
     "card_accent": "#00897b",
     "card_bg_color": "ice",
     "is_new": false,
-    "secure_networking_gtm": false,
+    "secure_networking_gtm": true,
     "support_level": "cisco_supported",
     "sc4s_url": "",
     "sc4s_label": "",
+    "sc4s_supported": false,
+    "sc4s_search_head_ta": "",
+    "sc4s_search_head_ta_label": "",
+    "sc4s_search_head_ta_splunkbase_url": "",
+    "sc4s_search_head_ta_splunkbase_id": "",
+    "sc4s_search_head_ta_install_url": "",
+    "sc4s_config_notes": [],
     "best_practices": [],
     "sort_order": 120
   },
@@ -3703,10 +3998,17 @@ export const PRODUCT_CATALOG = [
     "card_accent": "#00897b",
     "card_bg_color": "ice",
     "is_new": false,
-    "secure_networking_gtm": false,
+    "secure_networking_gtm": true,
     "support_level": "cisco_supported",
     "sc4s_url": "",
     "sc4s_label": "",
+    "sc4s_supported": false,
+    "sc4s_search_head_ta": "",
+    "sc4s_search_head_ta_label": "",
+    "sc4s_search_head_ta_splunkbase_url": "",
+    "sc4s_search_head_ta_splunkbase_id": "",
+    "sc4s_search_head_ta_install_url": "",
+    "sc4s_config_notes": [],
     "best_practices": [],
     "sort_order": 121
   },
@@ -3768,6 +4070,13 @@ export const PRODUCT_CATALOG = [
     "support_level": "cisco_supported",
     "sc4s_url": "",
     "sc4s_label": "",
+    "sc4s_supported": false,
+    "sc4s_search_head_ta": "",
+    "sc4s_search_head_ta_label": "",
+    "sc4s_search_head_ta_splunkbase_url": "",
+    "sc4s_search_head_ta_splunkbase_id": "",
+    "sc4s_search_head_ta_install_url": "",
+    "sc4s_config_notes": [],
     "best_practices": [],
     "sort_order": 122
   },
@@ -3803,19 +4112,22 @@ export const PRODUCT_CATALOG = [
         "app_id": "splunk_app_stream_ipfix_cisco_hsl",
         "display_name": "Cisco Catalyst Enhanced Netflow Add-on for Splunk",
         "uid": "6872",
-        "addon_splunkbase_url": "https://splunkbase.splunk.com/app/6872"
+        "addon_splunkbase_url": "https://splunkbase.splunk.com/app/6872",
+        "status": "active"
       },
       {
         "app_id": "ta_cisco_thousandeyes",
         "display_name": "Cisco ThousandEyes Add-on for Splunk",
         "uid": "7719",
-        "addon_splunkbase_url": "https://splunkbase.splunk.com/app/7719"
+        "addon_splunkbase_url": "https://splunkbase.splunk.com/app/7719",
+        "status": "archived"
       },
       {
         "app_id": "cisco_thousandeyes_alerting_app_for_splunk",
         "display_name": "Cisco ThousandEyes Alerting App for Splunk",
         "uid": "5737",
-        "addon_splunkbase_url": "https://splunkbase.splunk.com/app/5737"
+        "addon_splunkbase_url": "https://splunkbase.splunk.com/app/5737",
+        "status": "archived"
       }
     ],
     "prereq_apps": [
@@ -3850,7 +4162,9 @@ export const PRODUCT_CATALOG = [
     "dashboard": "",
     "custom_dashboard": "",
     "icon_emoji": "eye",
-    "aliases": [],
+    "aliases": [
+      "ThousandEyes"
+    ],
     "keywords": [
       "thousandeyes",
       "digital experience monitoring",
@@ -3885,6 +4199,13 @@ export const PRODUCT_CATALOG = [
     "support_level": "cisco_supported",
     "sc4s_url": "",
     "sc4s_label": "",
+    "sc4s_supported": false,
+    "sc4s_search_head_ta": "",
+    "sc4s_search_head_ta_label": "",
+    "sc4s_search_head_ta_splunkbase_url": "",
+    "sc4s_search_head_ta_splunkbase_id": "",
+    "sc4s_search_head_ta_install_url": "",
+    "sc4s_config_notes": [],
     "best_practices": [],
     "sort_order": 200
   },
@@ -3920,13 +4241,15 @@ export const PRODUCT_CATALOG = [
         "app_id": "appdynamics",
         "display_name": "AppDynamics (Archived)",
         "uid": "1297",
-        "addon_splunkbase_url": "https://splunkbase.splunk.com/app/1297"
+        "addon_splunkbase_url": "https://splunkbase.splunk.com/app/1297",
+        "status": "archived"
       },
       {
         "app_id": "splunk_app_AppDynamics",
         "display_name": "Splunk App for AppDynamics (Archived)",
         "uid": "3472",
-        "addon_splunkbase_url": "https://splunkbase.splunk.com/app/3472"
+        "addon_splunkbase_url": "https://splunkbase.splunk.com/app/3472",
+        "status": "archived"
       }
     ],
     "prereq_apps": [],
@@ -3946,7 +4269,9 @@ export const PRODUCT_CATALOG = [
     "dashboard": "dashboard",
     "custom_dashboard": "",
     "icon_emoji": "chart",
-    "aliases": [],
+    "aliases": [
+      "AppDynamics"
+    ],
     "keywords": [
       "appdynamics",
       "appd",
@@ -3962,7 +4287,7 @@ export const PRODUCT_CATALOG = [
       "label": "Content Pack for Splunk AppDynamics",
       "docs_url": "https://help.splunk.com/en/splunk-it-service-intelligence/content-packs-for-itsi-and-ite/content-pack-for-splunk-appdynamics/1.0/overview/about-the-content-pack-for-splunk-appdynamics"
     },
-    "card_banner": "Cisco Supported",
+    "card_banner": "Developer Supported",
     "card_banner_color": "gold",
     "card_banner_size": "small",
     "card_banner_opacity": "0.12",
@@ -3970,9 +4295,16 @@ export const PRODUCT_CATALOG = [
     "card_bg_color": "cream",
     "is_new": false,
     "secure_networking_gtm": false,
-    "support_level": "splunk_supported",
+    "support_level": "developer_supported",
     "sc4s_url": "",
     "sc4s_label": "",
+    "sc4s_supported": false,
+    "sc4s_search_head_ta": "",
+    "sc4s_search_head_ta_label": "",
+    "sc4s_search_head_ta_splunkbase_url": "",
+    "sc4s_search_head_ta_splunkbase_id": "",
+    "sc4s_search_head_ta_install_url": "",
+    "sc4s_config_notes": [],
     "best_practices": [],
     "sort_order": 201
   },
@@ -3997,60 +4329,61 @@ export const PRODUCT_CATALOG = [
     "app_viz_splunkbase_url": "https://splunkbase.splunk.com/app/669",
     "app_viz_docs_url": "https://sideviewapps.com/documentation/cisco-cdr-reporting-analytics-installation",
     "app_viz_install_url": "/manager/splunk-cisco-app-navigator/appsremote?order=relevance&query=\"CDR+Reporting\"",
-    "app_viz_2": "",
-    "app_viz_2_label": "",
-    "app_viz_2_splunkbase_url": "",
-    "app_viz_2_docs_url": "",
-    "app_viz_2_install_url": "",
+    "app_viz_2": "ta_cisco_webex_add_on_for_splunk",
+    "app_viz_2_label": "Webex Add-on for Splunk",
+    "app_viz_2_splunkbase_url": "https://splunkbase.splunk.com/app/8365",
+    "app_viz_2_docs_url": "https://splunkbase.splunk.com/app/8365",
+    "app_viz_2_install_url": "/manager/splunk-cisco-app-navigator/appsremote?order=relevance&query=\"Webex+Add-on+for+Splunk\"",
     "learn_more_url": "https://www.webex.com/",
     "legacy_apps": [
       {
         "app_id": "TA-DP-webex-teams",
         "display_name": "Technology Add-on for Webex Teams",
         "uid": "5152",
-        "addon_splunkbase_url": "https://splunkbase.splunk.com/app/5152"
-      },
-      {
-        "app_id": "ta_cisco_webex_add_on_for_splunk",
-        "display_name": "Webex Add-on for Splunk",
-        "uid": "8365",
-        "addon_splunkbase_url": "https://splunkbase.splunk.com/app/8365"
+        "addon_splunkbase_url": "https://splunkbase.splunk.com/app/5152",
+        "status": "archived"
       },
       {
         "app_id": "ta-cisco-webex-meetings-add-on-for-splunk",
         "display_name": "Cisco WebEx Meetings Add-on for Splunk",
         "uid": "4991",
-        "addon_splunkbase_url": "https://splunkbase.splunk.com/app/4991"
+        "addon_splunkbase_url": "https://splunkbase.splunk.com/app/4991",
+        "status": "archived"
       },
       {
         "app_id": "SA_sideview_webex",
         "display_name": "Sideview Supporting App for Webex",
         "uid": "8429",
-        "addon_splunkbase_url": "https://splunkbase.splunk.com/app/8429"
+        "addon_splunkbase_url": "https://splunkbase.splunk.com/app/8429",
+        "status": "archived"
       },
       {
         "app_id": "cisco_webex_meetings_app_for_splunk",
         "display_name": "Cisco WebEx Meetings App for Splunk",
         "uid": "4992",
-        "addon_splunkbase_url": "https://splunkbase.splunk.com/app/4992"
+        "addon_splunkbase_url": "https://splunkbase.splunk.com/app/4992",
+        "status": "archived"
       },
       {
         "app_id": "splunk_app_spark_room",
         "display_name": "Cisco Spark Add-on for Splunk",
         "uid": "3384",
-        "addon_splunkbase_url": "https://splunkbase.splunk.com/app/3384"
+        "addon_splunkbase_url": "https://splunkbase.splunk.com/app/3384",
+        "status": "archived"
       },
       {
         "app_id": "splunk_spark_app",
         "display_name": "Cisco Spark App for Splunk",
         "uid": "3385",
-        "addon_splunkbase_url": "https://splunkbase.splunk.com/app/3385"
+        "addon_splunkbase_url": "https://splunkbase.splunk.com/app/3385",
+        "status": "archived"
       },
       {
         "app_id": "WebexTeams_AlertAction",
         "display_name": "Cisco Webex Teams Alert Action (Archived)",
         "uid": "4870",
-        "addon_splunkbase_url": "https://splunkbase.splunk.com/app/4870"
+        "addon_splunkbase_url": "https://splunkbase.splunk.com/app/4870",
+        "status": "archived"
       }
     ],
     "prereq_apps": [
@@ -4086,7 +4419,9 @@ export const PRODUCT_CATALOG = [
     "dashboard": "",
     "custom_dashboard": "",
     "icon_emoji": "video",
-    "aliases": [],
+    "aliases": [
+      "WebEx Communications"
+    ],
     "keywords": [
       "webex",
       "webex meetings",
@@ -4111,7 +4446,7 @@ export const PRODUCT_CATALOG = [
       }
     ],
     "itsi_content_pack": null,
-    "card_banner": "Powered by Cisco Collaboration",
+    "card_banner": "Developer Supported",
     "card_banner_color": "purple",
     "card_banner_size": "small",
     "card_banner_opacity": "0.12",
@@ -4119,9 +4454,16 @@ export const PRODUCT_CATALOG = [
     "card_bg_color": "lavender",
     "is_new": false,
     "secure_networking_gtm": false,
-    "support_level": "cisco_supported",
+    "support_level": "developer_supported",
     "sc4s_url": "",
     "sc4s_label": "",
+    "sc4s_supported": false,
+    "sc4s_search_head_ta": "",
+    "sc4s_search_head_ta_label": "",
+    "sc4s_search_head_ta_splunkbase_url": "",
+    "sc4s_search_head_ta_splunkbase_id": "",
+    "sc4s_search_head_ta_install_url": "",
+    "sc4s_config_notes": [],
     "best_practices": [],
     "sort_order": 300
   },
@@ -4157,13 +4499,15 @@ export const PRODUCT_CATALOG = [
         "app_id": "SA_cisco_cdr_axl",
         "display_name": "Supporting App for AXL",
         "uid": "4640",
-        "addon_splunkbase_url": "https://splunkbase.splunk.com/app/4640"
+        "addon_splunkbase_url": "https://splunkbase.splunk.com/app/4640",
+        "status": "active"
       },
       {
         "app_id": "TA-ciscoaxl",
         "display_name": "Cisco CallManager API - TA-ciscoaxl",
         "uid": "2997",
-        "addon_splunkbase_url": "https://splunkbase.splunk.com/app/2997"
+        "addon_splunkbase_url": "https://splunkbase.splunk.com/app/2997",
+        "status": "archived"
       }
     ],
     "prereq_apps": [
@@ -4197,12 +4541,13 @@ export const PRODUCT_CATALOG = [
       "voip",
       "jabber",
       "cdr",
-      "cmr"
+      "cmr",
+      "sc4s"
     ],
     "alert_actions": [],
     "soar_connectors": [],
     "itsi_content_pack": null,
-    "card_banner": "Powered by Cisco Collaboration",
+    "card_banner": "Developer Supported",
     "card_banner_color": "purple",
     "card_banner_size": "small",
     "card_banner_opacity": "0.12",
@@ -4210,9 +4555,19 @@ export const PRODUCT_CATALOG = [
     "card_bg_color": "lavender",
     "is_new": false,
     "secure_networking_gtm": false,
-    "support_level": "cisco_supported",
-    "sc4s_url": "",
-    "sc4s_label": "",
+    "support_level": "developer_supported",
+    "sc4s_url": "https://splunk.github.io/splunk-connect-for-syslog/main/sources/vendor/Cisco/cisco_ucm/",
+    "sc4s_label": "SC4S: Cisco UCM",
+    "sc4s_supported": true,
+    "sc4s_search_head_ta": "cisco-cdr-reporting",
+    "sc4s_search_head_ta_label": "Cisco CDR Reporting and Analytics",
+    "sc4s_search_head_ta_splunkbase_url": "https://splunkbase.splunk.com/app/669",
+    "sc4s_search_head_ta_splunkbase_id": "669",
+    "sc4s_search_head_ta_install_url": "/manager/splunk-cisco-app-navigator/appsremote?order=relevance&query=%22Cisco+CDR%22&offset=0",
+    "sc4s_config_notes": [
+      "UCM syslog messages are auto-detected by SC4S.",
+      "Ensure UCM and SC4S clocks are NTP-synced within +/- 30 seconds."
+    ],
     "best_practices": [],
     "sort_order": 301
   },
@@ -4221,7 +4576,7 @@ export const PRODUCT_CATALOG = [
     "display_name": "Cisco Meeting Server (CMS)",
     "description": "On-premises video conferencing - multi-party meetings, webinars, and interoperability across standards-based endpoints.",
     "value_proposition": "Ingest CMS call detail records and system logs into Splunk for meeting quality analytics and capacity planning.",
-    "vendor": "Cisco",
+    "vendor": "Sideview, LLC",
     "tagline": "On-Prem Video Conferencing",
     "category": "collaboration",
     "version": "1.0.0",
@@ -4268,7 +4623,8 @@ export const PRODUCT_CATALOG = [
       "on-premises meetings",
       "h323",
       "webrtc",
-      "call bridge"
+      "call bridge",
+      "sc4s"
     ],
     "alert_actions": [],
     "soar_connectors": [],
@@ -4281,11 +4637,170 @@ export const PRODUCT_CATALOG = [
     "card_bg_color": "lavender",
     "is_new": false,
     "secure_networking_gtm": false,
+    "support_level": "developer_supported",
+    "sc4s_url": "https://splunk.github.io/splunk-connect-for-syslog/main/sources/vendor/Cisco/cisco_cms/",
+    "sc4s_label": "SC4S: Cisco Meeting Server",
+    "sc4s_supported": true,
+    "sc4s_search_head_ta": "TA-cisco-cms",
+    "sc4s_search_head_ta_label": "Supporting Add-on for Cisco Meeting Server",
+    "sc4s_search_head_ta_splunkbase_url": "https://splunkbase.splunk.com/app/8413",
+    "sc4s_search_head_ta_splunkbase_id": "8413",
+    "sc4s_search_head_ta_install_url": "/manager/splunk-cisco-app-navigator/appsremote?order=relevance&query=%22Cisco+Meeting+Server%22&offset=0&support=splunk",
+    "sc4s_config_notes": [
+      "CMS syslog messages are auto-detected by SC4S.",
+      "Ensure CMS and SC4S clocks are NTP-synced within +/- 30 seconds."
+    ],
+    "best_practices": [],
+    "sort_order": 302
+  },
+  {
+    "product_id": "cisco_meeting_management",
+    "display_name": "Cisco Meeting Management",
+    "description": "Mandatory management application for Cisco Meeting Server — monitor and control active meetings, manage participants, configure layouts, start/stop recording or streaming, and provision conference templates.",
+    "value_proposition": "Ingest Meeting Management audit logs and operational events into Splunk for meeting lifecycle analytics and compliance monitoring.",
+    "vendor": "Cisco",
+    "tagline": "CMS Meeting Operations",
+    "category": "collaboration",
+    "version": "1.0.0",
+    "status": "active",
+    "addon": "",
+    "addon_label": "",
+    "addon_family": "default",
+    "addon_splunkbase_url": "",
+    "addon_docs_url": "",
+    "addon_install_url": "",
+    "app_viz": "",
+    "app_viz_label": "",
+    "app_viz_splunkbase_url": "",
+    "app_viz_docs_url": "",
+    "app_viz_install_url": "",
+    "app_viz_2": "",
+    "app_viz_2_label": "",
+    "app_viz_2_splunkbase_url": "",
+    "app_viz_2_docs_url": "",
+    "app_viz_2_install_url": "",
+    "learn_more_url": "https://www.cisco.com/c/en/us/products/conferencing/meeting-server/datasheet-c78-742168.html",
+    "legacy_apps": [],
+    "prereq_apps": [],
+    "community_apps": [],
+    "sourcetypes": [
+      "cisco:meetingmgmt"
+    ],
+    "dashboard": "",
+    "custom_dashboard": "",
+    "icon_emoji": "clipboard",
+    "aliases": [],
+    "keywords": [
+      "meeting management",
+      "cms",
+      "meeting server",
+      "conference management",
+      "meeting control",
+      "recording",
+      "streaming",
+      "smart licensing"
+    ],
+    "alert_actions": [],
+    "soar_connectors": [],
+    "itsi_content_pack": null,
+    "card_banner": "Powered by Cisco Collaboration",
+    "card_banner_color": "cisco",
+    "card_banner_size": "small",
+    "card_banner_opacity": "0.12",
+    "card_accent": "#7b1fa2",
+    "card_bg_color": "lavender",
+    "is_new": false,
+    "secure_networking_gtm": false,
     "support_level": "cisco_supported",
     "sc4s_url": "",
     "sc4s_label": "",
+    "sc4s_supported": false,
+    "sc4s_search_head_ta": "",
+    "sc4s_search_head_ta_label": "",
+    "sc4s_search_head_ta_splunkbase_url": "",
+    "sc4s_search_head_ta_splunkbase_id": "",
+    "sc4s_search_head_ta_install_url": "",
+    "sc4s_config_notes": [],
     "best_practices": [],
-    "sort_order": 302
+    "sort_order": 303
+  },
+  {
+    "product_id": "cisco_tvcs",
+    "display_name": "Cisco TelePresence Video Communication Server (TVCS)",
+    "description": "Video conferencing session control and firewall traversal platform — enables rich video collaboration across and beyond enterprise networks for organizations using Cisco TelePresence conferencing applications.",
+    "value_proposition": "Ingest TVCS syslog and CDR events into Splunk for video infrastructure monitoring, call quality analytics, and firewall traversal troubleshooting.",
+    "vendor": "Cisco",
+    "tagline": "Video Session Control",
+    "category": "collaboration",
+    "version": "1.0.0",
+    "status": "active",
+    "addon": "",
+    "addon_label": "",
+    "addon_family": "default",
+    "addon_splunkbase_url": "",
+    "addon_docs_url": "",
+    "addon_install_url": "",
+    "app_viz": "",
+    "app_viz_label": "",
+    "app_viz_splunkbase_url": "",
+    "app_viz_docs_url": "",
+    "app_viz_install_url": "",
+    "app_viz_2": "",
+    "app_viz_2_label": "",
+    "app_viz_2_splunkbase_url": "",
+    "app_viz_2_docs_url": "",
+    "app_viz_2_install_url": "",
+    "learn_more_url": "https://www.cisco.com/c/en/us/products/conferencing/telepresence-video-communication-server-vcs/index.html",
+    "legacy_apps": [],
+    "prereq_apps": [],
+    "community_apps": [],
+    "sourcetypes": [
+      "cisco:tvcs"
+    ],
+    "dashboard": "",
+    "custom_dashboard": "",
+    "icon_emoji": "tv",
+    "aliases": [
+      "Cisco VCS"
+    ],
+    "keywords": [
+      "tvcs",
+      "vcs",
+      "telepresence",
+      "video communication server",
+      "expressway",
+      "firewall traversal",
+      "h323",
+      "sip",
+      "video conferencing",
+      "sc4s"
+    ],
+    "alert_actions": [],
+    "soar_connectors": [],
+    "itsi_content_pack": null,
+    "card_banner": "Powered by Cisco Collaboration",
+    "card_banner_color": "cisco",
+    "card_banner_size": "small",
+    "card_banner_opacity": "0.12",
+    "card_accent": "#7b1fa2",
+    "card_bg_color": "lavender",
+    "is_new": false,
+    "secure_networking_gtm": false,
+    "support_level": "splunk_supported",
+    "sc4s_url": "https://splunk.github.io/splunk-connect-for-syslog/main/sources/vendor/Cisco/cisco_tvcs/",
+    "sc4s_label": "SC4S: Cisco TVCS",
+    "sc4s_supported": true,
+    "sc4s_search_head_ta": "",
+    "sc4s_search_head_ta_label": "",
+    "sc4s_search_head_ta_splunkbase_url": "",
+    "sc4s_search_head_ta_splunkbase_id": "",
+    "sc4s_search_head_ta_install_url": "",
+    "sc4s_config_notes": [
+      "TVCS syslog messages are auto-detected by SC4S.",
+      "Ensure TVCS and SC4S clocks are NTP-synced within +/- 30 seconds."
+    ],
+    "best_practices": [],
+    "sort_order": 304
   },
   {
     "product_id": "cisco_cloud_web_security",
@@ -4345,6 +4860,13 @@ export const PRODUCT_CATALOG = [
     "support_level": "not_supported",
     "sc4s_url": "",
     "sc4s_label": "",
+    "sc4s_supported": false,
+    "sc4s_search_head_ta": "",
+    "sc4s_search_head_ta_label": "",
+    "sc4s_search_head_ta_splunkbase_url": "",
+    "sc4s_search_head_ta_splunkbase_id": "",
+    "sc4s_search_head_ta_install_url": "",
+    "sc4s_config_notes": [],
     "best_practices": [],
     "sort_order": 900
   },
@@ -4412,10 +4934,17 @@ export const PRODUCT_CATALOG = [
     "card_accent": "#9e9e9e",
     "card_bg_color": "smoke",
     "is_new": false,
-    "secure_networking_gtm": false,
+    "secure_networking_gtm": true,
     "support_level": "not_supported",
     "sc4s_url": "",
     "sc4s_label": "",
+    "sc4s_supported": false,
+    "sc4s_search_head_ta": "",
+    "sc4s_search_head_ta_label": "",
+    "sc4s_search_head_ta_splunkbase_url": "",
+    "sc4s_search_head_ta_splunkbase_id": "",
+    "sc4s_search_head_ta_install_url": "",
+    "sc4s_config_notes": [],
     "best_practices": [],
     "sort_order": 901
   },
@@ -4468,17 +4997,24 @@ export const PRODUCT_CATALOG = [
     "alert_actions": [],
     "soar_connectors": [],
     "itsi_content_pack": null,
-    "card_banner": "Deprecated",
+    "card_banner": "Developer Supported",
     "card_banner_color": "red",
     "card_banner_size": "small",
     "card_banner_opacity": "0.12",
     "card_accent": "#9e9e9e",
     "card_bg_color": "smoke",
     "is_new": false,
-    "secure_networking_gtm": false,
-    "support_level": "not_supported",
+    "secure_networking_gtm": true,
+    "support_level": "developer_supported",
     "sc4s_url": "",
     "sc4s_label": "",
+    "sc4s_supported": false,
+    "sc4s_search_head_ta": "",
+    "sc4s_search_head_ta_label": "",
+    "sc4s_search_head_ta_splunkbase_url": "",
+    "sc4s_search_head_ta_splunkbase_id": "",
+    "sc4s_search_head_ta_install_url": "",
+    "sc4s_config_notes": [],
     "best_practices": [],
     "sort_order": 902
   },
@@ -4537,17 +5073,24 @@ export const PRODUCT_CATALOG = [
     "alert_actions": [],
     "soar_connectors": [],
     "itsi_content_pack": null,
-    "card_banner": "Deprecated",
+    "card_banner": "Developer Supported",
     "card_banner_color": "red",
     "card_banner_size": "small",
     "card_banner_opacity": "0.12",
     "card_accent": "#9e9e9e",
     "card_bg_color": "smoke",
     "is_new": false,
-    "secure_networking_gtm": false,
-    "support_level": "not_supported",
+    "secure_networking_gtm": true,
+    "support_level": "developer_supported",
     "sc4s_url": "",
     "sc4s_label": "",
+    "sc4s_supported": false,
+    "sc4s_search_head_ta": "",
+    "sc4s_search_head_ta_label": "",
+    "sc4s_search_head_ta_splunkbase_url": "",
+    "sc4s_search_head_ta_splunkbase_id": "",
+    "sc4s_search_head_ta_install_url": "",
+    "sc4s_config_notes": [],
     "best_practices": [],
     "sort_order": 903
   },
@@ -4613,10 +5156,17 @@ export const PRODUCT_CATALOG = [
     "card_accent": "#9e9e9e",
     "card_bg_color": "smoke",
     "is_new": false,
-    "secure_networking_gtm": false,
+    "secure_networking_gtm": true,
     "support_level": "not_supported",
     "sc4s_url": "",
     "sc4s_label": "",
+    "sc4s_supported": false,
+    "sc4s_search_head_ta": "",
+    "sc4s_search_head_ta_label": "",
+    "sc4s_search_head_ta_splunkbase_url": "",
+    "sc4s_search_head_ta_splunkbase_id": "",
+    "sc4s_search_head_ta_install_url": "",
+    "sc4s_config_notes": [],
     "best_practices": [],
     "sort_order": 904
   },
@@ -4656,7 +5206,9 @@ export const PRODUCT_CATALOG = [
     "dashboard": "",
     "custom_dashboard": "",
     "icon_emoji": "archive",
-    "aliases": [],
+    "aliases": [
+      "Cisco Secure ACS"
+    ],
     "keywords": [
       "acs",
       "access control server",
@@ -4666,7 +5218,8 @@ export const PRODUCT_CATALOG = [
       "authentication",
       "authorization",
       "accounting",
-      "network access"
+      "network access",
+      "sc4s"
     ],
     "alert_actions": [],
     "soar_connectors": [],
@@ -4678,10 +5231,20 @@ export const PRODUCT_CATALOG = [
     "card_accent": "#9e9e9e",
     "card_bg_color": "smoke",
     "is_new": false,
-    "secure_networking_gtm": false,
+    "secure_networking_gtm": true,
     "support_level": "not_supported",
-    "sc4s_url": "",
-    "sc4s_label": "",
+    "sc4s_url": "https://splunk.github.io/splunk-connect-for-syslog/main/sources/vendor/Cisco/cisco_acs/",
+    "sc4s_label": "SC4S: Cisco ACS",
+    "sc4s_supported": true,
+    "sc4s_search_head_ta": "TA-cisco_acs",
+    "sc4s_search_head_ta_label": "Cisco ACS Add-on for Splunk",
+    "sc4s_search_head_ta_splunkbase_url": "https://splunkbase.splunk.com/app/1908",
+    "sc4s_search_head_ta_splunkbase_id": "1908",
+    "sc4s_search_head_ta_install_url": "/manager/splunk-cisco-app-navigator/appsremote?order=relevance&query=%22Cisco+ACS%22&offset=0&support=splunk",
+    "sc4s_config_notes": [
+      "ACS TACACS+ and RADIUS logs are auto-detected by SC4S.",
+      "Ensure ACS and SC4S clocks are NTP-synced within +/- 30 seconds."
+    ],
     "best_practices": [],
     "sort_order": 905
   },
@@ -4736,17 +5299,24 @@ export const PRODUCT_CATALOG = [
     "alert_actions": [],
     "soar_connectors": [],
     "itsi_content_pack": null,
-    "card_banner": "Deprecated",
+    "card_banner": "Developer Supported",
     "card_banner_color": "red",
     "card_banner_size": "small",
     "card_banner_opacity": "0.12",
     "card_accent": "#9e9e9e",
     "card_bg_color": "smoke",
     "is_new": false,
-    "secure_networking_gtm": false,
-    "support_level": "not_supported",
+    "secure_networking_gtm": true,
+    "support_level": "developer_supported",
     "sc4s_url": "",
     "sc4s_label": "",
+    "sc4s_supported": false,
+    "sc4s_search_head_ta": "",
+    "sc4s_search_head_ta_label": "",
+    "sc4s_search_head_ta_splunkbase_url": "",
+    "sc4s_search_head_ta_splunkbase_id": "",
+    "sc4s_search_head_ta_install_url": "",
+    "sc4s_config_notes": [],
     "best_practices": [],
     "sort_order": 906
   },
@@ -4788,7 +5358,9 @@ export const PRODUCT_CATALOG = [
     "dashboard": "",
     "custom_dashboard": "",
     "icon_emoji": "archive",
-    "aliases": [],
+    "aliases": [
+      "Cisco Intrusion Prevention System"
+    ],
     "keywords": [
       "ips",
       "intrusion prevention",
@@ -4811,10 +5383,17 @@ export const PRODUCT_CATALOG = [
     "card_accent": "#9e9e9e",
     "card_bg_color": "smoke",
     "is_new": false,
-    "secure_networking_gtm": false,
+    "secure_networking_gtm": true,
     "support_level": "not_supported",
     "sc4s_url": "",
     "sc4s_label": "",
+    "sc4s_supported": false,
+    "sc4s_search_head_ta": "",
+    "sc4s_search_head_ta_label": "",
+    "sc4s_search_head_ta_splunkbase_url": "",
+    "sc4s_search_head_ta_splunkbase_id": "",
+    "sc4s_search_head_ta_install_url": "",
+    "sc4s_config_notes": [],
     "best_practices": [],
     "sort_order": 907
   },
@@ -4850,13 +5429,15 @@ export const PRODUCT_CATALOG = [
         "app_id": "CMX",
         "display_name": "Cisco CMX App for Splunk",
         "uid": "3497",
-        "addon_splunkbase_url": "https://splunkbase.splunk.com/app/3497"
+        "addon_splunkbase_url": "https://splunkbase.splunk.com/app/3497",
+        "status": "archived"
       },
       {
         "app_id": "ta_cisco_spaces",
         "display_name": "Spaces Add-On for Splunk",
         "uid": "8485",
-        "addon_splunkbase_url": "https://splunkbase.splunk.com/app/8485"
+        "addon_splunkbase_url": "https://splunkbase.splunk.com/app/8485",
+        "status": "archived"
       }
     ],
     "prereq_apps": [],
@@ -4896,6 +5477,13 @@ export const PRODUCT_CATALOG = [
     "support_level": "not_supported",
     "sc4s_url": "",
     "sc4s_label": "",
+    "sc4s_supported": false,
+    "sc4s_search_head_ta": "",
+    "sc4s_search_head_ta_label": "",
+    "sc4s_search_head_ta_splunkbase_url": "",
+    "sc4s_search_head_ta_splunkbase_id": "",
+    "sc4s_search_head_ta_install_url": "",
+    "sc4s_config_notes": [],
     "best_practices": [],
     "sort_order": 908
   },
@@ -4950,7 +5538,7 @@ export const PRODUCT_CATALOG = [
     "alert_actions": [],
     "soar_connectors": [],
     "itsi_content_pack": null,
-    "card_banner": "Deprecated",
+    "card_banner": "Developer Supported",
     "card_banner_color": "red",
     "card_banner_size": "small",
     "card_banner_opacity": "0.12",
@@ -4958,9 +5546,16 @@ export const PRODUCT_CATALOG = [
     "card_bg_color": "smoke",
     "is_new": false,
     "secure_networking_gtm": false,
-    "support_level": "not_supported",
+    "support_level": "developer_supported",
     "sc4s_url": "",
     "sc4s_label": "",
+    "sc4s_supported": false,
+    "sc4s_search_head_ta": "",
+    "sc4s_search_head_ta_label": "",
+    "sc4s_search_head_ta_splunkbase_url": "",
+    "sc4s_search_head_ta_splunkbase_id": "",
+    "sc4s_search_head_ta_install_url": "",
+    "sc4s_config_notes": [],
     "best_practices": [],
     "sort_order": 909
   }

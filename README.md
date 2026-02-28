@@ -74,10 +74,14 @@ node bin/build.js build
 # 3. Deploy (symlink stage/ to Splunk)
 ln -s "$(pwd)/stage" /opt/splunk/etc/apps/splunk-cisco-app-navigator
 
-# 4. Clear cache & refresh
+# 4. Clear cache & refresh (Splunk 10.x compatible)
 rm -f /opt/splunk/var/run/splunk/appserver/i18n/products*.cache
-curl -sk -u admin:changeme https://localhost:8089/services/debug/refresh \
-  -X POST -d "entity=data/ui/views"
+curl -sk -u admin:changeme \
+  https://localhost:8089/servicesNS/nobody/splunk-cisco-app-navigator/configs/conf-products/_reload \
+  -X POST > /dev/null 2>&1
+curl -sk -u admin:changeme \
+  https://localhost:8089/servicesNS/nobody/splunk-cisco-app-navigator/data/ui/views/_reload \
+  -X POST > /dev/null 2>&1
 ```
 
 ## Feature Highlights

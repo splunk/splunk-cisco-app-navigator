@@ -12,10 +12,20 @@ display_name = <string>
 * Card title displayed to the user.
 
 description = <string>
-* Short description shown in the card body.
+* Short description shown in the card tooltip.
+* Supports lightweight inline markup:
+*   **bold**              → bold text
+*   *italic*              → italic text
+*   `code`                → inline code
+*   [link text](url)      → clickable link
+*   |  or  \n             → line break
+*   {small}text{/small}   → smaller text (11px)
+*   {large}text{/large}   → larger text (15px)
+*   {h}text{/h}           → heading-style text (16px bold)
 
 value_proposition = <string>
 * One-liner benefit statement shown below the description.
+* Supports the same inline markup as description.
 
 tagline = <string>
 * Short tagline displayed beneath the product name on the card.
@@ -120,6 +130,12 @@ legacy_uids = <comma-separated list>
 
 legacy_urls = <comma-separated list>
 * Splunkbase URLs parallel to legacy_apps.
+
+legacy_statuses = <comma-separated list>
+* Comma-separated Splunkbase status values parallel to legacy_apps.
+* Valid values: "active" (still available on Splunkbase) or "archived" (no longer available).
+* Used to split the Legacy Audit modal into Active vs Archived sections.
+* Defaults to "active" if omitted or if fewer values than legacy_apps entries.
 
 prereq_apps = <comma-separated list>
 * Comma-separated app_ids for prerequisite dependencies (e.g. "splunk_app_stream,Splunk_TA_stream").
@@ -301,6 +317,44 @@ sc4s_url = <url>
 sc4s_label = <string>
 * Display label for the SC4S link (e.g. "SC4S: Cisco ISE").
 * Default: "SC4S documentation".
+
+sc4s_supported = true | false
+* Whether this product supports high-scale data onboarding via SC4S.
+* When true, the card displays a "Dual-Path Onboarding" section showing both
+* the standard (TA + Heavy Forwarder) and high-scale (SC4S) ingestion paths.
+* Default: false.
+
+sc4s_search_head_ta = <string>
+* App ID of the product-specific TA required on the Search Head tier when
+* data is ingested via SC4S. SC4S handles all index-time operations; this TA
+* provides search-time CIM mappings and dashboards.
+* Example: Splunk_TA_cisco-ise
+* Default: (empty).
+
+sc4s_search_head_ta_label = <string>
+* Display label for the SC4S search-head TA.
+* Example: Splunk Add-on for Cisco ISE
+* Default: (empty).
+
+sc4s_search_head_ta_splunkbase_url = <url>
+* Splunkbase URL for the SC4S search-head TA.
+* Default: (empty).
+
+sc4s_search_head_ta_splunkbase_id = <string>
+* Splunkbase app ID number for the SC4S search-head TA.
+* Example: 1915
+* Default: (empty).
+
+sc4s_search_head_ta_install_url = <url>
+* Deep-link install URL for the SC4S search-head TA.
+* Default: (empty).
+
+sc4s_config_notes = <pipe-delimited string>
+* Product-specific configuration notes for the SC4S / high-scale onboarding path.
+* Multiple notes are separated by the pipe character (|).
+* Shown in the Dual-Path Onboarding section of the card.
+* Example: Configure ISE with Log Level 6 (Informational)|Use TCP/IP protocol
+* Default: (empty).
 
 best_practices = <pipe-delimited string>
 * Custom per-product best-practice tips shown in the Best Practices modal.
