@@ -34,3 +34,5 @@ backups/
 # Docs — generated presentations, chat history, binaries
 docs/
 scripts/
+.github/copilot-instructions.md
+.vscode/settings.json
