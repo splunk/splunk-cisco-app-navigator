@@ -2,7 +2,7 @@
 /**
  * AUTO-GENERATED from products.conf — DO NOT EDIT BY HAND.
  * Regenerate:  node bin/generate-catalog.js
- * Generated:   2026-02-28T19:28:44.096Z
+ * Generated:   2026-03-01T04:31:53.634Z
  * Products:    59
  */
 
@@ -212,7 +212,14 @@ export const PRODUCT_CATALOG = [
     "sc4s_search_head_ta_label": "Splunk Add-on for Cisco ASA",
     "sc4s_search_head_ta_splunkbase_url": "https://splunkbase.splunk.com/app/1620",
     "sc4s_search_head_ta_splunkbase_id": "1620",
-    "sc4s_search_head_ta_install_url": "/manager/splunk-cisco-app-navigator/appsremote?order=relevance&query=%22Cisco+ASA%22&offset=0&support=splunk",
+    "sc4s_search_head_ta_install_url": "/manager/splunk-cisco-app-navigator/appsremote?order=relevance&query=ASA&offset=0&support=splunk",
+    "sc4s_sourcetypes": [
+      "cisco:asa",
+      "cisco:fwsm",
+      "cisco:pix",
+      "cisco:firepower:syslog",
+      "cisco:ftd"
+    ],
     "sc4s_config_notes": [
       "ASA/FTD syslog messages are auto-detected by SC4S via their message format.",
       "Ensure all Cisco firewall devices are NTP-synced — SC4S requires clocks within +/- 30s of its system clock to properly parse timestamps."
@@ -326,6 +333,7 @@ export const PRODUCT_CATALOG = [
     "sc4s_search_head_ta_splunkbase_url": "",
     "sc4s_search_head_ta_splunkbase_id": "",
     "sc4s_search_head_ta_install_url": "",
+    "sc4s_sourcetypes": [],
     "sc4s_config_notes": [],
     "best_practices": [],
     "sort_order": 11
@@ -418,6 +426,7 @@ export const PRODUCT_CATALOG = [
     "sc4s_search_head_ta_splunkbase_url": "",
     "sc4s_search_head_ta_splunkbase_id": "",
     "sc4s_search_head_ta_install_url": "",
+    "sc4s_sourcetypes": [],
     "sc4s_config_notes": [],
     "best_practices": [],
     "sort_order": 12
@@ -524,6 +533,7 @@ export const PRODUCT_CATALOG = [
     "sc4s_search_head_ta_splunkbase_url": "",
     "sc4s_search_head_ta_splunkbase_id": "",
     "sc4s_search_head_ta_install_url": "",
+    "sc4s_sourcetypes": [],
     "sc4s_config_notes": [],
     "best_practices": [],
     "sort_order": 13
@@ -632,6 +642,7 @@ export const PRODUCT_CATALOG = [
     "sc4s_search_head_ta_splunkbase_url": "",
     "sc4s_search_head_ta_splunkbase_id": "",
     "sc4s_search_head_ta_install_url": "",
+    "sc4s_sourcetypes": [],
     "sc4s_config_notes": [],
     "best_practices": [],
     "sort_order": 15
@@ -706,6 +717,7 @@ export const PRODUCT_CATALOG = [
     "sc4s_search_head_ta_splunkbase_url": "",
     "sc4s_search_head_ta_splunkbase_id": "",
     "sc4s_search_head_ta_install_url": "",
+    "sc4s_sourcetypes": [],
     "sc4s_config_notes": [],
     "best_practices": [],
     "sort_order": 16
@@ -792,6 +804,7 @@ export const PRODUCT_CATALOG = [
     "sc4s_search_head_ta_splunkbase_url": "",
     "sc4s_search_head_ta_splunkbase_id": "",
     "sc4s_search_head_ta_install_url": "",
+    "sc4s_sourcetypes": [],
     "sc4s_config_notes": [],
     "best_practices": [],
     "sort_order": 17
@@ -902,6 +915,7 @@ export const PRODUCT_CATALOG = [
     "sc4s_search_head_ta_splunkbase_url": "",
     "sc4s_search_head_ta_splunkbase_id": "",
     "sc4s_search_head_ta_install_url": "",
+    "sc4s_sourcetypes": [],
     "sc4s_config_notes": [],
     "best_practices": [],
     "sort_order": 20
@@ -977,6 +991,7 @@ export const PRODUCT_CATALOG = [
     "sc4s_search_head_ta_splunkbase_url": "",
     "sc4s_search_head_ta_splunkbase_id": "",
     "sc4s_search_head_ta_install_url": "",
+    "sc4s_sourcetypes": [],
     "sc4s_config_notes": [],
     "best_practices": [],
     "sort_order": 21
@@ -1079,6 +1094,7 @@ export const PRODUCT_CATALOG = [
     "sc4s_search_head_ta_splunkbase_url": "",
     "sc4s_search_head_ta_splunkbase_id": "",
     "sc4s_search_head_ta_install_url": "",
+    "sc4s_sourcetypes": [],
     "sc4s_config_notes": [],
     "best_practices": [],
     "sort_order": 22
@@ -1161,6 +1177,7 @@ export const PRODUCT_CATALOG = [
     "sc4s_search_head_ta_splunkbase_url": "",
     "sc4s_search_head_ta_splunkbase_id": "",
     "sc4s_search_head_ta_install_url": "",
+    "sc4s_sourcetypes": [],
     "sc4s_config_notes": [],
     "best_practices": [],
     "sort_order": 25
@@ -1269,7 +1286,18 @@ export const PRODUCT_CATALOG = [
     "sc4s_search_head_ta_label": "Splunk Add-on for Cisco ESA",
     "sc4s_search_head_ta_splunkbase_url": "https://splunkbase.splunk.com/app/1761",
     "sc4s_search_head_ta_splunkbase_id": "1761",
-    "sc4s_search_head_ta_install_url": "/manager/splunk-cisco-app-navigator/appsremote?order=relevance&query=%22Cisco+ESA%22&offset=0&support=splunk",
+    "sc4s_search_head_ta_install_url": "/manager/splunk-cisco-app-navigator/appsremote?order=relevance&query=ESA&offset=0&support=splunk",
+    "sc4s_sourcetypes": [
+      "cisco:esa:amp",
+      "cisco:esa:antispam",
+      "cisco:esa:authentication",
+      "cisco:esa:cef",
+      "cisco:esa:content_scanner",
+      "cisco:esa:error_logs",
+      "cisco:esa:http",
+      "cisco:esa:system_logs",
+      "cisco:esa:textmail"
+    ],
     "sc4s_config_notes": [
       "ESA mail logs are auto-detected by SC4S.",
       "Ensure ESA and SC4S clocks are NTP-synced within +/- 30 seconds for proper timestamp parsing."
@@ -1349,6 +1377,7 @@ export const PRODUCT_CATALOG = [
     "sc4s_search_head_ta_splunkbase_url": "",
     "sc4s_search_head_ta_splunkbase_id": "",
     "sc4s_search_head_ta_install_url": "",
+    "sc4s_sourcetypes": [],
     "sc4s_config_notes": [],
     "best_practices": [],
     "sort_order": 30
@@ -1436,6 +1465,7 @@ export const PRODUCT_CATALOG = [
     "sc4s_search_head_ta_splunkbase_url": "",
     "sc4s_search_head_ta_splunkbase_id": "",
     "sc4s_search_head_ta_install_url": "",
+    "sc4s_sourcetypes": [],
     "sc4s_config_notes": [],
     "best_practices": [],
     "sort_order": 31
@@ -1509,6 +1539,7 @@ export const PRODUCT_CATALOG = [
     "sc4s_search_head_ta_splunkbase_url": "",
     "sc4s_search_head_ta_splunkbase_id": "",
     "sc4s_search_head_ta_install_url": "",
+    "sc4s_sourcetypes": [],
     "sc4s_config_notes": [],
     "best_practices": [],
     "sort_order": 32
@@ -1582,6 +1613,7 @@ export const PRODUCT_CATALOG = [
     "sc4s_search_head_ta_splunkbase_url": "",
     "sc4s_search_head_ta_splunkbase_id": "",
     "sc4s_search_head_ta_install_url": "",
+    "sc4s_sourcetypes": [],
     "sc4s_config_notes": [],
     "best_practices": [],
     "sort_order": 35
@@ -1732,6 +1764,7 @@ export const PRODUCT_CATALOG = [
     "sc4s_search_head_ta_splunkbase_url": "",
     "sc4s_search_head_ta_splunkbase_id": "",
     "sc4s_search_head_ta_install_url": "",
+    "sc4s_sourcetypes": [],
     "sc4s_config_notes": [],
     "best_practices": [],
     "sort_order": 36
@@ -1816,6 +1849,7 @@ export const PRODUCT_CATALOG = [
     "sc4s_search_head_ta_splunkbase_url": "",
     "sc4s_search_head_ta_splunkbase_id": "",
     "sc4s_search_head_ta_install_url": "",
+    "sc4s_sourcetypes": [],
     "sc4s_config_notes": [],
     "best_practices": [],
     "sort_order": 37
@@ -1896,6 +1930,7 @@ export const PRODUCT_CATALOG = [
     "sc4s_search_head_ta_splunkbase_url": "",
     "sc4s_search_head_ta_splunkbase_id": "",
     "sc4s_search_head_ta_install_url": "",
+    "sc4s_sourcetypes": [],
     "sc4s_config_notes": [],
     "best_practices": [],
     "sort_order": 38
@@ -1973,6 +2008,7 @@ export const PRODUCT_CATALOG = [
     "sc4s_search_head_ta_splunkbase_url": "",
     "sc4s_search_head_ta_splunkbase_id": "",
     "sc4s_search_head_ta_install_url": "",
+    "sc4s_sourcetypes": [],
     "sc4s_config_notes": [],
     "best_practices": [],
     "sort_order": 39
@@ -2044,11 +2080,14 @@ export const PRODUCT_CATALOG = [
     "sc4s_url": "https://splunk.github.io/splunk-connect-for-syslog/main/sources/vendor/Cisco/cisco_ucshx/",
     "sc4s_label": "SC4S: Cisco UCS",
     "sc4s_supported": true,
-    "sc4s_search_head_ta": "Splunk_TA_cisco-ucs",
-    "sc4s_search_head_ta_label": "Splunk Add-on for Cisco UCS",
-    "sc4s_search_head_ta_splunkbase_url": "https://splunkbase.splunk.com/app/2731",
-    "sc4s_search_head_ta_splunkbase_id": "2731",
-    "sc4s_search_head_ta_install_url": "/manager/splunk-cisco-app-navigator/appsremote?order=relevance&query=%22Cisco+UCS%22&offset=0&support=splunk",
+    "sc4s_search_head_ta": "",
+    "sc4s_search_head_ta_label": "",
+    "sc4s_search_head_ta_splunkbase_url": "",
+    "sc4s_search_head_ta_splunkbase_id": "",
+    "sc4s_search_head_ta_install_url": "",
+    "sc4s_sourcetypes": [
+      "cisco:ucs"
+    ],
     "sc4s_config_notes": [
       "UCS CIMC and fabric interconnect syslog messages are auto-detected by SC4S.",
       "Ensure UCS devices and SC4S clocks are NTP-synced within +/- 30 seconds."
@@ -2151,8 +2190,7 @@ export const PRODUCT_CATALOG = [
       "ucs management",
       "cloud operations",
       "workload optimization",
-      "infrastructure management",
-      "sc4s"
+      "infrastructure management"
     ],
     "alert_actions": [],
     "soar_connectors": [],
@@ -2166,18 +2204,16 @@ export const PRODUCT_CATALOG = [
     "is_new": false,
     "secure_networking_gtm": true,
     "support_level": "cisco_supported",
-    "sc4s_url": "https://splunk.github.io/splunk-connect-for-syslog/main/sources/vendor/Cisco/cisco_ucshx/",
-    "sc4s_label": "SC4S: Cisco IMC",
-    "sc4s_supported": true,
-    "sc4s_search_head_ta": "TA_cisco_catalyst",
-    "sc4s_search_head_ta_label": "Cisco Catalyst Add-on for Splunk",
-    "sc4s_search_head_ta_splunkbase_url": "https://splunkbase.splunk.com/app/7538",
-    "sc4s_search_head_ta_splunkbase_id": "7538",
-    "sc4s_search_head_ta_install_url": "/manager/launcher/appsremote?order=relevance&query=Catalyst&offset=0&category=network_security&type=addon&support=cisco",
-    "sc4s_config_notes": [
-      "IMC syslog messages are auto-detected by SC4S via CIMC source filter.",
-      "Ensure UCS/IMC devices and SC4S clocks are NTP-synced within +/- 30 seconds."
-    ],
+    "sc4s_url": "",
+    "sc4s_label": "",
+    "sc4s_supported": false,
+    "sc4s_search_head_ta": "",
+    "sc4s_search_head_ta_label": "",
+    "sc4s_search_head_ta_splunkbase_url": "",
+    "sc4s_search_head_ta_splunkbase_id": "",
+    "sc4s_search_head_ta_install_url": "",
+    "sc4s_sourcetypes": [],
+    "sc4s_config_notes": [],
     "best_practices": [],
     "sort_order": 46
   },
@@ -2191,15 +2227,15 @@ export const PRODUCT_CATALOG = [
     "category": "networking",
     "version": "1.0.0",
     "status": "active",
-    "addon": "Splunk_TA_cisco-ucs",
-    "addon_label": "Splunk Add-on for Cisco UCS",
-    "addon_family": "standalone",
+    "addon": "",
+    "addon_label": "",
+    "addon_family": "default",
     "subcategory": "compute_infra",
     "ai_enabled": false,
     "ai_description": "",
-    "addon_splunkbase_url": "https://splunkbase.splunk.com/app/2731",
-    "addon_docs_url": "https://splunk.github.io/splunk-add-on-for-cisco-ucs",
-    "addon_install_url": "/manager/splunk-cisco-app-navigator/appsremote?order=relevance&query=UCS&offset=0",
+    "addon_splunkbase_url": "",
+    "addon_docs_url": "",
+    "addon_install_url": "",
     "app_viz": "",
     "app_viz_label": "",
     "app_viz_splunkbase_url": "",
@@ -2214,10 +2250,7 @@ export const PRODUCT_CATALOG = [
     "legacy_apps": [],
     "prereq_apps": [],
     "community_apps": [],
-    "sourcetypes": [
-      "cisco:ucs",
-      "cisco:imc"
-    ],
+    "sourcetypes": [],
     "dashboard": "",
     "custom_dashboard": "",
     "icon_emoji": "wrench",
@@ -2240,7 +2273,7 @@ export const PRODUCT_CATALOG = [
     "alert_actions": [],
     "soar_connectors": [],
     "itsi_content_pack": null,
-    "card_banner": "Cisco Supported",
+    "card_banner": "Splunk Supported",
     "card_banner_color": "blue",
     "card_banner_size": "small",
     "card_banner_opacity": "0.12",
@@ -2249,14 +2282,17 @@ export const PRODUCT_CATALOG = [
     "is_new": false,
     "secure_networking_gtm": false,
     "support_level": "splunk_supported",
-    "sc4s_url": "https://splunk.github.io/splunk-connect-for-syslog/main/sources/vendor/Cisco/cisco_ucshx/",
+    "sc4s_url": "https://splunk.github.io/splunk-connect-for-syslog/main/sources/vendor/Cisco/cisco_imc/",
     "sc4s_label": "SC4S: Cisco IMC",
     "sc4s_supported": true,
-    "sc4s_search_head_ta": "Splunk_TA_cisco-ucs",
-    "sc4s_search_head_ta_label": "Splunk Add-on for Cisco UCS",
-    "sc4s_search_head_ta_splunkbase_url": "https://splunkbase.splunk.com/app/2731",
-    "sc4s_search_head_ta_splunkbase_id": "2731",
-    "sc4s_search_head_ta_install_url": "/manager/splunk-cisco-app-navigator/appsremote?order=relevance&query=%22Cisco+UCS%22&offset=0&support=splunk",
+    "sc4s_search_head_ta": "",
+    "sc4s_search_head_ta_label": "",
+    "sc4s_search_head_ta_splunkbase_url": "",
+    "sc4s_search_head_ta_splunkbase_id": "",
+    "sc4s_search_head_ta_install_url": "",
+    "sc4s_sourcetypes": [
+      "cisco:infraops"
+    ],
     "sc4s_config_notes": [
       "IMC/CIMC syslog messages are auto-detected by SC4S via CIMC source filter.",
       "Ensure IMC devices and SC4S clocks are NTP-synced within +/- 30 seconds."
@@ -2363,7 +2399,13 @@ export const PRODUCT_CATALOG = [
     "sc4s_search_head_ta_label": "Splunk Add-on for Cisco WSA",
     "sc4s_search_head_ta_splunkbase_url": "https://splunkbase.splunk.com/app/1747",
     "sc4s_search_head_ta_splunkbase_id": "1747",
-    "sc4s_search_head_ta_install_url": "/manager/splunk-cisco-app-navigator/appsremote?order=relevance&query=%22Cisco+WSA%22&offset=0&support=splunk",
+    "sc4s_search_head_ta_install_url": "/manager/splunk-cisco-app-navigator/appsremote?order=relevance&query=WSA&offset=0&support=splunk",
+    "sc4s_sourcetypes": [
+      "cisco:wsa:l4tm",
+      "cisco:wsa:squid",
+      "cisco:wsa:squid:new",
+      "cisco:wsa:w3c:recommended"
+    ],
     "sc4s_config_notes": [
       "WSA access logs are auto-detected by SC4S through their syslog format.",
       "Ensure WSA and SC4S clocks are NTP-synced within +/- 30 seconds."
@@ -2438,6 +2480,7 @@ export const PRODUCT_CATALOG = [
     "sc4s_search_head_ta_splunkbase_url": "",
     "sc4s_search_head_ta_splunkbase_id": "",
     "sc4s_search_head_ta_install_url": "",
+    "sc4s_sourcetypes": [],
     "sc4s_config_notes": [],
     "best_practices": [],
     "sort_order": 80
@@ -2512,6 +2555,7 @@ export const PRODUCT_CATALOG = [
     "sc4s_search_head_ta_splunkbase_url": "",
     "sc4s_search_head_ta_splunkbase_id": "",
     "sc4s_search_head_ta_install_url": "",
+    "sc4s_sourcetypes": [],
     "sc4s_config_notes": [],
     "best_practices": [],
     "sort_order": 82
@@ -2584,6 +2628,7 @@ export const PRODUCT_CATALOG = [
     "sc4s_search_head_ta_splunkbase_url": "",
     "sc4s_search_head_ta_splunkbase_id": "",
     "sc4s_search_head_ta_install_url": "",
+    "sc4s_sourcetypes": [],
     "sc4s_config_notes": [],
     "best_practices": [],
     "sort_order": 83
@@ -2726,11 +2771,14 @@ export const PRODUCT_CATALOG = [
     "sc4s_url": "https://splunk.github.io/splunk-connect-for-syslog/main/sources/vendor/Cisco/cisco_dna/",
     "sc4s_label": "SC4S: Cisco Catalyst Center",
     "sc4s_supported": true,
-    "sc4s_search_head_ta": "Splunk-TA-cisco-dnacenter",
-    "sc4s_search_head_ta_label": "Cisco DNA Center Add-on for Splunk",
-    "sc4s_search_head_ta_splunkbase_url": "https://splunkbase.splunk.com/app/6668",
-    "sc4s_search_head_ta_splunkbase_id": "6668",
-    "sc4s_search_head_ta_install_url": "/manager/splunk-cisco-app-navigator/appsremote?order=relevance&query=%22DNA+Center%22&offset=0&support=splunk",
+    "sc4s_search_head_ta": "",
+    "sc4s_search_head_ta_label": "",
+    "sc4s_search_head_ta_splunkbase_url": "",
+    "sc4s_search_head_ta_splunkbase_id": "",
+    "sc4s_search_head_ta_install_url": "",
+    "sc4s_sourcetypes": [
+      "cisco:dna"
+    ],
     "sc4s_config_notes": [
       "Configure Catalyst Center to send syslog to the SC4S host.",
       "Ensure Catalyst Center and SC4S clocks are NTP-synced within +/- 30 seconds."
@@ -2847,6 +2895,10 @@ export const PRODUCT_CATALOG = [
     "sc4s_search_head_ta_splunkbase_url": "https://splunkbase.splunk.com/app/1467",
     "sc4s_search_head_ta_splunkbase_id": "1467",
     "sc4s_search_head_ta_install_url": "/manager/splunk-cisco-app-navigator/appsremote?order=relevance&query=%22Cisco+Networks%22&offset=0&support=splunk",
+    "sc4s_sourcetypes": [
+      "cisco:ios",
+      "cisco:xr"
+    ],
     "sc4s_config_notes": [
       "SC4S auto-detects IOS syslog messages by their standard format.",
       "Ensure all Cisco network devices are NTP-synced — SC4S requires clocks within +/- 30s for proper timestamp parsing."
@@ -2986,6 +3038,9 @@ export const PRODUCT_CATALOG = [
     "sc4s_search_head_ta_splunkbase_url": "https://splunkbase.splunk.com/app/6656",
     "sc4s_search_head_ta_splunkbase_id": "6656",
     "sc4s_search_head_ta_install_url": "/manager/splunk-cisco-app-navigator/appsremote?order=relevance&query=%22Cisco+SD-WAN%22&offset=0&support=splunk",
+    "sc4s_sourcetypes": [
+      "cisco:viptela"
+    ],
     "sc4s_config_notes": [
       "Viptela/SD-WAN syslog messages from vEdge and cEdge routers are auto-detected by SC4S.",
       "Ensure SD-WAN devices and SC4S clocks are NTP-synced within +/- 30 seconds."
@@ -3123,10 +3178,13 @@ export const PRODUCT_CATALOG = [
     "sc4s_label": "SC4S: Cisco ISE",
     "sc4s_supported": true,
     "sc4s_search_head_ta": "Splunk_TA_cisco-ise",
-    "sc4s_search_head_ta_label": "Splunk Add-on for Cisco ISE",
+    "sc4s_search_head_ta_label": "Splunk Add-on for Cisco Identity Services",
     "sc4s_search_head_ta_splunkbase_url": "https://splunkbase.splunk.com/app/1915",
     "sc4s_search_head_ta_splunkbase_id": "1915",
-    "sc4s_search_head_ta_install_url": "/manager/splunk-cisco-app-navigator/appsremote?order=relevance&query=%22Cisco+ISE%22&offset=0&support=splunk",
+    "sc4s_search_head_ta_install_url": "/manager/splunk-cisco-app-navigator/appsremote?order=relevance&query=%22ISE%22&offset=0&support=splunk",
+    "sc4s_sourcetypes": [
+      "cisco:ise:syslog"
+    ],
     "sc4s_config_notes": [
       "Configure ISE with Log Level 6 (Informational) and use TCP/IP protocol for reliable syslog delivery.",
       "Ensure ISE and SC4S clocks are NTP-synced within +/- 30 seconds for proper timestamp parsing.",
@@ -3246,6 +3304,7 @@ export const PRODUCT_CATALOG = [
     "sc4s_search_head_ta_splunkbase_url": "",
     "sc4s_search_head_ta_splunkbase_id": "",
     "sc4s_search_head_ta_install_url": "",
+    "sc4s_sourcetypes": [],
     "sc4s_config_notes": [],
     "best_practices": [],
     "sort_order": 104
@@ -3357,6 +3416,7 @@ export const PRODUCT_CATALOG = [
     "sc4s_search_head_ta_splunkbase_url": "",
     "sc4s_search_head_ta_splunkbase_id": "",
     "sc4s_search_head_ta_install_url": "",
+    "sc4s_sourcetypes": [],
     "sc4s_config_notes": [],
     "best_practices": [],
     "sort_order": 105
@@ -3544,6 +3604,12 @@ export const PRODUCT_CATALOG = [
     "sc4s_search_head_ta_splunkbase_url": "https://splunkbase.splunk.com/app/3018",
     "sc4s_search_head_ta_splunkbase_id": "3018",
     "sc4s_search_head_ta_install_url": "/manager/splunk-cisco-app-navigator/appsremote?order=relevance&query=%22Cisco+Meraki%22&offset=0&support=splunk",
+    "sc4s_sourcetypes": [
+      "meraki",
+      "meraki:accesspoints",
+      "meraki:securityappliances",
+      "meraki:switches"
+    ],
     "sc4s_config_notes": [
       "Configure Meraki Dashboard to send syslog to the SC4S host IP and port.",
       "Meraki syslog format is auto-detected by SC4S — no unique port assignment needed in most cases."
@@ -3664,6 +3730,7 @@ export const PRODUCT_CATALOG = [
     "sc4s_search_head_ta_splunkbase_url": "",
     "sc4s_search_head_ta_splunkbase_id": "",
     "sc4s_search_head_ta_install_url": "",
+    "sc4s_sourcetypes": [],
     "sc4s_config_notes": [],
     "best_practices": [],
     "sort_order": 107
@@ -3776,6 +3843,7 @@ export const PRODUCT_CATALOG = [
     "sc4s_search_head_ta_splunkbase_url": "",
     "sc4s_search_head_ta_splunkbase_id": "",
     "sc4s_search_head_ta_install_url": "",
+    "sc4s_sourcetypes": [],
     "sc4s_config_notes": [],
     "best_practices": [],
     "sort_order": 108
@@ -3887,6 +3955,7 @@ export const PRODUCT_CATALOG = [
     "sc4s_search_head_ta_splunkbase_url": "",
     "sc4s_search_head_ta_splunkbase_id": "",
     "sc4s_search_head_ta_install_url": "",
+    "sc4s_sourcetypes": [],
     "sc4s_config_notes": [],
     "best_practices": [],
     "sort_order": 109
@@ -3997,6 +4066,7 @@ export const PRODUCT_CATALOG = [
     "sc4s_search_head_ta_splunkbase_url": "",
     "sc4s_search_head_ta_splunkbase_id": "",
     "sc4s_search_head_ta_install_url": "",
+    "sc4s_sourcetypes": [],
     "sc4s_config_notes": [],
     "best_practices": [],
     "sort_order": 110
@@ -4126,6 +4196,7 @@ export const PRODUCT_CATALOG = [
     "sc4s_search_head_ta_splunkbase_url": "",
     "sc4s_search_head_ta_splunkbase_id": "",
     "sc4s_search_head_ta_install_url": "",
+    "sc4s_sourcetypes": [],
     "sc4s_config_notes": [],
     "best_practices": [],
     "sort_order": 111
@@ -4226,6 +4297,7 @@ export const PRODUCT_CATALOG = [
     "sc4s_search_head_ta_splunkbase_url": "",
     "sc4s_search_head_ta_splunkbase_id": "",
     "sc4s_search_head_ta_install_url": "",
+    "sc4s_sourcetypes": [],
     "sc4s_config_notes": [],
     "best_practices": [],
     "sort_order": 120
@@ -4310,6 +4382,7 @@ export const PRODUCT_CATALOG = [
     "sc4s_search_head_ta_splunkbase_url": "",
     "sc4s_search_head_ta_splunkbase_id": "",
     "sc4s_search_head_ta_install_url": "",
+    "sc4s_sourcetypes": [],
     "sc4s_config_notes": [],
     "best_practices": [],
     "sort_order": 121
@@ -4382,6 +4455,7 @@ export const PRODUCT_CATALOG = [
     "sc4s_search_head_ta_splunkbase_url": "",
     "sc4s_search_head_ta_splunkbase_id": "",
     "sc4s_search_head_ta_install_url": "",
+    "sc4s_sourcetypes": [],
     "sc4s_config_notes": [],
     "best_practices": [],
     "sort_order": 122
@@ -4515,6 +4589,7 @@ export const PRODUCT_CATALOG = [
     "sc4s_search_head_ta_splunkbase_url": "",
     "sc4s_search_head_ta_splunkbase_id": "",
     "sc4s_search_head_ta_install_url": "",
+    "sc4s_sourcetypes": [],
     "sc4s_config_notes": [],
     "best_practices": [],
     "sort_order": 200
@@ -4618,6 +4693,7 @@ export const PRODUCT_CATALOG = [
     "sc4s_search_head_ta_splunkbase_url": "",
     "sc4s_search_head_ta_splunkbase_id": "",
     "sc4s_search_head_ta_install_url": "",
+    "sc4s_sourcetypes": [],
     "sc4s_config_notes": [],
     "best_practices": [],
     "sort_order": 201
@@ -4781,6 +4857,7 @@ export const PRODUCT_CATALOG = [
     "sc4s_search_head_ta_splunkbase_url": "",
     "sc4s_search_head_ta_splunkbase_id": "",
     "sc4s_search_head_ta_install_url": "",
+    "sc4s_sourcetypes": [],
     "sc4s_config_notes": [],
     "best_practices": [],
     "sort_order": 300
@@ -4881,11 +4958,14 @@ export const PRODUCT_CATALOG = [
     "sc4s_url": "https://splunk.github.io/splunk-connect-for-syslog/main/sources/vendor/Cisco/cisco_ucm/",
     "sc4s_label": "SC4S: Cisco UCM",
     "sc4s_supported": true,
-    "sc4s_search_head_ta": "cisco-cdr-reporting",
-    "sc4s_search_head_ta_label": "Cisco CDR Reporting and Analytics",
-    "sc4s_search_head_ta_splunkbase_url": "https://splunkbase.splunk.com/app/669",
-    "sc4s_search_head_ta_splunkbase_id": "669",
-    "sc4s_search_head_ta_install_url": "/manager/splunk-cisco-app-navigator/appsremote?order=relevance&query=%22Cisco+CDR%22&offset=0",
+    "sc4s_search_head_ta": "",
+    "sc4s_search_head_ta_label": "",
+    "sc4s_search_head_ta_splunkbase_url": "",
+    "sc4s_search_head_ta_splunkbase_id": "",
+    "sc4s_search_head_ta_install_url": "",
+    "sc4s_sourcetypes": [
+      "cisco:ucm"
+    ],
     "sc4s_config_notes": [
       "UCM syslog messages are auto-detected by SC4S.",
       "Ensure UCM and SC4S clocks are NTP-synced within +/- 30 seconds."
@@ -4964,14 +5044,17 @@ export const PRODUCT_CATALOG = [
     "is_new": false,
     "secure_networking_gtm": false,
     "support_level": "developer_supported",
-    "sc4s_url": "https://splunk.github.io/splunk-connect-for-syslog/main/sources/vendor/Cisco/cisco_cms/",
+    "sc4s_url": "https://splunk.github.io/splunk-connect-for-syslog/main/sources/vendor/Cisco/cisco_ms/",
     "sc4s_label": "SC4S: Cisco Meeting Server",
     "sc4s_supported": true,
-    "sc4s_search_head_ta": "TA-cisco-cms",
-    "sc4s_search_head_ta_label": "Supporting Add-on for Cisco Meeting Server",
-    "sc4s_search_head_ta_splunkbase_url": "https://splunkbase.splunk.com/app/8413",
-    "sc4s_search_head_ta_splunkbase_id": "8413",
-    "sc4s_search_head_ta_install_url": "/manager/splunk-cisco-app-navigator/appsremote?order=relevance&query=%22Cisco+Meeting+Server%22&offset=0&support=splunk",
+    "sc4s_search_head_ta": "",
+    "sc4s_search_head_ta_label": "",
+    "sc4s_search_head_ta_splunkbase_url": "",
+    "sc4s_search_head_ta_splunkbase_id": "",
+    "sc4s_search_head_ta_install_url": "",
+    "sc4s_sourcetypes": [
+      "cisco:ms"
+    ],
     "sc4s_config_notes": [
       "CMS syslog messages are auto-detected by SC4S.",
       "Ensure CMS and SC4S clocks are NTP-synced within +/- 30 seconds."
@@ -5050,6 +5133,7 @@ export const PRODUCT_CATALOG = [
     "sc4s_search_head_ta_splunkbase_url": "",
     "sc4s_search_head_ta_splunkbase_id": "",
     "sc4s_search_head_ta_install_url": "",
+    "sc4s_sourcetypes": [],
     "sc4s_config_notes": [],
     "best_practices": [],
     "sort_order": 303
@@ -5129,6 +5213,9 @@ export const PRODUCT_CATALOG = [
     "sc4s_search_head_ta_splunkbase_url": "",
     "sc4s_search_head_ta_splunkbase_id": "",
     "sc4s_search_head_ta_install_url": "",
+    "sc4s_sourcetypes": [
+      "cisco:tvcs"
+    ],
     "sc4s_config_notes": [
       "TVCS syslog messages are auto-detected by SC4S.",
       "Ensure TVCS and SC4S clocks are NTP-synced within +/- 30 seconds."
@@ -5204,6 +5291,7 @@ export const PRODUCT_CATALOG = [
     "sc4s_search_head_ta_splunkbase_url": "",
     "sc4s_search_head_ta_splunkbase_id": "",
     "sc4s_search_head_ta_install_url": "",
+    "sc4s_sourcetypes": [],
     "sc4s_config_notes": [],
     "best_practices": [],
     "sort_order": 900
@@ -5286,6 +5374,7 @@ export const PRODUCT_CATALOG = [
     "sc4s_search_head_ta_splunkbase_url": "",
     "sc4s_search_head_ta_splunkbase_id": "",
     "sc4s_search_head_ta_install_url": "",
+    "sc4s_sourcetypes": [],
     "sc4s_config_notes": [],
     "best_practices": [],
     "sort_order": 901
@@ -5360,6 +5449,7 @@ export const PRODUCT_CATALOG = [
     "sc4s_search_head_ta_splunkbase_url": "",
     "sc4s_search_head_ta_splunkbase_id": "",
     "sc4s_search_head_ta_install_url": "",
+    "sc4s_sourcetypes": [],
     "sc4s_config_notes": [],
     "best_practices": [],
     "sort_order": 902
@@ -5440,6 +5530,7 @@ export const PRODUCT_CATALOG = [
     "sc4s_search_head_ta_splunkbase_url": "",
     "sc4s_search_head_ta_splunkbase_id": "",
     "sc4s_search_head_ta_install_url": "",
+    "sc4s_sourcetypes": [],
     "sc4s_config_notes": [],
     "best_practices": [],
     "sort_order": 903
@@ -5520,6 +5611,7 @@ export const PRODUCT_CATALOG = [
     "sc4s_search_head_ta_splunkbase_url": "",
     "sc4s_search_head_ta_splunkbase_id": "",
     "sc4s_search_head_ta_install_url": "",
+    "sc4s_sourcetypes": [],
     "sc4s_config_notes": [],
     "best_practices": [],
     "sort_order": 904
@@ -5599,6 +5691,7 @@ export const PRODUCT_CATALOG = [
     "sc4s_search_head_ta_splunkbase_url": "https://splunkbase.splunk.com/app/1811",
     "sc4s_search_head_ta_splunkbase_id": "1811",
     "sc4s_search_head_ta_install_url": "/manager/splunk-cisco-app-navigator/appsremote?order=relevance&query=%22Cisco+ACS%22&offset=0&support=splunk",
+    "sc4s_sourcetypes": [],
     "sc4s_config_notes": [
       "ACS TACACS+ and RADIUS logs are auto-detected by SC4S.",
       "Ensure ACS and SC4S clocks are NTP-synced within +/- 30 seconds."
@@ -5678,6 +5771,7 @@ export const PRODUCT_CATALOG = [
     "sc4s_search_head_ta_splunkbase_url": "",
     "sc4s_search_head_ta_splunkbase_id": "",
     "sc4s_search_head_ta_install_url": "",
+    "sc4s_sourcetypes": [],
     "sc4s_config_notes": [],
     "best_practices": [],
     "sort_order": 906
@@ -5759,6 +5853,7 @@ export const PRODUCT_CATALOG = [
     "sc4s_search_head_ta_splunkbase_url": "",
     "sc4s_search_head_ta_splunkbase_id": "",
     "sc4s_search_head_ta_install_url": "",
+    "sc4s_sourcetypes": [],
     "sc4s_config_notes": [],
     "best_practices": [],
     "sort_order": 907
@@ -5853,6 +5948,7 @@ export const PRODUCT_CATALOG = [
     "sc4s_search_head_ta_splunkbase_url": "",
     "sc4s_search_head_ta_splunkbase_id": "",
     "sc4s_search_head_ta_install_url": "",
+    "sc4s_sourcetypes": [],
     "sc4s_config_notes": [],
     "best_practices": [],
     "sort_order": 908
@@ -5929,6 +6025,7 @@ export const PRODUCT_CATALOG = [
     "sc4s_search_head_ta_splunkbase_url": "",
     "sc4s_search_head_ta_splunkbase_id": "",
     "sc4s_search_head_ta_install_url": "",
+    "sc4s_sourcetypes": [],
     "sc4s_config_notes": [],
     "best_practices": [],
     "sort_order": 909

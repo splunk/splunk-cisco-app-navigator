@@ -168,6 +168,7 @@ function buildProduct(name, c) {
         sc4s_search_head_ta_splunkbase_url: c.sc4s_search_head_ta_splunkbase_url || '',
         sc4s_search_head_ta_splunkbase_id: c.sc4s_search_head_ta_splunkbase_id || '',
         sc4s_search_head_ta_install_url: c.sc4s_search_head_ta_install_url || '',
+        sc4s_sourcetypes: csvToArray(c.sc4s_sourcetypes),
         sc4s_config_notes: (c.sc4s_config_notes || '').split('|').map(s => s.trim()).filter(Boolean),
         best_practices: (c.best_practices || '').split('|').map(s => s.trim()).filter(Boolean),
         sort_order: parseInt(c.sort_order || '100', 10),

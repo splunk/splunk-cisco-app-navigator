@@ -314,6 +314,7 @@ async function loadProductsFromConf() {
             sc4s_search_head_ta_splunkbase_url: c.sc4s_search_head_ta_splunkbase_url || '',
             sc4s_search_head_ta_splunkbase_id: c.sc4s_search_head_ta_splunkbase_id || '',
             sc4s_search_head_ta_install_url: c.sc4s_search_head_ta_install_url || '',
+            sc4s_sourcetypes: (c.sc4s_sourcetypes || '').split(',').map(s => s.trim()).filter(Boolean),
             sc4s_config_notes: (c.sc4s_config_notes || '').split('|').map(s => s.trim()).filter(Boolean),
             best_practices: (c.best_practices || '').split('|').map(s => s.trim()).filter(Boolean),
             sort_order: parseInt(c.sort_order || '100', 10),
@@ -1152,7 +1153,7 @@ function ProductCard({ product, installedApps, appStatuses, sourcetypeData, isCo
         legacy_apps, prereq_apps, soar_connectors, alert_actions, community_apps, itsi_content_pack,
         card_banner, card_banner_color, card_banner_size, card_banner_opacity, card_accent, card_bg_color, is_new, support_level,
         sc4s_url, sc4s_supported, sc4s_search_head_ta, sc4s_search_head_ta_label,
-        sc4s_search_head_ta_splunkbase_url, sc4s_search_head_ta_install_url, sc4s_config_notes,
+        sc4s_search_head_ta_splunkbase_url, sc4s_search_head_ta_install_url, sc4s_sourcetypes, sc4s_config_notes,
     } = product;
 
     const appStatus = appStatuses[addon] || null;
@@ -1725,7 +1726,7 @@ function ProductCard({ product, installedApps, appStatuses, sourcetypeData, isCo
                                     <hr className="csc-dep-divider" />
                                     {sc4s_search_head_ta ? (
                                         <>
-                                            <span className="csc-dep-label csc-dep-label-sc4s">Search Head TA</span>
+                                            <span className="csc-dep-label csc-dep-label-sc4s">Required</span>
                                             <div className="csc-dep-detail">
                                                 {sc4sShTaStatus?.installed ? (
                                                     <a href={createURL(`/app/${sc4s_search_head_ta}/`)} target="_blank" rel="noopener noreferrer" className="csc-dep-name csc-dep-name-link" title={`Open ${sc4s_search_head_ta_label || sc4s_search_head_ta}`}>{sc4s_search_head_ta_label || sc4s_search_head_ta}</a>
@@ -1763,14 +1764,14 @@ function ProductCard({ product, installedApps, appStatuses, sourcetypeData, isCo
                                                 </div>
                                             )}
                                             {sc4s_search_head_ta_install_url && !sc4sShTaStatus?.installed && (
-                                                <a href={createURL(sc4s_search_head_ta_install_url)} target="_blank" rel="noopener noreferrer" className="csc-sc4s-install-btn" title="Install Search Head TA from Splunk App Manager">
-                                                    Install Search Head TA →
+                                                <a href={createURL(sc4s_search_head_ta_install_url)} target="_blank" rel="noopener noreferrer" className="csc-sc4s-install-btn" title="Install add-on from Splunk App Manager">
+                                                    Add-on
                                                 </a>
                                             )}
                                         </>
                                     ) : (
                                         <>
-                                            <span className="csc-dep-label csc-dep-label-sc4s">Search Head TA</span>
+                                            <span className="csc-dep-label csc-dep-label-sc4s">Required</span>
                                             <div className="csc-dep-detail">
                                                 <span className="csc-dep-name" style={{fontStyle: 'italic', opacity: 0.7}}>None required</span>
                                                 {sc4s_url && (
@@ -1783,6 +1784,29 @@ function ProductCard({ product, installedApps, appStatuses, sourcetypeData, isCo
                                             </div>
                                             <div className="csc-sc4s-note-compact csc-sc4s-note-compact-same">
                                                 ℹ️ No add-on needed on Search Heads — SC4S handles all parsing and indexing
+                                            </div>
+                                        </>
+                                    )}
+                                    {/* ── SC4S Sourcetypes (collapsible) ── */}
+                                    {sc4s_sourcetypes && sc4s_sourcetypes.length > 0 && (
+                                        <>
+                                            <hr className="csc-dep-divider" />
+                                            <div className="csc-sourcetypes-section" style={{ margin: '0' }}>
+                                                <div className="csc-st-summary" onClick={() => setStExpanded(v => !v)} role="button" tabIndex={0}>
+                                                    <span className="csc-st-count">
+                                                        📡 {sc4s_sourcetypes.length} SC4S sourcetype{sc4s_sourcetypes.length !== 1 ? 's' : ''}
+                                                    </span>
+                                                    <span className="csc-dep-toggle">
+                                                        {stExpanded ? '− Hide' : '+ Show'}
+                                                    </span>
+                                                </div>
+                                                {stExpanded && (
+                                                    <div className="csc-sourcetypes-chips">
+                                                        {sc4s_sourcetypes.map(st => (
+                                                            <span key={st} className="csc-st-chip" title={st}>{st}</span>
+                                                        ))}
+                                                    </div>
+                                                )}
                                             </div>
                                         </>
                                     )}
@@ -2669,6 +2693,7 @@ function ConfigViewerModal({ open, onClose, products, initialProductId, installe
 function UniversalFinderBar({ onSearch, resultCount, totalCount, products }) {
     const [query, setQuery] = useState('');
     const [focused, setFocused] = useState(false);
+    const [selectedIdx, setSelectedIdx] = useState(-1);
 
     const keywordMap = useMemo(() => {
         const map = {};
@@ -2691,9 +2716,29 @@ function UniversalFinderBar({ onSearch, resultCount, totalCount, products }) {
             .slice(0, 6);
     }, [query, keywordMap]);
 
+    // Reset selected index when suggestions change
+    useEffect(() => { setSelectedIdx(-1); }, [suggestions.length, query]);
+
     const handleChange = (e) => { const v = e.target.value; setQuery(v); onSearch(v); };
-    const handleSuggestionClick = (kw) => { setQuery(kw); onSearch(kw); setFocused(false); };
-    const handleClear = () => { setQuery(''); onSearch(''); };
+    const handleSuggestionClick = (kw) => { setQuery(kw); onSearch(kw); setFocused(false); setSelectedIdx(-1); };
+    const handleClear = () => { setQuery(''); onSearch(''); setSelectedIdx(-1); };
+    const handleKeyDown = (e) => {
+        if (!focused || suggestions.length === 0) return;
+        if (e.key === 'ArrowDown') {
+            e.preventDefault();
+            setSelectedIdx((prev) => (prev < suggestions.length - 1 ? prev + 1 : 0));
+        } else if (e.key === 'ArrowUp') {
+            e.preventDefault();
+            setSelectedIdx((prev) => (prev > 0 ? prev - 1 : suggestions.length - 1));
+        } else if (e.key === 'Enter') {
+            e.preventDefault();
+            const idx = selectedIdx >= 0 ? selectedIdx : 0;
+            handleSuggestionClick(suggestions[idx]);
+        } else if (e.key === 'Escape') {
+            setFocused(false);
+            setSelectedIdx(-1);
+        }
+    };
 
     return (
         <div className="products-search-bar">
@@ -2704,6 +2749,7 @@ function UniversalFinderBar({ onSearch, resultCount, totalCount, products }) {
                     placeholder='Search: "Firewall", "Duo", "XDR", "ISE", "SD-WAN"…'
                     value={query}
                     onChange={handleChange}
+                    onKeyDown={handleKeyDown}
                     onFocus={() => setFocused(true)}
                     onBlur={() => setTimeout(() => setFocused(false), 200)}
                     style={{
@@ -2734,17 +2780,17 @@ function UniversalFinderBar({ onSearch, resultCount, totalCount, products }) {
                         borderRadius: '0 0 6px 6px', boxShadow: '0 4px 12px rgba(0,0,0,0.12)',
                         zIndex: 100, maxHeight: '200px', overflowY: 'auto',
                     }}>
-                        {suggestions.map((kw) => (
+                        {suggestions.map((kw, idx) => (
                             <div
                                 key={kw}
                                 onMouseDown={() => handleSuggestionClick(kw)}
+                                onMouseEnter={() => setSelectedIdx(idx)}
                                 style={{
                                     padding: '10px 14px', fontSize: '13px', cursor: 'pointer',
                                     borderBottom: '1px solid var(--card-footer-border, #f0f0f0)',
                                     color: 'var(--page-color, #333)',
+                                    background: idx === selectedIdx ? 'var(--section-alt-bg, #eee)' : 'transparent',
                                 }}
-                                onMouseEnter={(e) => { e.target.style.background = 'var(--section-alt-bg, #eee)'; }}
-                                onMouseLeave={(e) => { e.target.style.background = 'transparent'; }}
                             >
                                 🔍 {kw}
                                 <span style={{ fontSize: '11px', color: 'var(--faint-color, #888)', marginLeft: '8px' }}>

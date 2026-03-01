@@ -370,6 +370,14 @@ sc4s_search_head_ta_install_url = <url>
 * Deep-link install URL for the SC4S search-head TA.
 * Default: (empty).
 
+sc4s_sourcetypes = <comma-separated list>
+* Sourcetypes specific to the SC4S / high-scale onboarding path.
+* When SC4S parses data differently from the standard add-on, the sourcetypes
+* may differ. This field lets each product declare its SC4S-specific sourcetypes
+* separately from the standard "sourcetypes" field.
+* Example: cisco:asa, cisco:ftd
+* Default: (empty).
+
 sc4s_config_notes = <pipe-delimited string>
 * Product-specific configuration notes for the SC4S / high-scale onboarding path.
 * Multiple notes are separated by the pipe character (|).
