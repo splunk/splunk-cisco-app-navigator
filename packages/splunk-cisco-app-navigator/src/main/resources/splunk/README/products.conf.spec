@@ -39,12 +39,27 @@ category = security | networking | collaboration | infrastructure | observabilit
 version = <string>
 * Current version of this product module (e.g. "1.0.0").
 
-status = active | under_development | deprecated | archived
+status = active | under_development | deprecated | archived | roadmap
 * Product lifecycle status.
 *   active             — Live product shown in the main grid.
 *   under_development  — Shows a Preview badge (use sparingly).
-*   deprecated         — Moved to the Deprecated category.
+*   deprecated         — Add-on archived or Cisco product retired (see cisco_retired).
 *   archived           — Hidden from the UI (disabled = 1).
+*   roadmap            — GTM coverage gap; no Splunk integration exists yet.
+
+cisco_retired = true | false
+* Whether the Cisco product itself has reached end-of-life / end-of-sale.
+* When true, the card shows a "CISCO RETIRED" ribbon and the product is
+* placed in the dedicated "Retired Products" section.
+* When false or omitted, a deprecated product is just "Add-on Archived"
+* (the Cisco product is still active but its Splunk add-on was removed
+* from Splunkbase).
+
+coverage_gap = true | false
+* Whether this product has zero Splunk coverage (no TA, no app, no
+* community integration).  Products with coverage_gap = true are shown
+* in the "GTM Roadmap — Coverage Gaps" section to highlight future
+* integration opportunities.  Typically paired with status = roadmap.
 
 addon = <string>
 * The Splunk app_id of the add-on / TA this card is associated with (e.g. "CiscoSecurityCloud").

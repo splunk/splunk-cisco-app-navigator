@@ -101,6 +101,8 @@ function buildProduct(name, c) {
         subcategory: c.subcategory || '',
         ai_enabled: c.ai_enabled === 'true' || c.ai_enabled === '1',
         ai_description: c.ai_description || '',
+        cisco_retired: c.cisco_retired === 'true' || c.cisco_retired === '1',
+        coverage_gap: c.coverage_gap === 'true' || c.coverage_gap === '1',
         addon_splunkbase_url: c.addon_splunkbase_url || '',
         addon_docs_url: c.addon_docs_url || '',
         addon_install_url: c.addon_install_url || '',

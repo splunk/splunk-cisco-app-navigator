@@ -18,6 +18,7 @@
  *   3. Unsupported Products   — products with no official support (not_supported)
  *   4. Coming Soon            — products under development
  *   5. Deprecated / Archived  — archived products no longer on Splunkbase
+ *   6. GTM Roadmap — Coverage Gaps — Cisco products with zero Splunk integration
  *
  * All product metadata lives in products.conf.  A static PRODUCT_CATALOG
  * array mirrors that file so cards always render even outside Splunk.
@@ -119,9 +120,7 @@ const CATEGORIES = [
 
 // Categories that render as product cards. Stanzas with a category NOT in this
 // set (e.g. alert_actions) are metadata-only and excluded from the UI grid.
-// 'deprecated' is included so deprecated products still load (they render in
-// the dedicated Deprecated / Archived section, not as a category pill).
-const CATEGORY_IDS = new Set([...CATEGORIES.map(c => c.id), 'deprecated']);
+const CATEGORY_IDS = new Set([...CATEGORIES.map(c => c.id)]);
 
 // Sub-categories within main categories, keyed by subcategory field value.
 // Based on official Cisco product taxonomy.
@@ -133,6 +132,7 @@ const SUB_CATEGORIES = {
         { id: 'email_security', name: 'Email Security', icon: '📧' },
         { id: 'endpoint_security', name: 'Endpoint Security', icon: '🖥️' },
         { id: 'workload_security', name: 'Workload Security', icon: '🐝' },
+        { id: 'application_security', name: 'Application Security', icon: '🛡️' },
         { id: 'threat_response', name: 'Threat Intel & Response', icon: '🔍' },
     ],
     networking: [
@@ -244,6 +244,8 @@ async function loadProductsFromConf() {
             subcategory: c.subcategory || '',
             ai_enabled: c.ai_enabled === 'true' || c.ai_enabled === '1' || c.ai_enabled === true,
             ai_description: c.ai_description || '',
+            cisco_retired: c.cisco_retired === 'true' || c.cisco_retired === '1' || c.cisco_retired === true,
+            coverage_gap: c.coverage_gap === 'true' || c.coverage_gap === '1' || c.coverage_gap === true,
             addon_splunkbase_url: c.addon_splunkbase_url || '',
             addon_docs_url: c.addon_docs_url || '',
             addon_troubleshoot_url: c.addon_troubleshoot_url || '',
@@ -611,7 +613,7 @@ function IntelligenceBadges({ appStatus, vizAppStatus, vizApp2Status, sourcetype
 
     if (appStatus) {
         if (appStatus.installed && appStatus.updateVersion) {
-            items.push({ cls: 'update', label: `Update v${appStatus.updateVersion}`, key: 'ta-update' });
+            items.push({ cls: 'update', label: `Add-on update v${appStatus.updateVersion}`, key: 'ta-update' });
         } else if (!appStatus.installed) {
             items.push({ cls: 'miss', label: 'Add-on not installed', key: 'ta-missing' });
         }
@@ -1145,13 +1147,13 @@ function InfoTooltip({ placement = 'bottom', width = 500, delay = 400, content, 
 
 function ProductCard({ product, installedApps, appStatuses, sourcetypeData, isConfigured, isComingSoon, platformType, onToggleConfigured, onShowBestPractices, onViewLegacy, onSetCustomDashboard, devMode, onViewConfig }) {
     const {
-        product_id, display_name, version, description, value_proposition, vendor, tagline,
+        product_id, display_name, version, status, description, value_proposition, vendor, tagline,
         icon_emoji, icon_svg, learn_more_url, addon_splunkbase_url, addon_docs_url, addon_troubleshoot_url, addon_install_url,
         addon, addon_label,
         app_viz, app_viz_label, app_viz_splunkbase_url, app_viz_docs_url, app_viz_troubleshoot_url, app_viz_install_url,
         app_viz_2, app_viz_2_label, app_viz_2_splunkbase_url, app_viz_2_docs_url, app_viz_2_troubleshoot_url, app_viz_2_install_url,
         legacy_apps, prereq_apps, soar_connectors, alert_actions, community_apps, itsi_content_pack,
-        card_banner, card_banner_color, card_banner_size, card_banner_opacity, card_accent, card_bg_color, is_new, support_level,
+        card_banner, card_banner_color, card_banner_size, card_banner_opacity, card_accent, card_bg_color, is_new, support_level, cisco_retired, coverage_gap,
         sc4s_url, sc4s_supported, sc4s_search_head_ta, sc4s_search_head_ta_label,
         sc4s_search_head_ta_splunkbase_url, sc4s_search_head_ta_install_url, sc4s_sourcetypes, sc4s_config_notes,
     } = product;
@@ -1280,6 +1282,18 @@ function ProductCard({ product, installedApps, appStatuses, sourcetypeData, isCo
             {is_new && (
                 <div className="csc-new-ribbon" aria-label="New product">NEW!</div>
             )}
+            {/* ── Cisco Retired Product ribbon ── */}
+            {cisco_retired && !is_new && (
+                <div className="csc-retired-ribbon" aria-label="Cisco retired product">CISCO RETIRED</div>
+            )}
+            {/* ── GTM Coverage Gap ribbon ── */}
+            {coverage_gap && !cisco_retired && !is_new && (
+                <div className="csc-coverage-gap-ribbon" aria-label="No Splunk coverage">NO COVERAGE</div>
+            )}
+            {/* ── Add-on Archived ribbon ── */}
+            {status === 'deprecated' && !cisco_retired && !coverage_gap && !is_new && (
+                <div className="csc-deprecated-ribbon" aria-label="Add-on archived">⚠ ADD-ON ARCHIVED</div>
+            )}
             {/* ── Header: icon + name + tagline + configured badge + info tooltip ── */}
             <div className="csc-card-header">
                 <div className="csc-card-icon">
@@ -1328,8 +1342,6 @@ function ProductCard({ product, installedApps, appStatuses, sourcetypeData, isCo
                         )}
                     </span>
                     <span className="csc-card-subtitle">
-                        {version && <span>v{version}</span>}
-                        {version && product.category && <span className="csc-card-meta-sep"> · </span>}
                         {product.category && <span>{(CATEGORIES.find(c => c.id === product.category) || {}).name || product.category}</span>}
                         {product.subcategory && <span className="csc-card-meta-sep"> · </span>}
                         {product.subcategory && (() => {
@@ -1943,7 +1955,7 @@ function ProductCard({ product, installedApps, appStatuses, sourcetypeData, isCo
                     <a href={addon_install_url ? createURL(addon_install_url) : addon_splunkbase_url} target="_blank" rel="noopener noreferrer"
                         className="csc-btn csc-btn-upgrade"
                         title={`Upgrade ${addon_label || addon} to v${appStatus.updateVersion}`}>
-                        ↑ Update
+                        ↑ Add-on
                     </a>
                 )}
                 {/* Upgrade Viz App */}
@@ -1951,7 +1963,7 @@ function ProductCard({ product, installedApps, appStatuses, sourcetypeData, isCo
                     <a href={app_viz_install_url ? createURL(app_viz_install_url) : app_viz_splunkbase_url} target="_blank" rel="noopener noreferrer"
                         className="csc-btn csc-btn-upgrade"
                         title={`Upgrade ${app_viz_label || app_viz} to v${vizAppStatus.updateVersion}`}>
-                        ↑ Update
+                        ↑ App
                     </a>
                 )}
                 {/* Upgrade Viz App 2 */}
@@ -1959,7 +1971,7 @@ function ProductCard({ product, installedApps, appStatuses, sourcetypeData, isCo
                     <a href={createURL(app_viz_2_install_url)} target="_blank" rel="noopener noreferrer"
                         className="csc-btn csc-btn-upgrade"
                         title={`Upgrade ${app_viz_2_label || app_viz_2} to v${vizApp2Status.updateVersion}`}>
-                        ↑ Update
+                        ↑ App 2
                     </a>
                 )}
                 {/* Install TA */}
@@ -2688,12 +2700,190 @@ function ConfigViewerModal({ open, onClose, products, initialProductId, installe
     );
 }
 
+// ─────────────────  TECH STACK MODAL  ─────────────────
+
+/**
+ * Latest known versions of Splunk UI packages (from splunkui.splunk.com/Packages — Feb 2026).
+ * These are updated periodically; the modal shows a "last checked" date.
+ */
+const KNOWN_LATEST_VERSIONS = {
+    // Splunk UI (from splunkui.splunk.com/Packages)
+    '@splunk/react-ui': '5.8.0',
+    '@splunk/themes': '1.5.0',
+    '@splunk/react-page': '8.2.1',
+    '@splunk/splunk-utils': '3.4.0',
+    '@splunk/webpack-configs': '7.0.3',
+    '@splunk/babel-preset': '4.0.0',
+    '@splunk/eslint-config': '5.0.0',
+    '@splunk/stylelint-config': '5.0.0',
+    '@splunk/react-toast-notifications': '0.12.0',
+    '@splunk/search-job': '3.1.0',
+    '@splunk/ui-utils': '1.12.0',
+    '@splunk/react-time-range': '11.3.0',
+    '@splunk/moment': '0.7.0',
+    '@splunk/create': '10.1.0',
+    '@splunk/react-icons': '5.8.0',
+    // React / UI framework (from npmjs.com)
+    'react': '18.3.1',
+    'react-dom': '18.3.1',
+    'styled-components': '6.1.14',
+    // Build tools (from npmjs.com)
+    '@babel/core': '7.26.9',
+    'babel-loader': '9.2.1',
+    'webpack': '5.98.0',
+    'webpack-cli': '6.0.1',
+    'webpack-merge': '6.0.1',
+    'copy-webpack-plugin': '13.0.0',
+    'eslint': '9.21.0',
+};
+const LATEST_VERSIONS_CHECKED = '2026-03-01';
+
+/** Compare two semver strings. Returns -1 (behind), 0 (match), 1+ (ahead) */
+function compareSemver(current, latest) {
+    if (!current || !latest) return 0;
+    const a = current.split('.').map(Number);
+    const b = latest.split('.').map(Number);
+    for (let i = 0; i < 3; i++) {
+        if ((a[i] || 0) < (b[i] || 0)) return -1;
+        if ((a[i] || 0) > (b[i] || 0)) return 1;
+    }
+    return 0;
+}
+
+function TechStackModal({ open, onClose }) {
+    const returnFocusRef = useRef(null);
+    const [copied, setCopied] = useState(false);
+
+    // SCAN_DEPENDENCY_VERSIONS is injected by webpack DefinePlugin at build time
+    const deps = typeof SCAN_DEPENDENCY_VERSIONS !== 'undefined' ? SCAN_DEPENDENCY_VERSIONS : {};
+
+    // Split into categories
+    const splunkDeps = [];
+    const reactDeps = [];
+    const buildDeps = [];
+
+    Object.entries(deps).forEach(([name, version]) => {
+        const entry = { name, current: version };
+        entry.latest = KNOWN_LATEST_VERSIONS[name] || null;
+        entry.cmp = entry.latest ? compareSemver(version, entry.latest) : 0;
+        if (name.startsWith('@splunk/')) {
+            splunkDeps.push(entry);
+        } else if (['react', 'react-dom', 'styled-components'].includes(name)) {
+            reactDeps.push(entry);
+        } else {
+            buildDeps.push(entry);
+        }
+    });
+
+    // Sort: outdated first, then alphabetical
+    const sortDeps = (arr) => arr.sort((a, b) => (a.cmp || 0) - (b.cmp || 0) || a.name.localeCompare(b.name));
+    sortDeps(splunkDeps);
+    sortDeps(reactDeps);
+    sortDeps(buildDeps);
+
+    const allDeps = [...splunkDeps, ...reactDeps, ...buildDeps];
+    const allTracked = allDeps.filter(d => d.latest);
+    const allOutdated = allTracked.filter(d => d.cmp < 0).length;
+    const allCurrent = allTracked.filter(d => d.cmp >= 0).length;
+
+    const handleCopy = () => {
+        const lines = ['# SCAN Tech Stack', ''];
+        const addSection = (title, arr) => {
+            lines.push(`## ${title}`);
+            arr.forEach(d => {
+                const status = d.latest ? (d.cmp < 0 ? '❌ OUTDATED' : d.cmp > 0 ? '🟢 AHEAD' : '✅ CURRENT') : '';
+                lines.push(`  ${d.name}: ${d.current}${d.latest ? ` → latest ${d.latest} ${status}` : ''}`);
+            });
+            lines.push('');
+        };
+        addSection('Splunk UI Packages', splunkDeps);
+        addSection('React / UI Framework', reactDeps);
+        addSection('Build Tools', buildDeps);
+        const text = lines.join('\n');
+        if (navigator.clipboard?.writeText) {
+            navigator.clipboard.writeText(text).then(() => { setCopied(true); setTimeout(() => setCopied(false), 2000); });
+        }
+    };
+
+    if (!open) return null;
+
+    const renderRow = (d) => {
+        const statusIcon = d.latest
+            ? (d.cmp < 0 ? '❌' : d.cmp > 0 ? '🟢' : '✅')
+            : '—';
+        const statusClass = d.latest
+            ? (d.cmp < 0 ? 'scan-ts-outdated' : d.cmp > 0 ? 'scan-ts-ahead' : 'scan-ts-current')
+            : 'scan-ts-unknown';
+        return (
+            <tr key={d.name} className={statusClass}>
+                <td className="scan-ts-name">{d.name}</td>
+                <td className="scan-ts-version">{d.current}</td>
+                <td className="scan-ts-latest">{d.latest || '—'}</td>
+                <td className="scan-ts-status">{statusIcon}</td>
+            </tr>
+        );
+    };
+
+    const renderSection = (title, emoji, arr) => (
+        arr.length > 0 && (
+            <div className="scan-ts-section" key={title}>
+                <h4 className="scan-ts-section-title">{emoji} {title}</h4>
+                <table className="scan-ts-table">
+                    <thead>
+                        <tr>
+                            <th>Package</th>
+                            <th>Current</th>
+                            <th>Latest</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {arr.map(renderRow)}
+                    </tbody>
+                </table>
+            </div>
+        )
+    );
+
+    return (
+        <Modal open returnFocus={returnFocusRef} onRequestClose={onClose} style={{ maxWidth: '720px', width: '90vw' }}>
+            <Modal.Header title="🛠 Tech Stack — Developer Mode" />
+            <Modal.Body>
+                <div className="scan-ts-summary">
+                    <span className="scan-ts-summary-pill scan-ts-summary-current">✅ {allCurrent} current</span>
+                    {allOutdated > 0 && <span className="scan-ts-summary-pill scan-ts-summary-outdated">❌ {allOutdated} outdated</span>}
+                    <span className="scan-ts-summary-pill scan-ts-summary-total">📦 {Object.keys(deps).length} total deps</span>
+                    <button className="csc-devmode-copy" onClick={handleCopy} style={{ marginLeft: 'auto' }}>
+                        {copied ? '✓ Copied!' : '📋 Copy'}
+                    </button>
+                </div>
+                {renderSection('Splunk UI Packages', '🔷', splunkDeps)}
+                {renderSection('React / UI Framework', '⚛️', reactDeps)}
+                {renderSection('Build Tools', '🔧', buildDeps)}
+                <div className="scan-ts-footer-note">
+                    Splunk UI versions from <a href="https://splunkui.splunk.com/Packages" target="_blank" rel="noopener noreferrer">splunkui.splunk.com/Packages</a> · Other versions from <a href="https://www.npmjs.com" target="_blank" rel="noopener noreferrer">npmjs.com</a> · Last checked {LATEST_VERSIONS_CHECKED}
+                </div>
+            </Modal.Body>
+            <Modal.Footer>
+                <Button appearance="secondary" label="Close" onClick={onClose} />
+            </Modal.Footer>
+        </Modal>
+    );
+}
+
 // ─────────────────────  SEARCH BAR  ─────────────────
 
-function UniversalFinderBar({ onSearch, resultCount, totalCount, products }) {
+function UniversalFinderBar({ onSearch, resultCount, totalCount, products, externalQuery }) {
     const [query, setQuery] = useState('');
     const [focused, setFocused] = useState(false);
     const [selectedIdx, setSelectedIdx] = useState(-1);
+
+    // Allow parent to clear the query (e.g. after devmode intercept)
+    useEffect(() => {
+        if (externalQuery !== undefined && externalQuery !== query) {
+            setQuery(externalQuery);
+        }
+    }, [externalQuery]);
 
     const keywordMap = useMemo(() => {
         const map = {};
@@ -2824,14 +3014,20 @@ function AddonFilterBar({ selectedAddon, onSelectAddon, products }) {
     const groups = useMemo(() => {
         const map = {};          // addon → { label, count }
         let standalone = 0;
+        let sc4sOnly = 0;
         (products || []).forEach((p) => {
-            if (!p.addon) { standalone++; return; }
+            if (!p.addon) {
+                if (p.sc4s_supported) { sc4sOnly++; }
+                else { standalone++; }
+                return;
+            }
             if (!map[p.addon]) map[p.addon] = { label: p.addon_label || p.addon, count: 0 };
             map[p.addon].count++;
         });
         // Sort by count desc, then alphabetical
         const entries = Object.entries(map)
             .sort((a, b) => b[1].count - a[1].count || a[1].label.localeCompare(b[1].label));
+        if (sc4sOnly > 0) entries.push(['__sc4s__', { label: 'Splunk Connect for Syslog (SC4S)', count: sc4sOnly }]);
         if (standalone > 0) entries.push(['__standalone__', { label: 'Standalone', count: standalone }]);
         return entries;          // [[ addonId, { label, count }], …]
     }, [products]);
@@ -2880,7 +3076,7 @@ function AddonFilterBar({ selectedAddon, onSelectAddon, products }) {
                             key={id}
                             className={`addon-dropdown-item${selectedAddon === id ? ' addon-dropdown-item-active' : ''}`}
                             onClick={() => handleSelect(id)}
-                            title={id === '__standalone__' ? 'Products with their own dedicated add-on' : g.label}
+                            title={id === '__standalone__' ? 'Products with their own dedicated add-on' : id === '__sc4s__' ? 'Products powered exclusively by Splunk Connect for Syslog' : g.label}
                         >
                             {g.label} <span className="addon-pill-count">{g.count}</span>
                         </button>
@@ -3201,6 +3397,8 @@ function SCANProductsPage() {
     const [devToast, setDevToast] = useState(null);
     const [configViewerOpen, setConfigViewerOpen] = useState(false);
     const [configViewerProductId, setConfigViewerProductId] = useState(null);
+    const [techStackOpen, setTechStackOpen] = useState(false);
+    const [searchBarQuery, setSearchBarQuery] = useState('');
     const [personaModalOpen, setPersonaModalOpen] = useState(() => {
         try { return localStorage.getItem(PERSONA_STORAGE_KEY) !== 'true'; } catch { return false; }
     });
@@ -3336,7 +3534,9 @@ function SCANProductsPage() {
                 setTimeout(() => setDevToast(null), 2500);
                 return next;
             });
-            // Don't pass devmode as a search query
+            // Clear the search bar and query
+            setSearchQuery('');
+            setSearchBarQuery('');
             return;
         }
         setSearchQuery(value);
@@ -3523,7 +3723,9 @@ function SCANProductsPage() {
         }
         if (selectedAddon) {
             if (selectedAddon === '__standalone__') {
-                filtered = filtered.filter((p) => !p.addon);
+                filtered = filtered.filter((p) => !p.addon && !p.sc4s_supported);
+            } else if (selectedAddon === '__sc4s__') {
+                filtered = filtered.filter((p) => !p.addon && p.sc4s_supported);
             } else {
                 filtered = filtered.filter((p) => p.addon === selectedAddon);
             }
@@ -3541,11 +3743,12 @@ function SCANProductsPage() {
         return filtered;
     }, [products, selectedCategory, selectedSubCategory, aiFilter, selectedAddon, searchQuery, showFullPortfolio]);
 
-    const configuredProducts = filteredProducts.filter((p) => p.status !== 'under_development' && configuredIds.includes(p.product_id));
-    const availableProducts = filteredProducts.filter((p) => p.status !== 'under_development' && p.status !== 'deprecated' && p.support_level !== 'not_supported' && !configuredIds.includes(p.product_id));
-    const unsupportedProducts = filteredProducts.filter((p) => p.status !== 'under_development' && p.support_level === 'not_supported' && !configuredIds.includes(p.product_id));
+    const configuredProducts = filteredProducts.filter((p) => p.status !== 'under_development' && !p.cisco_retired && !p.coverage_gap && configuredIds.includes(p.product_id));
+    const availableProducts = filteredProducts.filter((p) => p.status !== 'under_development' && !p.cisco_retired && !p.coverage_gap && p.support_level !== 'not_supported' && !configuredIds.includes(p.product_id));
+    const unsupportedProducts = filteredProducts.filter((p) => p.status !== 'under_development' && !p.cisco_retired && !p.coverage_gap && p.support_level === 'not_supported' && !configuredIds.includes(p.product_id));
     const comingSoonProducts = filteredProducts.filter((p) => p.status === 'under_development');
-    const deprecatedProducts = filteredProducts.filter((p) => p.status === 'deprecated' && p.support_level !== 'not_supported' && !configuredIds.includes(p.product_id));
+    const retiredProducts = filteredProducts.filter((p) => p.cisco_retired);
+    const gtmGapProducts = filteredProducts.filter((p) => p.coverage_gap);
 
     const categoryCounts = useMemo(() => {
         const base = showFullPortfolio ? products : products.filter((p) => SUPPORTED_LEVELS.has(p.support_level));
@@ -3684,6 +3887,15 @@ function SCANProductsPage() {
                             &lt;/&gt;
                         </button>
                     )}
+                    {devMode && (
+                        <button
+                            className="scan-util-pill scan-util-devmode scan-util-techstack"
+                            onClick={() => setTechStackOpen(true)}
+                            title="Tech Stack — React &amp; Splunk UI versions"
+                        >
+                            📦 Stack
+                        </button>
+                    )}
                 </div>
             </div>
 
@@ -3703,6 +3915,7 @@ function SCANProductsPage() {
                 resultCount={filteredProducts.length}
                 totalCount={showFullPortfolio ? products.length : products.filter((p) => SUPPORTED_LEVELS.has(p.support_level)).length}
                 products={products}
+                externalQuery={searchBarQuery}
             />
             <div style={{ marginBottom: '20px' }}>
                 <CategoryFilterBar
@@ -3839,15 +4052,41 @@ function SCANProductsPage() {
             </CollapsiblePanel>
             </div>
 
-            {/* Section 5: Deprecated / Archived */}
-            {deprecatedProducts.length > 0 && (
-                <div id="deprecated_products">
-                <CollapsiblePanel title={`Deprecated / Archived (${deprecatedProducts.length})`} defaultOpen={false} panelId="deprecated_products">
-                    <div style={{ padding: '8px 12px', marginBottom: '12px', background: 'var(--warning-bg, #fff3e0)', borderLeft: '4px solid #e65100', borderRadius: '4px', fontSize: '13px', color: 'var(--page-color, #333)' }}>
-                        ⚠ These products reference add-ons or apps that have been archived on Splunkbase. They will still work if already installed, but customers cannot discover them via <strong>Find More Apps</strong> inside Splunk.
+            {/* Section 5: Retired Products (Cisco EOL) */}
+            {retiredProducts.length > 0 && (
+                <div id="retired_products">
+                <CollapsiblePanel title={`Retired Products (${retiredProducts.length})`} defaultOpen={false} panelId="retired_products">
+                    <div style={{ padding: '8px 12px', marginBottom: '12px', background: 'var(--retired-info-bg, #fce4ec)', borderLeft: '4px solid #c62828', borderRadius: '4px', fontSize: '13px', color: 'var(--page-color, #333)' }}>
+                        🏛️ These Cisco products have reached <strong>end-of-life / end-of-sale</strong> and have been superseded by newer offerings. Their Splunk add-ons may still function if already installed.
                     </div>
                     <div className="csc-card-grid">
-                        {deprecatedProducts.map((p) => (
+                        {retiredProducts.map((p) => (
+                            <ProductCard
+                                key={p.product_id} product={p}
+                                installedApps={installedApps} appStatuses={appStatuses}
+                                sourcetypeData={sourcetypeData} isConfigured={configuredIds.includes(p.product_id)} isComingSoon={false}
+                                platformType={platformType}
+                                onToggleConfigured={handleToggleConfigured}
+                                onShowBestPractices={handleShowBestPractices}
+                                onViewLegacy={handleViewLegacy}
+                                onSetCustomDashboard={handleSetCustomDashboard}
+                                devMode={devMode} onViewConfig={handleOpenConfigViewer}
+                            />
+                        ))}
+                    </div>
+                </CollapsiblePanel>
+                </div>
+            )}
+
+            {/* Section 6: GTM Roadmap — Coverage Gaps */}
+            {gtmGapProducts.length > 0 && (
+                <div id="gtm_coverage_gaps">
+                <CollapsiblePanel title={`GTM Roadmap — Coverage Gaps (${gtmGapProducts.length})`} defaultOpen={false} panelId="gtm_coverage_gaps">
+                    <div style={{ padding: '8px 12px', marginBottom: '12px', background: 'var(--gtm-gap-info-bg, #eceff1)', borderLeft: '4px solid #607d8b', borderRadius: '4px', fontSize: '13px', color: 'var(--page-color, #333)' }}>
+                        🗺️ These Cisco products are on the <strong>Secure Networking GTM roadmap</strong> but have <strong>zero Splunk integration</strong> today — no add-on, no app, no community support. They represent opportunities for future TA/app development.
+                    </div>
+                    <div className="csc-card-grid">
+                        {gtmGapProducts.map((p) => (
                             <ProductCard
                                 key={p.product_id} product={p}
                                 installedApps={installedApps} appStatuses={appStatuses}
@@ -3864,6 +4103,7 @@ function SCANProductsPage() {
                 </CollapsiblePanel>
                 </div>
             )}
+
 
             {/* Modals */}
             <BestPracticesModal
@@ -3886,6 +4126,12 @@ function SCANProductsPage() {
                     installedApps={installedApps}
                     appStatuses={appStatuses}
                     sourcetypeData={sourcetypeData}
+                />
+            )}
+            {devMode && (
+                <TechStackModal
+                    open={techStackOpen}
+                    onClose={() => setTechStackOpen(false)}
                 />
             )}
             <PersonaModal

@@ -1,7 +1,16 @@
 const path = require('path');
+const webpack = require('webpack');
 const { merge: webpackMerge } = require('webpack-merge');
 const baseConfig = require('@splunk/webpack-configs').default;
 const CopyPlugin = require('copy-webpack-plugin');
+const pkg = require('./package.json');
+
+// Extract dependency versions from package.json for the Tech Stack dev-mode panel
+const depVersions = {};
+const allDeps = { ...(pkg.dependencies || {}), ...(pkg.devDependencies || {}) };
+Object.entries(allDeps).forEach(([name, version]) => {
+  depVersions[name] = version.replace(/^[\^~]/, '');
+});
 
 const commonConfig = webpackMerge(baseConfig, {
   entry: {
@@ -28,6 +37,9 @@ const commonConfig = webpackMerge(baseConfig, {
     },
   },
   plugins: [
+    new webpack.DefinePlugin({
+      SCAN_DEPENDENCY_VERSIONS: JSON.stringify(depVersions),
+    }),
     new CopyPlugin({
       patterns: [
         {
