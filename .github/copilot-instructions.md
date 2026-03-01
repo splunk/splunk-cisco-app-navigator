@@ -175,15 +175,24 @@ cd packages/splunk-cisco-app-navigator && node bin/build.js build
 ```
 This runs: `generate-catalog.js` (products.conf → JS) → `webpack` (JSX → bundle).
 
-### Deploy JS/CSS changes (no restart needed)
+### Deploy JS/CSS/conf changes (no restart needed)
 ```bash
 rm -f /opt/splunk/var/run/splunk/appserver/i18n/products*.cache
-curl -sk -u admin:changeme https://localhost:8089/services/debug/refresh \
-  -X POST -d "entity=data/ui/views" > /dev/null 2>&1
+# Reload products.conf via REST (Splunk 10.x compatible)
+curl -sk -u admin:changeme \
+  https://localhost:8089/servicesNS/nobody/splunk-cisco-app-navigator/configs/conf-products/_reload \
+  -X POST > /dev/null 2>&1
+# Reload views
+curl -sk -u admin:changeme \
+  https://localhost:8089/servicesNS/nobody/splunk-cisco-app-navigator/data/ui/views/_reload \
+  -X POST > /dev/null 2>&1
 ```
 Then hard-refresh the browser (Cmd+Shift+R).
 
-### Deploy conf changes (requires restart)
+**Note:** The old `debug/refresh` endpoint was removed in Splunk 10.x.
+Use the `_reload` endpoints above instead.
+
+### Deploy server.conf / app.conf changes (requires restart)
 ```bash
 /opt/splunk/bin/splunk restart
 ```
@@ -276,8 +285,8 @@ which stanzas render as cards (non-card categories like `alert_actions` are excl
 ### Troubleshooting
 - If cards don't appear: check browser console, verify app is loaded via REST API
 - If data flowing shows wrong state: check sourcetype case sensitivity in products.conf
-- If styles don't update: clear cache files and run debug/refresh endpoint
-- If products.conf changes don't take effect: `splunk restart` is required
+- If styles don't update: clear cache files and run `_reload` endpoints (see Deploy section)
+- If products.conf changes don't take effect: use `configs/conf-products/_reload` endpoint
 
 ---
 
