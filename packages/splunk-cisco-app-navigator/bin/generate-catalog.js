@@ -99,6 +99,8 @@ function buildProduct(name, c) {
         addon_label: c.addon_label || '',
         addon_family: c.addon_family || 'default',
         subcategory: c.subcategory || '',
+        ai_enabled: c.ai_enabled === 'true' || c.ai_enabled === '1',
+        ai_description: c.ai_description || '',
         addon_splunkbase_url: c.addon_splunkbase_url || '',
         addon_docs_url: c.addon_docs_url || '',
         addon_install_url: c.addon_install_url || '',

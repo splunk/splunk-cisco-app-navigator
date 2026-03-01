@@ -115,12 +115,13 @@ const CATEGORIES = [
     { id: 'observability', name: 'Observability', icon: 'chart', description: 'Monitoring, analytics, and telemetry' },
     { id: 'networking', name: 'Networking', icon: 'globe', description: 'Campus, branch, WAN, and OT/ICS networking' },
     { id: 'collaboration', name: 'Collaboration', icon: 'headset', description: 'Meeting, messaging, calling, and workspace platforms' },
-    { id: 'deprecated', name: 'Deprecated', icon: 'archive', description: 'Archived or deprecated products — add-on may no longer be available on Splunkbase' },
 ];
 
 // Categories that render as product cards. Stanzas with a category NOT in this
 // set (e.g. alert_actions) are metadata-only and excluded from the UI grid.
-const CATEGORY_IDS = new Set(CATEGORIES.map(c => c.id));
+// 'deprecated' is included so deprecated products still load (they render in
+// the dedicated Deprecated / Archived section, not as a category pill).
+const CATEGORY_IDS = new Set([...CATEGORIES.map(c => c.id), 'deprecated']);
 
 // Sub-categories within main categories, keyed by subcategory field value.
 // Based on official Cisco product taxonomy.
@@ -133,12 +134,12 @@ const SUB_CATEGORIES = {
         { id: 'endpoint_security', name: 'Endpoint Security', icon: '🖥️' },
         { id: 'workload_security', name: 'Workload Security', icon: '🐝' },
         { id: 'threat_response', name: 'Threat Intel & Response', icon: '🔍' },
-        { id: 'compute_infra', name: 'Compute & Infra', icon: '🏢' },
     ],
     networking: [
         { id: 'campus_wireless', name: 'Campus & Wireless', icon: '📡' },
         { id: 'routing_wan', name: 'Routing & WAN', icon: '🛣️' },
         { id: 'data_center_net', name: 'Data Center', icon: '🏢' },
+        { id: 'compute_infra', name: 'Compute & Infra', icon: '🖥️' },
     ],
 };
 
@@ -241,6 +242,8 @@ async function loadProductsFromConf() {
             addon_label: c.addon_label || '',
             addon_family: c.addon_family || 'default',
             subcategory: c.subcategory || '',
+            ai_enabled: c.ai_enabled === 'true' || c.ai_enabled === '1' || c.ai_enabled === true,
+            ai_description: c.ai_description || '',
             addon_splunkbase_url: c.addon_splunkbase_url || '',
             addon_docs_url: c.addon_docs_url || '',
             addon_troubleshoot_url: c.addon_troubleshoot_url || '',
@@ -949,8 +952,6 @@ function LegacyAuditModal({ open, onClose, legacyApps, onMigrate }) {
 }
 
 // ────────────────────  FEEDBACK MODAL  ─────────────────────
-// TODO: Wire in feedback backend before re-enabling
-/*
 function FeedbackModal({ open, onClose }) {
     const returnFocusRef = useRef(null);
     const [feedbackType, setFeedbackType] = useState('feature');
@@ -1064,7 +1065,6 @@ function FeedbackTab({ onClick }) {
         </button>
     );
 }
-*/
 
 // ─────────────────────────  INFO TOOLTIP  ─────────────────────────
 
@@ -1270,44 +1270,11 @@ function ProductCard({ product, installedApps, appStatuses, sourcetypeData, isCo
         ? buildSourcetypeSearchUrl(product.sourcetypes)
         : null;
 
-    // Banner color: named preset → hex, or raw hex passthrough
-    const BANNER_PRESETS = { blue: '#049fd9', green: '#6abf4b', gold: '#d4a017', red: '#e53935', purple: '#7b1fa2', teal: '#00897b', cisco: '#049fd9' };
-    const bannerHex = card_banner_color ? (BANNER_PRESETS[card_banner_color.toLowerCase()] || card_banner_color) : null;
-    const bannerOpacity = card_banner_opacity ? parseFloat(card_banner_opacity) : null;
-
-    // Card background: support hex colors or named shades
-    const BG_PRESETS = {
-        ice: '#f0f8ff', mint: '#f0fff4', lavender: '#f5f0ff', rose: '#fff5f5',
-        cream: '#fffdf5', smoke: '#f4f5f7', sky: '#eef6fc', pearl: '#fafafa',
-    };
-    const cardBgStyle = {};
-    if (card_accent) cardBgStyle.borderLeft = `4px solid ${card_accent}`;
-    if (card_bg_color) {
-        const bgVal = BG_PRESETS[card_bg_color.toLowerCase()] || card_bg_color;
-        cardBgStyle.background = bgVal;
-    }
-
     return (
         <div
             className="csc-card"
             data-addon-family={addonFamily}
-            style={Object.keys(cardBgStyle).length ? cardBgStyle : undefined}
         >
-            {/* ── Translucent background banner ── */}
-            {card_banner && (
-                <div
-                    className={`csc-card-banner${card_banner_size && card_banner_size !== 'medium' ? ` csc-banner-${card_banner_size}` : ''}`}
-                    aria-hidden="true"
-                    style={bannerHex
-                        ? { color: bannerHex, opacity: bannerOpacity || 0.10 }
-                        : bannerOpacity
-                            ? { opacity: bannerOpacity }
-                            : undefined
-                    }
-                >
-                    {card_banner}
-                </div>
-            )}
             {/* ── NEW! corner ribbon ── */}
             {is_new && (
                 <div className="csc-new-ribbon" aria-label="New product">NEW!</div>
@@ -1335,6 +1302,15 @@ function ProductCard({ product, installedApps, appStatuses, sourcetypeData, isCo
                         {hasItsi && <span className="csc-itsi-badge"><img src={createURL(`/static/app/${APP_ID}/icon-itsi.svg`)} alt="" className="badge-icon" /> ITSI</span>}
                         {soar_connectors && soar_connectors.length > 0 && <span className="csc-soar-badge" title={`${soar_connectors.length} SOAR connector${soar_connectors.length > 1 ? 's' : ''} available`}><img src={createURL(`/static/app/${APP_ID}/icon-soar.svg`)} alt="" className="badge-icon" /> SOAR</span>}
                         {alert_actions && alert_actions.length > 0 && <span className="csc-alert-badge" title={`${alert_actions.length} alert action${alert_actions.length > 1 ? 's' : ''} available`}>🔔 Alert Action</span>}
+                        {product.ai_enabled && (() => {
+                            const aiText = product.ai_description || 'This product leverages AI technologies';
+                            return (
+                                <span className="csc-ai-badge csc-ai-badge-hover" tabIndex={0} aria-label={aiText}>
+                                    🤖 AI
+                                    <span className="csc-ai-tooltip">{aiText}</span>
+                                </span>
+                            );
+                        })()}
                         {description && (
                             <Tooltip
                                 content={
@@ -1351,8 +1327,21 @@ function ProductCard({ product, installedApps, appStatuses, sourcetypeData, isCo
                         )}
                     </span>
                     <span className="csc-card-subtitle">
-                        {tagline || vendor || 'Cisco'}
+                        {version && <span>v{version}</span>}
+                        {version && product.category && <span className="csc-card-meta-sep"> · </span>}
+                        {product.category && <span>{(CATEGORIES.find(c => c.id === product.category) || {}).name || product.category}</span>}
+                        {product.subcategory && <span className="csc-card-meta-sep"> · </span>}
+                        {product.subcategory && (() => {
+                            const subs = SUB_CATEGORIES[product.category];
+                            const sub = subs && subs.find(s => s.id === product.subcategory);
+                            return <span>{sub ? sub.name : product.subcategory}</span>;
+                        })()}
                     </span>
+                    {tagline && (
+                        <span className="csc-card-tagline">
+                            {tagline}
+                        </span>
+                    )}
                     {product.aliases && product.aliases.length > 0 && (
                         <span className="csc-card-aliases">
                             Formerly: {product.aliases.join(', ')}
@@ -1360,6 +1349,13 @@ function ProductCard({ product, installedApps, appStatuses, sourcetypeData, isCo
                     )}
                 </div>
             </div>
+
+            {/* ── Value Proposition ── */}
+            {value_proposition && (
+                <div className="csc-card-value-prop">
+                    {value_proposition}
+                </div>
+            )}
 
             {/* ── Intelligence Badges (add-on status, updates, data flowing, legacy) ── */}
             <IntelligenceBadges
@@ -1908,8 +1904,73 @@ function ProductCard({ product, installedApps, appStatuses, sourcetypeData, isCo
                 </div>
             )}
 
-            {/* ── Footer: compact icon buttons (full text in title tooltip) ── */}
+            {/* ── Footer: clean button row ── */}
             <div className="csc-card-footer">
+                {/* Learn More — full text, outline */}
+                {learn_more_url && (
+                    <a href={learn_more_url} target="_blank" rel="noopener noreferrer"
+                        className="csc-btn csc-btn-outline"
+                        title={`Learn more about ${display_name}`}>
+                        Learn More
+                    </a>
+                )}
+                {/* Upgrade TA */}
+                {!isComingSoon && isConfigured && appStatus?.installed && appStatus?.updateVersion && (addon_install_url || addon_splunkbase_url) && (
+                    <a href={addon_install_url ? createURL(addon_install_url) : addon_splunkbase_url} target="_blank" rel="noopener noreferrer"
+                        className="csc-btn csc-btn-upgrade"
+                        title={`Upgrade ${addon_label || addon} to v${appStatus.updateVersion}`}>
+                        ↑ Update
+                    </a>
+                )}
+                {/* Upgrade Viz App */}
+                {!isComingSoon && isConfigured && vizAppStatus?.installed && vizAppStatus?.updateVersion && (app_viz_install_url || app_viz_splunkbase_url) && (
+                    <a href={app_viz_install_url ? createURL(app_viz_install_url) : app_viz_splunkbase_url} target="_blank" rel="noopener noreferrer"
+                        className="csc-btn csc-btn-upgrade"
+                        title={`Upgrade ${app_viz_label || app_viz} to v${vizAppStatus.updateVersion}`}>
+                        ↑ Update
+                    </a>
+                )}
+                {/* Upgrade Viz App 2 */}
+                {!isComingSoon && isConfigured && vizApp2Status?.installed && vizApp2Status?.updateVersion && app_viz_2_install_url && (
+                    <a href={createURL(app_viz_2_install_url)} target="_blank" rel="noopener noreferrer"
+                        className="csc-btn csc-btn-upgrade"
+                        title={`Upgrade ${app_viz_2_label || app_viz_2} to v${vizApp2Status.updateVersion}`}>
+                        ↑ Update
+                    </a>
+                )}
+                {/* Install TA */}
+                {!isComingSoon && isConfigured && addon && !appStatus?.installed && (addon_install_url || addon_splunkbase_url) && (
+                    <a href={addon_install_url ? createURL(addon_install_url) : addon_splunkbase_url}
+                        target="_blank" rel="noopener noreferrer"
+                        className={`csc-btn ${!addon_install_url ? 'csc-btn-archived' : 'csc-btn-green'}`}
+                        title={!addon_install_url
+                            ? `Not available in Browse More Apps — download ${addon_label || addon} from Splunkbase`
+                            : `Install ${addon_label || addon}`}>
+                        {!addon_install_url ? 'Add-on ↗' : 'Add-on'}
+                    </a>
+                )}
+                {/* Install Viz App */}
+                {!isComingSoon && isConfigured && app_viz && !vizAppStatus?.installed && (app_viz_install_url || app_viz_splunkbase_url) && (
+                    <a href={app_viz_install_url ? createURL(app_viz_install_url) : app_viz_splunkbase_url}
+                        target="_blank" rel="noopener noreferrer"
+                        className={`csc-btn ${!app_viz_install_url ? 'csc-btn-archived' : 'csc-btn-green'}`}
+                        title={!app_viz_install_url
+                            ? `Not available in Browse More Apps — download ${app_viz_label || app_viz} from Splunkbase`
+                            : `Install ${app_viz_label || app_viz}`}>
+                        {!app_viz_install_url ? 'App ↗' : 'App'}
+                    </a>
+                )}
+                {/* Install Viz App 2 */}
+                {!isComingSoon && isConfigured && app_viz_2 && !vizApp2Status?.installed && (app_viz_2_install_url || app_viz_2_splunkbase_url) && (
+                    <a href={app_viz_2_install_url ? createURL(app_viz_2_install_url) : app_viz_2_splunkbase_url}
+                        target="_blank" rel="noopener noreferrer"
+                        className={`csc-btn ${!app_viz_2_install_url ? 'csc-btn-archived' : 'csc-btn-green'}`}
+                        title={!app_viz_2_install_url
+                            ? `Not available in Browse More Apps — download ${app_viz_2_label || app_viz_2} from Splunkbase`
+                            : `Install ${app_viz_2_label || app_viz_2}`}>
+                        {!app_viz_2_install_url ? 'App 2 ↗' : 'App 2'}
+                    </a>
+                )}
                 {/* Launch — split button when custom dashboard exists */}
                 {!isComingSoon && isConfigured && isInstalled && (
                     <div className="csc-launch-wrap" ref={launchBtnRef}>
@@ -1945,63 +2006,6 @@ function ProductCard({ product, installedApps, appStatuses, sourcetypeData, isCo
                         )}
                     </div>
                 )}
-                {/* Install TA — use install_url (Browse More Apps) or fall back to splunkbase_url */}
-                {!isComingSoon && isConfigured && addon && !appStatus?.installed && (addon_install_url || addon_splunkbase_url) && (
-                    <a href={addon_install_url ? createURL(addon_install_url) : addon_splunkbase_url}
-                        target="_blank" rel="noopener noreferrer"
-                        className={`csc-btn ${!addon_install_url ? 'csc-btn-archived' : 'csc-btn-green'}`}
-                        title={!addon_install_url
-                            ? `Not available in Browse More Apps — download ${addon_label || addon} from Splunkbase`
-                            : `Install ${addon_label || addon}`}>
-                        {!addon_install_url ? 'Add-on ↗' : 'Add-on'}
-                    </a>
-                )}
-                {/* Install Viz App — use install_url or fall back to splunkbase_url */}
-                {!isComingSoon && isConfigured && app_viz && !vizAppStatus?.installed && (app_viz_install_url || app_viz_splunkbase_url) && (
-                    <a href={app_viz_install_url ? createURL(app_viz_install_url) : app_viz_splunkbase_url}
-                        target="_blank" rel="noopener noreferrer"
-                        className={`csc-btn ${!app_viz_install_url ? 'csc-btn-archived' : 'csc-btn-green'}`}
-                        title={!app_viz_install_url
-                            ? `Not available in Browse More Apps — download ${app_viz_label || app_viz} from Splunkbase`
-                            : `Install ${app_viz_label || app_viz}`}>
-                        {!app_viz_install_url ? 'App ↗' : 'App'}
-                    </a>
-                )}
-                {/* Install Viz App 2 — use install_url or fall back to splunkbase_url */}
-                {!isComingSoon && isConfigured && app_viz_2 && !vizApp2Status?.installed && (app_viz_2_install_url || app_viz_2_splunkbase_url) && (
-                    <a href={app_viz_2_install_url ? createURL(app_viz_2_install_url) : app_viz_2_splunkbase_url}
-                        target="_blank" rel="noopener noreferrer"
-                        className={`csc-btn ${!app_viz_2_install_url ? 'csc-btn-archived' : 'csc-btn-green'}`}
-                        title={!app_viz_2_install_url
-                            ? `Not available in Browse More Apps — download ${app_viz_2_label || app_viz_2} from Splunkbase`
-                            : `Install ${app_viz_2_label || app_viz_2}`}>
-                        {!app_viz_2_install_url ? 'App 2 ↗' : 'App 2'}
-                    </a>
-                )}
-                {/* Upgrade TA */}
-                {!isComingSoon && isConfigured && appStatus?.installed && appStatus?.updateVersion && (addon_install_url || addon_splunkbase_url) && (
-                    <a href={addon_install_url ? createURL(addon_install_url) : addon_splunkbase_url} target="_blank" rel="noopener noreferrer"
-                        className="csc-btn csc-btn-upgrade"
-                        title={`Upgrade ${addon_label || addon} to v${appStatus.updateVersion}`}>
-                        v{appStatus.updateVersion}
-                    </a>
-                )}
-                {/* Upgrade Viz App */}
-                {!isComingSoon && isConfigured && vizAppStatus?.installed && vizAppStatus?.updateVersion && (app_viz_install_url || app_viz_splunkbase_url) && (
-                    <a href={app_viz_install_url ? createURL(app_viz_install_url) : app_viz_splunkbase_url} target="_blank" rel="noopener noreferrer"
-                        className="csc-btn csc-btn-upgrade"
-                        title={`Upgrade ${app_viz_label || app_viz} to v${vizAppStatus.updateVersion}`}>
-                        v{vizAppStatus.updateVersion}
-                    </a>
-                )}
-                {/* Upgrade Viz App 2 */}
-                {!isComingSoon && isConfigured && vizApp2Status?.installed && vizApp2Status?.updateVersion && app_viz_2_install_url && (
-                    <a href={createURL(app_viz_2_install_url)} target="_blank" rel="noopener noreferrer"
-                        className="csc-btn csc-btn-upgrade"
-                        title={`Upgrade ${app_viz_2_label || app_viz_2} to v${vizApp2Status.updateVersion}`}>
-                        v{vizApp2Status.updateVersion}
-                    </a>
-                )}
                 {/* Add to My Products */}
                 {!isComingSoon && !isConfigured && (
                     <button className="csc-btn csc-btn-green" onClick={() => onToggleConfigured(product_id)}
@@ -2009,27 +2013,19 @@ function ProductCard({ product, installedApps, appStatuses, sourcetypeData, isCo
                         Add
                     </button>
                 )}
-                {/* Best Practices — icon only */}
+                {/* Best Practices */}
                 {!isComingSoon && (
                     <button className="csc-btn csc-btn-icon csc-btn-outline" onClick={() => onShowBestPractices(product)}
                         title="Best Practices">
                         ?
                     </button>
                 )}
-                {/* Remove — icon only */}
+                {/* Remove */}
                 {!isComingSoon && isConfigured && (
                     <button className="csc-btn csc-btn-icon csc-btn-outline" onClick={() => onToggleConfigured(product_id)}
                         title="Remove from My Products">
                         ×
                     </button>
-                )}
-                {/* Learn More — icon only */}
-                {learn_more_url && (
-                    <a href={learn_more_url} target="_blank" rel="noopener noreferrer"
-                        className="csc-btn csc-btn-icon csc-btn-outline"
-                        title={`Learn more about ${display_name}`}>
-                        ↗
-                    </a>
                 )}
                 {/* Dev Mode — view config */}
                 {devMode && onViewConfig && (
@@ -2090,11 +2086,9 @@ function ProductCard({ product, installedApps, appStatuses, sourcetypeData, isCo
                 </Modal>
             )}
 
-            {/* ── IS4S-inspired gradient bottom border ── */}
+            {/* ── Gradient bottom border ── */}
             <div className={`csc-card-bottom-border ${
-                card_accent ? 'csc-bottom-cisco' :
-                card_banner_color === 'cisco' ? 'csc-bottom-security' :
-                'csc-bottom-neutral'
+                isConfigured ? 'csc-bottom-cisco' : 'csc-bottom-neutral'
             }`} />
         </div>
     );
@@ -2906,12 +2900,13 @@ function PersonaModal({ open, onClose, onSelectPersona, products }) {
 
 // ──────────────────────  CATEGORY FILTER  ────────────────────
 
-function CategoryFilterBar({ selectedCategory, onSelectCategory, selectedSubCategory, onSelectSubCategory, categoryCounts, products }) {
+function CategoryFilterBar({ selectedCategory, onSelectCategory, selectedSubCategory, onSelectSubCategory, aiFilter, onToggleAiFilter, categoryCounts, products }) {
     const iconMap = { shield: '🛡️', chart: '📊', globe: '🌐', headset: '🎧', archive: '📦' };
     const btnStyle = (active, variant) => {
         const isAmber = variant === 'soar';
         const isTeal = variant === 'alert';
         const isSecNet = variant === 'secnet';
+        const isAi = variant === 'ai';
         let activeColor, activeBg, activeBorder, activeText;
         if (isAmber) {
             activeBg = '#fef3c7'; activeBorder = '#f59e0b'; activeText = '#92400e';
@@ -2919,6 +2914,8 @@ function CategoryFilterBar({ selectedCategory, onSelectCategory, selectedSubCate
             activeBg = '#dbeafe'; activeBorder = '#3b82f6'; activeText = '#1e40af';
         } else if (isSecNet) {
             activeBg = '#e0f2f1'; activeBorder = '#00897b'; activeText = '#004d40';
+        } else if (isAi) {
+            activeBg = '#ede9fe'; activeBorder = '#7c3aed'; activeText = '#5b21b6';
         } else {
             activeBg = '#049fd9'; activeBorder = '#049fd9'; activeText = '#fff';
         }
@@ -2928,15 +2925,16 @@ function CategoryFilterBar({ selectedCategory, onSelectCategory, selectedSubCate
             borderColor: active ? activeBorder : 'var(--card-border, #ddd)',
             background: active ? activeBg : 'var(--card-bg, #f5f5f5)',
             color: active ? activeText : 'var(--page-color, #333)',
-            cursor: 'pointer', fontWeight: 600, fontSize: '12px',
+            cursor: 'pointer', fontWeight: 600, fontSize: '13px',
             transition: 'all 0.2s', flexShrink: 0,
         };
     };
 
-    const totalCount = categoryCounts ? Object.keys(categoryCounts).reduce((sum, k) => (k === 'soar' || k === 'alert_actions' || k === 'secure_networking') ? sum : sum + categoryCounts[k], 0) : null;
+    const totalCount = categoryCounts ? Object.keys(categoryCounts).reduce((sum, k) => (k === 'soar' || k === 'alert_actions' || k === 'secure_networking' || k === 'ai_powered') ? sum : sum + categoryCounts[k], 0) : null;
     const soarCount = categoryCounts?.soar || 0;
     const alertCount = categoryCounts?.alert_actions || 0;
     const secNetCount = categoryCounts?.secure_networking || 0;
+    const aiPoweredCount = categoryCounts?.ai_powered || 0;
 
     return (<>
         <div style={{ display: 'flex', gap: '8px', overflowX: 'auto', paddingBottom: '4px', scrollBehavior: 'smooth', alignItems: 'center' }}>
@@ -3031,6 +3029,26 @@ function CategoryFilterBar({ selectedCategory, onSelectCategory, selectedSubCate
                     </button>
                 </>
             )}
+            {/* ── AI-Powered cross-cutting filter ── */}
+            {aiPoweredCount > 0 && (
+                <>
+                    <span style={{ width: '1px', height: '24px', background: 'var(--card-border, #ddd)', flexShrink: 0 }} />
+                    <button
+                        onClick={() => onSelectCategory(selectedCategory === 'ai_powered' ? null : 'ai_powered')}
+                        title="Show products that leverage AI/ML technologies"
+                        style={btnStyle(selectedCategory === 'ai_powered', 'ai')}
+                    >
+                        🤖 AI-Powered
+                        <span style={{
+                            fontSize: '10px',
+                            background: selectedCategory === 'ai_powered' ? 'rgba(91,33,182,0.12)' : 'var(--version-bg, #e8e8e8)',
+                            padding: '1px 6px', borderRadius: '10px',
+                        }}>
+                            {aiPoweredCount}
+                        </span>
+                    </button>
+                </>
+            )}
         </div>
         {/* ── Sub-category pills ── */}
         {selectedCategory && SUB_CATEGORIES[selectedCategory] && (() => {
@@ -3066,6 +3084,37 @@ function CategoryFilterBar({ selectedCategory, onSelectCategory, selectedSubCate
                             📦 Other <span className="csc-subcategory-count">{unassigned}</span>
                         </button>
                     )}
+                    {/* ── AI filter pill (always visible, end of pill row) ── */}
+                    {(() => {
+                        const aiCount = catProducts.filter(p => p.ai_enabled).length;
+                        if (aiCount === 0) return null;
+                        return (
+                            <>
+                                <span style={{ borderLeft: '1.5px solid var(--card-border, #ddd)', height: '18px', margin: '0 4px' }} />
+                                <button onClick={() => onToggleAiFilter(!aiFilter)}
+                                    className={`csc-subcategory-pill csc-ai-pill ${aiFilter ? 'csc-ai-pill-active' : ''}`}
+                                    title="Filter products that leverage AI technologies">
+                                    🤖 AI-Powered <span className="csc-subcategory-count">{aiCount}</span>
+                                </button>
+                            </>
+                        );
+                    })()}
+                </div>
+            );
+        })()}
+        {/* ── AI pill for categories without sub-categories ── */}
+        {selectedCategory && !SUB_CATEGORIES[selectedCategory] && (() => {
+            const base = products || [];
+            const catProducts = base.filter(p => p.category === selectedCategory);
+            const aiCount = catProducts.filter(p => p.ai_enabled).length;
+            if (aiCount === 0) return null;
+            return (
+                <div className="csc-subcategory-bar" style={{ display: 'flex', gap: '6px', marginTop: '8px', paddingLeft: '8px', flexWrap: 'wrap', alignItems: 'center' }}>
+                    <button onClick={() => onToggleAiFilter(!aiFilter)}
+                        className={`csc-subcategory-pill csc-ai-pill ${aiFilter ? 'csc-ai-pill-active' : ''}`}
+                        title="Filter products that leverage AI technologies">
+                        🤖 AI-Powered <span className="csc-subcategory-count">{aiCount}</span>
+                    </button>
                 </div>
             );
         })()}
@@ -3085,12 +3134,13 @@ function SCANProductsPage() {
     const [searchQuery, setSearchQuery] = useState('');
     const [selectedCategory, setSelectedCategory] = useState(null);
     const [selectedSubCategory, setSelectedSubCategory] = useState(null);
+    const [aiFilter, setAiFilter] = useState(false);
     const [selectedAddon, setSelectedAddon] = useState(null);
     const [legacyModalOpen, setLegacyModalOpen] = useState(false);
     const [legacyModalApps, setLegacyModalApps] = useState([]);
     const [bpModalOpen, setBpModalOpen] = useState(false);
     const [bpProduct, setBpProduct] = useState(null);
-    // const [feedbackOpen, setFeedbackOpen] = useState(false); // TODO: re-enable with feedback backend
+    const [feedbackOpen, setFeedbackOpen] = useState(false);
     const [removeAllModalOpen, setRemoveAllModalOpen] = useState(false);
     const removeAllReturnRef = useRef(null);
     const [appVersion, setAppVersion] = useState('');
@@ -3408,6 +3458,8 @@ function SCANProductsPage() {
             filtered = filtered.filter((p) => p.alert_actions && p.alert_actions.length > 0);
         } else if (selectedCategory === 'secure_networking') {
             filtered = filtered.filter((p) => p.secure_networking_gtm);
+        } else if (selectedCategory === 'ai_powered') {
+            filtered = filtered.filter((p) => p.ai_enabled);
         } else if (selectedCategory) {
             filtered = filtered.filter((p) => p.category === selectedCategory);
         }
@@ -3419,6 +3471,9 @@ function SCANProductsPage() {
             } else {
                 filtered = filtered.filter((p) => p.subcategory === selectedSubCategory);
             }
+        }
+        if (aiFilter) {
+            filtered = filtered.filter((p) => p.ai_enabled);
         }
         if (selectedAddon) {
             if (selectedAddon === '__standalone__') {
@@ -3438,7 +3493,7 @@ function SCANProductsPage() {
             });
         }
         return filtered;
-    }, [products, selectedCategory, selectedSubCategory, selectedAddon, searchQuery, showFullPortfolio]);
+    }, [products, selectedCategory, selectedSubCategory, aiFilter, selectedAddon, searchQuery, showFullPortfolio]);
 
     const configuredProducts = filteredProducts.filter((p) => p.status !== 'under_development' && configuredIds.includes(p.product_id));
     const availableProducts = filteredProducts.filter((p) => p.status !== 'under_development' && p.status !== 'deprecated' && p.support_level !== 'not_supported' && !configuredIds.includes(p.product_id));
@@ -3453,6 +3508,7 @@ function SCANProductsPage() {
         counts.soar = base.filter((p) => p.soar_connectors && p.soar_connectors.length > 0).length;
         counts.alert_actions = base.filter((p) => p.alert_actions && p.alert_actions.length > 0).length;
         counts.secure_networking = base.filter((p) => p.secure_networking_gtm).length;
+        counts.ai_powered = base.filter((p) => p.ai_enabled).length;
         return counts;
     }, [products, showFullPortfolio]);
 
@@ -3525,11 +3581,11 @@ function SCANProductsPage() {
                     <button
                         className={`scan-util-pill scan-util-portfolio ${showFullPortfolio ? 'scan-util-portfolio-on' : ''}`}
                         onClick={handlePortfolioToggle}
-                        title={showFullPortfolio ? 'Showing full portfolio — click to show only Cisco & Splunk supported' : 'Showing Cisco & Splunk supported — click to show full portfolio'}
+                        title={showFullPortfolio ? 'Showing all products — click to show supported only' : 'Showing supported products only — click to show all'}
                     >
                         {showFullPortfolio ? '📂' : '✅'}
                         <span className="scan-util-portfolio-label">
-                            {showFullPortfolio ? 'Full Portfolio' : 'Supported'}
+                            {showFullPortfolio ? 'All Products' : 'Supported Only'}
                         </span>
                     </button>
                 </div>
@@ -3605,9 +3661,11 @@ function SCANProductsPage() {
             <div style={{ marginBottom: '20px' }}>
                 <CategoryFilterBar
                     selectedCategory={selectedCategory}
-                    onSelectCategory={(cat) => { setSelectedCategory(cat); setSelectedSubCategory(null); }}
+                    onSelectCategory={(cat) => { setSelectedCategory(cat); setSelectedSubCategory(null); setAiFilter(false); }}
                     selectedSubCategory={selectedSubCategory}
                     onSelectSubCategory={setSelectedSubCategory}
+                    aiFilter={aiFilter}
+                    onToggleAiFilter={setAiFilter}
                     categoryCounts={categoryCounts}
                     products={showFullPortfolio ? products : products.filter((p) => SUPPORTED_LEVELS.has(p.support_level))}
                 />
@@ -3790,7 +3848,7 @@ function SCANProductsPage() {
                 onSelectPersona={handleSelectPersona}
                 products={products}
             />
-            {/* <FeedbackModal open={feedbackOpen} onClose={() => setFeedbackOpen(false)} /> */}
+            <FeedbackModal open={feedbackOpen} onClose={() => setFeedbackOpen(false)} />
 
             {/* Remove All Confirmation Modal */}
             {removeAllModalOpen && (
@@ -3824,7 +3882,7 @@ function SCANProductsPage() {
                 </Modal>
             )}
 
-            {/* <FeedbackTab onClick={() => setFeedbackOpen(true)} /> */}
+            <FeedbackTab onClick={() => setFeedbackOpen(true)} />
 
             {/* Footer */}
             <div style={{

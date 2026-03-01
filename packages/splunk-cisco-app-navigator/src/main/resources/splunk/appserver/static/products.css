@@ -127,7 +127,7 @@
     --platform-cloud-color: #0d47a1;
     --platform-cloud-bg: #e3f2fd;
     --platform-cloud-border: #90caf9;
-    --icon-fill: #e8f4fd;
+    --icon-fill: #ffffff;
     --spinner-overlay-bg: rgba(237,240,243,0.7);
     --spinner-text: #333;
     --under-dev-banner-bg: #fff8e1;
@@ -890,46 +890,37 @@ html.dce-dark [data-view="views/shared/Page"] {
     max-width: 1500px;  /* ~3 cards + gaps */
 }
 
-/* ===== CSC Card (premium 3D depth + glass) ===== */
+/* ===== CSC Card (clean, minimal depth) ===== */
 .csc-card {
     position: relative;
     overflow: visible;
     background: var(--card-bg);
     border: 1px solid var(--card-border);
-    border-radius: 14px;
+    border-radius: 10px;
     display: flex;
     flex-direction: column;
-    box-shadow:
-        0 1px 2px rgba(0, 0, 0, 0.04),
-        0 4px 12px rgba(0, 0, 0, 0.08),
-        0 0 0 1px rgba(0, 0, 0, 0.03);
-    transition: box-shadow 0.35s cubic-bezier(0.22, 0.61, 0.36, 1),
-                transform 0.35s cubic-bezier(0.22, 0.61, 0.36, 1),
-                border-color 0.35s ease;
+    box-shadow: rgba(0,0,0,0.15) 0px 2px 8px, rgba(0,0,0,0.12) 0px 0px 1px;
+    transition: box-shadow 0.25s ease, transform 0.25s ease;
 }
 
 .csc-card:hover {
-    box-shadow:
-        0 4px 8px rgba(0, 0, 0, 0.06),
-        0 12px 32px rgba(0, 0, 0, 0.12),
-        0 0 0 1px rgba(4, 159, 217, 0.08);
-    transform: translateY(-4px);
-    border-color: rgba(4, 159, 217, 0.2);
+    box-shadow: rgba(0,0,0,0.22) 0px 6px 20px, rgba(0,0,0,0.15) 0px 0px 2px;
+    transform: translateY(-2px);
     z-index: 50;
 }
 
 /* ── IS4S-inspired gradient bottom border ── */
 .csc-card-bottom-border {
     position: relative;
-    height: 5px;
+    height: 4px;
     width: calc(100% + 2px);
     left: -1px;
     bottom: -1px;
-    border-bottom-left-radius: 14px;
-    border-bottom-right-radius: 14px;
+    border-bottom-left-radius: 10px;
+    border-bottom-right-radius: 10px;
     margin-top: auto;
 }
-/* Cisco teal-to-blue gradient (default for cards with accent) */
+/* Cisco teal-to-blue gradient (configured cards) */
 .csc-card-bottom-border.csc-bottom-cisco {
     background: linear-gradient(
         -30deg,
@@ -937,11 +928,11 @@ html.dce-dark [data-view="views/shared/Page"] {
         #6abf4b 58%, #049fd9 85%
     );
 }
-/* Gray gradient for non-accented / unconfigured cards */
+/* Gray gradient for unconfigured cards */
 .csc-card-bottom-border.csc-bottom-neutral {
     background: linear-gradient(
         -30deg,
-        #a8a8a8 20%, #c4c4c4 50%, #d5d5d5 80%
+        #c4c4c4 20%, #d5d5d5 50%, #e0e0e0 80%
     );
 }
 /* OneCisco spectrum (security products) */
@@ -953,30 +944,15 @@ html.dce-dark [data-view="views/shared/Page"] {
     );
 }
 
-/* ── Translucent card banner (e.g. "Powered by Cisco Security Cloud") ── */
+/* ── Translucent card banner — DISABLED for clean look ── */
 .csc-card-banner {
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%) rotate(-18deg);
-    white-space: nowrap;
-    font-size: 13px;
-    font-weight: 700;
-    letter-spacing: 0.5px;
-    color: rgba(0, 0, 0, 0.055);
-    pointer-events: none;
-    user-select: none;
-    z-index: 0;
-    overflow: hidden;
-    max-width: 140%;
-    text-overflow: clip;
+    display: none;
 }
-/* Banner size variants */
-.csc-card-banner.csc-banner-small  { font-size: 11px; letter-spacing: 0.3px; }
-.csc-card-banner.csc-banner-large  { font-size: 16px; letter-spacing: 0.8px; }
+.csc-card-banner.csc-banner-small  { display: none; }
+.csc-card-banner.csc-banner-large  { display: none; }
 
 :root.dce-dark .csc-card-banner {
-    color: rgba(255, 255, 255, 0.06);
+    display: none;
 }
 
 /* ── NEW! corner ribbon ── */
@@ -990,7 +966,7 @@ html.dce-dark [data-view="views/shared/Page"] {
     font-weight: 800;
     letter-spacing: 0.8px;
     padding: 3px 10px 3px 8px;
-    border-radius: 0 14px 0 10px;
+    border-radius: 0 10px 0 10px;
     z-index: 3;
     box-shadow: 0 2px 6px rgba(255, 111, 0, 0.35);
     text-transform: uppercase;
@@ -1008,13 +984,13 @@ html.dce-dark [data-view="views/shared/Page"] {
     top: 0;
     left: 0;
     right: 0;
-    height: 3px;
-    border-radius: 14px 14px 0 0;
-    background: linear-gradient(90deg, var(--card-border) 0%, rgba(4, 159, 217, 0.15) 50%, var(--card-border) 100%);
-    transition: background 0.35s ease;
+    height: 2px;
+    border-radius: 10px 10px 0 0;
+    background: var(--card-border);
+    transition: background 0.25s ease;
 }
 .csc-card:hover::before {
-    background: linear-gradient(90deg, #049fd9 0%, #6abf4b 50%, #049fd9 100%);
+    background: var(--card-border);
 }
 
 /* ── ITSI Content Pack badge ── */
@@ -1043,9 +1019,9 @@ html.dce-dark [data-view="views/shared/Page"] {
 /* ===== CSC Card Header ===== */
 .csc-card-header {
     display: flex;
-    align-items: center;
+    align-items: flex-start;
     gap: 14px;
-    padding: 20px 22px 10px;
+    padding: 18px 20px 8px;
 }
 
 .csc-card-icon {
@@ -1056,26 +1032,26 @@ html.dce-dark [data-view="views/shared/Page"] {
 }
 
 .csc-icon-placeholder {
-    width: 44px;
-    height: 44px;
+    width: 48px;
+    height: 48px;
     display: flex;
     align-items: center;
     justify-content: center;
     font-size: 28px;
     color: rgb(58, 135, 173);
-    background: var(--icon-fill, #e8f4fd);
-    border-radius: 12px;
-    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+    background: transparent;
+    border-radius: 0;
+    box-shadow: none;
     transition: transform 0.25s ease;
-    overflow: hidden;
+    overflow: visible;
 }
 .csc-card:hover .csc-icon-placeholder {
-    transform: scale(1.05);
+    transform: scale(1.03);
 }
 /* SVG product icon inside the placeholder */
 .csc-product-icon-svg {
-    width: 34px;
-    height: 34px;
+    width: 36px;
+    height: 36px;
     object-fit: contain;
     display: block;
 }
@@ -1091,7 +1067,7 @@ html.dce-dark [data-view="views/shared/Page"] {
 }
 
 .csc-card-name {
-    font-size: 16.5px;
+    font-size: 17px;
     font-weight: 700;
     color: var(--heading-color);
     line-height: 1.3;
@@ -1106,9 +1082,23 @@ html.dce-dark [data-view="views/shared/Page"] {
     font-weight: 400;
 }
 
+.csc-card-meta-sep {
+    color: var(--faint-color);
+    margin: 0 1px;
+}
+
+.csc-card-tagline {
+    display: block;
+    font-size: 12.5px;
+    color: var(--faint-color);
+    line-height: 1.3;
+    margin-top: 1px;
+    font-weight: 400;
+}
+
 .csc-card-aliases {
     display: block;
-    font-size: 11px;
+    font-size: 12px;
     color: var(--muted-color);
     opacity: 0.7;
     line-height: 1.3;
@@ -1119,33 +1109,51 @@ html.dce-dark [data-view="views/shared/Page"] {
 
 /* ===== CSC Card Description ===== */
 .csc-card-description {
-    flex: 1;
-    padding: 0 22px;
-    font-size: 13px;
-    line-height: 1.65;
+    padding: 4px 20px 0;
+    font-size: 13.5px;
+    line-height: 1.6;
     color: var(--card-desc-color);
 }
 
 .csc-card-description p {
     margin: 0;
     display: -webkit-box;
-    -webkit-line-clamp: 3;
+    -webkit-line-clamp: 4;
     -webkit-box-orient: vertical;
     overflow: hidden;
+}
+
+/* ===== CSC Card Value Proposition ===== */
+.csc-card-value-prop {
+    margin: 8px 20px 0;
+    font-size: 12.5px;
+    line-height: 1.5;
+    color: #1a7f3d;
+    font-weight: 500;
+    font-style: italic;
+    padding: 6px 10px;
+    background: var(--vp-bg, #f0f9ff);
+    border-left: 3px solid var(--vp-color, #1a7f3d);
+    border-radius: 0 4px 4px 0;
+}
+:root.dce-dark .csc-card-value-prop {
+    color: #66bb6a;
+    background: rgba(102, 187, 106, 0.08);
+    border-left-color: #66bb6a;
 }
 
 /* ===== CSC Card Footer ===== */
 .csc-card-footer {
     display: flex;
     align-items: center;
-    justify-content: flex-end;
+    justify-content: flex-start;
     flex-wrap: wrap;
     gap: 8px;
-    padding: 14px 22px;
+    padding: 12px 20px;
     border-top: 1px solid var(--card-footer-border);
     margin-top: auto;
     background: var(--card-footer-bg);
-    border-radius: 0 0 14px 14px;
+    border-radius: 0 0 10px 10px;
 }
 
 /* ===== Split Launch Button & Dropdown ===== */
@@ -1221,7 +1229,7 @@ html.dce-dark [data-view="views/shared/Page"] {
     justify-content: center;
     gap: 4px;
     padding: 6px 14px;
-    font-size: 12px;
+    font-size: 13px;
     font-weight: 600;
     border-radius: 5px;
     cursor: pointer;
@@ -1269,14 +1277,15 @@ html.dce-dark [data-view="views/shared/Page"] {
 }
 
 .csc-btn-upgrade {
-    background: transparent;
-    color: #b45400;
-    border: 1px solid #d4a574;
+    background: linear-gradient(135deg, #e65100, #ff8f00);
+    color: #ffffff;
+    border: 1px solid #e65100;
+    font-weight: 700;
 }
 
 .csc-btn-upgrade:hover {
-    background: #b45400;
-    border-color: #b45400;
+    background: linear-gradient(135deg, #bf4500, #e68200);
+    border-color: #bf4500;
     color: #ffffff;
 }
 
@@ -1321,12 +1330,13 @@ html.dce-dark [data-view="views/shared/Page"] {
     border-color: #2e9e56;
 }
 :root.dce-dark .csc-btn-upgrade {
-    color: #ffb74d;
-    border-color: #8a6530;
+    background: linear-gradient(135deg, #e65100, #ff8f00);
+    color: #ffffff;
+    border-color: #e65100;
 }
 :root.dce-dark .csc-btn-upgrade:hover {
-    background: #8a5500;
-    border-color: #8a5500;
+    background: linear-gradient(135deg, #bf4500, #e68200);
+    border-color: #bf4500;
     color: #fff;
 }
 :root.dce-dark .csc-btn-archived {
@@ -1739,6 +1749,107 @@ html.dce-dark [data-view="views/shared/Page"] {
     border-color: rgba(59, 130, 246, 0.25);
 }
 
+/* ── AI badge — purple gradient pill next to product name ── */
+.csc-ai-badge {
+    display: inline-flex;
+    align-items: center;
+    margin-left: 4px;
+    padding: 1px 7px;
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.3px;
+    color: #6d28d9;
+    background: linear-gradient(135deg, #ede9fe 0%, #f3e8ff 100%);
+    border: 1px solid #c4b5fd;
+    border-radius: 10px;
+    vertical-align: middle;
+    white-space: nowrap;
+    cursor: help;
+    position: relative;
+}
+.csc-ai-badge .csc-ai-tooltip {
+    display: none;
+    position: absolute;
+    left: 50%;
+    bottom: calc(100% + 8px);
+    transform: translateX(-50%);
+    background: #1e1b4b;
+    color: #ede9fe;
+    padding: 8px 12px;
+    border-radius: 8px;
+    font-size: 12px;
+    font-weight: 400;
+    letter-spacing: 0;
+    line-height: 1.4;
+    white-space: normal;
+    width: max-content;
+    max-width: 300px;
+    z-index: 9999;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.25);
+    pointer-events: none;
+}
+.csc-ai-badge .csc-ai-tooltip::after {
+    content: '';
+    position: absolute;
+    top: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    border: 6px solid transparent;
+    border-top-color: #1e1b4b;
+}
+.csc-ai-badge:hover .csc-ai-tooltip,
+.csc-ai-badge:focus .csc-ai-tooltip {
+    display: block;
+}
+:root.dce-dark .csc-ai-badge {
+    color: #a78bfa;
+    background: linear-gradient(135deg, rgba(109, 40, 217, 0.15) 0%, rgba(139, 92, 246, 0.1) 100%);
+    border-color: rgba(139, 92, 246, 0.3);
+}
+:root.dce-dark .csc-ai-badge .csc-ai-tooltip {
+    background: #312e81;
+    color: #e0e7ff;
+}
+:root.dce-dark .csc-ai-badge .csc-ai-tooltip::after {
+    border-top-color: #312e81;
+}
+
+/* ── AI filter pill — purple accent at end of sub-category pills ── */
+.csc-ai-pill {
+    border-color: #c4b5fd !important;
+    color: #6d28d9 !important;
+    background: linear-gradient(135deg, #f5f3ff 0%, #ede9fe 100%) !important;
+}
+.csc-ai-pill:hover {
+    border-color: #8b5cf6 !important;
+    background: linear-gradient(135deg, #ede9fe 0%, #ddd6fe 100%) !important;
+}
+.csc-ai-pill-active {
+    background: linear-gradient(135deg, #7c3aed 0%, #8b5cf6 100%) !important;
+    border-color: #7c3aed !important;
+    color: #fff !important;
+}
+.csc-ai-pill-active .csc-subcategory-count {
+    background: rgba(255, 255, 255, 0.25) !important;
+}
+:root.dce-dark .csc-ai-pill {
+    border-color: rgba(139, 92, 246, 0.4) !important;
+    color: #a78bfa !important;
+    background: linear-gradient(135deg, rgba(109, 40, 217, 0.12) 0%, rgba(139, 92, 246, 0.08) 100%) !important;
+}
+:root.dce-dark .csc-ai-pill:hover {
+    border-color: #8b5cf6 !important;
+    background: linear-gradient(135deg, rgba(109, 40, 217, 0.2) 0%, rgba(139, 92, 246, 0.15) 100%) !important;
+}
+:root.dce-dark .csc-ai-pill-active {
+    background: linear-gradient(135deg, #7c3aed 0%, #8b5cf6 100%) !important;
+    border-color: #7c3aed !important;
+    color: #fff !important;
+}
+:root.dce-dark .csc-ai-pill-active .csc-subcategory-count {
+    background: rgba(255, 255, 255, 0.2) !important;
+}
+
 /* Alert Actions filter pill — dark mode overrides */
 :root.dce-dark .csc-alert-filter-active {
     background: rgba(59, 130, 246, 0.18) !important;
@@ -1946,7 +2057,7 @@ a.csc-dep-name-link:hover {
     border-radius: 4px;
     overflow: hidden;
     border: 1px solid var(--card-border, #dce0e4);
-    font-size: 10px;
+    font-size: 11px;
     line-height: 1;
     vertical-align: middle;
     flex-shrink: 0;
@@ -2217,7 +2328,7 @@ a.csc-dep-name-link:hover {
     gap: 8px;
     cursor: pointer;
     user-select: none;
-    font-size: 12px;
+    font-size: 13px;
     color: var(--faint-color, #888);
     line-height: 1.4;
 }
@@ -2539,12 +2650,10 @@ a.csc-dep-name-link:hover {
 .lab-dismiss { background: none; border: none; color: var(--legacy-banner-dismiss); font-size: 16px; cursor: pointer; padding: 4px; line-height: 1; flex-shrink: 0; }
 .lab-dismiss:hover { color: var(--legacy-banner-strong); }
 
-/* Feedback button (legacy) — commented out until wired in
 .feedback-btn { margin-top: 4px; padding: 5px 14px; font-size: 12px; font-weight: 600; color: #fff; background: linear-gradient(135deg, #1a1a2e, #0f3460); border: none; border-radius: 14px; cursor: pointer; white-space: nowrap; }
 .feedback-btn:hover { opacity: 0.85; }
-*/
 
-/* ── Floating "Give Feedback" tab (right edge) — commented out until wired in
+/* ── Floating "Give Feedback" tab (right edge) ── */
 .scan-feedback-tab {
     position: fixed;
     right: 0;
@@ -2580,7 +2689,6 @@ a.csc-dep-name-link:hover {
 }
 .scan-feedback-tab-text {
 }
-*/
 
 /* ── Dependency Tab Bar (SC4S Standard / High-Scale) ── */
 .csc-dep-tabs {
@@ -3559,26 +3667,23 @@ a.csc-dep-name-link:hover {
 /* ─── Dark mode card enhancements ─── */
 :root.dce-dark .csc-card {
     box-shadow:
-        0 1px 2px rgba(0, 0, 0, 0.12),
-        0 4px 16px rgba(0, 0, 0, 0.25),
-        0 0 0 1px rgba(255, 255, 255, 0.04);
+        rgba(0,0,0,0.3) 0px 2px 8px,
+        rgba(0,0,0,0.2) 0px 0px 1px;
 }
 :root.dce-dark .csc-card:hover {
     box-shadow:
-        0 6px 16px rgba(0, 0, 0, 0.2),
-        0 16px 40px rgba(0, 0, 0, 0.35),
-        0 0 0 1px rgba(4, 159, 217, 0.15);
-    border-color: rgba(4, 159, 217, 0.3);
+        rgba(0,0,0,0.4) 0px 6px 20px,
+        rgba(0,0,0,0.25) 0px 0px 2px;
 }
 :root.dce-dark .csc-card::before {
-    background: linear-gradient(90deg, var(--card-border) 0%, rgba(4, 159, 217, 0.2) 50%, var(--card-border) 100%);
+    background: var(--card-border);
 }
 :root.dce-dark .csc-card:hover::before {
-    background: linear-gradient(90deg, #049fd9 0%, #6abf4b 50%, #049fd9 100%);
+    background: var(--card-border);
 }
 :root.dce-dark .csc-icon-placeholder {
-    background: rgba(4, 159, 217, 0.08);
-    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+    background: transparent;
+    box-shadow: none;
 }
 :root.dce-dark .csc-card-footer {
     background: var(--card-footer-bg);

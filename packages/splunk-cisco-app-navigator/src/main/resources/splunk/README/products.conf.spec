@@ -63,6 +63,14 @@ subcategory = <string>
 * Networking: campus_wireless | routing_wan | data_center_net
 * Omit for categories with too few products (collaboration, observability, deprecated).
 
+ai_enabled = true|false
+* Whether this product leverages AI technologies.
+* Products with ai_enabled = true show an AI badge on the card and appear in the AI filter pill.
+
+ai_description = <string>
+* Brief description of how AI is used in this product.
+* Shown as a tooltip when hovering over the AI badge or filter pill.
+
 addon_label = <string>
 * Human-readable label for the required add-on (e.g. "Cisco Security Cloud").
 
@@ -172,6 +180,11 @@ custom_dashboard = <string>
 
 icon_emoji = <string>
 * Emoji or short text used as the card icon placeholder.
+
+icon_svg = <string>
+* Base name of the SVG icon file (without .svg extension) in appserver/static/icons/.
+* The app loads icons/<value>.svg in light mode and icons/<value>_white.svg in dark mode.
+* Example: icon_svg = firewall  →  icons/firewall.svg / icons/firewall_white.svg
 
 aliases = <comma-separated list>
 * Comma-separated former/alternate product names (e.g. "IronPort Email Security,Email Security Appliance").
