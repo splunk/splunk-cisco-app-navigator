@@ -1,14 +1,12 @@
 # Build outputs
-packages/cisco-control-center-app/stage/
-packages/cisco-control-center-app/cisco-control-center-app/
-packages/cisco-control-center-app/*.tar.gz
+packages/splunk-cisco-app-navigator/stage/
+packages/splunk-cisco-app-navigator/*.tar.gz
 
 # Dependencies
 node_modules/
 
 # OS
 .DS_Store
-**/.DS_Store
 Thumbs.db
 
 # Python
@@ -20,12 +18,17 @@ __pycache__/
 # Editor
 .idea/
 *.swp
-*.swo
 
 # Splunk local overrides (never commit)
 **/local/
-**/local.meta
 ~$*
-docs/chat_history_recovered.md
-# backups/
+
+# Backups
 backups/
+
+# Docs — generated presentations, chat history, binaries
+docs/
+scripts/
+# .github/copilot-instructions.md
+.vscode/settings.json
+/cisco

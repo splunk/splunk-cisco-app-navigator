@@ -1,0 +1,73 @@
+<nav search_view="search" color="#049fd9">
+    <view name="products" default="true" label="Cisco Products" />
+
+    <collection label="Reports">
+
+      <!-- ── Ecosystem Overview ── -->
+      <collection label="Ecosystem Overview">
+        <saved name="SCAN - Ecosystem Summary" />
+        <saved name="SCAN - All Apps and Add-ons Involved" />
+        <saved name="SCAN - Product Catalog - Full Dump" />
+      </collection>
+
+      <!-- ── Catalog Analysis ── -->
+      <collection label="Catalog Analysis">
+        <saved name="SCAN - Product Catalog - By Category" />
+        <saved name="SCAN - Product Catalog - By Add-on Family" />
+        <saved name="SCAN - Sourcetype Coverage" />
+        <saved name="SCAN - SOAR Connector Inventory" />
+        <saved name="SCAN - Products with Prerequisites" />
+        <saved name="SCAN - Data Quality - Missing Fields Audit" />
+      </collection>
+
+      <!-- ── Migration &amp; Legacy ── -->
+      <collection label="Migration &amp; Legacy">
+        <saved name="SCAN - Legacy App Inventory" />
+        <saved name="SCAN - CSV - Archived App Inventory" />
+        <saved name="SCAN - CSV - Deprecated Migration Map" />
+        <saved name="SCAN - Gap Analysis - CSV vs Catalog" />
+      </collection>
+
+      <!-- ── Installation &amp; Deployment ── -->
+      <collection label="Installation &amp; Deployment">
+        <saved name="SCAN - Installed Apps vs Catalog" />
+        <saved name="SCAN - Installed vs CSV - Full Estate Audit" />
+        <saved name="SCAN - CSV - Deployment Readiness" />
+        <saved name="SCAN - CSV - Platform Compatibility Matrix" />
+        <saved name="SCAN - CSV - Install Footprint by Category" />
+      </collection>
+
+      <!-- ── Splunkbase Intelligence ── -->
+      <collection label="Splunkbase Intelligence">
+        <saved name="SCAN - CSV - Splunkbase Ecosystem Overview" />
+        <saved name="SCAN - CSV - Cisco Category Breakdown" />
+        <saved name="SCAN - CSV - Support Level Distribution" />
+        <saved name="SCAN - CSV - Support x Category Heatmap" />
+        <saved name="SCAN - CSV - Download Popularity Ranking" />
+        <saved name="SCAN - CSV - Top Rated Apps" />
+      </collection>
+
+      <!-- ── Versions &amp; Compliance ── -->
+      <collection label="Versions &amp; Compliance">
+        <saved name="SCAN - CSV - Version and Update Tracker" />
+        <saved name="SCAN - CSV - App Age Analysis" />
+        <saved name="SCAN - CSV - Splunk Version Compatibility" />
+        <saved name="SCAN - CSV - CIM Compatibility Report" />
+        <saved name="SCAN - CSV - Validation and AppInspect Status" />
+        <saved name="SCAN - CSV - Compliance Status (FedRAMP and FIPS)" />
+      </collection>
+
+      <!-- ── Data Coverage ── -->
+      <collection label="Data Coverage">
+        <saved name="SCAN - CSV - Sourcetype Cross-Reference" />
+        <saved name="SCAN - CSV - Cisco Products Coverage Matrix" />
+      </collection>
+
+      <divider />
+      <a href="/app/splunk-cisco-app-navigator/reports" target="_blank">All Reports ↗</a>
+
+    </collection>
+
+    <a href="search" target="_blank" rel="noopener"></a>
+    <view name="datasets" />
+</nav>

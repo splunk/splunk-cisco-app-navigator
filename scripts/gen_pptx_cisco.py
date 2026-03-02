@@ -237,7 +237,7 @@ agenda_items = [
     "3.  Stakeholder Feedback — Top 12 Challenges & The Magic 6",
     "4.  Option 1: Hire & Build — Doesn't Scale",
     "5.  Option 2: Super App Bundling — Right Direction, Still Expensive",
-    "6.  Two Deliverables — Quick Win (CCC) + Strategic Play (Super App)",
+    "6.  Two Deliverables — Quick Win (SCAN) + Strategic Play (Super App)",
     "7.  The AI-Powered Path Forward",
     "8.  Next Steps & Roadmap",
 ]
@@ -289,7 +289,7 @@ add_table(slide, 0.2, 3.15, 12.9, insights_data, col_widths=[0.4, 2.8, 4.5, 4.8]
 # Punchline
 add_rounded_rect(slide, 0.2, 6.15, 12.9, 0.5, PURPLE,
                  '74% of Cisco\u2019s Splunkbase ecosystem is non-functional, unsupported, or flagged.  '
-                 'CCC is the aspirin. The Super App is the cure.', 11, WHITE)
+                 'SCAN is the aspirin. The Super App is the cure.', 11, WHITE)
 
 # Financial impact
 add_text_box(slide, 0.35, 6.75, 12.6, 0.3,
@@ -542,9 +542,9 @@ for ph in slide.placeholders:
         for p in ph.text_frame.paragraphs:
             p.font.color.rgb = CISCO_BLUE
 
-# CCC (left)
+# SCAN (left)
 add_rounded_rect(slide, 0.35, 1.2, 6.0, 0.9, WARN_AMBER,
-                 'DELIVERABLE 1: Cisco Control Center (CCC)\n"The Front Door"  \u2022  Ships in Weeks', 14, BLACK)
+                 'DELIVERABLE 1: Splunk Cisco App Navigator (SCAN)\n"The Front Door"  \u2022  Ships in Weeks', 14, BLACK)
 ccc_items = [
     "\u2705  Catalog 57 products with correct add-on for each",
     "\u2705  Monitor 321 sourcetypes \u2014 Proof of Innocence (MTTI)",
@@ -554,7 +554,7 @@ ccc_items = [
     "\u2705  Platform-aware guidance (Cloud vs Enterprise)",
     "",
     '\u201cThe network is innocent until proven guilty \u2014',
-    'CCC provides the proof in seconds.\u201d',
+    'SCAN provides the proof in seconds.\u201d',
     "Lightweight: no conf generation, no data collection",
     "Splunkbase in 2\u20133 weeks (AppInspect + packaging)",
 ]
@@ -580,12 +580,12 @@ add_bullet_list(slide, 7.1, 2.25, 5.7, 3.5, sa_items, font_size=11, color=DARK_T
 
 # Aspirin / Cure tagline
 add_text_box(slide, 0.35, 5.3, 12.6, 0.5,
-             'CCC is the aspirin.  The Super App is the cure.',
+             'SCAN is the aspirin.  The Super App is the cure.',
              font_size=20, bold=True, color=CISCO_BLUE, alignment=PP_ALIGN.CENTER)
 
 # Comparison table
 compare_data = [
-    ["", "CCC (Quick Win)", "Super App (Strategic)"],
+    ["", "SCAN (Quick Win)", "Super App (Strategic)"],
     ["Purpose", "Guide to the right TA", "Replace legacy TAs entirely"],
     ["Ships", "2\u20133 weeks", "3\u20136 months (v1)"],
     ["Customer value", "What do I install?", "One app, activate what I need"],
@@ -655,7 +655,7 @@ for i, color in enumerate(ap_colors):
 options_data = [
     ["", "Option 1: Hire", "Option 2: Static", "Our Approach"],
     ["Architecture", "1 TA per product", "Bundled, static", "Dynamic Super App + DCE"],
-    ["Intelligence", "None", "None", "CCC + MTTI"],
+    ["Intelligence", "None", "None", "SCAN + MTTI"],
     ["AI authoring", "No", "No", "AI drafts, humans validate"],
     ["Cost", "$$$$$ (100+ eng-yrs)", "$$$ (6\u20138 eng-yrs)", "$ (<1 eng-yr)"],
     ["Speed", "3\u20134 months/TA", "2\u20133 months", "2\u20133 weeks"],
@@ -673,7 +673,7 @@ set_title(slide, "8. Next Steps & Roadmap")
 
 actions_data = [
     ["#", "Action", "Owner", "Timeline"],
-    ["1", "Ship CCC to Splunkbase \u2014 package, AppInspect, certify", "AK", "2\u20133 weeks"],
+    ["1", "Ship SCAN to Splunkbase \u2014 package, AppInspect, certify", "AK", "2\u20133 weeks"],
     ["2", "Expand Super App Master Library (next 5 products)", "AK + HCL", "0\u20133 months"],
     ["3", "Pilot AI-assisted TA authoring on 3 products", "AK + HCL", "0\u20133 months"],
     ["\u26a0", "DECISION: Approve FDSE partnership (Rafal Piekarz) for AI-driven TA maintenance", "Alan / Exec", "This quarter"],
@@ -694,7 +694,7 @@ add_text_box(slide, 0.5, 4.5, 3.5, 0.4, 'Phase 1: "Stop the Bleeding"',
 add_text_box(slide, 0.5, 4.9, 3.5, 0.3, '0\u20133 months  \u2022  Immediate Visibility',
              font_size=10, color=RGBColor(0x55, 0x55, 0x55))
 add_bullet_list(slide, 0.5, 5.3, 3.5, 1.5, [
-    "Ship CCC to Splunkbase", "Expand Master Library to 12+",
+    "Ship SCAN to Splunkbase", "Expand Master Library to 12+",
     "Pilot AI authoring w/ FDSE", "Migrate top 10 legacy offenders",
 ], font_size=10, color=BLACK, spacing=Pt(3))
 
@@ -717,7 +717,7 @@ add_text_box(slide, 8.9, 4.9, 3.9, 0.3, '6\u201312 months  \u2022  Strategic Dif
              font_size=10, color=RGBColor(0xBB, 0xDE, 0xFB))
 add_bullet_list(slide, 8.9, 5.3, 3.9, 1.5, [
     "Full CDF/MDL integration", "MCP-driven AI features",
-    "200+ data sources covered", 'CCC + Super App = "One Cisco"',
+    "200+ data sources covered", 'SCAN + Super App = "One Cisco"',
 ], font_size=10, color=WHITE, spacing=Pt(3))
 
 # Arrows between phases
@@ -743,8 +743,8 @@ add_text_box(slide, 0.35, 0.3, 12.6, 0.7, "Summary",
 summary_data = [
     ["The Problem", "Our Answer"],
     ["110 apps, customers confused", "CCC: ships in weeks, shows the right answer"],
-    ["Blank dashboards, no validation", "CCC monitors 321 sourcetypes; Super App activates what has data"],
-    ["Legacy apps cause conflicts", "CCC detects 93 legacy; Super App replaces entirely"],
+    ["Blank dashboards, no validation", "SCAN monitors 321 sourcetypes; Super App activates what has data"],
+    ["Legacy apps cause conflicts", "SCAN detects 93 legacy; Super App replaces entirely"],
     ["TAs cost 3\u20134 months each", "AI authoring: 2\u20133 weeks per product"],
     ["Can't hire (400 = 133 eng-yrs)", "AI drafts, humans validate, Super App scales"],
     ["Static Super Apps have regression risk", "DCE: each product is an isolated mini-TA"],
@@ -763,7 +763,7 @@ shape.fill.fore_color.rgb = MED_GRAY
 shape.line.fill.background()
 
 add_rounded_rect(slide, 5.1, 5.4, 3.5, 1.2, WARN_AMBER,
-                 'QUICK WIN: CCC\n"The Front Door"\nShips in weeks', 13, BLACK)
+                 'QUICK WIN: SCAN\n"The Front Door"\nShips in weeks', 13, BLACK)
 shape2 = slide.shapes.add_shape(MSO_SHAPE.RIGHT_ARROW, Inches(8.7), Inches(5.7), Inches(0.6), Inches(0.4))
 shape2.fill.solid()
 shape2.fill.fore_color.rgb = MED_GRAY
@@ -800,10 +800,10 @@ add_table(slide, 0.2, 1.1, 12.9, endorse_data, col_widths=[2.0, 3.5, 7.0],
           header_color=CISCO_BLUE, font_size=10)
 
 add_text_box(slide, 0.35, 5.7, 12.6, 0.5,
-             "Feedback unanimously supports the CCC + Dynamic Super App strategy.",
+             "Feedback unanimously supports the SCAN + Dynamic Super App strategy.",
              font_size=16, bold=True, color=SPLUNK_GREEN, alignment=PP_ALIGN.CENTER)
 add_text_box(slide, 0.35, 6.2, 12.6, 0.5,
-             'CCC is the aspirin. The Super App is the cure.',
+             'SCAN is the aspirin. The Super App is the cure.',
              font_size=22, bold=True, color=CISCO_BLUE, alignment=PP_ALIGN.CENTER)
 
 
