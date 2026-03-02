@@ -31,3 +31,4 @@ docs/
 scripts/
 # .github/copilot-instructions.md
 .vscode/settings.json
+/cisco

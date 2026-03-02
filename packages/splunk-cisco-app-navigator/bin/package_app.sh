@@ -7,7 +7,16 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 PKG_ROOT="${SCRIPT_DIR}/.."
 STAGE_DIR="${PKG_ROOT}/stage"
 APP_NAME="splunk-cisco-app-navigator"
-PKG_PATH="${PKG_ROOT}/${APP_NAME}.tar.gz"
+
+# Read version from app.conf (source of truth)
+APP_CONF="${PKG_ROOT}/src/main/resources/splunk/default/app.conf"
+VERSION=$(grep -E '^\s*version\s*=' "$APP_CONF" | head -1 | sed 's/.*=\s*//' | xargs)
+if [[ -z "$VERSION" ]]; then
+  echo "ERROR: Could not read version from app.conf" >&2
+  exit 1
+fi
+
+PKG_PATH="${PKG_ROOT}/${APP_NAME}-${VERSION}.tar.gz"
 
 if [[ ! -d "$STAGE_DIR" ]]; then
   echo "stage/ not found; running clean:build first..."

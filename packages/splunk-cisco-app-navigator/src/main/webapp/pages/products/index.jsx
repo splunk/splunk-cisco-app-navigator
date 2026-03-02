@@ -877,39 +877,56 @@ function BestPracticesModal({ open, onClose, product, platformType }) {
 
 // ────────────────────  LEGACY AUDIT MODAL  ───────────────────────
 
-function LegacyAuditModal({ open, onClose, legacyApps, onMigrate }) {
+function LegacyAuditModal({ open, onClose, legacyApps, installedApps, onMigrate }) {
     const returnFocusRef = useRef(null);
     if (!open) return null;
 
-    const activeApps = (legacyApps || []).filter(a => a.status !== 'archived');
-    const archivedApps = (legacyApps || []).filter(a => a.status === 'archived');
+    const allApps = legacyApps || [];
+    const activeApps = allApps.filter(a => a.status !== 'archived');
+    const archivedApps = allApps.filter(a => a.status === 'archived');
+    const installedCount = allApps.filter(a => installedApps && installedApps[a.app_id]).length;
 
-    const renderCard = (app, isArchived) => (
-        <div key={app.app_id} className={isArchived ? 'csc-legacy-card csc-legacy-archived' : 'csc-legacy-card csc-legacy-active'}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                <strong>{app.display_name || app.app_id}</strong>
-                <span className={isArchived ? 'csc-legacy-status-badge csc-legacy-status-archived' : 'csc-legacy-status-badge csc-legacy-status-active'}>
-                    {isArchived ? '📦 Archived' : '⚠️ Active'}
-                </span>
-            </div>
-            <div style={{ fontSize: '12px', marginTop: '4px' }}>
-                <code style={{ background: 'var(--legacy-enabled-code-bg, #f5f5f5)', padding: '1px 4px', borderRadius: '3px' }}>{app.app_id}</code>
-            </div>
-            {app.addon_splunkbase_url && (
-                <div style={{ marginTop: '6px' }}>
-                    <a href={app.addon_splunkbase_url} target="_blank" rel="noopener noreferrer" style={{ fontSize: '12px' }}>
-                        {isArchived ? 'View on Splunkbase (archived) →' : 'View on Splunkbase →'}
-                    </a>
+    const renderCard = (app, isArchived) => {
+        const isInstalled = installedApps && installedApps[app.app_id];
+        return (
+            <div key={app.app_id} className={isArchived ? 'csc-legacy-card csc-legacy-archived' : 'csc-legacy-card csc-legacy-active'}
+                 style={isInstalled ? { borderLeft: '4px solid #d41029' } : {}}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '4px' }}>
+                    <strong>{app.display_name || app.app_id}</strong>
+                    <div style={{ display: 'flex', gap: '6px', alignItems: 'center' }}>
+                        {isInstalled && (
+                            <span className="csc-legacy-status-badge" style={{
+                                background: '#d41029', color: '#fff', fontWeight: 700, fontSize: '11px',
+                                padding: '2px 8px', borderRadius: '4px'
+                            }}>🔴 Installed</span>
+                        )}
+                        <span className={isArchived ? 'csc-legacy-status-badge csc-legacy-status-archived' : 'csc-legacy-status-badge csc-legacy-status-active'}>
+                            {isArchived ? '📦 Archived' : '⚠️ Active'}
+                        </span>
+                    </div>
                 </div>
-            )}
-        </div>
-    );
+                <div style={{ fontSize: '12px', marginTop: '4px' }}>
+                    <code style={{ background: 'var(--legacy-enabled-code-bg, #f5f5f5)', padding: '1px 4px', borderRadius: '3px' }}>{app.app_id}</code>
+                    {isInstalled && (
+                        <span style={{ marginLeft: '8px', fontSize: '11px', color: '#d41029', fontWeight: 600 }}>← remove this app</span>
+                    )}
+                </div>
+                {app.addon_splunkbase_url && (
+                    <div style={{ marginTop: '6px' }}>
+                        <a href={app.addon_splunkbase_url} target="_blank" rel="noopener noreferrer" style={{ fontSize: '12px' }}>
+                            {isArchived ? 'View on Splunkbase (archived) →' : 'View on Splunkbase →'}
+                        </a>
+                    </div>
+                )}
+            </div>
+        );
+    };
 
     return (
         <Modal open={true} returnFocus={returnFocusRef} onRequestClose={onClose} style={{ maxWidth: '720px' }}>
             <Modal.Header title="Legacy Debt Audit Report" />
             <Modal.Body>
-                {!legacyApps || legacyApps.length === 0
+                {allApps.length === 0
                     ? (
                         <div style={{ padding: '20px', textAlign: 'center' }}>
                             <span style={{ fontSize: '48px' }}>✅</span>
@@ -918,8 +935,30 @@ function LegacyAuditModal({ open, onClose, legacyApps, onMigrate }) {
                     )
                     : (
                         <div>
+                            {/* ── Summary bar ── */}
+                            <div style={{
+                                display: 'flex', gap: '12px', marginBottom: '16px', flexWrap: 'wrap', alignItems: 'center'
+                            }}>
+                                <span style={{
+                                    fontSize: '13px', padding: '4px 12px', borderRadius: '12px',
+                                    background: installedCount > 0 ? '#fce4ec' : '#e8f5e9',
+                                    color: installedCount > 0 ? '#c62828' : '#2e7d32', fontWeight: 600
+                                }}>
+                                    {installedCount > 0
+                                        ? `🔴 ${installedCount} installed on this instance`
+                                        : '✅ None installed on this instance'}
+                                </span>
+                                <span style={{
+                                    fontSize: '13px', padding: '4px 12px', borderRadius: '12px',
+                                    background: 'var(--legacy-summary-bg, #f5f5f5)',
+                                    color: 'var(--muted-color, #666)'
+                                }}>
+                                    {allApps.length} total legacy app{allApps.length !== 1 ? 's' : ''} cataloged
+                                </span>
+                            </div>
+
                             <p style={{ fontSize: '13px', color: 'var(--muted-color, #666)', marginBottom: '16px' }}>
-                                The following legacy Cisco apps were detected. Disable and remove them before using the recommended add-on.
+                                Legacy Cisco apps that should be replaced by the recommended add-on. Apps marked <strong style={{ color: '#d41029' }}>Installed</strong> were detected on this Splunk instance.
                             </p>
 
                             {/* ── Active Legacy Apps ── */}
@@ -1321,7 +1360,7 @@ function ProductCard({ product, installedApps, appStatuses, sourcetypeData, isCo
                             const aiText = product.ai_description || 'This product leverages AI technologies';
                             return (
                                 <span className="csc-ai-badge csc-ai-badge-hover" tabIndex={0} aria-label={aiText}>
-                                    🤖 AI
+                                    <img src={createURL(`/static/app/${APP_ID}/icons/cat-ai.svg`)} alt="" style={{ width: '14px', height: '14px', verticalAlign: '-2px' }} /> AI
                                     <span className="csc-ai-tooltip">{aiText}</span>
                                 </span>
                             );
@@ -3143,7 +3182,17 @@ function PersonaModal({ open, onClose, onSelectPersona, products }) {
 // ──────────────────────  CATEGORY FILTER  ────────────────────
 
 function CategoryFilterBar({ selectedCategory, onSelectCategory, selectedSubCategory, onSelectSubCategory, aiFilter, onToggleAiFilter, categoryCounts, products }) {
-    const iconMap = { shield: '🛡️', chart: '📊', globe: '🌐', headset: '🎧', archive: '📦' };
+    // Cisco official category SVG icons (from cisco.com CDN)
+    const catIconMap = { security: 'cat-security', observability: 'cat-observability', networking: 'cat-networking', collaboration: 'cat-collaboration' };
+    const renderCatIcon = (catId, active) => {
+        const svgName = catIconMap[catId];
+        if (!svgName) return null;
+        return React.createElement('img', {
+            src: createURL(`/static/app/${APP_ID}/icons/${svgName}.svg`),
+            alt: '',
+            style: { width: '18px', height: '18px', filter: active ? 'brightness(0) saturate(100%) invert(15%) sepia(70%) saturate(6000%) hue-rotate(200deg)' : 'none', transition: 'filter 0.2s' },
+        });
+    };
     const btnStyle = (active, variant) => {
         const isAmber = variant === 'soar';
         const isTeal = variant === 'alert';
@@ -3196,7 +3245,7 @@ function CategoryFilterBar({ selectedCategory, onSelectCategory, selectedSubCate
                 const active = selectedCategory === cat.id;
                 return (
                     <button key={cat.id} onClick={() => onSelectCategory(cat.id)} title={cat.description} style={btnStyle(active)}>
-                        {iconMap[cat.icon] || '📁'} {cat.name}
+                        {renderCatIcon(cat.id, active) || '📁'} {cat.name}
                         {categoryCounts?.[cat.id] != null && (
                             <span style={{
                                 fontSize: '10px',
@@ -3212,13 +3261,13 @@ function CategoryFilterBar({ selectedCategory, onSelectCategory, selectedSubCate
             {/* ── Secure Networking GTM cross-cutting filter ── */}
             {secNetCount > 0 && (
                 <>
-                    <span style={{ width: '1px', height: '24px', background: 'var(--card-border, #ddd)', flexShrink: 0 }} />
+                    <span style={{ width: '2px', height: '28px', background: 'var(--pill-divider, #b0b0b0)', flexShrink: 0, margin: '0 4px', borderRadius: '1px' }} />
                     <button
                         onClick={() => onSelectCategory(selectedCategory === 'secure_networking' ? null : 'secure_networking')}
                         title="Cisco Secure Networking GTM — show products in the Secure Networking go-to-market strategy"
                         style={btnStyle(selectedCategory === 'secure_networking', 'secnet')}
                     >
-                        🔐 Secure Networking
+                        <img src={createURL(`/static/app/${APP_ID}/icons/cat-secnet.svg`)} alt="" style={{ width: '16px', height: '16px', verticalAlign: '-3px' }} /> Secure Networking GTM
                         <span style={{
                             fontSize: '10px',
                             background: selectedCategory === 'secure_networking' ? 'rgba(255,255,255,0.25)' : 'var(--version-bg, #e8e8e8)',
@@ -3232,14 +3281,14 @@ function CategoryFilterBar({ selectedCategory, onSelectCategory, selectedSubCate
             {/* ── SOAR cross-cutting filter ── */}
             {soarCount > 0 && (
                 <>
-                    <span style={{ width: '1px', height: '24px', background: 'var(--card-border, #ddd)', flexShrink: 0 }} />
+                    <span style={{ width: '2px', height: '28px', background: 'var(--pill-divider, #b0b0b0)', flexShrink: 0, margin: '0 4px', borderRadius: '1px' }} />
                     <button
                         className={selectedCategory === 'soar' ? 'csc-soar-filter-active' : ''}
                         onClick={() => onSelectCategory(selectedCategory === 'soar' ? null : 'soar')}
                         title="Show only products with Splunk SOAR connectors available"
                         style={btnStyle(selectedCategory === 'soar', 'soar')}
                     >
-                        ⚡ SOAR
+                        <img src={createURL(`/static/app/${APP_ID}/icon-soar.svg`)} alt="" style={{ width: '16px', height: '16px', verticalAlign: '-3px' }} /> SOAR
                         <span className={selectedCategory === 'soar' ? 'csc-soar-filter-count' : ''} style={{
                             fontSize: '10px',
                             background: selectedCategory === 'soar' ? 'rgba(146,64,14,0.15)' : 'var(--version-bg, #e8e8e8)',
@@ -3253,14 +3302,14 @@ function CategoryFilterBar({ selectedCategory, onSelectCategory, selectedSubCate
             {/* ── Alert Actions cross-cutting filter ── */}
             {alertCount > 0 && (
                 <>
-                    {soarCount === 0 && <span style={{ width: '1px', height: '24px', background: 'var(--card-border, #ddd)', flexShrink: 0 }} />}
+                    {soarCount === 0 && <span style={{ width: '2px', height: '28px', background: 'var(--pill-divider, #b0b0b0)', flexShrink: 0, margin: '0 4px', borderRadius: '1px' }} />}
                     <button
                         className={selectedCategory === 'alert_actions' ? 'csc-alert-filter-active' : ''}
                         onClick={() => onSelectCategory(selectedCategory === 'alert_actions' ? null : 'alert_actions')}
                         title="Show only products with custom alert actions available"
                         style={btnStyle(selectedCategory === 'alert_actions', 'alert')}
                     >
-                        🔔 Alert Actions
+                        <img src={createURL(`/static/app/${APP_ID}/icons/cat-alert.svg`)} alt="" style={{ width: '16px', height: '16px', verticalAlign: '-3px' }} /> Alert Actions
                         <span className={selectedCategory === 'alert_actions' ? 'csc-alert-filter-count' : ''} style={{
                             fontSize: '10px',
                             background: selectedCategory === 'alert_actions' ? 'rgba(30,64,175,0.12)' : 'var(--version-bg, #e8e8e8)',
@@ -3274,13 +3323,13 @@ function CategoryFilterBar({ selectedCategory, onSelectCategory, selectedSubCate
             {/* ── AI-Powered cross-cutting filter ── */}
             {aiPoweredCount > 0 && (
                 <>
-                    <span style={{ width: '1px', height: '24px', background: 'var(--card-border, #ddd)', flexShrink: 0 }} />
+                    <span style={{ width: '2px', height: '28px', background: 'var(--pill-divider, #b0b0b0)', flexShrink: 0, margin: '0 4px', borderRadius: '1px' }} />
                     <button
                         onClick={() => onSelectCategory(selectedCategory === 'ai_powered' ? null : 'ai_powered')}
                         title="Show products that leverage AI/ML technologies"
                         style={btnStyle(selectedCategory === 'ai_powered', 'ai')}
                     >
-                        🤖 AI-Powered
+                        <img src={createURL(`/static/app/${APP_ID}/icons/cat-ai.svg`)} alt="" style={{ width: '16px', height: '16px', verticalAlign: '-2px' }} /> AI-Powered
                         <span style={{
                             fontSize: '10px',
                             background: selectedCategory === 'ai_powered' ? 'rgba(91,33,182,0.12)' : 'var(--version-bg, #e8e8e8)',
@@ -3336,7 +3385,7 @@ function CategoryFilterBar({ selectedCategory, onSelectCategory, selectedSubCate
                                 <button onClick={() => onToggleAiFilter(!aiFilter)}
                                     className={`csc-subcategory-pill csc-ai-pill ${aiFilter ? 'csc-ai-pill-active' : ''}`}
                                     title="Filter products that leverage AI technologies">
-                                    🤖 AI-Powered <span className="csc-subcategory-count">{aiCount}</span>
+                                    <img src={createURL(`/static/app/${APP_ID}/icons/cat-ai.svg`)} alt="" style={{ width: '14px', height: '14px', verticalAlign: '-2px' }} /> AI-Powered <span className="csc-subcategory-count">{aiCount}</span>
                                 </button>
                             </>
                         );
@@ -3355,7 +3404,7 @@ function CategoryFilterBar({ selectedCategory, onSelectCategory, selectedSubCate
                     <button onClick={() => onToggleAiFilter(!aiFilter)}
                         className={`csc-subcategory-pill csc-ai-pill ${aiFilter ? 'csc-ai-pill-active' : ''}`}
                         title="Filter products that leverage AI technologies">
-                        🤖 AI-Powered <span className="csc-subcategory-count">{aiCount}</span>
+                        <img src={createURL(`/static/app/${APP_ID}/icons/cat-ai.svg`)} alt="" style={{ width: '14px', height: '14px', verticalAlign: '-2px' }} /> AI-Powered <span className="csc-subcategory-count">{aiCount}</span>
                     </button>
                 </div>
             );
@@ -4116,6 +4165,7 @@ function SCANProductsPage() {
                 open={legacyModalOpen}
                 onClose={() => setLegacyModalOpen(false)}
                 legacyApps={legacyModalApps}
+                installedApps={installedApps}
             />
             {devMode && (
                 <ConfigViewerModal

@@ -80,6 +80,7 @@
     --dimmed-color: #999999;
     --card-bg: #ffffff;
     --card-border: #dce0e4;
+    --pill-divider: #b0b0b0;
     --card-shadow: rgba(0, 0, 0, 0.08);
     --card-shadow-hover: rgba(0, 0, 0, 0.12);
     --card-header-bg: #ffffff;
@@ -149,6 +150,7 @@
     --dimmed-color: #777777;
     --card-bg: #1e262c;
     --card-border: #333d44;
+    --pill-divider: #5a6570;
     --card-shadow: rgba(0, 0, 0, 0.3);
     --card-shadow-hover: rgba(0, 0, 0, 0.45);
     --card-header-bg: #1e262c;

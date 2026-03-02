@@ -14,6 +14,39 @@ const glob = require('glob');
 const cmd = process.argv[2] || 'build';
 const pkgRoot = path.join(__dirname, '..');
 
+// --- Pre-build: stamp build hash in app.conf ---
+function stampBuildHash() {
+  const appConfPath = path.join(pkgRoot, 'src/main/resources/splunk/default/app.conf');
+  if (!fs.existsSync(appConfPath)) return;
+
+  // Try git short hash first (matches existing format like 0689691d)
+  let buildHash;
+  try {
+    buildHash = execSync('git rev-parse --short=8 HEAD', { cwd: pkgRoot, stdio: 'pipe' })
+      .toString()
+      .trim();
+  } catch (_) {
+    // Fallback: date-based hex stamp (YYYYMMDD as hex-like 8 chars)
+    const now = new Date();
+    const pad = (n) => String(n).padStart(2, '0');
+    const stamp = `${now.getFullYear()}${pad(now.getMonth() + 1)}${pad(now.getDate())}`;
+    buildHash = parseInt(stamp, 10).toString(16).slice(0, 8);
+  }
+
+  let conf = fs.readFileSync(appConfPath, 'utf8');
+  const oldMatch = conf.match(/^build\s*=\s*(.+)$/m);
+  const oldHash = oldMatch ? oldMatch[1].trim() : null;
+
+  if (oldHash === buildHash) {
+    console.log(`\x1b[36m[build-stamp]\x1b[0m build = ${buildHash} (unchanged)`);
+    return;
+  }
+
+  conf = conf.replace(/^build\s*=\s*.+$/m, `build = ${buildHash}`);
+  fs.writeFileSync(appConfPath, conf, 'utf8');
+  console.log(`\x1b[36m[build-stamp]\x1b[0m build = ${buildHash}` + (oldHash ? ` (was ${oldHash})` : ''));
+}
+
 // --- Post-build: clear Splunk cache & refresh UI ---
 function postBuildRefresh() {
   const splunkHome = process.env.SPLUNK_HOME || '/opt/splunk';
@@ -62,6 +95,8 @@ function postBuildRefresh() {
 }
 
 if (cmd === 'build') {
+  // 0. Stamp build hash in app.conf (git short hash or date fallback)
+  stampBuildHash();
   // 1. Generate static catalog from products.conf
   const genResult = spawnSync('node', [path.join(pkgRoot, 'bin', 'generate-catalog.js')], {
     stdio: 'inherit',

@@ -2,8 +2,8 @@
 /**
  * AUTO-GENERATED from products.conf — DO NOT EDIT BY HAND.
  * Regenerate:  node bin/generate-catalog.js
- * Generated:   2026-03-01T21:25:39.239Z
- * Products:    77
+ * Generated:   2026-03-02T20:00:01.380Z
+ * Products:    78
  */
 
 export const PRODUCT_CATALOG = [
@@ -2187,7 +2187,7 @@ export const PRODUCT_CATALOG = [
     "dashboard": "dashboard",
     "custom_dashboard": "",
     "icon_emoji": "server",
-    "icon_svg": "workload",
+    "icon_svg": "cisco_rack_server",
     "aliases": [],
     "keywords": [
       "unified computing system",
@@ -2319,7 +2319,7 @@ export const PRODUCT_CATALOG = [
     "dashboard": "activity_monitor",
     "custom_dashboard": "",
     "icon_emoji": "satellite",
-    "icon_svg": "cloud_insights",
+    "icon_svg": "cisco_intersight_product",
     "aliases": [],
     "keywords": [
       "intersight",
@@ -2393,7 +2393,7 @@ export const PRODUCT_CATALOG = [
     "dashboard": "",
     "custom_dashboard": "",
     "icon_emoji": "wrench",
-    "icon_svg": "workload",
+    "icon_svg": "cisco_server",
     "aliases": [],
     "keywords": [
       "imc",
@@ -3013,7 +3013,7 @@ export const PRODUCT_CATALOG = [
     "dashboard": "",
     "custom_dashboard": "",
     "icon_emoji": "switch",
-    "icon_svg": "network_analytics",
+    "icon_svg": "cisco_switch",
     "aliases": [],
     "keywords": [
       "catalyst switch",
@@ -3157,7 +3157,7 @@ export const PRODUCT_CATALOG = [
     "dashboard": "",
     "custom_dashboard": "",
     "icon_emoji": "highway",
-    "icon_svg": "sase",
+    "icon_svg": "cisco_sdwan",
     "aliases": [
       "Viptela SD-WAN"
     ],
@@ -3429,7 +3429,7 @@ export const PRODUCT_CATALOG = [
     "dashboard": "",
     "custom_dashboard": "",
     "icon_emoji": "satellite",
-    "icon_svg": "client",
+    "icon_svg": "cisco_wifi",
     "aliases": [],
     "keywords": [
       "access point",
@@ -3544,7 +3544,7 @@ export const PRODUCT_CATALOG = [
     "dashboard": "",
     "custom_dashboard": "",
     "icon_emoji": "wifi",
-    "icon_svg": "client",
+    "icon_svg": "cisco_wifi",
     "aliases": [],
     "keywords": [
       "wlc",
@@ -3721,7 +3721,7 @@ export const PRODUCT_CATALOG = [
     "dashboard": "",
     "custom_dashboard": "",
     "icon_emoji": "cloud_network",
-    "icon_svg": "cloud_analytics",
+    "icon_svg": "cisco_cloud_networking",
     "aliases": [
       "Meraki"
     ],
@@ -3860,7 +3860,7 @@ export const PRODUCT_CATALOG = [
     "dashboard": "cvi_dashboard",
     "custom_dashboard": "",
     "icon_emoji": "factory",
-    "icon_svg": "analytics_logging",
+    "icon_svg": "cisco_cyber_vision",
     "aliases": [],
     "keywords": [
       "ccv",
@@ -3976,7 +3976,7 @@ export const PRODUCT_CATALOG = [
     "dashboard": "",
     "custom_dashboard": "",
     "icon_emoji": "router",
-    "icon_svg": "network_analytics",
+    "icon_svg": "cisco_router",
     "aliases": [],
     "keywords": [
       "asr",
@@ -4091,7 +4091,7 @@ export const PRODUCT_CATALOG = [
     "dashboard": "",
     "custom_dashboard": "",
     "icon_emoji": "router",
-    "icon_svg": "network_analytics",
+    "icon_svg": "cisco_router",
     "aliases": [],
     "keywords": [
       "isr",
@@ -4205,7 +4205,7 @@ export const PRODUCT_CATALOG = [
     "dashboard": "",
     "custom_dashboard": "",
     "icon_emoji": "globe",
-    "icon_svg": "network_analytics",
+    "icon_svg": "cisco_router",
     "aliases": [],
     "keywords": [
       "crs",
@@ -4334,7 +4334,7 @@ export const PRODUCT_CATALOG = [
     "dashboard": "",
     "custom_dashboard": "",
     "icon_emoji": "switch",
-    "icon_svg": "network_analytics",
+    "icon_svg": "cisco_nexus_switch",
     "aliases": [],
     "keywords": [
       "nexus",
@@ -4439,7 +4439,7 @@ export const PRODUCT_CATALOG = [
     "dashboard": "",
     "custom_dashboard": "",
     "icon_emoji": "jigsaw",
-    "icon_svg": "network_analytics",
+    "icon_svg": "cisco_nexus_aci",
     "aliases": [],
     "keywords": [
       "aci",
@@ -4526,7 +4526,7 @@ export const PRODUCT_CATALOG = [
     "dashboard": "",
     "custom_dashboard": "",
     "icon_emoji": "dashboard",
-    "icon_svg": "cloud_insights",
+    "icon_svg": "cisco_nexus_dashboard",
     "aliases": [],
     "keywords": [
       "nexus dashboard",
@@ -4995,7 +4995,7 @@ export const PRODUCT_CATALOG = [
     "dashboard": "",
     "custom_dashboard": "",
     "icon_emoji": "video",
-    "icon_svg": "cloud_app_security",
+    "icon_svg": "cisco_video",
     "aliases": [
       "WebEx Communications"
     ],
@@ -5113,7 +5113,7 @@ export const PRODUCT_CATALOG = [
     "dashboard": "",
     "custom_dashboard": "",
     "icon_emoji": "phone",
-    "icon_svg": "app_delivery",
+    "icon_svg": "cisco_call_manager",
     "aliases": [
       "Cisco CallManager"
     ],
@@ -5206,7 +5206,7 @@ export const PRODUCT_CATALOG = [
     "dashboard": "",
     "custom_dashboard": "",
     "icon_emoji": "video",
-    "icon_svg": "cloud_app_security",
+    "icon_svg": "cisco_conference",
     "aliases": [],
     "keywords": [
       "cms",
@@ -5290,7 +5290,7 @@ export const PRODUCT_CATALOG = [
     "dashboard": "",
     "custom_dashboard": "",
     "icon_emoji": "clipboard",
-    "icon_svg": "analytics_logging",
+    "icon_svg": "cisco_conference",
     "aliases": [],
     "keywords": [
       "meeting management",
@@ -5375,7 +5375,7 @@ export const PRODUCT_CATALOG = [
     "dashboard": "",
     "custom_dashboard": "",
     "icon_emoji": "tv",
-    "icon_svg": "app_delivery",
+    "icon_svg": "cisco_telepresence",
     "aliases": [
       "Cisco VCS"
     ],
@@ -5422,6 +5422,83 @@ export const PRODUCT_CATALOG = [
     "sort_order": 304
   },
   {
+    "product_id": "cisco_ace",
+    "display_name": "Cisco Application Control Engine (ACE)",
+    "description": "The Cisco Application Control Engine (ACE) was a hardware-based load balancer and application delivery controller providing server load balancing, SSL offloading, and application acceleration. ACE reached end-of-life in 2014 and end-of-support in 2019. Data ingestion is still supported via SC4S.",
+    "value_proposition": "Stream ACE syslog events into Splunk via SC4S for legacy load balancer monitoring, compliance, and historical analysis.",
+    "vendor": "Cisco",
+    "tagline": "Application Delivery Controller",
+    "category": "networking",
+    "version": "1.0.0",
+    "status": "deprecated",
+    "addon": "",
+    "addon_label": "",
+    "addon_family": "default",
+    "subcategory": "data_center_net",
+    "ai_enabled": false,
+    "ai_description": "",
+    "cisco_retired": true,
+    "coverage_gap": false,
+    "addon_splunkbase_url": "",
+    "addon_docs_url": "",
+    "addon_install_url": "",
+    "app_viz": "",
+    "app_viz_label": "",
+    "app_viz_splunkbase_url": "",
+    "app_viz_docs_url": "",
+    "app_viz_install_url": "",
+    "app_viz_2": "",
+    "app_viz_2_label": "",
+    "app_viz_2_splunkbase_url": "",
+    "app_viz_2_docs_url": "",
+    "app_viz_2_install_url": "",
+    "learn_more_url": "https://www.cisco.com/c/en/us/support/security/retired.html",
+    "legacy_apps": [],
+    "prereq_apps": [],
+    "community_apps": [],
+    "sourcetypes": [
+      "cisco:ace"
+    ],
+    "dashboard": "",
+    "custom_dashboard": "",
+    "icon_emoji": "balance_scale",
+    "icon_svg": "balance_scale",
+    "aliases": [],
+    "keywords": [
+      "ace",
+      "application control engine",
+      "load balancer",
+      "adc",
+      "application delivery",
+      "server load balancing",
+      "ssl offload"
+    ],
+    "alert_actions": [],
+    "soar_connectors": [],
+    "itsi_content_pack": null,
+    "card_banner": "Cisco Retired Product",
+    "card_banner_color": "red",
+    "card_banner_size": "small",
+    "card_banner_opacity": "0.12",
+    "card_accent": "#9e9e9e",
+    "card_bg_color": "smoke",
+    "is_new": false,
+    "secure_networking_gtm": false,
+    "support_level": "not_supported",
+    "sc4s_url": "https://splunk.github.io/splunk-connect-for-syslog/main/sources/vendor/Cisco/cisco_ace/",
+    "sc4s_label": "SC4S: Cisco ACE",
+    "sc4s_supported": false,
+    "sc4s_search_head_ta": "",
+    "sc4s_search_head_ta_label": "",
+    "sc4s_search_head_ta_splunkbase_url": "",
+    "sc4s_search_head_ta_splunkbase_id": "",
+    "sc4s_search_head_ta_install_url": "",
+    "sc4s_sourcetypes": [],
+    "sc4s_config_notes": [],
+    "best_practices": [],
+    "sort_order": 899
+  },
+  {
     "product_id": "cisco_cloud_web_security",
     "display_name": "Cisco Cloud Web Security (CWS)",
     "description": "Cisco Cloud Web Security (CWS) was a cloud-delivered web security service providing advanced threat protection, URL filtering, and application visibility. CWS has been retired by Cisco and superseded by Cisco Umbrella / Cisco Secure Access.",
@@ -5452,7 +5529,7 @@ export const PRODUCT_CATALOG = [
     "app_viz_2_splunkbase_url": "",
     "app_viz_2_docs_url": "",
     "app_viz_2_install_url": "",
-    "learn_more_url": "https://www.cisco.com/c/en/us/products/security/cloud-web-security/index.html",
+    "learn_more_url": "https://www.cisco.com/c/en/us/support/security/retired.html",
     "legacy_apps": [],
     "prereq_apps": [],
     "community_apps": [],
@@ -5527,7 +5604,7 @@ export const PRODUCT_CATALOG = [
     "app_viz_2_splunkbase_url": "",
     "app_viz_2_docs_url": "",
     "app_viz_2_install_url": "",
-    "learn_more_url": "https://www.cisco.com/c/en/us/products/security/email-security/index.html",
+    "learn_more_url": "https://www.cisco.com/c/en/us/support/security/retired.html",
     "legacy_apps": [],
     "prereq_apps": [],
     "community_apps": [],
@@ -5612,7 +5689,7 @@ export const PRODUCT_CATALOG = [
     "app_viz_2_splunkbase_url": "",
     "app_viz_2_docs_url": "",
     "app_viz_2_install_url": "",
-    "learn_more_url": "https://www.cisco.com/c/en/us/products/data-center-analytics/network-assurance-engine/index.html",
+    "learn_more_url": "https://www.cisco.com/c/en/us/support/security/retired.html",
     "legacy_apps": [],
     "prereq_apps": [],
     "community_apps": [],
@@ -5689,7 +5766,7 @@ export const PRODUCT_CATALOG = [
     "app_viz_2_splunkbase_url": "",
     "app_viz_2_docs_url": "",
     "app_viz_2_install_url": "",
-    "learn_more_url": "https://www.cisco.com/c/en/us/products/cloud-systems-management/prime-infrastructure/index.html",
+    "learn_more_url": "https://www.cisco.com/c/en/us/support/security/retired.html",
     "legacy_apps": [],
     "prereq_apps": [],
     "community_apps": [],
@@ -5855,7 +5932,7 @@ export const PRODUCT_CATALOG = [
     "app_viz_2_splunkbase_url": "",
     "app_viz_2_docs_url": "",
     "app_viz_2_install_url": "",
-    "learn_more_url": "https://www.cisco.com/c/en/us/support/security/secure-access-control-system/series.html",
+    "learn_more_url": "https://www.cisco.com/c/en/us/support/security/retired.html",
     "legacy_apps": [],
     "prereq_apps": [],
     "community_apps": [],
@@ -5942,7 +6019,7 @@ export const PRODUCT_CATALOG = [
     "app_viz_2_splunkbase_url": "",
     "app_viz_2_docs_url": "",
     "app_viz_2_install_url": "",
-    "learn_more_url": "https://www.cisco.com/c/en/us/products/security/securex/index.html",
+    "learn_more_url": "https://www.cisco.com/c/en/us/support/security/retired.html",
     "legacy_apps": [],
     "prereq_apps": [],
     "community_apps": [],
@@ -6021,7 +6098,7 @@ export const PRODUCT_CATALOG = [
     "app_viz_2_splunkbase_url": "",
     "app_viz_2_docs_url": "",
     "app_viz_2_install_url": "",
-    "learn_more_url": "https://www.cisco.com/c/en/us/products/security/intrusion-prevention-system-ips/index.html",
+    "learn_more_url": "https://www.cisco.com/c/en/us/support/security/retired.html",
     "legacy_apps": [],
     "prereq_apps": [],
     "community_apps": [],
@@ -6105,7 +6182,7 @@ export const PRODUCT_CATALOG = [
     "app_viz_2_splunkbase_url": "",
     "app_viz_2_docs_url": "",
     "app_viz_2_install_url": "",
-    "learn_more_url": "https://www.cisco.com/c/en/us/solutions/enterprise-networks/connected-mobile-experiences/index.html",
+    "learn_more_url": "https://www.cisco.com/c/en/us/support/security/retired.html",
     "legacy_apps": [
       {
         "app_id": "CMX",
@@ -6134,7 +6211,7 @@ export const PRODUCT_CATALOG = [
     "dashboard": "",
     "custom_dashboard": "",
     "icon_emoji": "globe",
-    "icon_svg": "client",
+    "icon_svg": "cisco_wifi",
     "aliases": [],
     "keywords": [
       "cmx",
@@ -6444,7 +6521,7 @@ export const PRODUCT_CATALOG = [
     "dashboard": "",
     "custom_dashboard": "",
     "icon_emoji": "factory",
-    "icon_svg": "network_analytics",
+    "icon_svg": "cisco_iot",
     "aliases": [],
     "keywords": [
       "industrial ethernet",
@@ -6525,7 +6602,7 @@ export const PRODUCT_CATALOG = [
     "dashboard": "",
     "custom_dashboard": "",
     "icon_emoji": "server",
-    "icon_svg": "network_analytics",
+    "icon_svg": "cisco_mds",
     "aliases": [],
     "keywords": [
       "mds",
@@ -6601,7 +6678,7 @@ export const PRODUCT_CATALOG = [
     "dashboard": "",
     "custom_dashboard": "",
     "icon_emoji": "satellite",
-    "icon_svg": "network_analytics",
+    "icon_svg": "cisco_router",
     "aliases": [],
     "keywords": [
       "8000 series",
@@ -6754,7 +6831,7 @@ export const PRODUCT_CATALOG = [
     "dashboard": "",
     "custom_dashboard": "",
     "icon_emoji": "globe",
-    "icon_svg": "network_analytics",
+    "icon_svg": "cisco_wifi",
     "aliases": [],
     "keywords": [
       "cisco spaces",
@@ -7291,7 +7368,7 @@ export const PRODUCT_CATALOG = [
     "dashboard": "",
     "custom_dashboard": "",
     "icon_emoji": "satellite_antenna",
-    "icon_svg": "network_analytics",
+    "icon_svg": "cisco_router",
     "aliases": [],
     "keywords": [
       "ncs",
@@ -7533,7 +7610,7 @@ export const PRODUCT_CATALOG = [
     "dashboard": "",
     "custom_dashboard": "",
     "icon_emoji": "desktop_computer",
-    "icon_svg": "cloud_app_security",
+    "icon_svg": "cisco_desk_phone",
     "aliases": [],
     "keywords": [
       "deskpro",
