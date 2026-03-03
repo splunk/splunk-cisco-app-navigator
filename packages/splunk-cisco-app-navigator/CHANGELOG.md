@@ -1,95 +1,144 @@
 # Change Log
 
-0.0.3 – February 22, 2026
+1.0.4 — March 2, 2026
+-------
+
+### Dark Mode Icon Enhancements
+* **Filter pill icon visibility** — Added `csc-filter-pill-icon` class to all category filter pill `<img>` tags for dark mode white chip treatment.
+* **Card icon frosted glass** — Dark mode card icons render with frosted glass container, Cisco-blue glow, white drop-shadow, and 40px sizing.
+* **Badge pill preservation** — SOAR, AI, ITSI, and Alert badge pills preserve light-mode styling in dark mode for icon visibility.
+
+### Documentation
+* Updated copilot-instructions.md, README.md, and CHANGELOG.md with current v1.0.4 stats.
+
+1.0.3 — February 28, 2026
+-------
+
+### AI-Powered Badge
+* **AI badge** — Purple gradient badge with sparkle icon on cards with `ai_enabled = 1`.
+* **AI tooltip** — Hover tooltip shows `ai_description` text.
+* **AI cross-cutting filter** — "AI-Powered" pill in Category Filter Bar (15 products).
+* **`ai_enabled`, `ai_description`** — New fields in products.conf.
+
+### Subcategory Pills
+* **13 subcategories** — Granular filtering within Security (8), Networking (4), and Observability (1).
+* **Animated slide-in** — Subcategory pills expand with CSS animation when category selected.
+* **`subcategory`** — New field in products.conf.
+
+### SC4S Integration
+* **SC4S pills** — Blue SC4S pill on cards with `sc4s_url` set (18 products).
+* **SC4S best practices** — SC4S tip merges with platform syslog tip, avoids duplication.
+* **`sc4s_url`, `sc4s_label`** — New fields in products.conf.
+
+1.0.2 — February 27, 2026
+-------
+
+### Strategic Sort Order
+* **Sort ranges** — Products strategically sorted with related products adjacent within categories.
+* **Keyword cleanup** — Keywords start with primary acronym; generic terms removed.
+* **`update_sort_keywords_v2.py`** — Line-by-line parser for bulk updates (replaces broken v1).
+
+### Cisco Brand Icons
+* **128 icons** — 126 SVGs + 2 PNGs covering all 78 products.
+* **Light/dark variants** — `{name}.svg` and `{name}_white.svg` variants.
+* **Icon fallback chain** — icon_svg -> icon_emoji (32 emojis) -> first-letter fallback.
+
+### ACE Product Addition
+* **Application Centric Engine (ACE)** — New product in Networking/data_center_net.
+
+1.0.1 — February 26, 2026
+-------
+
+### Secure Networking GTM
+* **GTM tagging** — 60 products tagged with `secure_networking_gtm = 1`.
+* **GTM filter pill** — Secure Networking GTM cross-cutting filter with `cat-secnet.svg` icon.
+
+### Product Catalog Expansion (57 -> 78)
+* **78 total products** — Added 21 new products across all categories.
+* **Security:** 27 -> 39 products.
+* **Networking:** 15 -> 30 products.
+* **Observability:** 2 -> 3 products.
+* **Collaboration:** 3 -> 6 products.
+
+### CCC -> SCAN Rename
+* **Full rebrand** — Cisco Control Center renamed to Splunk Cisco App Navigator.
+* **App ID:** `splunk-cisco-app-navigator`
+* **Git:** New repo, old repo archived.
+
+1.0.0 — February 25, 2026
+-------
+
+### Production Release
+* **Feature-complete Glass Pane UI** — All card intelligence badges, category filtering, search, theme toggle, best practices modals.
+* **Build system** — generate-catalog.js + webpack + auto build hash stamp.
+* **Splunkbase packaging** — package_app.sh creates versioned tarball.
+* **CiscoSansTT fonts** — Cisco brand typography integrated.
+* **Platform detection** — Cloud vs Enterprise via server/info REST endpoint.
+* **Sourcetype detection** — tstats-based data flow validation for 429+ sourcetypes.
+* **Persona Quick Start** — Pre-built workspace configurations.
+* **Tech Stack Modal** — Full technology stack visualization.
+
+0.0.3 — February 22, 2026
 -------
 
 ### Product Catalog Expansion
-* **57 products** — Expanded from 47 to 57 total products across 5 categories.
-* **10 deprecated products** — Added Bug Search Tool, Cloud Web Security, CMX, Domain Protection, NAE, Prime Infrastructure, PSIRT, ACS, Secure IPS, SecureX.
-* **Collaboration active** — Webex, Meeting Server, and CUCM moved from "Coming Soon" to active.
-* **New networking products** — Added Access Points, ASR, CRS, Catalyst Switches, ISR, WLC, Nexus HyperFabric, Meraki.
-* **New security products** — Added AI Defense, Cloudlock CASB, Intersight, Talos, Umbrella, UCS, WSA, Secure Email Gateway.
+* **57 products** — Expanded from 47 to 57 total products.
+* **10 deprecated products** added.
+* **Collaboration active** — Webex, Meeting Server, CUCM moved to active.
+* **New networking/security products** added.
 
 ### SOAR Connector Intelligence
-* **SOAR badges** — Purple SOAR badge on cards with Splunk SOAR connectors (10 products).
-* **SOAR detail section** — Dedicated card section with connector name and Splunkbase link.
-* **SOAR cross-cutting filter** — Amber "⚡ SOAR" pill in the Category Filter Bar to show only SOAR-enabled products.
-* **SVG icon** — Custom `icon-soar.svg` badge replacing emoji.
+* **SOAR badges** — Purple badge on cards with SOAR connectors (10 products).
+* **SOAR cross-cutting filter** — SOAR pill in Category Filter Bar.
+* **SVG icon** — Custom icon-soar.svg badge.
 
 ### ITSI Content Pack Intelligence
-* **ITSI refactor** — ITSI moved from `app_viz` field to dedicated `itsi_content_pack` field (parallel to SOAR connector pattern). ITSI may run on a dedicated search head.
-* **ITSI badges** — Blue ITSI badge on cards with Content Packs (4 products: Meraki, ThousandEyes, AppDynamics, Catalyst Center).
-* **ITSI detail section** — Shows pack name, docs link, and install hint ("Install via ITSI → Content Library").
-* **SVG icon** — Custom `icon-itsi.svg` badge replacing emoji.
-* **`itsi_content_pack_label` / `itsi_content_pack_docs_url`** — New fields in `products.conf` and `products.conf.spec`.
+* **ITSI refactor** — Dedicated `itsi_content_pack` fields.
+* **ITSI badges** — Blue badge on cards with Content Packs (4 products).
+* **SVG icon** — Custom icon-itsi.svg badge.
 
 ### Alert Actions Intelligence
-* **Alert Actions badges** — Blue badge on cards with companion alert action add-ons (3 products).
-* **Alert Actions detail section** — Shows action name with Splunkbase link.
-* **Alert Actions cross-cutting filter** — Blue "🔔 Alert Actions" pill in the Category Filter Bar.
-* **`alert_action_label/uid/url`** — New fields in `products.conf` (supports up to 2 alert actions per product).
+* **Alert Actions badges** — Blue badge on cards with alert action add-ons.
+* **Alert Actions cross-cutting filter** — Alert Actions pill in Category Filter Bar.
 
 ### Community App Detection
-* **Community app warning** — Collapsible "⚠ Third-party add-on detected" warning on cards where a non-Cisco community TA is installed.
-* **"+ Details" toggle** — Warning is collapsed by default; expands to show the community app name and Splunkbase link.
-* **`community_apps/labels/uids/urls`** — New fields in `products.conf` (5 products mapped).
+* **Community app warning** — Collapsible warning for non-Cisco community TAs.
 
 ### SVG Badge Icons
-* **Custom SVG icon set** — Replaced emoji for ITSI, SOAR, Splunk Enterprise, and Splunk Cloud badges with 41×40px SVG icons.
-* **Dark mode support** — SVG icons use CSS `filter: invert(0.85) hue-rotate(180deg)` in dark mode.
-* **Static assets** — `icon-itsi.svg`, `icon-soar.svg`, `icon-enterprise.svg`, `icon-cloud.svg` in `appserver/static/`.
+* **Custom SVG icon set** — Replaced emoji for ITSI, SOAR, Enterprise, Cloud badges.
 
 ### Deprecated Product Enhancements
-* **Deprecated/Replacement chips** — Each deprecated card shows a "Deprecated" chip and a "Replacement" chip linking to the modern successor product.
-* **`addon_family = deprecated`** — Deprecated products grouped by family.
+* **Deprecated/Replacement chips** — Each deprecated card links to successor.
 
 ### Additional Fields
-* **`aliases`** — Former/alternate product names displayed as "Formerly: ..." on cards and included in search.
-* **`prereq_apps/labels/uids/urls`** — Prerequisite companion app dependencies (e.g., Splunk App for Stream).
-* **`addon_family`** — Add-on family grouping for catalog generation (security-cloud, catalyst, dc-networking, etc.).
-* **`addon_docs_url`** — Documentation URL for add-ons.
-* **`dashboards`** — Dashboard XML view names for the Launch button.
+* **aliases**, **prereq_apps**, **addon_family**, **addon_docs_url**, **dashboards** — New fields.
 
 ### Bug Fixes
-* **Meraki prerequisite guard** — Fixed prereq dependency rendering when prereq fields are present.
-* **FeedbackModal crash** — Fixed uncontrolled component warning on feedback type dropdown.
+* **Meraki prerequisite guard** — Fixed prereq dependency rendering.
+* **FeedbackModal crash** — Fixed uncontrolled component warning.
 
-0.0.2 – February 22, 2026
+0.0.2 — February 22, 2026
 -------
 
 ### UI/UX Redesign
-* **IS4S green design language** — Replaced blue accent (#049fd9) with green (#1a7f3d) throughout: buttons, links, badges, category pills, and accent borders.
-* **Typography** — Set `'Splunk Platform Sans', 'Proxima Nova', 'Helvetica Neue'` as the base font family.
-* **Uniform card styling** — Removed colored bottom borders and per-section accent stripes. All cards share a clean, consistent design with a subtle 2px top accent stripe.
-* **Card grid** — Updated to `minmax(420px, 1fr)` with 1500px max-width for better readability.
+* **IS4S green design language** — Green accent throughout.
+* **Uniform card styling** — Clean design with subtle accent stripe.
 
 ### Dark/Light Mode
-* **Theme detection** — Detects Splunk's theme preference via DOM `data-theme` attributes, body CSS classes, and Splunk REST user-prefs API.
-* **30+ dark-mode CSS overrides** — All green accents, badges, buttons, inputs, code blocks, and modals adapt to dark mode via `:root.dce-dark`.
-* **No OS override** — Removed `prefers-color-scheme` media query to prevent macOS dark mode from overriding Splunk's explicit light-mode setting.
-* **MutationObserver** — Watches for dynamic theme class changes on `<html>` and `<body>`.
+* **Theme detection** — Detects Splunk theme via DOM attributes and REST API.
+* **30+ dark-mode CSS overrides** via `:root.dce-dark`.
+* **MutationObserver** — Watches for dynamic theme class changes.
 
 ### Custom Dashboard Launch
-* **Split-button Launch** — Each configured+installed product's Launch button now has a dropdown caret (▾) with:
-  - The default Cisco dashboard (showing the actual view name, title-cased)
-  - A customer-configured custom dashboard (if set)
-  - "Set Custom…" / "Edit Custom…" modal to configure.
-* **Custom dashboard modal** — Text input for `app_name/view_name` format, with format help and save/cancel.
-* **Persistence** — Custom dashboards are saved to `local/products.conf` via Splunk REST API, surviving app upgrades.
-* **`custom_dashboard` field** — Added to `products.conf.spec` with full documentation.
-* **Portal-based dropdown** — Menu renders via `ReactDOM.createPortal` to escape parent overflow constraints.
+* **Split-button Launch** — Default + custom dashboard dropdown.
+* **Persistence** — Custom dashboards saved to `local/products.conf` via REST API.
 
 ### Bug Fixes
-* **CSRF authentication** — Replaced custom cookie regex with Splunk's official `getCSRFToken()` from `@splunk/splunk-utils/config`, fixing 401 errors on POST requests.
-* **Modal `returnFocus` prop** — Added required `returnFocus` prop to custom dashboard Modal.
-* **Modal.Header `onRequestClose`** — Removed invalid `onRequestClose` prop from all `Modal.Header` components (close button is provided via context from the parent `Modal`).
-* **ITSI 404 elimination** — Per-app version checks now only query apps present in the bulk `installedApps` lookup, skipping HTTP requests for apps that aren't installed.
-* **Sourcetype search guard** — `detectSourcetypeData()` skips the search POST if no CSRF token is available.
+* **CSRF authentication** — Uses Splunk's official `getCSRFToken()`.
+* **ITSI 404 elimination** — Only queries installed apps.
+* **Sourcetype search guard** — Skips search if no CSRF token.
 
-### Deprecated Section
-* **Fourth section** — Added "Deprecated / Archived" collapsible panel for products with archived add-ons on Splunkbase.
-
-0.0.1 – Release date: TBA
+0.0.1
 -------
 
 * Initial version

@@ -744,10 +744,24 @@ html.dce-dark [data-view="views/shared/Page"] {
     border: 1px solid var(--platform-cloud-border);
 }
 
-/* Dark mode: invert the light-gray background of SVG badge icons */
-:root.dce-dark .badge-icon,
+/* Dark mode: keep badge icons unfiltered (light-mode pill styling preserved) */
+:root.dce-dark .badge-icon {
+    filter: none;
+}
 :root.dce-dark .platform-icon {
-    filter: invert(0.85) hue-rotate(180deg);
+    filter: brightness(1.5);
+}
+
+/* Dark mode: filter pill icons — white chip background so SVGs with light fills stay visible */
+.csc-filter-pill-icon {
+    border-radius: 4px;
+    flex-shrink: 0;
+}
+:root.dce-dark .csc-filter-pill-icon {
+    background: #fff;
+    border-radius: 4px;
+    padding: 1px;
+    box-shadow: 0 0 0 1px rgba(255,255,255,0.15);
 }
 
 /* (version labels now in utility strip — .scan-util-version) */
@@ -1083,10 +1097,11 @@ html.dce-dark [data-view="views/shared/Page"] {
     vertical-align: middle;
     white-space: nowrap;
 }
+/* Dark mode: keep ITSI badge in light-mode styling for icon visibility */
 :root.dce-dark .csc-itsi-badge {
-    color: var(--muted-color);
+    color: #555;
     background: transparent;
-    border-color: var(--card-border);
+    border-color: #ddd;
 }
 
 /* ===== CSC Card Header ===== */
@@ -1719,10 +1734,11 @@ html.dce-dark [data-view="views/shared/Page"] {
     vertical-align: middle;
     white-space: nowrap;
 }
+/* Dark mode: keep SOAR badge in light-mode styling for icon visibility */
 :root.dce-dark .csc-soar-badge {
-    color: #fbbf24;
-    background: rgba(251, 191, 36, 0.12);
-    border-color: rgba(251, 191, 36, 0.25);
+    color: #b45309;
+    background: #fef3c7;
+    border-color: #fde68a;
 }
 
 /* SOAR filter pill — dark mode overrides for amber active state */
@@ -1816,10 +1832,11 @@ html.dce-dark [data-view="views/shared/Page"] {
     vertical-align: middle;
     white-space: nowrap;
 }
+/* Dark mode: keep Alert badge in light-mode styling */
 :root.dce-dark .csc-alert-badge {
-    color: #60a5fa;
-    background: rgba(59, 130, 246, 0.12);
-    border-color: rgba(59, 130, 246, 0.25);
+    color: #1e40af;
+    background: #dbeafe;
+    border-color: #93c5fd;
 }
 
 /* ── AI badge — purple gradient pill next to product name ── */
@@ -1874,10 +1891,14 @@ html.dce-dark [data-view="views/shared/Page"] {
 .csc-ai-badge:focus .csc-ai-tooltip {
     display: block;
 }
+/* Dark mode: keep AI badge in light-mode styling for icon visibility */
 :root.dce-dark .csc-ai-badge {
-    color: #a78bfa;
-    background: linear-gradient(135deg, rgba(109, 40, 217, 0.15) 0%, rgba(139, 92, 246, 0.1) 100%);
-    border-color: rgba(139, 92, 246, 0.3);
+    color: #6d28d9;
+    background: linear-gradient(135deg, #ede9fe 0%, #f3e8ff 100%);
+    border-color: #c4b5fd;
+}
+:root.dce-dark .csc-ai-badge img {
+    filter: none;
 }
 :root.dce-dark .csc-ai-badge .csc-ai-tooltip {
     background: #312e81;
@@ -3755,8 +3776,14 @@ a.csc-dep-name-link:hover {
     background: var(--card-border);
 }
 :root.dce-dark .csc-icon-placeholder {
-    background: transparent;
-    box-shadow: none;
+    background: rgba(255, 255, 255, 0.06);
+    border-radius: 12px;
+    box-shadow: 0 0 12px 2px rgba(4, 159, 217, 0.15);
+}
+:root.dce-dark .csc-product-icon-svg {
+    width: 40px;
+    height: 40px;
+    filter: drop-shadow(0 0 4px rgba(255, 255, 255, 0.25));
 }
 :root.dce-dark .csc-card-footer {
     background: var(--card-footer-bg);

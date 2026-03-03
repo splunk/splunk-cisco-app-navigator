@@ -1,0 +1,473 @@
+# ============================================================================
+# Splunk Cisco App Navigator (SCAN) — GitLab CI/CD Pipeline
+# ============================================================================
+# Adapted from IS4S (health_check_hq) pipeline.
+# Repo: sg-cloud-tools-engineering/splunk-cisco-app-navigator
+# App:  splunk-cisco-app-navigator
+# ============================================================================
+
+include:
+    - project: 'ci-cd/templates'
+      file: '/prodsec/.sast-scan.yml'
+
+    - template: DAST.gitlab-ci.yml
+    - project: 'ci-cd/templates'
+      ref: master
+      file: '/prodsec/.oss-scan.yml'
+
+default:
+    image: docker.repo.splunkdev.net/ci-cd/ci-container/node-24-bookworm:4.3.0
+
+variables:
+    FF_TIMESTAMPS: true
+    PYTHONUNBUFFERED: true
+    APP_NAME: splunk-cisco-app-navigator
+    REPO_DIR: $CI_BUILDS_DIR/sg-cloud-tools-engineering/splunk-cisco-app-navigator
+    PKG_DIR: $CI_BUILDS_DIR/sg-cloud-tools-engineering/splunk-cisco-app-navigator/packages/splunk-cisco-app-navigator
+
+stages:
+    - lint
+    - build
+    - ProdSec
+    - deploy
+    - bump_refresh
+    - test
+    - splunkbase
+
+workflow:
+    rules:
+        - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+          when: never
+        - if: $CI_COMMIT_REF_PROTECTED != "true"
+          variables:
+              ARTIFACTORY_ROLE: artifactory:v2/cloud/role/prod-splunk-cisco-app-navigator-test-deployer-role
+              WORKFLOW_TYPE: 'PUSH'
+        - if: $CI_COMMIT_REF_PROTECTED == "true"
+          variables:
+              ARTIFACTORY_ROLE: artifactory:v2/cloud/role/prod-splunk-cisco-app-navigator-deployer-role
+              WORKFLOW_TYPE: 'MAIN_MERGE'
+
+# ---------------------------------------------------------------------------
+# Base job — Python 3.12 image with AWS SSM SSH access for deploy targets
+# ---------------------------------------------------------------------------
+.base_job:
+    image: docker.repo.splunkdev.net/ci-cd/ci-container/python-3.12-bookworm-aws:4.3.1
+    before_script:
+        - echo -e "machine cd.splunkdev.com\nlogin gitlab-ci-token\npassword ${CI_JOB_TOKEN}" > ~/.netrc
+          - 'which ssh-agent || ( apt-get update -y && apt-get install openssh-client -y )'
+        - eval $(ssh-agent -s)
+        - echo "$ssh_key" | tr -d '\r' | ssh-add -
+        - echo "host i-* mi-*" > ~/.ssh/config
+        - echo "  ProxyCommand sh -c \"aws ssm start-session --region us-west-2 --profile ssm --target %h --document-name AWS-StartSSHSession --parameters 'portNumber=%p'\"" >> ~/.ssh/config
+        - echo "  StrictHostKeyChecking no" >> ~/.ssh/config
+        - echo "  UserKnownHostsFile=/dev/null" >> ~/.ssh/config
+        - apt-get update -y && apt-get install groff -y
+        - mkdir ~/.aws
+        - touch ~/.aws/credentials
+        - echo "[ssm]" > ~/.aws/credentials
+        - echo aws_access_key_id=$AWS_ACCESS_KEY_ID >> ~/.aws/credentials
+        - echo aws_secret_access_key=$AWS_SECRET_ACCESS_KEY >>  ~/.aws/credentials
+        - curl "https://s3.amazonaws.com/session-manager-downloads/plugin/latest/ubuntu_64bit/session-manager-plugin.deb" -o "session-manager-plugin.deb"
+        - dpkg -i session-manager-plugin.deb
+
+# ---------------------------------------------------------------------------
+# Bump-refresh base — shared script block for all bump_refresh jobs
+# ---------------------------------------------------------------------------
+.bump_refresh_base:
+    stage: bump_refresh
+    image: docker.repo.splunkdev.net/ci-cd/ci-container/debian-bullseye:4.3.1
+    rules:
+        - if: $WORKFLOW_TYPE == "MAIN_MERGE"
+    script:
+        - echo -e "machine cd.splunkdev.com\nlogin gitlab-ci-token\npassword ${CI_JOB_TOKEN}" > ~/.netrc
+        - apt-get update
+        - apt-get install python3-pip -y
+        - pip3 install selenium
+        - apt install firefox-esr -y
+        - cd /tmp
+        - git clone https://cd.splunkdev.com/sg-cloud-tools-engineering/tools-team-tools.git
+        - cd tools-team-tools/bumpRefresh
+        - python3 bump_refresh_new.py
+
+# ===========================================================================
+# Stage: lint
+# ===========================================================================
+
+lint_eslint:
+    stage: lint
+    allow_failure: true
+    rules:
+        - if: $WORKFLOW_TYPE == "PUSH"
+    script:
+        - creds-helper init && eval $(creds-helper npm --eval artifactory:v2/cloud/role/prod-searchbase_app-npm-reader-role)
+        - export NODE_OPTIONS=--openssl-legacy-provider
+        - node --version
+        - npm --version
+        - yarn --version
+        - cd $REPO_DIR
+        - yarn --registry https://repo.splunkdev.net/artifactory/api/npm/npm
+        - cd $PKG_DIR
+        - yarn run eslint:ci
+    artifacts:
+        when: always
+        reports:
+            junit: packages/splunk-cisco-app-navigator/test-reports/lint-results.xml
+    id_tokens:
+        CI_JOB_JWT:
+            aud: $CICD_VAULT_ADDR
+
+# ===========================================================================
+# Stage: build
+# ===========================================================================
+
+build_app_artifact:
+    stage: build
+    allow_failure: false
+    tags:
+        - large
+    rules:
+        - if: $WORKFLOW_TYPE == "PUSH" || $WORKFLOW_TYPE == "MAIN_MERGE"
+    needs: []
+    script:
+        - creds-helper init && eval $(creds-helper npm --eval artifactory:v2/cloud/role/prod-searchbase_app-npm-reader-role)
+        - export NODE_OPTIONS=--openssl-legacy-provider
+        - node --version
+        - npm --version
+        - yarn --version
+        - cd $REPO_DIR
+        - yarn --registry https://repo.splunkdev.net/artifactory/api/npm/npm
+        - cd $PKG_DIR
+        - pwd
+        - ls -la
+        # Stamp the CI commit hash into app.conf build field
+        - VERSION=$(grep -E '^\s*version\s*=' src/main/resources/splunk/default/app.conf | head -1 | sed 's/.*=\s*//' | xargs)
+        - echo "Building version $VERSION"
+        - sed -i "s/^build.*/build = ${CI_COMMIT_SHORT_SHA}/g" src/main/resources/splunk/default/app.conf
+        - cat src/main/resources/splunk/default/app.conf
+        # Build and package
+        - yarn run package:app
+        - PKG_FILE="${APP_NAME}-${VERSION}.tar.gz"
+        - test -f "$PKG_FILE"
+        - echo "VERSION=$VERSION" >> build.env
+        - echo "PKG_FILE=$PKG_FILE" >> build.env
+    artifacts:
+        when: on_success
+        expire_in: '30 days'
+        paths:
+            - packages/splunk-cisco-app-navigator/splunk-cisco-app-navigator-*.tar.gz
+        reports:
+            dotenv: packages/splunk-cisco-app-navigator/build.env
+    id_tokens:
+        CI_JOB_JWT:
+            aud: $CICD_VAULT_ADDR
+
+show_build_info:
+    stage: build
+    needs:
+        - job: build_app_artifact
+          artifacts: true
+    image: alpine:latest
+    script:
+        - |
+          echo "
+          <-- Build Information -->
+          app     $APP_NAME
+          version $VERSION
+          build   $CI_COMMIT_SHORT_SHA
+          package $PKG_FILE
+          <----------------------->
+          "
+
+# ===========================================================================
+# Stage: test
+# ===========================================================================
+
+test_appinspect_api:
+    stage: test
+    needs:
+        - build_app_artifact
+    rules:
+        - if: $WORKFLOW_TYPE == "PUSH" || $WORKFLOW_TYPE == "MAIN_MERGE"
+    when: manual
+    allow_failure: true
+    dependencies:
+        - build_app_artifact
+    before_script:
+        - apt-get update
+        - apt-get install python3-pip python3.11-venv -y
+    script:
+        - cd $REPO_DIR
+        - python3 -m venv venv
+        - source venv/bin/activate
+        - pip install -r packages/splunk-cisco-app-navigator/scripts/requirements.txt
+        - python --version
+        - cd packages/splunk-cisco-app-navigator
+        - python scripts/app_spec.py --username "$splunkbase_user" --password "$splunkbase_pass" --package_name "$PKG_FILE" --allowed_failures 0
+    artifacts:
+        when: always
+        expire_in: '30 days'
+        paths:
+            - packages/splunk-cisco-app-navigator/appinspect_report.html
+
+# ===========================================================================
+# Stage: deploy — All deploy jobs are manual on MAIN_MERGE
+# ===========================================================================
+# Deploy targets use the same fleet as IS4S. Each job copies the tar.gz to the
+# target EC2 instance via AWS SSM and installs via Splunk CLI.
+# ---------------------------------------------------------------------------
+
+is4s_deploy:
+    stage: deploy
+    needs: ['build_app_artifact']
+    extends: .base_job
+    rules:
+        - if: $WORKFLOW_TYPE == "MAIN_MERGE"
+    when: manual
+    script:
+        - echo "Deploying SCAN to IS4S"
+        - export splunk_lab_server=i-0109f55db0f33afd9
+        - scp $PKG_DIR/$PKG_FILE ubuntu@"$splunk_lab_server":/tmp
+        - ssh -t -t ubuntu@"$splunk_lab_server" "cd /tmp && /opt/splunk/bin/splunk install app $PKG_FILE -auth admin:$admin_pass -update 1"
+
+scma_deploy:
+    stage: deploy
+    needs: ['build_app_artifact']
+    extends: .base_job
+    rules:
+        - if: $WORKFLOW_TYPE == "MAIN_MERGE"
+    when: manual
+    script:
+        - echo "Deploying SCAN to SCMA"
+        - export splunk_lab_server=i-03e8eb3a0f91de4a1
+        - scp $PKG_DIR/$PKG_FILE ubuntu@"$splunk_lab_server":/tmp
+        - ssh -t -t ubuntu@"$splunk_lab_server" "cd /tmp && /opt/splunk/bin/splunk install app $PKG_FILE -auth admin:$admin_pass -update 1"
+
+stage_deploy:
+    stage: deploy
+    needs: ['build_app_artifact']
+    extends: .base_job
+    rules:
+        - if: $WORKFLOW_TYPE == "MAIN_MERGE"
+          when: manual
+        - if: $WORKFLOW_TYPE == "PUSH"
+          when: on_success
+    script:
+        - echo "Deploying SCAN to Stage"
+        - export splunk_lab_server=i-0109f55db0f33afd9
+        - scp $PKG_DIR/$PKG_FILE ubuntu@"$splunk_lab_server":/tmp
+        - ssh -t -t ubuntu@"$splunk_lab_server" "cd /tmp && /opt/sbase/bin/splunk install app $PKG_FILE -auth admin:$admin_pass -update 1"
+
+is4s_splunk_show_deploy:
+    stage: deploy
+    needs: ['build_app_artifact']
+    extends: .base_job
+    rules:
+        - if: $WORKFLOW_TYPE == "MAIN_MERGE"
+    when: manual
+    script:
+        - echo "Deploying SCAN to is4s.splunk.show"
+        - export splunk_lab_server=i-0aaf434a4e9f7def7
+        - scp $PKG_DIR/$PKG_FILE ubuntu@$splunk_lab_server:/tmp
+        - ssh -t -t "ubuntu"@"$splunk_lab_server" "cd /tmp && sudo /opt/splunk/bin/splunk install app $PKG_FILE -auth admin:$admin_pass -update 1"
+        - ssh -t -t "ubuntu"@"$splunk_lab_server" "if [ -f /tmp/$PKG_FILE ]; then rm /tmp/$PKG_FILE; else echo '/tmp/$PKG_FILE does not exist'; fi"
+
+searchbase_deploy:
+    stage: deploy
+    needs: ['build_app_artifact']
+    extends: .base_job
+    rules:
+        - if: $WORKFLOW_TYPE == "MAIN_MERGE"
+    when: manual
+    script:
+        - echo "Deploying SCAN to Searchbase"
+        - export splunk_lab_server=i-0aaf434a4e9f7def7
+        - scp $PKG_DIR/$PKG_FILE ubuntu@"$splunk_lab_server":/tmp
+        - ssh -t -t ubuntu@"$splunk_lab_server" "cd /tmp && /opt/sbase/bin/splunk install app $PKG_FILE -auth admin:$admin_pass -update 1"
+
+es_deploy:
+    stage: deploy
+    needs: ['build_app_artifact']
+    extends: .base_job
+    rules:
+        - if: $WORKFLOW_TYPE == "MAIN_MERGE"
+    when: manual
+    script:
+        - echo "Deploying SCAN to ES"
+        - export splunk_lab_server=i-00a325a4071f01a59
+        - scp $PKG_DIR/$PKG_FILE ubuntu@"$splunk_lab_server":/tmp
+        - ssh -t -t ubuntu@"$splunk_lab_server" "cd /tmp && /opt/splunk/bin/splunk install app $PKG_FILE -auth admin:$admin_pass -update 1"
+
+itsi_deploy:
+    stage: deploy
+    needs: ['build_app_artifact']
+    extends: .base_job
+    rules:
+        - if: $WORKFLOW_TYPE == "MAIN_MERGE"
+    when: manual
+    script:
+        - echo "Deploying SCAN to ITSI"
+        - export splunk_lab_server=i-0b4d0c657528e0656
+        - scp $PKG_DIR/$PKG_FILE ubuntu@"$splunk_lab_server":/tmp
+        - ssh -t -t ubuntu@"$splunk_lab_server" "cd /tmp && /opt/splunk/bin/splunk install app $PKG_FILE -auth admin:$admin_pass -update 1"
+
+# ===========================================================================
+# Stage: bump_refresh — Browser-based cache refresh after each deploy
+# ===========================================================================
+
+is4s_bump_refresh:
+    extends: .bump_refresh_base
+    needs: ['is4s_deploy']
+    variables:
+        splunk_lab_server: "https://is4s.toolsengineering.com:8000"
+
+scma_bump_refresh:
+    extends: .bump_refresh_base
+    needs: ['scma_deploy']
+    variables:
+        splunk_lab_server: "https://scma.toolsengineering.com:8000"
+
+stage_bump_refresh:
+    extends: .bump_refresh_base
+    needs: ['stage_deploy']
+    rules:
+        - if: $WORKFLOW_TYPE == "MAIN_MERGE"
+          when: manual
+        - if: $WORKFLOW_TYPE == "PUSH"
+          when: on_success
+    variables:
+        splunk_lab_server: "https://stage.toolsengineering.com:8443"
+
+is4s_splunk_show_bump_refresh:
+    extends: .bump_refresh_base
+    image: docker.repo.splunkdev.net/ci-cd/ci-container/python-3.12-bookworm:4.3.1
+    needs: ['is4s_splunk_show_deploy']
+    variables:
+        splunk_lab_server: "https://is4s.splunk.show"
+
+searchbase_bump_refresh:
+    extends: .bump_refresh_base
+    image: docker.repo.splunkdev.net/ci-cd/ci-container/python-3.12-bookworm:4.3.1
+    needs: ['searchbase_deploy']
+    variables:
+        splunk_lab_server: "https://searchbase.toolsengineering.com:8443"
+
+es_bump_refresh:
+    extends: .bump_refresh_base
+    needs: ['es_deploy']
+    variables:
+        DEBUG_REFRESH_TIMEOUT: '300'
+        splunk_lab_server: "https://es.toolsengineering.com:8000"
+
+itsi_bump_refresh:
+    extends: .bump_refresh_base
+    needs: ['itsi_deploy']
+    variables:
+        DEBUG_REFRESH_TIMEOUT: '300'
+        splunk_lab_server: "https://itsi.toolsengineering.com:8000"
+
+# ===========================================================================
+# Stage: ProdSec
+# ===========================================================================
+
+sast:
+    extends: .sast_scan
+    stage: ProdSec
+    when: manual
+    allow_failure: true
+    needs: []
+    variables:
+        SAST_SCANNER: 'Semgrep'
+        SEMGREP_EXCLUDE: '*.tar.gz'
+        alert_mode: 'policy'
+    only:
+        refs:
+            - /^release/
+            - /^hotfix/
+            - /^TENG/
+            - /^VULN/
+
+oss_scan:
+    extends: .oss-scan
+    stage: ProdSec
+    needs: []
+    rules:
+        - if: |
+              $CI_PIPELINE_SOURCE == "schedule" ||
+              $WORKFLOW_TYPE == "MAIN_MERGE" ||
+              $WORKFLOW_TYPE == "PUSH"
+
+dast:
+    stage: ProdSec
+    needs: []
+    allow_failure: true
+    variables:
+        GIT_STRATEGY: fetch
+        GIT_SUBMODULE_STRATEGY: recursive
+        DAST_VERSION: 1
+        DAST_PATHS_FILE: urls.txt
+        DAST_USERNAME: $DAST_USER
+        DAST_PASSWORD: $DAST_PASS
+        DAST_FULL_SCAN_ENABLED: 'true'
+        DAST_HTML_REPORT: scan-dast-report.html
+    before_script:
+        - 'export "DAST_AUTH_URL=$(cat environment_url.txt)/login"'
+    artifacts:
+        paths:
+            - $DAST_HTML_REPORT
+        expire_in: 1 day
+    when: manual
+    rules:
+        - if: '$CI_COMMIT_BRANCH =~ /^release\/.*$/ && $CI_COMMIT_TAG =~ /^release\/.*$/'
+          when: manual
+        - if: $CI_COMMIT_BRANCH =~ /^release/ || $CI_COMMIT_BRANCH =~ /^hotfix/
+          when: manual
+
+# ===========================================================================
+# Stage: splunkbase
+# ===========================================================================
+# NOTE: Update the Splunkbase app IDs below once SCAN is registered on
+# Splunkbase. The IDs below are placeholders.
+# ---------------------------------------------------------------------------
+
+splunkbase_deploy:
+    stage: splunkbase
+    when: manual
+    needs: ['build_app_artifact']
+    rules:
+        - if: $WORKFLOW_TYPE == "MAIN_MERGE"
+    script:
+        - splunk_versions="10.2,10.1,10.0,9.4,9.3,9.2,9.1,9.0"
+        - cim_versions="6.x,5.x,4.x,3.x"
+        # TODO: Replace XXXXX with actual Splunkbase app ID once registered
+        - curl -u ${splunkbase_user}:${splunkbase_pass} --request POST https://splunkbase.splunk.com/api/v1/app/XXXXX/new_release/ -F "files[]=@$PKG_DIR/$PKG_FILE" -F "filename=$PKG_FILE" -F "visibility=false" -F "splunk_versions=$splunk_versions" -F "cim_versions=$cim_versions"
+
+splunkbase_stage_deploy:
+    stage: splunkbase
+    when: manual
+    needs: ['build_app_artifact']
+    rules:
+        - if: $WORKFLOW_TYPE == "MAIN_MERGE"
+    script:
+        - splunk_versions="10.0,9.4,9.3,9.2,9.1,9.0"
+        - cim_versions="6.x,5.x,4.x,3.x"
+        # TODO: Replace YYYYY with actual Splunkbase stage app ID once registered
+        - curl -u ${splunkbase_stage_user}:${splunkbase_stage_pass} --http1.1 --fail-with-body --request POST https://stage.splunkbase.splunk.com/api/v1/app/YYYYY/new_release/ -F "files[]=@$PKG_DIR/$PKG_FILE" -F "filename=$PKG_FILE" -F "visibility=false" -F "splunk_versions=$splunk_versions" -F "cim_versions=$cim_versions"
+
+artifactory_push:
+    when: manual
+    allow_failure: true
+    stage: splunkbase
+    needs: ['build_app_artifact']
+    script:
+        - creds-helper init
+        - eval $(creds-helper artifactory --eval ${ARTIFACTORY_ROLE})
+        - VERSION=$(grep -E '^\s*version\s*=' $PKG_DIR/src/main/resources/splunk/default/app.conf | head -1 | sed 's/.*=\s*//' | xargs)
+        - echo "Version $VERSION"
+        - ARTIFACT_NAME="${APP_NAME}_${VERSION}-${CI_COMMIT_SHORT_SHA}.tgz"
+        - cp "$PKG_DIR/$PKG_FILE" "packages/splunk-cisco-app-navigator/$ARTIFACT_NAME"
+        - ls packages/splunk-cisco-app-navigator/
+        - artifact-ci
+        - artifact-ci publish generic "packages/splunk-cisco-app-navigator/$ARTIFACT_NAME" "apps/sg-cloud-tools-engineering/splunk-cisco-app-navigator/$ARTIFACT_NAME"
+    id_tokens:
+        CI_JOB_JWT:
+            aud: $CICD_VAULT_ADDR

@@ -155,6 +155,7 @@ const ICON_EMOJI_MAP = {
     cloud_network: '☁️🌐',
     headset: '🎧', video: '📹', phone: '📞',
     archive: '📦', shield_cloud: '🛡️☁️',
+    balance_scale: '⚖️',
 };
 
 // ─────────────────  STATIC PRODUCT CATALOG  ─────────────────
@@ -3190,6 +3191,7 @@ function CategoryFilterBar({ selectedCategory, onSelectCategory, selectedSubCate
         return React.createElement('img', {
             src: createURL(`/static/app/${APP_ID}/icons/${svgName}.svg`),
             alt: '',
+            className: 'csc-filter-pill-icon',
             style: { width: '18px', height: '18px', filter: active ? 'brightness(0) saturate(100%) invert(15%) sepia(70%) saturate(6000%) hue-rotate(200deg)' : 'none', transition: 'filter 0.2s' },
         });
     };
@@ -3267,7 +3269,7 @@ function CategoryFilterBar({ selectedCategory, onSelectCategory, selectedSubCate
                         title="Cisco Secure Networking GTM — show products in the Secure Networking go-to-market strategy"
                         style={btnStyle(selectedCategory === 'secure_networking', 'secnet')}
                     >
-                        <img src={createURL(`/static/app/${APP_ID}/icons/cat-secnet.svg`)} alt="" style={{ width: '16px', height: '16px', verticalAlign: '-3px' }} /> Secure Networking GTM
+                        <img src={createURL(`/static/app/${APP_ID}/icons/cat-secnet.svg`)} alt="" className="csc-filter-pill-icon" style={{ width: '16px', height: '16px', verticalAlign: '-3px' }} /> Secure Networking GTM
                         <span style={{
                             fontSize: '10px',
                             background: selectedCategory === 'secure_networking' ? 'rgba(255,255,255,0.25)' : 'var(--version-bg, #e8e8e8)',
@@ -3288,7 +3290,7 @@ function CategoryFilterBar({ selectedCategory, onSelectCategory, selectedSubCate
                         title="Show only products with Splunk SOAR connectors available"
                         style={btnStyle(selectedCategory === 'soar', 'soar')}
                     >
-                        <img src={createURL(`/static/app/${APP_ID}/icon-soar.svg`)} alt="" style={{ width: '16px', height: '16px', verticalAlign: '-3px' }} /> SOAR
+                        <img src={createURL(`/static/app/${APP_ID}/icon-soar.svg`)} alt="" className="csc-filter-pill-icon" style={{ width: '16px', height: '16px', verticalAlign: '-3px' }} /> SOAR
                         <span className={selectedCategory === 'soar' ? 'csc-soar-filter-count' : ''} style={{
                             fontSize: '10px',
                             background: selectedCategory === 'soar' ? 'rgba(146,64,14,0.15)' : 'var(--version-bg, #e8e8e8)',
@@ -3309,7 +3311,7 @@ function CategoryFilterBar({ selectedCategory, onSelectCategory, selectedSubCate
                         title="Show only products with custom alert actions available"
                         style={btnStyle(selectedCategory === 'alert_actions', 'alert')}
                     >
-                        <img src={createURL(`/static/app/${APP_ID}/icons/cat-alert.svg`)} alt="" style={{ width: '16px', height: '16px', verticalAlign: '-3px' }} /> Alert Actions
+                        <img src={createURL(`/static/app/${APP_ID}/icons/cat-alert.svg`)} alt="" className="csc-filter-pill-icon" style={{ width: '16px', height: '16px', verticalAlign: '-3px' }} /> Alert Actions
                         <span className={selectedCategory === 'alert_actions' ? 'csc-alert-filter-count' : ''} style={{
                             fontSize: '10px',
                             background: selectedCategory === 'alert_actions' ? 'rgba(30,64,175,0.12)' : 'var(--version-bg, #e8e8e8)',
@@ -3329,7 +3331,7 @@ function CategoryFilterBar({ selectedCategory, onSelectCategory, selectedSubCate
                         title="Show products that leverage AI/ML technologies"
                         style={btnStyle(selectedCategory === 'ai_powered', 'ai')}
                     >
-                        <img src={createURL(`/static/app/${APP_ID}/icons/cat-ai.svg`)} alt="" style={{ width: '16px', height: '16px', verticalAlign: '-2px' }} /> AI-Powered
+                        <img src={createURL(`/static/app/${APP_ID}/icons/cat-ai.svg`)} alt="" className="csc-filter-pill-icon" style={{ width: '16px', height: '16px', verticalAlign: '-2px' }} /> AI-Powered
                         <span style={{
                             fontSize: '10px',
                             background: selectedCategory === 'ai_powered' ? 'rgba(91,33,182,0.12)' : 'var(--version-bg, #e8e8e8)',
