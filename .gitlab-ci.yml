@@ -75,6 +75,7 @@ workflow:
 # ---------------------------------------------------------------------------
 .bump_refresh_base:
     stage: bump_refresh
+    when: manual
     image: docker.repo.splunkdev.net/ci-cd/ci-container/debian-bullseye:4.3.1
     rules:
         - if: $WORKFLOW_TYPE == "MAIN_MERGE"
@@ -96,6 +97,7 @@ workflow:
 lint_eslint:
     stage: lint
     allow_failure: true
+    when: manual
     rules:
         - if: $WORKFLOW_TYPE == "PUSH"
     script:
@@ -123,6 +125,7 @@ lint_eslint:
 build_app_artifact:
     stage: build
     allow_failure: false
+    when: manual
     tags:
         - large
     rules:
@@ -163,6 +166,7 @@ build_app_artifact:
 
 show_build_info:
     stage: build
+    when: manual
     needs:
         - job: build_app_artifact
           artifacts: true
@@ -250,7 +254,7 @@ stage_deploy:
         - if: $WORKFLOW_TYPE == "MAIN_MERGE"
           when: manual
         - if: $WORKFLOW_TYPE == "PUSH"
-          when: on_success
+          when: manual
     script:
         - echo "Deploying SCAN to Stage"
         - export splunk_lab_server=i-0109f55db0f33afd9
@@ -333,7 +337,7 @@ stage_bump_refresh:
         - if: $WORKFLOW_TYPE == "MAIN_MERGE"
           when: manual
         - if: $WORKFLOW_TYPE == "PUSH"
-          when: on_success
+          when: manual
     variables:
         splunk_lab_server: "https://stage.toolsengineering.com:8443"
 
@@ -389,6 +393,7 @@ sast:
 oss_scan:
     extends: .oss-scan
     stage: ProdSec
+    when: manual
     needs: []
     rules:
         - if: |
