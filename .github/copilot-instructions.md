@@ -2,6 +2,7 @@
 
 > This file is automatically loaded by GitHub Copilot at the start of every chat
 > session. It provides the full technical context for this project.
+> **Last updated:** March 2, 2026
 
 ---
 
@@ -14,12 +15,11 @@
 | **Splunk Folder** | `splunk-cisco-app-navigator` |
 | **App Label** | Splunk Cisco App Navigator |
 | **App ID** | `splunk-cisco-app-navigator` |
-| **Version** | 1.0.2 |
+| **Version** | 1.0.4 |
 | **GitLab Repo** | `https://cd.splunkdev.com/sg-cloud-tools-engineering/splunk-cisco-app-navigator.git` |
-| **Old Repo (archived)** | `https://cd.splunkdev.com/sg-cloud-tools-engineering/cisco-control-center-app.git` |
 
 Previously known as "Cisco Control Center" (CCC). Renamed to "Splunk Cisco App
-Navigator" (SCAN) in Feb 2026.
+Navigator" (SCAN) in Feb 2026. Old repo archived.
 
 ---
 
@@ -36,6 +36,11 @@ Each Cisco product gets a card in the UI showing:
 - Whether expected sourcetypes are arriving (data flowing detection)
 - Platform-aware best-practice guidance (Cloud vs Enterprise)
 - Custom per-product best practices and SC4S links
+- AI-enabled badge for products leveraging ML/AI
+- SOAR connector availability
+- ITSI Content Pack availability
+- Alert action availability
+- Cisco brand SVG icons (128 icons: 126 SVGs + 2 PNGs)
 
 The product catalog is driven by `products.conf` — a Splunk-style INI file with
 one stanza per product.
@@ -48,41 +53,38 @@ one stanza per product.
 .
 ├── lerna.json
 ├── package.json                      # Root workspace (Lerna + Yarn)
-├── scripts/                          # Utility Python scripts (auditing, analysis)
-├── docs/                             # Presentations, briefs (.gitignore'd)
+├── README.md                         # Project overview
+├── scripts/                          # 70 utility Python scripts
 └── packages/
     └── splunk-cisco-app-navigator/   # THE main Splunk app package
         ├── package.json
         ├── webpack.config.js
+        ├── CHANGELOG.md
+        ├── README.md
         ├── bin/
-        │   ├── build.js              # Build orchestrator (generate-catalog → webpack)
-        │   ├── generate-catalog.js   # Reads products.conf → productCatalog.generated.js
-        │   ├── package_app.sh        # Creates .tar.gz for Splunkbase upload
+        │   ├── build.js              # Build orchestrator
+        │   ├── generate-catalog.js   # products.conf → productCatalog.generated.js
+        │   ├── package_app.sh        # Splunkbase packaging
         │   └── clean_build.sh
         ├── src/main/
-        │   ├── resources/splunk/     # Splunk config files (deployed to stage/)
+        │   ├── resources/splunk/
         │   │   ├── default/
-        │   │   │   ├── app.conf      # App identity, label, version
-        │   │   │   ├── products.conf # PRODUCT CATALOG — source of truth (57 stanzas, ~2316 lines)
+        │   │   │   ├── app.conf      # App identity, version (1.0.4)
+        │   │   │   ├── products.conf # PRODUCT CATALOG (78 stanzas, ~3263 lines)
         │   │   │   ├── savedsearches.conf
         │   │   │   ├── server.conf
         │   │   │   ├── splunk_create.conf
         │   │   │   └── data/ui/
-        │   │   │       ├── nav/default.xml
-        │   │   │       └── views/products.xml
-        │   │   ├── appserver/
-        │   │   │   ├── static/       # CSS, JS loaders
-        │   │   │   │   ├── products.css          # All styles including dark mode
-        │   │   │   │   ├── products_loader.js    # Bootstrap script
-        │   │   │   │   ├── reloadui.css
-        │   │   │   │   └── reloadui.js
-        │   │   │   └── templates/products.html   # HTML template for the page
+        │   │   ├── appserver/static/
+        │   │   │   ├── products.css  # All styles + dark mode (~4079 lines)
+        │   │   │   ├── icons/        # 128 Cisco brand icons
+        │   │   │   └── fonts/        # CiscoSansTT font family
         │   │   ├── lookups/cisco_apps.csv
         │   │   ├── metadata/default.meta
-        │   │   └── README/products.conf.spec     # Field documentation
+        │   │   └── README/products.conf.spec
         │   └── webapp/pages/products/
-        │       ├── index.jsx                     # MAIN REACT COMPONENT (~2407 lines)
-        │       ├── productCatalog.generated.js   # Auto-generated at build time (DO NOT EDIT)
+        │       ├── index.jsx         # MAIN REACT COMPONENT (~4243 lines)
+        │       ├── productCatalog.generated.js  # Auto-generated (DO NOT EDIT)
         │       └── render.jsx
         └── stage/                    # Build output (symlinked into Splunk)
 ```
@@ -94,71 +96,78 @@ one stanza per product.
 ### `products.conf` — Product Catalog
 **Path:** `packages/splunk-cisco-app-navigator/src/main/resources/splunk/default/products.conf`
 
-The single source of truth for all product data. Each stanza `[product_id]`
-defines one card in the UI. Currently has 57 product stanzas.
+Source of truth for all product data. Each stanza `[product_id]` defines one
+card. Currently **78 product stanzas** (~3263 lines).
 
-**Key fields** (see `README/products.conf.spec` for full documentation):
+**Product breakdown:**
+- 39 Security, 30 Networking, 3 Observability, 6 Collaboration
+- 48 active, 11 deprecated, 17 roadmap, 2 under development
+- 13 subcategories across Security and Networking
+- 60 tagged for Secure Networking GTM
+- 18 with SC4S documentation links
+- 15 AI-enabled, 12 with SOAR connectors, 5 with ITSI Content Packs
+- 5 with alert actions, 6 with community TA detection
+- 429+ sourcetypes across all products
+
+**Key fields** (see `README/products.conf.spec` for full docs):
 - `display_name`, `description`, `value_proposition`, `tagline`
-- `category` — `security | networking | collaboration | observability | deprecated`
-- `status` — `active | archived`
-- `addon`, `addon_label`, `addon_splunkbase_url`, `addon_docs_url`, `addon_install_url`
-- `app_viz`, `app_viz_label`, `app_viz_splunkbase_url`, `app_viz_docs_url`
-- `sourcetypes` — comma-separated list of expected Splunk sourcetypes
+- `category` — `security | networking | collaboration | observability`
+- `subcategory` — 13 subcategories
+- `status` — `active | deprecated | roadmap | under_development`
+- `sort_order` — strategic ordering (related products adjacent)
+- `keywords` — comma-separated search keywords (primary acronym first)
+- `icon_svg` — Cisco brand icon filename (without .svg)
+- `icon_emoji` — fallback emoji via ICON_EMOJI_MAP (32 mapped)
+- `addon`, `addon_label`, `addon_splunkbase_url`, `addon_docs_url`
+- `app_viz`, `app_viz_label`, `app_viz_splunkbase_url`
+- `sourcetypes` — comma-separated expected Splunk sourcetypes
 - `legacy_apps`, `legacy_labels`, `legacy_uids`, `legacy_urls`
 - `prereq_apps`, `prereq_labels`, `prereq_uids`, `prereq_urls`
 - `community_apps`, `community_labels`, `community_uids`, `community_urls`
-- `sc4s_url`, `sc4s_label` — SC4S documentation link (shown as pill + in best practices)
-- `best_practices` — pipe-delimited (`|`) custom tips shown in the Best Practices modal
+- `sc4s_url`, `sc4s_label` — SC4S documentation link
+- `best_practices` — pipe-delimited custom tips
 - `soar_connector_label/uid/url` (up to 3)
 - `alert_action_label/uid/url` (up to 2)
-- `icon_emoji`, `card_accent`, `card_bg_color`, `card_banner`
-
-**Format notes:**
-- Only populated fields are present (compact format, no empty fields)
-- Stanzas with `category = alert_actions` (or other non-card categories) are
-  metadata-only and excluded from the UI grid
-- Fields like `addon_install_url` use deep-links:
-  `/manager/splunk-cisco-app-navigator/appsremote?order=relevance&query="..."`
+- `ai_enabled`, `ai_description` — AI badge and tooltip
+- `secure_networking_gtm` — GTM tag (1 = included)
+- `itsi_content_pack_label`, `itsi_content_pack_docs_url`
+- `card_accent`, `card_bg_color`, `card_banner`
 
 ### `index.jsx` — Main React Component
 **Path:** `packages/splunk-cisco-app-navigator/src/main/webapp/pages/products/index.jsx`
 
-Single-file React app (~2407 lines) that renders the entire Glass Pane UI.
-Uses `@splunk/react-ui` components. Key constant: `APP_ID = 'splunk-cisco-app-navigator'`.
+Single-file React app (~4243 lines). Uses `@splunk/react-ui` components.
+Key constant: `APP_ID = 'splunk-cisco-app-navigator'`.
 
 **Major sections:**
-- Constants & emoji map (lines 1–80)
+- Constants, ICON_EMOJI_MAP (32 emojis), PERSONA_PRESETS (lines 1-115)
 - Static catalog import from `productCatalog.generated.js`
 - Helper functions (configured products, theme, search)
-- `getBestPractices(product, platformInfo)` — returns enriched tip objects with
-  `{text, linkLabel, linkUrl, icon, custom}`. Merges platform-generic tips with
-  SC4S-specific tips (when `sc4s_url` is set) and custom `best_practices` entries.
+- `getBestPractices(product, platformInfo)` — enriched tip objects
+- Icon rendering: `icon_svg` loads from icons/ directory with dark variant
 - Card components (collapsed/expanded views)
-- Category sections, search/filter UI
-- Modals: BestPracticesModal, DataModelModal, LegacyAppsModal
-- Dark mode support via CSS variables and theme toggle
+- Category filter bar with subcategory pills and cross-cutting filters
+- Filter pill icons use `csc-filter-pill-icon` class for dark mode
+- Search with `deepMatch` — checks keywords, aliases, display_name, etc.
+- Modals: BestPractices, DataModel, LegacyApps, TechStack, PersonaQuickStart
+- Dark/Light/Auto theme toggle (three-state)
 
 ### `products.css` — Styles
 **Path:** `packages/splunk-cisco-app-navigator/src/main/resources/splunk/appserver/static/products.css`
 
-All card, layout, modal, dark mode styles. Key CSS variables:
-- `--custom-tip-bg` — background for custom best practices tips (green)
-- `.csc-split-pill-sc4s` — SC4S pill styling (blue, bold)
-- Dark mode uses `[data-theme="dark"]` selector
+All styles (~4079 lines). Key features:
+- CSS variables for theme switching
+- `.csc-filter-pill-icon` — dark mode white chip for filter pill SVGs
+- Dark mode uses `:root.dce-dark` selector
+- Dark mode card icons: frosted glass + Cisco-blue glow + white drop-shadow
+- Dark mode badge pills: light-mode styling preserved
+- CiscoSansTT font integration
+- Subcategory pill styling with animated slide-in
 
 ### `generate-catalog.js` — Build-Time Catalog Generator
 **Path:** `packages/splunk-cisco-app-navigator/bin/generate-catalog.js`
 
 Reads `products.conf` at build time and emits `productCatalog.generated.js`.
-This is the static fallback catalog that `index.jsx` imports. When adding new
-fields to `products.conf`, you must also add them to the field mapping in this
-file.
-
-### `products.conf.spec` — Field Documentation
-**Path:** `packages/splunk-cisco-app-navigator/src/main/resources/splunk/README/products.conf.spec`
-
-Splunk-standard spec file documenting every field in `products.conf`. Update
-this when adding new fields.
 
 ---
 
@@ -166,49 +175,21 @@ this when adding new fields.
 
 ### Prerequisites
 - Node.js, Yarn, Lerna (monorepo)
-- Splunk Enterprise installed at `/opt/splunk`
-- Symlink: `/opt/splunk/etc/apps/splunk-cisco-app-navigator` → `packages/splunk-cisco-app-navigator/stage`
+- Splunk Enterprise at `/opt/splunk`
+- Symlink: `/opt/splunk/etc/apps/splunk-cisco-app-navigator` -> `stage/`
 
-### Build (compile JS + copy configs to stage/)
+### Build
 ```bash
 cd packages/splunk-cisco-app-navigator && node bin/build.js build
 ```
-This runs: `generate-catalog.js` (products.conf → JS) → `webpack` (JSX → bundle).
 
-### Deploy JS/CSS/conf changes (no restart needed)
-```bash
-rm -f /opt/splunk/var/run/splunk/appserver/i18n/products*.cache
-# Reload products.conf via REST (Splunk 10.x compatible)
-curl -sk -u admin:changeme \
-  https://localhost:8089/servicesNS/nobody/splunk-cisco-app-navigator/configs/conf-products/_reload \
-  -X POST > /dev/null 2>&1
-# Reload views
-curl -sk -u admin:changeme \
-  https://localhost:8089/servicesNS/nobody/splunk-cisco-app-navigator/data/ui/views/_reload \
-  -X POST > /dev/null 2>&1
-```
-Then hard-refresh the browser (Cmd+Shift+R).
-
-**Note:** The old `debug/refresh` endpoint was removed in Splunk 10.x.
-Use the `_reload` endpoints above instead.
-
-### Deploy server.conf / app.conf changes (requires restart)
-```bash
-/opt/splunk/bin/splunk restart
-```
+### Deploy (no restart needed for JS/CSS/conf)
+Build auto-clears cache and triggers Splunk `_reload` endpoints.
+Hard-refresh browser (Cmd+Shift+R).
 
 ### Package for Splunkbase
 ```bash
 cd packages/splunk-cisco-app-navigator && bash bin/package_app.sh
-```
-Produces `splunk-cisco-app-navigator-<version>.tar.gz`. Automatically strips
-`local/` directory before packaging.
-
-### Verify app is loaded
-```bash
-curl -sk -u admin:changeme \
-  'https://localhost:8089/services/apps/local/splunk-cisco-app-navigator?output_mode=json' \
-  | python3 -m json.tool | grep -E '"label"|"version"|"visible"|"disabled"'
 ```
 
 ---
@@ -217,110 +198,53 @@ curl -sk -u admin:changeme \
 
 | Remote | URL | Purpose |
 |---|---|---|
-| `origin` | `https://cd.splunkdev.com/sg-cloud-tools-engineering/splunk-cisco-app-navigator.git` | **Current** — push here |
-| `old-ccc` | `https://cd.splunkdev.com/sg-cloud-tools-engineering/cisco-control-center-app.git` | **Old** — archive/remove |
+| `origin` | `https://cd.splunkdev.com/sg-cloud-tools-engineering/splunk-cisco-app-navigator.git` | Primary |
 
-**Primary branch:** `feature/scan-improvements` (has all latest work)
+**Primary branch:** `feature/scan-improvements`
 **Main branch:** `main`
-
-After confirming new origin has everything: `git remote remove old-ccc`
 
 ---
 
 ## Architecture Notes
 
-### Data Flow
-1. Admin adds products to their workspace (localStorage, key: `scan_configured_products`)
-2. App fetches live data from Splunk REST endpoints:
-   - `configs/conf-products` — product metadata
-   - `apps/local` — installed app inventory
-   - `server/info` — platform detection (Cloud vs Enterprise)
-   - `search/jobs` — sourcetype detection (data flowing checks, `| tstats count`)
-3. Cards render with real-time install status, version checks, data flowing indicators
+### Icon System
+- **Primary:** `icon_svg` loads `icons/{name}.svg` (light) / `{name}_white.svg` (dark)
+- **Fallback:** `icon_emoji` via ICON_EMOJI_MAP (32 emojis)
+- **Ultimate fallback:** First letter of `display_name`
+- **128 icon files:** 126 SVGs + 2 PNGs
+- **Dark mode:** Frosted glass + Cisco-blue glow + drop-shadow
 
-### Sourcetype Detection
-- Uses `| tstats count WHERE index=* sourcetype=<st> | where count > 0`
-- Three states: flowing (green), not flowing (red), checking (spinner)
-- Count=0 is treated as "not flowing" (important fix)
+### Categories & Subcategories
+4 main categories: Security (39), Networking (30), Collaboration (6), Observability (3).
+13 subcategories for granular filtering.
+Cross-cutting filters: SOAR (12), Alert Actions (5), AI-Powered (15), Secure Networking GTM (60).
 
-### Best Practices Modal
-- Platform-aware tips (different for Cloud vs Enterprise)
-- Auto-generated tips from product metadata (addon docs, dashboards, legacy removal)
-- SC4S tip merges with platform syslog tip when `sc4s_url` is set (avoids duplication)
-- Custom per-product tips from `best_practices` field (pipe-delimited)
-- Custom tips render with green styling (border + background)
+### Sort Order Strategy
+Products sorted with related products adjacent:
+- Security: 10-60, 900-909 (Retired)
+- Networking: 100-141, 899-908 (Retired)
+- Observability: 200-202
+- Collaboration: 300-305
 
 ### Dark Mode
-- Theme toggle in header (sun/moon icon)
-- Stored in localStorage (key: `scan_theme_preference`)
-- CSS uses `[data-theme="dark"]` selector
-- Variables: `--bg`, `--text`, `--card-bg`, `--border`, `--custom-tip-bg`, etc.
-
-### Categories
-Products are grouped into: Security, Networking, Collaboration, Observability, Deprecated.
-Each category has an emoji icon and description. The `CATEGORY_IDS` set determines
-which stanzas render as cards (non-card categories like `alert_actions` are excluded).
+- Three-state toggle: Light / Dark / Auto
+- CSS uses `:root.dce-dark` selector
+- Card icons: frosted glass + Cisco-blue glow
+- Filter pill icons: white chip via `.csc-filter-pill-icon`
+- Badge pills: light-mode styling preserved in dark mode
 
 ---
 
-## Common Tasks
-
-### Add a new product
-1. Add a stanza to `products.conf` (follow existing examples)
-2. Update `products.conf.spec` if adding new fields
-3. Update `generate-catalog.js` field mapping if adding new fields
-4. Build: `cd packages/splunk-cisco-app-navigator && node bin/build.js build`
-5. Deploy (see above)
-
-### Edit a product card
-1. Edit the stanza in `products.conf`
-2. Rebuild and deploy
-
-### Add a new UI feature
-1. Edit `index.jsx` for logic/components
-2. Edit `products.css` for styles
-3. If new conf fields needed: update `products.conf`, `generate-catalog.js`, `products.conf.spec`
-4. Build and deploy
-
-### Troubleshooting
-- If cards don't appear: check browser console, verify app is loaded via REST API
-- If data flowing shows wrong state: check sourcetype case sensitivity in products.conf
-- If styles don't update: clear cache files and run `_reload` endpoints (see Deploy section)
-- If products.conf changes don't take effect: use `configs/conf-products/_reload` endpoint
-
----
-
-## Important Conventions
-
-- **No empty fields** — if a field has no value, omit it entirely from products.conf
-- **Sourcetypes are case-sensitive** — must match exactly what Splunk indexes
-- **productCatalog.generated.js is auto-generated** — never edit directly; edit products.conf
-- **stage/ is the build output** — don't edit files there; they're overwritten on build
-- **`disabled = 1`** hides a product stanza from the UI entirely
-- **addon_install_url** deep-links must use `/manager/splunk-cisco-app-navigator/...`
-
----
-
-## Pending Tasks (as of Feb 2026)
-
-- [ ] Push `main` and `feature/scan-improvements` branches to new `origin` (GitLab)
-- [ ] Rename outer repo folder: `~/repo/cisco_control_center_app` → `~/repo/splunk-cisco-app-navigator`
-  - Requires: close VS Code, `mv` folder, fix symlink, reopen
-  - Fix symlink: `rm /opt/splunk/etc/apps/splunk-cisco-app-navigator && ln -s ~/repo/splunk-cisco-app-navigator/packages/splunk-cisco-app-navigator/stage /opt/splunk/etc/apps/splunk-cisco-app-navigator`
-- [ ] Archive old GitLab project: Settings → General → Advanced → Archive
-- [ ] Remove `old-ccc` remote after confirming new origin has all branches
-
----
-
-## Utility Scripts (in `scripts/`)
+## Utility Scripts (scripts/ — 70 scripts)
 
 | Script | Purpose |
 |---|---|
-| `normalize_products_conf.py` | Normalize/clean products.conf formatting |
-| `resort_products.py` | Re-sort product stanzas in products.conf |
-| `csv_deep_v2.py` | Deep CSV analysis of product data |
-| `csv_correct_analysis.py` | CSV correction analysis |
-| `gen_pptx_cisco.py` | Generate Cisco-branded PowerPoint presentations |
-| `convert_potx_to_pptx.py` | Convert PowerPoint templates |
-| `verify_pptx.py` | Verify generated presentations |
-| `inspect_template.py` | Inspect PowerPoint template structure |
+| `normalize_products_conf.py` | Normalize products.conf formatting |
+| `resort_products.py` | Re-sort product stanzas |
+| `update_sort_keywords_v2.py` | Bulk update sort_order and keywords |
+| `audit_sourcetypes.py` | Audit sourcetype coverage |
+| `audit_card_appearance.py` | Audit card appearance fields |
+| `rename_ccc_to_scan.py` | SCAN rename utility |
+| `gen_pptx_cisco.py` | Generate Cisco-branded presentations |
+
+**Note:** `update_sort_keywords.py` (v1) is broken — use `update_sort_keywords_v2.py` instead.

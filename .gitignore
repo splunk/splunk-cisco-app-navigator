@@ -1,34 +1,32 @@
-# Build outputs
+# === Build outputs ===
 packages/splunk-cisco-app-navigator/stage/
 packages/splunk-cisco-app-navigator/*.tar.gz
 
-# Dependencies
+# === Dependencies ===
 node_modules/
 
-# OS
+# === OS ===
 .DS_Store
 Thumbs.db
 
-# Python
+# === Python ===
 __pycache__/
 *.pyc
 *.pyo
 .venv/
 
-# Editor
+# === Editor / IDE ===
 .idea/
+.vscode/settings.json
 *.swp
-
-# Splunk local overrides (never commit)
-**/local/
 ~$*
 
-# Backups
-backups/
+# === Splunk local overrides (never commit) ===
+**/local/
 
-# Docs — generated presentations, chat history, binaries
+# === Backups & docs (local reference, not tracked) ===
+backups/
 docs/
-scripts/
-# .github/copilot-instructions.md
-.vscode/settings.json
+
+# === Cisco brand assets (large binaries, reference only) ===
 /cisco
