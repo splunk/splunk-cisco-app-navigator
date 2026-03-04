@@ -400,6 +400,58 @@ sc4s_config_notes = <pipe-delimited string>
 * Example: Configure ISE with Log Level 6 (Informational)|Use TCP/IP protocol
 * Default: (empty).
 
+netflow_supported = true | false
+* Whether this product supports network telemetry onboarding via NetFlow / Splunk Stream.
+* When true, the card displays a "NetFlow / Stream" tab in the Dual-Path Onboarding section,
+* alongside the Standard and SC4S tabs (if SC4S is also supported).
+* Default: false.
+
+netflow_addon = <string>
+* App ID of the Cisco-specific NetFlow add-on required for this onboarding path.
+* Typically the Cisco Catalyst Enhanced Netflow Add-on (splunk_app_stream_ipfix_cisco_hsl).
+* Example: splunk_app_stream_ipfix_cisco_hsl
+* Default: (empty).
+
+netflow_addon_label = <string>
+* Display label for the NetFlow add-on.
+* Example: Cisco Catalyst Enhanced Netflow Add-on for Splunk
+* Default: (empty).
+
+netflow_addon_splunkbase_url = <url>
+* Splunkbase URL for the NetFlow add-on.
+* Default: (empty).
+
+netflow_addon_splunkbase_id = <string>
+* Splunkbase app ID number for the NetFlow add-on.
+* Example: 6872
+* Default: (empty).
+
+netflow_addon_install_url = <url>
+* Deep-link install URL for the NetFlow add-on within the Splunk App Manager.
+* Default: (empty).
+
+netflow_addon_docs_url = <url>
+* Documentation URL for the NetFlow add-on.
+* Default: (empty).
+
+stream_docs_url = <url>
+* Documentation URL for the Splunk Stream platform.
+* Links to the official Splunk Stream documentation covering installation,
+* configuration, and operation of all three Stream packages.
+* Default: (empty).
+
+netflow_sourcetypes = <comma-separated list>
+* Sourcetypes specific to the NetFlow / Stream onboarding path.
+* Example: stream:cisco_ipfix
+* Default: (empty).
+
+netflow_config_notes = <pipe-delimited string>
+* Product-specific configuration notes for the NetFlow / Stream onboarding path.
+* Multiple notes are separated by the pipe character (|).
+* Shown in the NetFlow tab of the Dual-Path Onboarding section.
+* Example: Configure NetFlow v9 on switches|Export to Stream Forwarder UDP port
+* Default: (empty).
+
 best_practices = <pipe-delimited string>
 * Custom per-product best-practice tips shown in the Best Practices modal.
 * Multiple tips are separated by the pipe character (|).
