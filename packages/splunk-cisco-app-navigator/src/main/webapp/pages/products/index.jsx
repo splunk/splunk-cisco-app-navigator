@@ -319,6 +319,16 @@ async function loadProductsFromConf() {
             sc4s_search_head_ta_install_url: c.sc4s_search_head_ta_install_url || '',
             sc4s_sourcetypes: (c.sc4s_sourcetypes || '').split(',').map(s => s.trim()).filter(Boolean),
             sc4s_config_notes: (c.sc4s_config_notes || '').split('|').map(s => s.trim()).filter(Boolean),
+            netflow_supported: c.netflow_supported === 'true' || c.netflow_supported === '1' || c.netflow_supported === true,
+            netflow_addon: c.netflow_addon || '',
+            netflow_addon_label: c.netflow_addon_label || '',
+            netflow_addon_splunkbase_url: c.netflow_addon_splunkbase_url || '',
+            netflow_addon_splunkbase_id: c.netflow_addon_splunkbase_id || '',
+            netflow_addon_install_url: c.netflow_addon_install_url || '',
+            netflow_addon_docs_url: c.netflow_addon_docs_url || '',
+            stream_docs_url: c.stream_docs_url || '',
+            netflow_sourcetypes: (c.netflow_sourcetypes || '').split(',').map(s => s.trim()).filter(Boolean),
+            netflow_config_notes: (c.netflow_config_notes || '').split('|').map(s => s.trim()).filter(Boolean),
             best_practices: (c.best_practices || '').split('|').map(s => s.trim()).filter(Boolean),
             sort_order: parseInt(c.sort_order || '100', 10),
         };
@@ -836,6 +846,224 @@ function SC4SInfoModal({ open, onClose }) {
     );
 }
 
+// ────────────────────  NETFLOW / STREAM INFO MODAL  ───────────────────────
+
+function NetFlowInfoModal({ open, onClose }) {
+    const returnFocusRef = useRef(null);
+    if (!open) return null;
+    return (
+        <Modal open returnFocus={returnFocusRef} onRequestClose={onClose} style={{ maxWidth: '860px', width: '92vw' }}>
+            <Modal.Header title="📊 NetFlow / Splunk Stream" />
+            <Modal.Body>
+                <div className="csc-sc4s-info">
+                    <div className="csc-sc4s-info-hero" style={{ background: 'linear-gradient(135deg, rgba(0,115,0,0.04), rgba(4,159,217,0.04))' }}>
+                        <div className="csc-sc4s-info-hero-icon">📊</div>
+                        <div className="csc-sc4s-info-hero-text">
+                            <h3>Technical Overview</h3>
+                            <p>The NetFlow / Splunk Stream solution provides network traffic visibility from Cisco devices using <strong>4 complementary packages</strong> — <strong>3 from Splunk</strong> (the Stream platform) and <strong>1 from Cisco</strong> (enhanced Netflow). Together they collect, parse, enrich, and visualize NetFlow v9, IPFIX, and wire data from your Cisco infrastructure.</p>
+                        </div>
+                    </div>
+
+                    <div className="csc-sc4s-info-section">
+                        <h4>📦 The 4-Package Ecosystem</h4>
+                        <p style={{ marginBottom: '12px', color: '#666', fontSize: '13px' }}>All 4 packages work together. The 3 Splunk packages form the core Stream platform; the Cisco package adds IOS-XE-specific enhancements.</p>
+                        <div className="csc-sc4s-info-grid">
+                            <div className="csc-sc4s-info-card" style={{ borderLeft: '3px solid #049fd9' }}>
+                                <span className="csc-sc4s-info-card-icon">📡</span>
+                                <strong>Splunk Add-on for Stream Forwarders</strong>
+                                <span style={{ fontSize: '11px', color: '#888', fontStyle: 'italic' }}><a href="https://splunkbase.splunk.com/app/5238" target="_blank" rel="noopener noreferrer" style={{ color: '#049fd9' }}>Splunkbase 5238</a> &middot; Splunk</span>
+                                <span>The <strong>collection agent</strong>. Receives NetFlow/IPFIX exports from Cisco devices on configured UDP ports. Install on any <strong>Heavy Forwarder or Universal Forwarder</strong> that receives network flow traffic.</span>
+                            </div>
+                            <div className="csc-sc4s-info-card" style={{ borderLeft: '3px solid #049fd9' }}>
+                                <span className="csc-sc4s-info-card-icon">📊</span>
+                                <strong>Splunk App for Stream</strong>
+                                <span style={{ fontSize: '11px', color: '#888', fontStyle: 'italic' }}><a href="https://splunkbase.splunk.com/app/1809" target="_blank" rel="noopener noreferrer" style={{ color: '#049fd9' }}>Splunkbase 1809</a> &middot; Splunk</span>
+                                <span>The <strong>management UI</strong>. Provides dashboards, stream configurations, and forwarder management. Install on <strong>Search Heads</strong>.</span>
+                            </div>
+                            <div className="csc-sc4s-info-card" style={{ borderLeft: '3px solid #049fd9' }}>
+                                <span className="csc-sc4s-info-card-icon">🏷️</span>
+                                <strong>Splunk Add-on for Stream Wire Data</strong>
+                                <span style={{ fontSize: '11px', color: '#888', fontStyle: 'italic' }}><a href="https://splunkbase.splunk.com/app/5234" target="_blank" rel="noopener noreferrer" style={{ color: '#049fd9' }}>Splunkbase 5234</a> &middot; Splunk</span>
+                                <span><strong>Knowledge objects &amp; CIM mappings</strong> for parsing and normalizing Stream data. Install on <strong>Search Heads</strong> (for search-time parsing) and <strong>Indexers</strong> (for field extractions at index time).</span>
+                            </div>
+                            <div className="csc-sc4s-info-card" style={{ borderLeft: '3px solid #6abf4b' }}>
+                                <span className="csc-sc4s-info-card-icon">🔌</span>
+                                <strong>Cisco Catalyst Enhanced Netflow Add-on</strong>
+                                <span style={{ fontSize: '11px', color: '#888', fontStyle: 'italic' }}><a href="https://splunkbase.splunk.com/app/6872" target="_blank" rel="noopener noreferrer" style={{ color: '#6abf4b' }}>Splunkbase 6872</a> &middot; Cisco</span>
+                                <span>Extends Stream with <strong>Cisco-specific IPFIX templates</strong> and field extractions for IOS-XE devices. Decodes proprietary information elements for Application Visibility, Performance Routing, and SD-WAN metrics. Install on <strong>Search Heads</strong>.</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div className="csc-sc4s-info-section">
+                        <h4>🎯 When Do You Need Each Package?</h4>
+                        <table className="csc-sc4s-info-table">
+                            <thead>
+                                <tr>
+                                    <th style={{ width: '28%', fontWeight: 600, padding: '8px 12px', textAlign: 'left' }}>Cisco Platform</th>
+                                    <th style={{ width: '42%', fontWeight: 600, padding: '8px 12px', textAlign: 'left' }}>3 Splunk Stream Packages</th>
+                                    <th style={{ width: '30%', fontWeight: 600, padding: '8px 12px', textAlign: 'left' }}>Cisco Enhanced Netflow</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td className="csc-sc4s-info-table-label">IOS-XE Devices</td>
+                                    <td>✅ Required — core Stream platform</td>
+                                    <td><strong>✅ Required</strong> — decodes Cisco IPFIX templates</td>
+                                </tr>
+                                <tr style={{ fontSize: '12px', color: '#888' }}>
+                                    <td style={{ paddingLeft: '20px', border: 'none', paddingTop: 0 }}></td>
+                                    <td colSpan="2" style={{ border: 'none', paddingTop: 0 }}><em>Catalyst Center, Catalyst SD-WAN, ISR, ASR, WLC, Catalyst Switches, Meraki</em></td>
+                                </tr>
+                                <tr>
+                                    <td className="csc-sc4s-info-table-label">NX-OS Devices</td>
+                                    <td>✅ Required — core Stream platform</td>
+                                    <td>⬜ Not needed — NX-OS uses standard NetFlow v9</td>
+                                </tr>
+                                <tr style={{ fontSize: '12px', color: '#888' }}>
+                                    <td style={{ paddingLeft: '20px', border: 'none', paddingTop: 0 }}></td>
+                                    <td colSpan="2" style={{ border: 'none', paddingTop: 0 }}><em>Nexus switches (standard NetFlow v9 templates)</em></td>
+                                </tr>
+                                <tr>
+                                    <td className="csc-sc4s-info-table-label">ACI Fabric</td>
+                                    <td>✅ Required — captures SPAN/ERSPAN traffic</td>
+                                    <td>⬜ Not needed — ACI uses SPAN/ERSPAN, not NetFlow</td>
+                                </tr>
+                                <tr style={{ fontSize: '12px', color: '#888' }}>
+                                    <td style={{ paddingLeft: '20px', border: 'none', paddingTop: 0 }}></td>
+                                    <td colSpan="2" style={{ border: 'none', paddingTop: 0 }}><em>ACI leaf/spine switches (mirrored traffic via ERSPAN)</em></td>
+                                </tr>
+                                <tr>
+                                    <td className="csc-sc4s-info-table-label">IOS-XR Devices</td>
+                                    <td>✅ Required — core Stream platform</td>
+                                    <td><strong>✅ Recommended</strong> — enhances IPFIX decoding</td>
+                                </tr>
+                                <tr style={{ fontSize: '12px', color: '#888' }}>
+                                    <td style={{ paddingLeft: '20px', border: 'none', paddingTop: 0 }}></td>
+                                    <td colSpan="2" style={{ border: 'none', paddingTop: 0 }}><em>CRS carrier routers (IPFIX-capable)</em></td>
+                                </tr>
+                            </tbody>
+                        </table>
+
+                        <div style={{ marginTop: '14px', padding: '12px 16px', background: 'linear-gradient(135deg, rgba(0,137,123,0.06), rgba(4,159,217,0.04))', borderRadius: '8px', borderLeft: '3px solid #00897b' }}>
+                            <strong style={{ fontSize: '13px' }}>💡 Nexus Dashboard — Proprietary Flow Monitoring</strong>
+                            <p style={{ margin: '6px 0 0', fontSize: '12.5px', lineHeight: 1.5 }}>
+                                For <strong>ACI and Nexus switches</strong>, Cisco also offers <strong>Nexus Dashboard Insights (NDI)</strong> — a proprietary flow monitoring and analytics technology built into the fabric itself.
+                                NDI provides deep fabric-level flow telemetry, anomaly detection, and advisory intelligence <em>without</em> requiring Splunk Stream.
+                                This data can be ingested into Splunk via the <strong>Cisco DC Networking TA</strong> (sourcetype <code>cisco:dc:nd:flows</code>).
+                            </p>
+                            <p style={{ margin: '6px 0 0', fontSize: '12px', color: '#888' }}>
+                                <em>Stream-based collection (above) and Nexus Dashboard are complementary — Stream captures raw NetFlow/SPAN at the packet level, while NDI provides Cisco-native application-level flow analytics and fabric assurance.</em>
+                            </p>
+                        </div>
+                    </div>
+
+                    <div className="csc-sc4s-info-section">
+                        <h4>🏗️ Deployment Architecture</h4>
+                        <table className="csc-sc4s-info-table">
+                            <thead>
+                                <tr>
+                                    <th style={{ width: '22%', fontWeight: 600, padding: '8px 12px', textAlign: 'left' }}>Splunk Tier</th>
+                                    <th style={{ fontWeight: 600, padding: '8px 12px', textAlign: 'left' }}>What to Install</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td className="csc-sc4s-info-table-label">Forwarders</td>
+                                    <td><strong>Add-on for Stream Forwarders</strong> (5238) — collects NetFlow/IPFIX/SPAN on configured UDP ports</td>
+                                </tr>
+                                <tr>
+                                    <td className="csc-sc4s-info-table-label">Indexers</td>
+                                    <td><strong>Add-on for Stream Wire Data</strong> (5234) — index-time field extractions and CIM mappings</td>
+                                </tr>
+                                <tr>
+                                    <td className="csc-sc4s-info-table-label">Search Heads</td>
+                                    <td><strong>App for Stream</strong> (1809) + <strong>Add-on for Stream Wire Data</strong> (5234) + <strong>Cisco Enhanced Netflow Add-on</strong> (6872, IOS-XE only)</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <div className="csc-sc4s-info-section">
+                        <h4>⚡ Key Technical Benefits</h4>
+                        <div className="csc-sc4s-info-grid">
+                            <div className="csc-sc4s-info-card">
+                                <span className="csc-sc4s-info-card-icon">🔍</span>
+                                <strong>Deep Cisco Visibility</strong>
+                                <span>The Cisco Enhanced Netflow Add-on decodes proprietary IPFIX information elements for Application Visibility, Performance Routing, SD-WAN, and media metrics from IOS-XE devices.</span>
+                            </div>
+                            <div className="csc-sc4s-info-card">
+                                <span className="csc-sc4s-info-card-icon">📈</span>
+                                <strong>Flow Aggregation</strong>
+                                <span>Stream's built-in aggregation reduces indexed volume while maintaining full network visibility — critical for high-volume environments with thousands of flows per second.</span>
+                            </div>
+                            <div className="csc-sc4s-info-card">
+                                <span className="csc-sc4s-info-card-icon">🌐</span>
+                                <strong>Multi-Protocol</strong>
+                                <span>Supports NetFlow v5, v9, IPFIX, sFlow, jFlow, and SPAN/ERSPAN — covering IOS-XE, NX-OS, IOS-XR, and ACI platforms.</span>
+                            </div>
+                            <div className="csc-sc4s-info-card">
+                                <span className="csc-sc4s-info-card-icon">🏷️</span>
+                                <strong>CIM-Compliant</strong>
+                                <span>The Wire Data Add-on maps Stream data to the Splunk Common Information Model, enabling cross-product correlation in ES, ITSI, and custom dashboards.</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div className="csc-sc4s-info-section">
+                        <h4>✅ Best Practices</h4>
+                        <div className="csc-sc4s-info-bp">
+                            <div className="csc-sc4s-info-bp-item csc-sc4s-info-bp-good">
+                                <span className="csc-sc4s-info-bp-marker">📊</span>
+                                <div>
+                                    <strong>Install All 3 Stream Packages</strong>
+                                    <p>All three Splunk Stream packages are required: the Forwarder TA on forwarders, the App on search heads, and the Wire Data TA on both search heads and indexers. Missing any one will result in incomplete data parsing.</p>
+                                </div>
+                            </div>
+                            <div className="csc-sc4s-info-bp-item csc-sc4s-info-bp-good">
+                                <span className="csc-sc4s-info-bp-marker">🔌</span>
+                                <div>
+                                    <strong>Add Cisco Enhanced Netflow for IOS-XE</strong>
+                                    <p>If your Cisco devices run IOS-XE (Catalyst, SD-WAN/cEdge, ISR, ASR, WLC), install the Cisco Enhanced Netflow Add-on on search heads. It is <em>not</em> needed for NX-OS (Nexus) or ACI.</p>
+                                </div>
+                            </div>
+                            <div className="csc-sc4s-info-bp-item csc-sc4s-info-bp-good">
+                                <span className="csc-sc4s-info-bp-marker">⚙️</span>
+                                <div>
+                                    <strong>Use IPFIX over NetFlow v5</strong>
+                                    <p>IPFIX (based on NetFlow v9) provides richer metadata including application visibility and media flow data. Critical for Cisco Catalyst, SD-WAN, and ISR platforms.</p>
+                                </div>
+                            </div>
+                            <div className="csc-sc4s-info-bp-item">
+                                <span className="csc-sc4s-info-bp-marker">⚖️</span>
+                                <div>
+                                    <strong>Aggregation for Volume Control</strong>
+                                    <p>Use Stream's built-in aggregation to reduce NetFlow data volume before indexing. Especially important for high-volume environments with thousands of active flows per second.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div className="csc-sc4s-info-footer">
+                        <a href="https://help.splunk.com/en/splunk-cloud-platform/collect-stream-data/install-and-configure-splunk-stream/8.1/introduction/about-splunk-stream" target="_blank" rel="noopener noreferrer" className="csc-sc4s-info-link">
+                            📚 Splunk Stream Documentation ↗
+                        </a>
+                        <a href="https://www.cisco.com/c/en/us/solutions/collateral/enterprise-networks/sd-wan/sd-wan-splunk-integration-ug.html" target="_blank" rel="noopener noreferrer" className="csc-sc4s-info-link csc-sc4s-info-link-gh">
+                            📖 Cisco Enhanced Netflow Guide ↗
+                        </a>
+                        <a href="https://splunkbase.splunk.com/app/6872" target="_blank" rel="noopener noreferrer" className="csc-sc4s-info-link csc-sc4s-info-link-gh">
+                            🔌 Enhanced Netflow on Splunkbase ↗
+                        </a>
+                    </div>
+                </div>
+            </Modal.Body>
+            <Modal.Footer>
+                <Button appearance="secondary" label="Close" onClick={onClose} />
+            </Modal.Footer>
+        </Modal>
+    );
+}
+
 // ────────────────────  BEST PRACTICES MODAL  ───────────────────────
 
 function BestPracticesModal({ open, onClose, product, platformType }) {
@@ -1196,6 +1424,9 @@ function ProductCard({ product, installedApps, appStatuses, sourcetypeData, isCo
         card_banner, card_banner_color, card_banner_size, card_banner_opacity, card_accent, card_bg_color, is_new, support_level, cisco_retired, coverage_gap,
         sc4s_url, sc4s_supported, sc4s_search_head_ta, sc4s_search_head_ta_label,
         sc4s_search_head_ta_splunkbase_url, sc4s_search_head_ta_install_url, sc4s_sourcetypes, sc4s_config_notes,
+        netflow_supported, netflow_addon, netflow_addon_label,
+        netflow_addon_splunkbase_url, netflow_addon_install_url, netflow_addon_docs_url,
+        stream_docs_url, netflow_sourcetypes, netflow_config_notes,
     } = product;
 
     const appStatus = appStatuses[addon] || null;
@@ -1209,9 +1440,27 @@ function ProductCard({ product, installedApps, appStatuses, sourcetypeData, isCo
     const sc4sShTaStatus = sc4s_search_head_ta ? (appStatuses[sc4s_search_head_ta] || null) : null;
     const hasDifferentSc4sTa = sc4s_supported && sc4s_search_head_ta && sc4s_search_head_ta !== addon;
 
+    const netflowAddonStatus = netflow_addon ? (appStatuses[netflow_addon] || null) : null;
+    const hasTabs = sc4s_supported || netflow_supported;
+
+    // Separate Stream prereqs from Standard prereqs — Stream apps belong in the NetFlow tab
+    const STREAM_APP_IDS = new Set(['Splunk_TA_stream', 'splunk_app_stream', 'Splunk_TA_stream_wire_data']);
+    const standardPrereqs = netflow_supported
+        ? (prereq_apps || []).filter(pa => !STREAM_APP_IDS.has(pa.app_id))
+        : (prereq_apps || []);
+    // Splunk App for Stream = the visualization/dashboard app for Stream data
+    const streamVizApp = netflow_supported
+        ? (prereq_apps || []).find(pa => pa.app_id === 'splunk_app_stream') || null
+        : null;
+    // The 2 Stream TAs are the real prerequisites (Forwarder TA + Wire Data TA)
+    const streamPrereqs = netflow_supported
+        ? (prereq_apps || []).filter(pa => STREAM_APP_IDS.has(pa.app_id) && pa.app_id !== 'splunk_app_stream')
+        : [];
+
     const [depsExpanded, setDepsExpanded] = useState(false);
-    const [depTab, setDepTab] = useState('standard');            // 'standard' | 'sc4s'
+    const [depTab, setDepTab] = useState('standard');            // 'standard' | 'sc4s' | 'netflow'
     const [sc4sInfoOpen, setSc4sInfoOpen] = useState(false);
+    const [netflowInfoOpen, setNetflowInfoOpen] = useState(false);
     const [dataWarnExpanded, setDataWarnExpanded] = useState(false);
     const [stExpanded, setStExpanded] = useState(false);
     const [communityExpanded, setCommunityExpanded] = useState(false);
@@ -1235,7 +1484,7 @@ function ProductCard({ product, installedApps, appStatuses, sourcetypeData, isCo
     }));
     const allDeps = [...depItems, ...prereqItems];
     const depsMissing = allDeps.filter(d => !d.installed).length;
-    const hasDeps = allDeps.length > 0 || sc4s_supported;
+    const hasDeps = allDeps.length > 0 || sc4s_supported || netflow_supported;
 
     // Launch handlers
     const handleLaunchDefault = () => {
@@ -1453,8 +1702,8 @@ function ProductCard({ product, installedApps, appStatuses, sourcetypeData, isCo
                     {/* Expanded detail rows */}
                     {depsExpanded && (
                         <div className="csc-dep-expanded">
-                            {/* ── Support Level Badge (non-SC4S products only — SC4S products show it inside the tab) ── */}
-                            {support_level && !sc4s_supported && (
+                            {/* ── Support Level Badge (products without tabs show it outside) ── */}
+                            {support_level && !hasTabs && (
                                 <div className={`csc-support-badge csc-support-${support_level}`}>
                                     {support_level === 'cisco_supported' && '🛡️ Cisco Supported'}
                                     {support_level === 'splunk_supported' && '✦ Splunk Supported'}
@@ -1464,8 +1713,8 @@ function ProductCard({ product, installedApps, appStatuses, sourcetypeData, isCo
                                 </div>
                             )}
 
-                            {/* ── Tab bar (SC4S products only) ── */}
-                            {sc4s_supported && (
+                            {/* ── Tab bar (products with SC4S and/or NetFlow) ── */}
+                            {hasTabs && (
                                 <>
                                 <div className="csc-dep-tabs">
                                     <button
@@ -1475,31 +1724,55 @@ function ProductCard({ product, installedApps, appStatuses, sourcetypeData, isCo
                                     >
                                         🟢 Standard
                                     </button>
-                                    <button
-                                        className={`csc-dep-tab ${depTab === 'sc4s' ? 'csc-dep-tab-active csc-dep-tab-sc4s' : ''}`}
-                                        onClick={() => setDepTab('sc4s')}
-                                        type="button"
-                                    >
-                                        📡 SC4S / High-Scale
-                                    </button>
-                                    <button
-                                        className="csc-sc4s-info-trigger"
-                                        onClick={(e) => { e.stopPropagation(); setSc4sInfoOpen(true); }}
-                                        type="button"
-                                        title="What is SC4S? — Learn about Splunk Connect for Syslog"
-                                    >
-                                        ℹ️
-                                    </button>
+                                    {sc4s_supported && (
+                                        <button
+                                            className={`csc-dep-tab ${depTab === 'sc4s' ? 'csc-dep-tab-active csc-dep-tab-sc4s' : ''}`}
+                                            onClick={() => setDepTab('sc4s')}
+                                            type="button"
+                                        >
+                                            📡 SC4S / High-Scale
+                                        </button>
+                                    )}
+                                    {netflow_supported && (
+                                        <button
+                                            className={`csc-dep-tab ${depTab === 'netflow' ? 'csc-dep-tab-active csc-dep-tab-netflow' : ''}`}
+                                            onClick={() => setDepTab('netflow')}
+                                            type="button"
+                                        >
+                                            <img src={createURL(`/static/app/${APP_ID}/icons/network_analytics.svg`)} alt="" style={{ width: '14px', height: '14px', verticalAlign: '-2px', marginRight: '4px' }} className="csc-filter-pill-icon" />NetFlow / Stream
+                                        </button>
+                                    )}
+                                    {sc4s_supported && (
+                                        <button
+                                            className="csc-sc4s-info-trigger"
+                                            onClick={(e) => { e.stopPropagation(); setSc4sInfoOpen(true); }}
+                                            type="button"
+                                            title="What is SC4S? — Learn about Splunk Connect for Syslog"
+                                        >
+                                            <span style={{ fontSize: '13px' }}>📡</span> <span style={{ fontSize: '10px', fontWeight: 600, opacity: 0.7 }}>ⓘ</span>
+                                        </button>
+                                    )}
+                                    {netflow_supported && (
+                                        <button
+                                            className="csc-sc4s-info-trigger csc-netflow-info-trigger"
+                                            onClick={(e) => { e.stopPropagation(); setNetflowInfoOpen(true); }}
+                                            type="button"
+                                            title="What is NetFlow / Stream? — Learn about Splunk Stream for NetFlow collection"
+                                        >
+                                            <img src={createURL(`/static/app/${APP_ID}/icons/network_analytics.svg`)} alt="" style={{ width: '13px', height: '13px', verticalAlign: '-1px' }} className="csc-filter-pill-icon" /> <span style={{ fontSize: '10px', fontWeight: 600, opacity: 0.7 }}>ⓘ</span>
+                                        </button>
+                                    )}
                                 </div>
                                 <SC4SInfoModal open={sc4sInfoOpen} onClose={() => setSc4sInfoOpen(false)} />
+                                <NetFlowInfoModal open={netflowInfoOpen} onClose={() => setNetflowInfoOpen(false)} />
                                 </>
                             )}
 
-                            {/* ── Tab content: Standard (always shown for non-SC4S; tab 1 for SC4S) ── */}
-                            {(!sc4s_supported || depTab === 'standard') && (
+                            {/* ── Tab content: Standard (always shown for non-tabbed; tab 1 for tabbed) ── */}
+                            {(!hasTabs || depTab === 'standard') && (
                                 <>
-                            {/* Support badge inside Standard tab for SC4S products */}
-                            {sc4s_supported && support_level && (
+                            {/* Support badge inside Standard tab for tabbed products */}
+                            {hasTabs && support_level && (
                                 <div className={`csc-support-badge csc-support-${support_level}`}>
                                     {support_level === 'cisco_supported' && '🛡️ Cisco Supported'}
                                     {support_level === 'splunk_supported' && '✦ Splunk Supported'}
@@ -1650,11 +1923,11 @@ function ProductCard({ product, installedApps, appStatuses, sourcetypeData, isCo
                                     </>
                                 );
                             })()}
-                            {prereq_apps && prereq_apps.length > 0 && (
+                            {standardPrereqs.length > 0 && (
                                 <>
                                     <hr className="csc-dep-divider" />
                                     <span className="csc-dep-label csc-dep-label-prereq">Prerequisites</span>
-                                    {prereq_apps.map((pa) => {
+                                    {standardPrereqs.map((pa) => {
                                         const prereqInstalled = !!installedApps[pa.app_id];
                                         return (
                                             <div className="csc-dep-detail" key={pa.app_id}>
@@ -1879,8 +2152,163 @@ function ProductCard({ product, installedApps, appStatuses, sourcetypeData, isCo
                                 </>
                             )}
 
-                            {/* ── Dashboard App (shared — shown below both tabs, or for non-SC4S products inside the standard flow) ── */}
-                            {sc4s_supported && app_viz && (
+                            {/* ── Tab content: NetFlow / Stream (tab for NetFlow-capable products) ── */}
+                            {netflow_supported && depTab === 'netflow' && (
+                                <>
+                                    {/* NetFlow path is always Cisco Supported */}
+                                    <div className="csc-support-badge csc-support-cisco_supported">
+                                        🛡️ Cisco Supported
+                                    </div>
+                                    <hr className="csc-dep-divider" />
+                                    {netflow_addon ? (
+                                        <>
+                                            <span className="csc-dep-label csc-dep-label-netflow">NetFlow Add-on</span>
+                                            <div className="csc-dep-detail">
+                                                {netflowAddonStatus?.installed ? (
+                                                    <a href={createURL(`/app/${netflow_addon}/`)} target="_blank" rel="noopener noreferrer" className="csc-dep-name csc-dep-name-link" title={`Open ${netflow_addon_label || netflow_addon}`}>{netflow_addon_label || netflow_addon}</a>
+                                                ) : (
+                                                    <span className="csc-dep-name">{netflow_addon_label || netflow_addon}</span>
+                                                )}
+                                                {netflow_addon_label && netflow_addon_label !== netflow_addon && <span className="csc-dep-appid" title="Splunk folder name">{netflow_addon}</span>}
+                                                {(netflow_addon_splunkbase_url || netflow_addon_docs_url) && (
+                                                    <span className="csc-split-pill">
+                                                        {netflow_addon_splunkbase_url && (
+                                                            <a href={netflow_addon_splunkbase_url} target="_blank" rel="noopener noreferrer" className="csc-split-pill-seg" title="View on Splunkbase">
+                                                                Splunkbase ↗
+                                                            </a>
+                                                        )}
+                                                        {netflow_addon_docs_url && (
+                                                            <a href={netflow_addon_docs_url} target="_blank" rel="noopener noreferrer" className="csc-split-pill-seg csc-split-pill-netflow" title="NetFlow add-on documentation">
+                                                                Docs 📖
+                                                            </a>
+                                                        )}
+                                                    </span>
+                                                )}
+                                                {netflowAddonStatus?.version && (
+                                                    <span className="csc-dep-version">v{netflowAddonStatus.version}</span>
+                                                )}
+                                                {netflowAddonStatus?.updateVersion && (
+                                                    <span className="csc-dep-update">⬆ v{netflowAddonStatus.updateVersion}</span>
+                                                )}
+                                                {!netflowAddonStatus?.installed && (
+                                                    <span className="csc-dep-status-missing">not installed</span>
+                                                )}
+                                            </div>
+                                            {netflow_addon_install_url && !netflowAddonStatus?.installed && (
+                                                <a href={createURL(netflow_addon_install_url)} target="_blank" rel="noopener noreferrer" className="csc-netflow-install-btn" title="Install NetFlow add-on from Splunk App Manager">
+                                                    Install Add-on
+                                                </a>
+                                            )}
+                                        </>
+                                    ) : (
+                                        <>
+                                            <span className="csc-dep-label csc-dep-label-netflow">NetFlow Add-on</span>
+                                            <div className="csc-dep-detail">
+                                                <span className="csc-dep-name" style={{fontStyle: 'italic', opacity: 0.7}}>No specific NetFlow add-on defined</span>
+                                            </div>
+                                        </>
+                                    )}
+                                    {/* ── Stream Prerequisites ── */}
+                                    {streamPrereqs.length > 0 && (
+                                        <>
+                                            <hr className="csc-dep-divider" />
+                                            <span className="csc-dep-label csc-dep-label-netflow">Stream Prerequisites</span>
+                                            {streamPrereqs.map((pa) => {
+                                                const paStatus = appStatuses[pa.app_id] || null;
+                                                return (
+                                                    <div className="csc-dep-detail" key={pa.app_id}>
+                                                        {paStatus?.installed ? (
+                                                            <a href={createURL(`/app/${pa.app_id}/`)} target="_blank" rel="noopener noreferrer" className="csc-dep-name csc-dep-name-link" title={`Open ${pa.display_name}`}>{pa.display_name}</a>
+                                                        ) : (
+                                                            <span className="csc-dep-name">{pa.display_name}</span>
+                                                        )}
+                                                        {pa.addon_splunkbase_url && (
+                                                            <span className="csc-split-pill">
+                                                                <a href={pa.addon_splunkbase_url} target="_blank" rel="noopener noreferrer" className="csc-split-pill-seg" title="View on Splunkbase">
+                                                                    Splunkbase ↗
+                                                                </a>
+                                                            </span>
+                                                        )}
+                                                        {paStatus?.version && <span className="csc-dep-version">v{paStatus.version}</span>}
+                                                        {!paStatus?.installed && <span className="csc-dep-status-missing">not installed</span>}
+                                                    </div>
+                                                );
+                                            })}
+                                        </>
+                                    )}
+                                    {/* ── NetFlow Sourcetypes (collapsible) ── */}
+                                    {netflow_sourcetypes && netflow_sourcetypes.length > 0 && (
+                                        <>
+                                            <hr className="csc-dep-divider" />
+                                            <div className="csc-sourcetypes-section" style={{ margin: '0' }}>
+                                                <div className="csc-st-summary" onClick={() => setStExpanded(v => !v)} role="button" tabIndex={0}>
+                                                    <span className="csc-st-count">
+                                                        📊 {netflow_sourcetypes.length} NetFlow sourcetype{netflow_sourcetypes.length !== 1 ? 's' : ''}
+                                                    </span>
+                                                    <span className="csc-dep-toggle">
+                                                        {stExpanded ? '− Hide' : '+ Show'}
+                                                    </span>
+                                                </div>
+                                                {stExpanded && (
+                                                    <div className="csc-sourcetypes-chips">
+                                                        {netflow_sourcetypes.map(st => (
+                                                            <span key={st} className="csc-st-chip" title={st}>{st}</span>
+                                                        ))}
+                                                    </div>
+                                                )}
+                                            </div>
+                                        </>
+                                    )}
+                                    {netflow_config_notes && netflow_config_notes.length > 0 && (
+                                        <details className="csc-dep-details">
+                                            <summary className="csc-dep-details-summary">
+                                                ⚙️ Configuration Notes ({netflow_config_notes.length})
+                                            </summary>
+                                            <div className="csc-dep-details-body">
+                                                <ul className="csc-sc4s-config-list">
+                                                    {netflow_config_notes.map((note, i) => (
+                                                        <li key={i}>{note}</li>
+                                                    ))}
+                                                </ul>
+                                            </div>
+                                        </details>
+                                    )}
+                                </>
+                            )}
+
+                            {/* ── Dashboard App (context-sensitive: Stream App for NetFlow tab, app_viz for Standard/SC4S) ── */}
+                            {hasTabs && depTab === 'netflow' && streamVizApp && (() => {
+                                const svStatus = appStatuses[streamVizApp.app_id] || null;
+                                return (
+                                    <>
+                                        <hr className="csc-dep-divider" />
+                                        <span className="csc-dep-label csc-dep-label-netflow">Stream Dashboard App</span>
+                                        <div className="csc-dep-detail">
+                                            {svStatus?.installed ? (
+                                                <a href={createURL(`/app/${streamVizApp.app_id}/`)} target="_blank" rel="noopener noreferrer" className="csc-dep-name csc-dep-name-link" title={`Open ${streamVizApp.display_name}`}>{streamVizApp.display_name}</a>
+                                            ) : (
+                                                <span className="csc-dep-name">{streamVizApp.display_name}</span>
+                                            )}
+                                            <span className="csc-dep-appid" title="Splunk folder name">{streamVizApp.app_id}</span>
+                                            <span className="csc-split-pill">
+                                                {streamVizApp.addon_splunkbase_url && (
+                                                    <a href={streamVizApp.addon_splunkbase_url} target="_blank" rel="noopener noreferrer" className="csc-split-pill-seg" title="View on Splunkbase">
+                                                        Splunkbase ↗
+                                                    </a>
+                                                )}
+                                                {stream_docs_url && (
+                                                    <a href={stream_docs_url} target="_blank" rel="noopener noreferrer" className="csc-split-pill-seg csc-split-pill-netflow" title="Splunk Stream documentation">
+                                                        Docs 📖
+                                                    </a>
+                                                )}
+                                            </span>
+                                            {svStatus?.version && <span className="csc-dep-version">v{svStatus.version}</span>}
+                                            {!svStatus?.installed && <span className="csc-dep-status-missing">not installed</span>}
+                                        </div>
+                                    </>
+                                );
+                            })()}
+                            {hasTabs && depTab !== 'netflow' && app_viz && (
                                 <>
                                     <hr className="csc-dep-divider" />
                                     <span className="csc-dep-label">Dashboard App</span>
@@ -3182,7 +3610,7 @@ function PersonaModal({ open, onClose, onSelectPersona, products }) {
 
 // ──────────────────────  CATEGORY FILTER  ────────────────────
 
-function CategoryFilterBar({ selectedCategory, onSelectCategory, selectedSubCategory, onSelectSubCategory, aiFilter, onToggleAiFilter, categoryCounts, products }) {
+function CategoryFilterBar({ selectedCategory, onSelectCategory, selectedSubCategory, onSelectSubCategory, aiFilter, onToggleAiFilter, streamFilter, onToggleStreamFilter, sc4sFilter, onToggleSc4sFilter, categoryCounts, products, allProducts, advancedFiltersOpen, onToggleAdvancedFilters, supportLevelFilter, onSelectSupportLevel, showRetired, onToggleShowRetired, showDeprecated, onToggleShowDeprecated, showComingSoon, onToggleShowComingSoon, showFullPortfolio, showGtmRoadmap, onToggleShowGtmRoadmap }) {
     // Cisco official category SVG icons (from cisco.com CDN)
     const catIconMap = { security: 'cat-security', observability: 'cat-observability', networking: 'cat-networking', collaboration: 'cat-collaboration' };
     const renderCatIcon = (catId, active) => {
@@ -3200,6 +3628,7 @@ function CategoryFilterBar({ selectedCategory, onSelectCategory, selectedSubCate
         const isTeal = variant === 'alert';
         const isSecNet = variant === 'secnet';
         const isAi = variant === 'ai';
+        const isAdvanced = variant === 'advanced';
         let activeColor, activeBg, activeBorder, activeText;
         if (isAmber) {
             activeBg = '#fef3c7'; activeBorder = '#f59e0b'; activeText = '#92400e';
@@ -3209,6 +3638,8 @@ function CategoryFilterBar({ selectedCategory, onSelectCategory, selectedSubCate
             activeBg = '#e0f2f1'; activeBorder = '#00897b'; activeText = '#004d40';
         } else if (isAi) {
             activeBg = '#ede9fe'; activeBorder = '#7c3aed'; activeText = '#5b21b6';
+        } else if (isAdvanced) {
+            activeBg = '#e8eaf6'; activeBorder = '#5c6bc0'; activeText = '#283593';
         } else {
             activeBg = '#049fd9'; activeBorder = '#049fd9'; activeText = '#fff';
         }
@@ -3342,6 +3773,26 @@ function CategoryFilterBar({ selectedCategory, onSelectCategory, selectedSubCate
                     </button>
                 </>
             )}
+            {/* ── Advanced Filters toggle ── */}
+            <span style={{ width: '2px', height: '28px', background: 'var(--pill-divider, #b0b0b0)', flexShrink: 0, margin: '0 4px', borderRadius: '1px' }} />
+            {(() => {
+                const hasActiveFilter = supportLevelFilter || !showRetired || !showDeprecated || !showComingSoon || !showGtmRoadmap || streamFilter || sc4sFilter;
+                return (
+                    <button
+                        onClick={() => onToggleAdvancedFilters(!advancedFiltersOpen)}
+                        title="Advanced filtering by support level and product status"
+                        style={{
+                            ...btnStyle(advancedFiltersOpen || hasActiveFilter, 'advanced'),
+                            position: 'relative',
+                        }}
+                    >
+                        ⚙️ Advanced
+                        {hasActiveFilter && !advancedFiltersOpen && (
+                            <span style={{ width: '6px', height: '6px', borderRadius: '50%', background: '#5c6bc0', position: 'absolute', top: '4px', right: '4px' }} />
+                        )}
+                    </button>
+                );
+            })()}
         </div>
         {/* ── Sub-category pills ── */}
         {selectedCategory && SUB_CATEGORIES[selectedCategory] && (() => {
@@ -3411,6 +3862,128 @@ function CategoryFilterBar({ selectedCategory, onSelectCategory, selectedSubCate
                 </div>
             );
         })()}
+        {/* ── Advanced Filters sub-row ── */}
+        {advancedFiltersOpen && (() => {
+            /* Compute a portfolio-aware base (respects Supported/All toggle) */
+            const rawBase = allProducts || products;
+            const portfolioBase = showFullPortfolio
+                ? rawBase
+                : rawBase.filter(p => SUPPORTED_LEVELS.has(p.support_level));
+
+            /* Support pill counts: apply visibility filters but NOT the support-level filter */
+            let supportCountBase = portfolioBase;
+            if (!showRetired) supportCountBase = supportCountBase.filter(p => p.status !== 'retired');
+            if (!showDeprecated) supportCountBase = supportCountBase.filter(p => p.status !== 'deprecated');
+            if (!showComingSoon) supportCountBase = supportCountBase.filter(p => p.status !== 'under_development');
+            if (!showGtmRoadmap) supportCountBase = supportCountBase.filter(p => !p.coverage_gap);
+
+            const supportCounts = {
+                cisco_supported: supportCountBase.filter(p => p.support_level === 'cisco_supported').length,
+                splunk_supported: supportCountBase.filter(p => p.support_level === 'splunk_supported').length,
+                developer_supported: supportCountBase.filter(p => p.support_level === 'developer_supported').length,
+                not_supported: supportCountBase.filter(p => p.support_level === 'not_supported').length,
+            };
+            const supportTotal = supportCountBase.length;
+
+            /* Visibility pill counts: apply support filter but NOT the visibility filters */
+            let visCountBase = portfolioBase;
+            if (supportLevelFilter) visCountBase = visCountBase.filter(p => p.support_level === supportLevelFilter);
+
+            const retiredCount = visCountBase.filter(p => p.status === 'retired').length;
+            const deprecatedCount = visCountBase.filter(p => p.status === 'deprecated').length;
+            const comingSoonCount = visCountBase.filter(p => p.status === 'under_development').length;
+            const gtmRoadmapCount = visCountBase.filter(p => p.coverage_gap).length;
+
+            const supportPill = (level, label, emoji, activeClass) => {
+                const active = supportLevelFilter === level;
+                return (
+                    <button
+                        onClick={() => onSelectSupportLevel(active ? null : level)}
+                        className={`csc-subcategory-pill csc-support-pill ${active ? activeClass : ''}`}
+                        title={`Show only ${label} products`}
+                    >
+                        {emoji} {label} <span className="csc-subcategory-count">{supportCounts[level]}</span>
+                    </button>
+                );
+            };
+            return (
+                <div className="csc-subcategory-bar csc-advanced-filter-bar" style={{ display: 'flex', gap: '6px', marginTop: '8px', paddingLeft: '8px', flexWrap: 'wrap', alignItems: 'center' }}>
+                    <span style={{ fontSize: '11px', color: 'var(--faint-color, #888)', fontWeight: 500, marginRight: '4px' }}>Support:</span>
+                    <button
+                        onClick={() => onSelectSupportLevel(null)}
+                        className={`csc-subcategory-pill ${!supportLevelFilter ? 'csc-subcategory-pill-active' : ''}`}
+                    >
+                        All <span className="csc-subcategory-count">{supportTotal}</span>
+                    </button>
+                    {supportPill('cisco_supported', 'Cisco', '🟢', 'csc-support-pill-cisco-active')}
+                    {supportPill('splunk_supported', 'Splunk', '🔵', 'csc-support-pill-splunk-active')}
+                    {supportPill('developer_supported', 'Developer', '🟠', 'csc-support-pill-dev-active')}
+                    {supportPill('not_supported', 'Unsupported', '⚪', 'csc-support-pill-unsupported-active')}
+                    <span style={{ borderLeft: '1.5px solid var(--card-border, #ddd)', height: '18px', margin: '0 4px' }} />
+                    <span style={{ fontSize: '11px', color: 'var(--faint-color, #888)', fontWeight: 500, marginRight: '4px' }}>Visibility:</span>
+                    <button
+                        onClick={() => onToggleShowRetired(!showRetired)}
+                        className={`csc-subcategory-pill csc-visibility-pill ${showRetired ? 'csc-visibility-pill-on' : 'csc-visibility-pill-off'}`}
+                        title={showRetired ? 'Retired products are shown — click to hide' : 'Retired products are hidden — click to show'}
+                    >
+                        {showRetired ? '👁' : '🚫'} Retired <span className="csc-subcategory-count">{retiredCount}</span>
+                    </button>
+                    <button
+                        onClick={() => onToggleShowDeprecated(!showDeprecated)}
+                        className={`csc-subcategory-pill csc-visibility-pill ${showDeprecated ? 'csc-visibility-pill-on' : 'csc-visibility-pill-off'}`}
+                        title={showDeprecated ? 'Deprecated products are shown — click to hide' : 'Deprecated products are hidden — click to show'}
+                    >
+                        {showDeprecated ? '👁' : '🚫'} Deprecated <span className="csc-subcategory-count">{deprecatedCount}</span>
+                    </button>
+                    <button
+                        onClick={() => onToggleShowComingSoon(!showComingSoon)}
+                        className={`csc-subcategory-pill csc-visibility-pill ${showComingSoon ? 'csc-visibility-pill-on' : 'csc-visibility-pill-off'}`}
+                        title={showComingSoon ? 'Coming Soon products are shown — click to hide' : 'Coming Soon products are hidden — click to show'}
+                    >
+                        {showComingSoon ? '👁' : '🚫'} Coming Soon <span className="csc-subcategory-count">{comingSoonCount}</span>
+                    </button>
+                    {gtmRoadmapCount > 0 && (
+                        <button
+                            onClick={() => onToggleShowGtmRoadmap(!showGtmRoadmap)}
+                            className={`csc-subcategory-pill csc-visibility-pill ${showGtmRoadmap ? 'csc-visibility-pill-on' : 'csc-visibility-pill-off'}`}
+                            title={showGtmRoadmap ? 'GTM Roadmap products are shown — click to hide' : 'GTM Roadmap products are hidden — click to show'}
+                        >
+                            {showGtmRoadmap ? '👁' : '🚫'} GTM Roadmap <span className="csc-subcategory-count">{gtmRoadmapCount}</span>
+                        </button>
+                    )}
+                    {/* ── Onboarding Path filters ── */}
+                    {(() => {
+                        const streamCount = visCountBase.filter(p => p.netflow_supported).length;
+                        const sc4sCount = visCountBase.filter(p => p.sc4s_supported).length;
+                        if (streamCount === 0 && sc4sCount === 0) return null;
+                        return (
+                            <>
+                                <span style={{ borderLeft: '1.5px solid var(--card-border, #ddd)', height: '18px', margin: '0 4px' }} />
+                                <span style={{ fontSize: '11px', color: 'var(--faint-color, #888)', fontWeight: 500, marginRight: '4px' }}>Onboarding:</span>
+                                {sc4sCount > 0 && (
+                                    <button
+                                        onClick={() => onToggleSc4sFilter(!sc4sFilter)}
+                                        className={`csc-subcategory-pill csc-sc4s-filter-pill ${sc4sFilter ? 'csc-sc4s-filter-pill-active' : ''}`}
+                                        title={sc4sFilter ? 'Showing SC4S-supported products — click to clear' : 'Show only products with SC4S onboarding'}
+                                    >
+                                        📡 SC4S <span className="csc-subcategory-count">{sc4sCount}</span>
+                                    </button>
+                                )}
+                                {streamCount > 0 && (
+                                    <button
+                                        onClick={() => onToggleStreamFilter(!streamFilter)}
+                                        className={`csc-subcategory-pill csc-stream-pill ${streamFilter ? 'csc-stream-pill-active' : ''}`}
+                                        title={streamFilter ? 'Showing Stream/NetFlow products — click to clear' : 'Show only products with Stream/NetFlow onboarding'}
+                                    >
+                                        🌊 Stream <span className="csc-subcategory-count">{streamCount}</span>
+                                    </button>
+                                )}
+                            </>
+                        );
+                    })()}
+                </div>
+            );
+        })()}
     </>);
 }
 
@@ -3428,6 +4001,8 @@ function SCANProductsPage() {
     const [selectedCategory, setSelectedCategory] = useState(null);
     const [selectedSubCategory, setSelectedSubCategory] = useState(null);
     const [aiFilter, setAiFilter] = useState(false);
+    const [streamFilter, setStreamFilter] = useState(false);
+    const [sc4sFilter, setSc4sFilter] = useState(false);
     const [selectedAddon, setSelectedAddon] = useState(null);
     const [legacyModalOpen, setLegacyModalOpen] = useState(false);
     const [legacyModalApps, setLegacyModalApps] = useState([]);
@@ -3450,6 +4025,12 @@ function SCANProductsPage() {
     const [configViewerProductId, setConfigViewerProductId] = useState(null);
     const [techStackOpen, setTechStackOpen] = useState(false);
     const [searchBarQuery, setSearchBarQuery] = useState('');
+    const [advancedFiltersOpen, setAdvancedFiltersOpen] = useState(false);
+    const [supportLevelFilter, setSupportLevelFilter] = useState(null);
+    const [showRetired, setShowRetired] = useState(true);
+    const [showDeprecated, setShowDeprecated] = useState(true);
+    const [showComingSoon, setShowComingSoon] = useState(true);
+    const [showGtmRoadmap, setShowGtmRoadmap] = useState(true);
     const [personaModalOpen, setPersonaModalOpen] = useState(() => {
         try { return localStorage.getItem(PERSONA_STORAGE_KEY) !== 'true'; } catch { return false; }
     });
@@ -3702,14 +4283,24 @@ function SCANProductsPage() {
             if (p.app_viz && installedApps[p.app_viz]) appIds.add(p.app_viz);
             if (p.app_viz_2 && installedApps[p.app_viz_2]) appIds.add(p.app_viz_2);
             if (p.sc4s_search_head_ta && installedApps[p.sc4s_search_head_ta]) appIds.add(p.sc4s_search_head_ta);
+            // Include prereq apps (Stream packages) and NetFlow add-on
+            if (p.netflow_addon && installedApps[p.netflow_addon]) appIds.add(p.netflow_addon);
+            (p.prereq_apps || []).forEach((pa) => {
+                if (pa.app_id && installedApps[pa.app_id]) appIds.add(pa.app_id);
+            });
         });
         const checkAll = async () => {
             const statuses = {};
             // Pre-fill not-installed status for apps not in installedApps
             products.forEach((p) => {
-                [p.addon, p.app_viz, p.app_viz_2, p.sc4s_search_head_ta].forEach((aid) => {
+                [p.addon, p.app_viz, p.app_viz_2, p.sc4s_search_head_ta, p.netflow_addon].forEach((aid) => {
                     if (aid && !appIds.has(aid) && !statuses[aid]) {
                         statuses[aid] = { installed: false, version: null, updateVersion: null, disabled: false };
+                    }
+                });
+                (p.prereq_apps || []).forEach((pa) => {
+                    if (pa.app_id && !appIds.has(pa.app_id) && !statuses[pa.app_id]) {
+                        statuses[pa.app_id] = { installed: false, version: null, updateVersion: null, disabled: false };
                     }
                 });
             });
@@ -3740,15 +4331,38 @@ function SCANProductsPage() {
             savePortfolioPreference(next);
             return next;
         });
+        // Clear the support-level pill — the portfolio toggle is the canonical
+        // "supported vs all" control, so a specific support-level filter would
+        // silently override it and confuse the user.
+        setSupportLevelFilter(null);
     }, []);
+
+    // ── Base product list (support-level + portfolio + status visibility) ──
+    const portfolioProducts = useMemo(() => {
+        let base = products;
+        if (supportLevelFilter) {
+            base = base.filter((p) => p.support_level === supportLevelFilter);
+        } else if (!showFullPortfolio) {
+            base = base.filter((p) => SUPPORTED_LEVELS.has(p.support_level));
+        }
+        if (!showRetired) {
+            base = base.filter((p) => p.status !== 'retired');
+        }
+        if (!showDeprecated) {
+            base = base.filter((p) => p.status !== 'deprecated');
+        }
+        if (!showComingSoon) {
+            base = base.filter((p) => p.status !== 'under_development');
+        }
+        if (!showGtmRoadmap) {
+            base = base.filter((p) => !p.coverage_gap);
+        }
+        return base;
+    }, [products, supportLevelFilter, showFullPortfolio, showRetired, showDeprecated, showComingSoon, showGtmRoadmap]);
 
     // ── Filtering ──
     const filteredProducts = useMemo(() => {
-        let filtered = products;
-        // Support-level filter: default shows only Cisco/Splunk supported products
-        if (!showFullPortfolio) {
-            filtered = filtered.filter((p) => SUPPORTED_LEVELS.has(p.support_level));
-        }
+        let filtered = portfolioProducts;
         if (selectedCategory === 'soar') {
             filtered = filtered.filter((p) => p.soar_connectors && p.soar_connectors.length > 0);
         } else if (selectedCategory === 'alert_actions') {
@@ -3772,6 +4386,12 @@ function SCANProductsPage() {
         if (aiFilter) {
             filtered = filtered.filter((p) => p.ai_enabled);
         }
+        if (streamFilter) {
+            filtered = filtered.filter((p) => p.netflow_supported);
+        }
+        if (sc4sFilter) {
+            filtered = filtered.filter((p) => p.sc4s_supported);
+        }
         if (selectedAddon) {
             if (selectedAddon === '__standalone__') {
                 filtered = filtered.filter((p) => !p.addon && !p.sc4s_supported);
@@ -3792,17 +4412,18 @@ function SCANProductsPage() {
             });
         }
         return filtered;
-    }, [products, selectedCategory, selectedSubCategory, aiFilter, selectedAddon, searchQuery, showFullPortfolio]);
+    }, [portfolioProducts, selectedCategory, selectedSubCategory, aiFilter, streamFilter, sc4sFilter, selectedAddon, searchQuery]);
 
-    const configuredProducts = filteredProducts.filter((p) => p.status !== 'under_development' && !p.cisco_retired && !p.coverage_gap && configuredIds.includes(p.product_id));
-    const availableProducts = filteredProducts.filter((p) => p.status !== 'under_development' && !p.cisco_retired && !p.coverage_gap && p.support_level !== 'not_supported' && !configuredIds.includes(p.product_id));
-    const unsupportedProducts = filteredProducts.filter((p) => p.status !== 'under_development' && !p.cisco_retired && !p.coverage_gap && p.support_level === 'not_supported' && !configuredIds.includes(p.product_id));
+    const configuredProducts = filteredProducts.filter((p) => p.status !== 'under_development' && p.status !== 'retired' && p.status !== 'deprecated' && !p.coverage_gap && configuredIds.includes(p.product_id));
+    const availableProducts = filteredProducts.filter((p) => p.status !== 'under_development' && p.status !== 'retired' && p.status !== 'deprecated' && !p.coverage_gap && p.support_level !== 'not_supported' && !configuredIds.includes(p.product_id));
+    const unsupportedProducts = filteredProducts.filter((p) => p.status !== 'under_development' && p.status !== 'retired' && p.status !== 'deprecated' && !p.coverage_gap && p.support_level === 'not_supported' && !configuredIds.includes(p.product_id));
     const comingSoonProducts = filteredProducts.filter((p) => p.status === 'under_development');
-    const retiredProducts = filteredProducts.filter((p) => p.cisco_retired);
+    const deprecatedProducts = filteredProducts.filter((p) => p.status === 'deprecated');
+    const retiredProducts = filteredProducts.filter((p) => p.status === 'retired');
     const gtmGapProducts = filteredProducts.filter((p) => p.coverage_gap);
 
     const categoryCounts = useMemo(() => {
-        const base = showFullPortfolio ? products : products.filter((p) => SUPPORTED_LEVELS.has(p.support_level));
+        const base = portfolioProducts;
         const counts = {};
         CATEGORIES.forEach((c) => { counts[c.id] = base.filter((p) => p.category === c.id).length; });
         counts.soar = base.filter((p) => p.soar_connectors && p.soar_connectors.length > 0).length;
@@ -3810,7 +4431,7 @@ function SCANProductsPage() {
         counts.secure_networking = base.filter((p) => p.secure_networking_gtm).length;
         counts.ai_powered = base.filter((p) => p.ai_enabled).length;
         return counts;
-    }, [products, showFullPortfolio]);
+    }, [portfolioProducts]);
 
     // ── Render ──
     if (loading) {
@@ -3964,27 +4585,65 @@ function SCANProductsPage() {
             <UniversalFinderBar
                 onSearch={handleSearchInput}
                 resultCount={filteredProducts.length}
-                totalCount={showFullPortfolio ? products.length : products.filter((p) => SUPPORTED_LEVELS.has(p.support_level)).length}
+                totalCount={portfolioProducts.length}
                 products={products}
                 externalQuery={searchBarQuery}
             />
             <div style={{ marginBottom: '20px' }}>
                 <CategoryFilterBar
                     selectedCategory={selectedCategory}
-                    onSelectCategory={(cat) => { setSelectedCategory(cat); setSelectedSubCategory(null); setAiFilter(false); }}
+                    onSelectCategory={(cat) => {
+                        setSelectedCategory(cat);
+                        setSelectedSubCategory(null);
+                        setAiFilter(false);
+                        setStreamFilter(false);
+                        setSc4sFilter(false);
+                        if (!cat) {
+                            // "All" clicked — clear every downstream filter so the user sees the full list
+                            setSelectedAddon(null);
+                            setSearchQuery('');
+                            setSearchBarQuery('');
+                        }
+                    }}
                     selectedSubCategory={selectedSubCategory}
                     onSelectSubCategory={setSelectedSubCategory}
                     aiFilter={aiFilter}
                     onToggleAiFilter={setAiFilter}
+                    streamFilter={streamFilter}
+                    onToggleStreamFilter={setStreamFilter}
+                    sc4sFilter={sc4sFilter}
+                    onToggleSc4sFilter={setSc4sFilter}
                     categoryCounts={categoryCounts}
-                    products={showFullPortfolio ? products : products.filter((p) => SUPPORTED_LEVELS.has(p.support_level))}
+                    products={portfolioProducts}
+                    allProducts={products}
+                    advancedFiltersOpen={advancedFiltersOpen}
+                    onToggleAdvancedFilters={setAdvancedFiltersOpen}
+                    supportLevelFilter={supportLevelFilter}
+                    onSelectSupportLevel={(level) => {
+                        setSupportLevelFilter(level);
+                        // When selecting a non-supported tier, auto-switch to 'All Products'
+                        // so they remain visible after the pill is later cleared.
+                        if (level && !SUPPORTED_LEVELS.has(level) && !showFullPortfolio) {
+                            setShowFullPortfolio(true);
+                            savePortfolioPreference(true);
+                        }
+                    }}
+                    showRetired={showRetired}
+                    onToggleShowRetired={setShowRetired}
+                    showDeprecated={showDeprecated}
+                    onToggleShowDeprecated={setShowDeprecated}
+                    showComingSoon={showComingSoon}
+                    onToggleShowComingSoon={setShowComingSoon}
+                    showFullPortfolio={showFullPortfolio}
+                    showGtmRoadmap={showGtmRoadmap}
+                    onToggleShowGtmRoadmap={setShowGtmRoadmap}
                 />
             </div>
 
             <AddonFilterBar
                 selectedAddon={selectedAddon}
                 onSelectAddon={setSelectedAddon}
-                products={showFullPortfolio ? products : products.filter((p) => SUPPORTED_LEVELS.has(p.support_level))}
+                products={portfolioProducts}
             />
 
             {/* Section 1: Configured */}
@@ -4103,7 +4762,33 @@ function SCANProductsPage() {
             </CollapsiblePanel>
             </div>
 
-            {/* Section 5: Retired Products (Cisco EOL) */}
+            {/* Section 5: Deprecated Products */}
+            {deprecatedProducts.length > 0 && (
+                <div id="deprecated_products">
+                <CollapsiblePanel title={`Deprecated Products (${deprecatedProducts.length})`} defaultOpen={false} panelId="deprecated_products">
+                    <div style={{ padding: '8px 12px', marginBottom: '12px', background: 'var(--warning-bg, #fff3e0)', borderLeft: '4px solid #e65100', borderRadius: '4px', fontSize: '13px', color: 'var(--page-color, #333)' }}>
+                        ⚠️ These Splunk add-ons or apps have been <strong>deprecated</strong> — the Cisco product may still be active but the integration is being sunset or replaced by a newer add-on.
+                    </div>
+                    <div className="csc-card-grid">
+                        {deprecatedProducts.map((p) => (
+                            <ProductCard
+                                key={p.product_id} product={p}
+                                installedApps={installedApps} appStatuses={appStatuses}
+                                sourcetypeData={sourcetypeData} isConfigured={configuredIds.includes(p.product_id)} isComingSoon={false}
+                                platformType={platformType}
+                                onToggleConfigured={handleToggleConfigured}
+                                onShowBestPractices={handleShowBestPractices}
+                                onViewLegacy={handleViewLegacy}
+                                onSetCustomDashboard={handleSetCustomDashboard}
+                                devMode={devMode} onViewConfig={handleOpenConfigViewer}
+                            />
+                        ))}
+                    </div>
+                </CollapsiblePanel>
+                </div>
+            )}
+
+            {/* Section 6: Retired Products (Cisco EOL) */}
             {retiredProducts.length > 0 && (
                 <div id="retired_products">
                 <CollapsiblePanel title={`Retired Products (${retiredProducts.length})`} defaultOpen={false} panelId="retired_products">
