@@ -3805,7 +3805,7 @@ function UniversalFinderBar({ onSearch, resultCount, totalCount, products, exter
             </div>
             <span className="search-result-count">
                 {resultCount != null && totalCount != null
-                    ? query ? `${resultCount} of ${totalCount} products` : `${totalCount} products`
+                    ? resultCount < totalCount ? `${resultCount} of ${totalCount} products` : `${totalCount} products`
                     : ''}
             </span>
         </div>
@@ -3834,7 +3834,7 @@ function FilterDrawer({
     splunkbaseData,
     csvSyncStatus, csvSyncMessage, onSyncSplunkbase,
     selectedAddon, onSelectAddon,
-    products, allProducts, categoryCounts,
+    products, allProducts, preAddonProducts, categoryCounts,
     showFullPortfolio,
 }) {
     /* ── Helper: apply platform/version compat filters ── */
@@ -3937,12 +3937,13 @@ function FilterDrawer({
         return sortVersionsDesc([...cardVersions]);
     })();
 
-    /* Addon (Powered By) groups */
+    /* Addon (Powered By) groups — derived from preAddonProducts for faceted counts */
+    const addonSource = preAddonProducts || products;
     const addonGroups = useMemo(() => {
         const map = {};
         let standalone = 0;
         let sc4sOnly = 0;
-        (products || []).forEach((p) => {
+        (addonSource || []).forEach((p) => {
             if (!p.addon) {
                 if (p.sc4s_supported) { sc4sOnly++; } else { standalone++; }
                 return;
@@ -3955,10 +3956,10 @@ function FilterDrawer({
         if (sc4sOnly > 0) entries.push(['__sc4s__', { label: 'SC4S Only', count: sc4sOnly }]);
         if (standalone > 0) entries.push(['__standalone__', { label: 'Standalone', count: standalone }]);
         return entries;
-    }, [products]);
+    }, [addonSource]);
 
     const isCrossCutting = (cat) => ['soar', 'alert_actions', 'secure_networking', 'ai_powered'].includes(cat);
-    const addonTotal = (products || []).length;
+    const addonTotal = (addonSource || []).length;
 
     return (
         <>
@@ -4161,30 +4162,37 @@ function FilterDrawer({
                                     <option value="Splunk Cloud">Splunk Cloud</option>
                                     <option value="Splunk Enterprise">Splunk Enterprise</option>
                                 </select>
-                                {versionList.length > 0 && (
-                                    <div className="scan-drawer-version-list">
-                                        <div className="scan-drawer-version-header">
-                                            <span className="scan-drawer-version-label">Splunk Version</span>
-                                            {versionFilter.length > 0 && (
-                                                <button
-                                                    className="scan-drawer-version-clear"
-                                                    onClick={() => onSelectVersion(null)}
-                                                    title="Clear all version filters"
-                                                >Clear</button>
-                                            )}
+                                {versionList.length > 0 && (() => {
+                                    const vGroups = {};
+                                    versionList.forEach(v => { const m = v.split('.')[0]; if (!vGroups[m]) vGroups[m] = []; vGroups[m].push(v); });
+                                    const gKeys = Object.keys(vGroups).sort((a, b) => parseInt(b) - parseInt(a));
+                                    return (
+                                        <div className="scan-drawer-version-list">
+                                            <div className="scan-drawer-version-header">
+                                                <span className="scan-drawer-version-label">Splunk Version</span>
+                                                {versionFilter.length > 0 && (
+                                                    <button
+                                                        className="scan-drawer-version-clear"
+                                                        onClick={() => onSelectVersion(null)}
+                                                        title="Clear all version filters"
+                                                    >Clear ({versionFilter.length})</button>
+                                                )}
+                                            </div>
+                                            {gKeys.map((major, gi) => (
+                                                <div key={major} className="scan-drawer-version-group">
+                                                    <div className="scan-drawer-version-group-label">{major}.x</div>
+                                                    {vGroups[major].map(v => (
+                                                        <label key={v} className={`scan-drawer-version-item ${versionFilter.includes(v) ? 'scan-drawer-version-item-active' : ''}`}>
+                                                            <input type="checkbox" checked={versionFilter.includes(v)} onChange={() => onSelectVersion(v)} />
+                                                            <span className="scan-drawer-version-text"><span className="scan-drawer-version-prefix">Splunk</span> {v}</span>
+                                                        </label>
+                                                    ))}
+                                                    {gi < gKeys.length - 1 && <div className="scan-drawer-version-group-divider" />}
+                                                </div>
+                                            ))}
                                         </div>
-                                        {versionList.map(v => (
-                                            <label key={v} className={`scan-drawer-version-item ${versionFilter.includes(v) ? 'scan-drawer-version-item-active' : ''}`}>
-                                                <input
-                                                    type="checkbox"
-                                                    checked={versionFilter.includes(v)}
-                                                    onChange={() => onSelectVersion(v)}
-                                                />
-                                                <span>Splunk {v}</span>
-                                            </label>
-                                        ))}
-                                    </div>
-                                )}
+                                    );
+                                })()}
                                 <div className="scan-drawer-sync-row">
                                     <button
                                         className={`scan-drawer-pill scan-util-sync ${csvSyncStatus === 'success' ? 'scan-sync-ok' : csvSyncStatus === 'error' ? 'scan-sync-err' : csvSyncStatus === 'syncing' ? 'scan-sync-busy' : ''}`}
@@ -4210,11 +4218,13 @@ function FilterDrawer({
                             </div>
                             <div className="scan-drawer-addon-list">
                                 <button
-                                    className={`scan-drawer-addon-item ${!selectedAddon ? 'scan-drawer-addon-item-active' : ''}`}
+                                    className={`scan-drawer-addon-item scan-drawer-addon-all ${!selectedAddon ? 'scan-drawer-addon-item-active' : ''}`}
                                     onClick={() => onSelectAddon(null)}
                                 >
-                                    All <span className="scan-drawer-pill-count">{addonTotal}</span>
+                                    <span className="scan-drawer-addon-name">All</span>
+                                    <span className="scan-drawer-addon-count">{addonTotal}</span>
                                 </button>
+                                <div className="scan-drawer-addon-divider" />
                                 {addonGroups.map(([id, g]) => (
                                     <button
                                         key={id}
@@ -4222,7 +4232,8 @@ function FilterDrawer({
                                         onClick={() => onSelectAddon(selectedAddon === id ? null : id)}
                                         title={g.label}
                                     >
-                                        {g.label} <span className="scan-drawer-pill-count">{g.count}</span>
+                                        <span className="scan-drawer-addon-name">{g.label}</span>
+                                        <span className="scan-drawer-addon-count">{g.count}</span>
                                     </button>
                                 ))}
                             </div>
@@ -5279,6 +5290,16 @@ function SCANProductsPage() {
                 });
             });
         }
+        // Apply addon filter so category counts reflect the selected addon
+        if (selectedAddon) {
+            if (selectedAddon === '__standalone__') {
+                base = base.filter(p => !p.addon && !p.sc4s_supported);
+            } else if (selectedAddon === '__sc4s__') {
+                base = base.filter(p => !p.addon && p.sc4s_supported);
+            } else {
+                base = base.filter(p => p.addon === selectedAddon);
+            }
+        }
         const counts = {};
         CATEGORIES.forEach((c) => { counts[c.id] = base.filter((p) => p.category === c.id).length; });
         counts.soar = base.filter((p) => p.soar_connectors && p.soar_connectors.length > 0).length;
@@ -5286,7 +5307,7 @@ function SCANProductsPage() {
         counts.secure_networking = base.filter((p) => p.secure_networking_gtm).length;
         counts.ai_powered = base.filter((p) => p.ai_enabled).length;
         return counts;
-    }, [portfolioProducts, streamFilter, sc4sFilter, aiFilter, searchQuery, platformFilter, versionFilter, splunkbaseData]);
+    }, [portfolioProducts, streamFilter, sc4sFilter, aiFilter, searchQuery, platformFilter, versionFilter, splunkbaseData, selectedAddon]);
 
     // ── Render ──
     if (loading) {
@@ -5550,6 +5571,7 @@ function SCANProductsPage() {
                 onSelectAddon={setSelectedAddon}
                 products={portfolioProducts}
                 allProducts={products}
+                preAddonProducts={preAddonProducts}
                 categoryCounts={categoryCounts}
                 showFullPortfolio={showFullPortfolio}
             />

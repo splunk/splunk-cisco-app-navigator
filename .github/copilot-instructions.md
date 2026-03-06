@@ -104,7 +104,7 @@ one stanza per product.
         │   │   │   ├── download_splunkbase_csv.py  # Custom search command
         │   │   │   └── splunklib/                   # Bundled splunklib 2.1.1
         │   │   ├── appserver/static/
-        │   │   │   ├── products.css  # All styles + dark mode (~4547 lines)
+        │   │   │   ├── products.css  # All styles + dark mode (~5130 lines)
         │   │   │   ├── icons/        # 128 Cisco brand icons
         │   │   │   └── fonts/        # CiscoSansTT font family
         │   │   ├── lookups/scan_splunkbase_apps.csv.gz  # Synced Splunkbase catalog
@@ -211,7 +211,8 @@ All styles (~5130 lines). Key features:
 - Compatibility select dropdown styling
 - Sidebar Drawer styles (`.scan-drawer-*`)
 - Indexer tier badge styles (`.scan-idx-tier-badge`, `.scan-idx-chip-*`)
-- Multi-select version checkbox styles (`.scan-drawer-version-*`)
+- Multi-select version checkbox styles with groups (`.scan-drawer-version-*`)
+- Powered By addon list styles with count badges (`.scan-drawer-addon-*`)
 
 ### `generate-catalog.js` — Build-Time Catalog Generator
 **Path:** `packages/splunk-cisco-app-navigator/bin/generate-catalog.js`
@@ -303,7 +304,8 @@ The UI has a multi-stage filter pipeline:
 8. **Product sections**: Configured → Detected → Available → Unsupported → Coming Soon → Deprecated → Retired → GTM Gaps
 
 ### Counter Logic
-- **Category pill counts** (`categoryCounts` useMemo): Start from `portfolioProducts`, apply cross-cutting + search + compat filters, then count per-category
+- **Category pill counts** (`categoryCounts` useMemo): Start from `portfolioProducts`, apply cross-cutting + search + compat + addon filters, then count per-category
+- **Addon counts** (FilterDrawer): Derived from `preAddonProducts` (all filters except addon) for proper faceted counts
 - **Advanced filter counts**: Start from `allProducts` with `applyCompatFilters()`, then re-apply portfolio semantics (support level + `under_development` exclusion in supported-only mode), then segregate into support/visibility/onboarding bases
 - **`totalCount`** in search bar: `portfolioProducts.length`
 - **`resultCount`** in search bar: `filteredProducts.length`
@@ -353,7 +355,7 @@ Products sorted with related products adjacent:
 
 ### Sidebar Drawer (FilterDrawer)
 - Replaces old in-page advanced filter panels
-- Slides in from right; `drawerOpen` state toggle
+- Slides in from left (Splunkbase-style); `drawerOpen` state toggle
 - Contains: Support level checkboxes, Visibility toggles, Onboarding (SC4S/NetFlow), Platform dropdown, Version multi-select checkboxes
 - ActiveFilterChips bar shows selected filters with clear-all
 - Splunkbase CSV sync button inside drawer
@@ -417,6 +419,12 @@ Products sorted with related products adjacent:
   - Moved `extend` from top-level into `options` (Dashboard Studio v2 requirement)
 - Implemented Sidebar Drawer (FilterDrawer) redesign for advanced filters
 - Renamed "NetFlow / Stream" → "NetFlow" across all UI labels, comments, and docs
+- Enhanced Filter Drawer UI: version checkboxes grouped by major version (10.x/9.x) with
+  custom-styled checkboxes and left accent highlights; Powered By section with bordered list,
+  count badge pills, divider after All row, and left accent on active
+- Moved Filter Drawer from right side to left side (Splunkbase-style)
+- Fixed faceted filter counting: category pill counts now include addon filter;
+  Powered By counts now derived from `preAddonProducts` for accurate faceted search
 - Updated this copilot-instructions.md with new architecture sections
 
 ### March 5, 2026
