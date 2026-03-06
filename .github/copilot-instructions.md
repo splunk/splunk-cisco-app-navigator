@@ -2,7 +2,7 @@
 
 > This file is automatically loaded by GitHub Copilot at the start of every chat
 > session. It provides the full technical context for this project.
-> **Last updated:** March 5, 2026
+> **Last updated:** March 6, 2026
 
 ---
 
@@ -40,6 +40,7 @@ Each Cisco product gets a card in the UI showing:
 - SOAR connector availability
 - ITSI Content Pack availability
 - Alert action availability
+- Indexer tier add-on deployment detection (version match, disabled alert)
 - Splunkbase compatibility (platform + version) via synced CSV catalog
 - Cisco brand SVG icons (128 icons: 126 SVGs + 2 PNGs)
 
@@ -96,19 +97,21 @@ one stanza per product.
         │   │   │   ├── splunk_create.conf
         │   │   │   └── data/ui/
         │   │   │       ├── nav/default.xml   # Navigation menu
-        │   │   │       └── views/products.xml
+        │   │   │       └── views/
+        │   │   │           ├── products.xml
+        │   │   │           └── ecosystem_intelligence.xml  # Dashboard Studio v2
         │   │   ├── bin/
         │   │   │   ├── download_splunkbase_csv.py  # Custom search command
         │   │   │   └── splunklib/                   # Bundled splunklib 2.1.1
         │   │   ├── appserver/static/
-        │   │   │   ├── products.css  # All styles + dark mode (~4547 lines)
+        │   │   │   ├── products.css  # All styles + dark mode (~5130 lines)
         │   │   │   ├── icons/        # 128 Cisco brand icons
         │   │   │   └── fonts/        # CiscoSansTT font family
         │   │   ├── lookups/scan_splunkbase_apps.csv.gz  # Synced Splunkbase catalog
         │   │   ├── metadata/default.meta
         │   │   └── README/products.conf.spec
         │   └── webapp/pages/products/
-        │       ├── index.jsx         # MAIN REACT COMPONENT (~5561 lines)
+        │       ├── index.jsx         # MAIN REACT COMPONENT (~5900 lines)
         │       ├── productCatalog.generated.js  # Auto-generated (DO NOT EDIT)
         │       └── render.jsx
         └── stage/                    # Build output (symlinked into Splunk)
@@ -131,7 +134,7 @@ card. Currently **79 product stanzas** (~3386 lines).
 - 65 tagged for Secure Networking GTM
 - 18 with SC4S documentation links
 - 15 AI-enabled, 12 with SOAR connectors, 6 with ITSI Content Packs
-- 6 with alert actions, 10 with NetFlow/Stream support
+- 6 with alert actions, 10 with NetFlow support
 - 16 coverage gap products (GTM roadmap)
 - 429+ sourcetypes across all products
 
@@ -161,14 +164,14 @@ card. Currently **79 product stanzas** (~3386 lines).
 - `ai_enabled`, `ai_description` — AI badge and tooltip
 - `secure_networking_gtm` — GTM tag (true = included)
 - `itsi_content_pack_label`, `itsi_content_pack_docs_url`
-- `netflow_supported` — Stream/NetFlow compatibility
+- `netflow_supported` — NetFlow compatibility
 - `coverage_gap` — GTM roadmap product with no integration yet
 - `card_accent`, `card_bg_color`, `card_banner`
 
 ### `index.jsx` — Main React Component
 **Path:** `packages/splunk-cisco-app-navigator/src/main/webapp/pages/products/index.jsx`
 
-Single-file React app (~5561 lines). Uses `@splunk/react-ui` components.
+Single-file React app (~5900 lines). Uses `@splunk/react-ui` components.
 Key constant: `APP_ID = 'splunk-cisco-app-navigator'`.
 
 **Major sections:**
@@ -180,9 +183,12 @@ Key constant: `APP_ID = 'splunk-cisco-app-navigator'`.
 - `getBestPractices(product, platformInfo)` — enriched tip objects
 - Icon rendering: `icon_svg` loads from icons/ directory with dark variant
 - Card components (collapsed/expanded views) with compatibility section
+- Indexer tier add-on detection badges (deployed/mismatch/missing/disabled)
+- Sidebar Drawer (FilterDrawer) replacing old in-page advanced filter panels
 - Category filter bar with subcategory pills and cross-cutting filters
 - Advanced filters: Support level, Visibility, Onboarding, Compatibility
-- Platform/Version filter dropdowns (Splunkbase compatibility)
+- Multi-select version filter (checkbox list, Splunkbase-style)
+- Platform filter dropdown (Splunkbase compatibility)
 - Splunkbase CSV sync button + InfoTooltip
 - Search with `deepMatch` — checks keywords, aliases, display_name, etc.
 - Modals: BestPractices, DataModel, LegacyApps, TechStack, PersonaQuickStart, ConfigViewer, Feedback
@@ -193,7 +199,7 @@ Key constant: `APP_ID = 'splunk-cisco-app-navigator'`.
 ### `products.css` — Styles
 **Path:** `packages/splunk-cisco-app-navigator/src/main/resources/splunk/appserver/static/products.css`
 
-All styles (~4547 lines). Key features:
+All styles (~5130 lines). Key features:
 - CSS variables for theme switching
 - `.csc-filter-pill-icon` — dark mode white chip for filter pill SVGs
 - Dark mode uses `:root.dce-dark` selector
@@ -203,6 +209,10 @@ All styles (~4547 lines). Key features:
 - Subcategory pill styling with animated slide-in
 - Support level pill colors (Cisco green, Splunk blue, Developer orange)
 - Compatibility select dropdown styling
+- Sidebar Drawer styles (`.scan-drawer-*`)
+- Indexer tier badge styles (`.scan-idx-tier-badge`, `.scan-idx-chip-*`)
+- Multi-select version checkbox styles with groups (`.scan-drawer-version-*`)
+- Powered By addon list styles with count badges (`.scan-drawer-addon-*`)
 
 ### `generate-catalog.js` — Build-Time Catalog Generator
 **Path:** `packages/splunk-cisco-app-navigator/bin/generate-catalog.js`
@@ -288,13 +298,14 @@ The UI has a multi-stage filter pipeline:
 2. **Category filter** (pills): Security, Networking, Observability, Collaboration, cross-cutting
 3. **Subcategory filter** (sub-pills): 13 subcategories + AI-Powered
 4. **Cross-cutting filters**: SOAR, Alert Actions, Secure Networking GTM, AI-Powered
-5. **Advanced filters**: Support level, Visibility (Retired/Deprecated/Coming Soon/GTM Roadmap), Onboarding (SC4S/Stream), Platform/Version compatibility
+5. **Advanced filters** (in Sidebar Drawer): Support level, Visibility (Retired/Deprecated/Coming Soon/GTM Roadmap), Onboarding (SC4S/NetFlow), Platform/Version compatibility
 6. **Search filter**: Deep keyword match
 7. **Addon filter** ("Powered By" dropdown): Filter by TA family
 8. **Product sections**: Configured → Detected → Available → Unsupported → Coming Soon → Deprecated → Retired → GTM Gaps
 
 ### Counter Logic
-- **Category pill counts** (`categoryCounts` useMemo): Start from `portfolioProducts`, apply cross-cutting + search + compat filters, then count per-category
+- **Category pill counts** (`categoryCounts` useMemo): Start from `portfolioProducts`, apply cross-cutting + search + compat + addon filters, then count per-category
+- **Addon counts** (FilterDrawer): Derived from `preAddonProducts` (all filters except addon) for proper faceted counts
 - **Advanced filter counts**: Start from `allProducts` with `applyCompatFilters()`, then re-apply portfolio semantics (support level + `under_development` exclusion in supported-only mode), then segregate into support/visibility/onboarding bases
 - **`totalCount`** in search bar: `portfolioProducts.length`
 - **`resultCount`** in search bar: `filteredProducts.length`
@@ -304,9 +315,9 @@ The UI has a multi-stage filter pipeline:
 2. CSV stored as `scan_splunkbase_apps.csv.gz` in lookups/
 3. On page load, `| inputlookup scan_splunkbase_apps` loads into `splunkbaseData` state
 4. `getProductUids(product)` extracts UIDs from addon/viz Splunkbase URLs
-5. Version filter: exact match against `version_compatibility` field (pipe-delimited)
+5. Version filter: multi-select checkboxes, each version exact-matched against `version_compatibility` field (pipe-delimited)
 6. Platform filter: substring match against `product_compatibility` field
-7. Only versions > 9.0 shown in dropdown; sorted descending
+7. Only versions > 9.0 shown in checkbox list; sorted descending
 
 ### Icon System
 - **Primary:** `icon_svg` loads `icons/{name}.svg` (light) / `{name}_white.svg` (dark)
@@ -318,7 +329,7 @@ The UI has a multi-stage filter pipeline:
 ### Categories & Subcategories
 4 main categories: Security (39), Networking (31), Collaboration (6), Observability (3).
 13 subcategories for granular filtering.
-Cross-cutting filters: SOAR (12), Alert Actions (6), AI-Powered (15), Secure Networking GTM (65), SC4S (18), Stream (10).
+Cross-cutting filters: SOAR (12), Alert Actions (6), AI-Powered (15), Secure Networking GTM (65), SC4S (18), NetFlow (10).
 
 ### Sort Order Strategy
 Products sorted with related products adjacent:
@@ -333,6 +344,27 @@ Products sorted with related products adjacent:
 - Card icons: frosted glass + Cisco-blue glow
 - Filter pill icons: white chip via `.csc-filter-pill-icon`
 - Badge pills: light-mode styling preserved in dark mode
+
+### Indexer Tier Detection
+- `detectIndexerTierApps()` runs `| rest splunk_server=* /services/apps/local` filtered to non-SH servers
+- SPL: `| stats latest(version) as version, max(is_disabled) as disabled, dc(splunk_server) as indexerCount by title`
+- State: `indexerApps` — null (loading) / {} (no indexers) / `{appId: {version, disabled, indexerCount}}`
+- Per-card `idxTierState`: deployed (version match), mismatch (version differs), missing (not on indexers), disabled
+- Badges shown in expanded dependency section + collapsed card summary chips
+- Disabled state shown as red alert chip (🔴 IDX Disabled)
+
+### Sidebar Drawer (FilterDrawer)
+- Replaces old in-page advanced filter panels
+- Slides in from left (Splunkbase-style); `drawerOpen` state toggle
+- Contains: Support level checkboxes, Visibility toggles, Onboarding (SC4S/NetFlow), Platform dropdown, Version multi-select checkboxes
+- ActiveFilterChips bar shows selected filters with clear-all
+- Splunkbase CSV sync button inside drawer
+
+### Ecosystem Intelligence Dashboard
+- File: `ecosystem_intelligence.xml` (Dashboard Studio v2)
+- 2 base data sources + 18 chain data sources
+- Chain `extend` property must be inside `options` object (Studio v2 requirement)
+- Navigation: accessible from SCAN nav menu
 
 ### Logging
 - Log file: `$SPLUNK_HOME/var/log/splunk/download_splunkbase_csv.log`
@@ -375,6 +407,25 @@ Products sorted with related products adjacent:
 ---
 
 ## Session History (recent work)
+
+### March 6, 2026
+- Added Indexer Tier add-on detection (`detectIndexerTierApps()`) with per-card badges
+  - States: deployed (green), mismatch (amber), missing (yellow), disabled (red)
+  - Collapsed card summary chips + expanded dependency section badges
+- Converted version filter from single-select dropdown to multi-select checkboxes
+  - `versionFilter` state changed from `null | string` to `string[]`
+  - Splunkbase-style checkbox list with "Clear" link
+- Fixed all 18 chain data sources in `ecosystem_intelligence.xml`
+  - Moved `extend` from top-level into `options` (Dashboard Studio v2 requirement)
+- Implemented Sidebar Drawer (FilterDrawer) redesign for advanced filters
+- Renamed "NetFlow / Stream" → "NetFlow" across all UI labels, comments, and docs
+- Enhanced Filter Drawer UI: version checkboxes grouped by major version (10.x/9.x) with
+  custom-styled checkboxes and left accent highlights; Powered By section with bordered list,
+  count badge pills, divider after All row, and left accent on active
+- Moved Filter Drawer from right side to left side (Splunkbase-style)
+- Fixed faceted filter counting: category pill counts now include addon filter;
+  Powered By counts now derived from `preAddonProducts` for accurate faceted search
+- Updated this copilot-instructions.md with new architecture sections
 
 ### March 5, 2026
 - Commented out all `console.log`/`console.debug` calls (kept `console.warn`/`console.error`)

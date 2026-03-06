@@ -544,6 +544,54 @@ async function detectAllSourcetypeData(products) {
 }
 
 /**
+ * Detect add-on deployment status on the indexer tier.
+ * Runs: | rest splunk_server=* apps/local — then subtracts the local SH.
+ * Returns { appid: { version, disabled, indexerCount } } for each app
+ * found on the indexer tier.
+ *
+ * "One indexer = all indexers" — we assume the same app set is on every
+ * indexer, so we only report the latest version and whether ANY indexer
+ * has the app disabled.
+ */
+async function detectIndexerTierApps() {
+    const csrf = getCSRFToken();
+    if (!csrf) return null; // can't run without CSRF
+    try {
+        const spl = [
+            '| rest splunk_server=* /servicesNS/-/-/apps/local',
+            '| search NOT [| rest /services/server/info f=splunk_server splunk_server=local | fields splunk_server]',
+            '| eval is_disabled=if(disabled=="1" OR disabled="true", 1, 0)',
+            '| stats latest(version) as idx_version max(is_disabled) as any_disabled dc(splunk_server) as idx_count by title',
+            '| fields title idx_version any_disabled idx_count',
+        ].join(' ');
+        const res = await splunkFetch(SEARCH_ENDPOINT, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+            body: `search=${encodeURIComponent(spl)}&output_mode=json&exec_mode=oneshot&count=0&timeout=120`,
+        });
+        if (!res.ok) {
+            console.warn('[SCAN] Indexer tier detection failed (HTTP ' + res.status + ')');
+            return null;
+        }
+        const data = await res.json();
+        const rows = data.results || [];
+        if (rows.length === 0) return {}; // no peer indexers found — standalone
+        const lookup = {};
+        rows.forEach(r => {
+            lookup[r.title] = {
+                version: r.idx_version || null,
+                disabled: parseInt(r.any_disabled, 10) >= 1,
+                indexerCount: parseInt(r.idx_count, 10) || 0,
+            };
+        });
+        return lookup;
+    } catch (e) {
+        console.warn('[SCAN] Indexer tier detection error:', e);
+        return null;
+    }
+}
+
+/**
  * Build a Splunk search URL that runs:
  *   | metadata type=sourcetypes | where match(sourcetype, "pattern")
  */
@@ -1570,7 +1618,7 @@ function InfoTooltip({ placement = 'bottom', width = 500, delay = 400, content, 
 
 // ────────────────────────  PRODUCT CARD  ─────────────────────
 
-function ProductCard({ product, installedApps, appStatuses, sourcetypeData, splunkbaseData, isConfigured, isComingSoon, platformType, onToggleConfigured, onShowBestPractices, onViewLegacy, onSetCustomDashboard, devMode, onViewConfig }) {
+function ProductCard({ product, installedApps, appStatuses, indexerApps, sourcetypeData, splunkbaseData, isConfigured, isComingSoon, platformType, onToggleConfigured, onShowBestPractices, onViewLegacy, onSetCustomDashboard, devMode, onViewConfig }) {
     const {
         product_id, display_name, version, status, description, value_proposition, vendor, tagline,
         icon_emoji, icon_svg, learn_more_url, addon_splunkbase_url, addon_docs_url, addon_troubleshoot_url, addon_install_url,
@@ -1590,6 +1638,25 @@ function ProductCard({ product, installedApps, appStatuses, sourcetypeData, splu
     const vizAppStatus = app_viz ? (appStatuses[app_viz] || null) : null;
     const vizApp2Status = app_viz_2 ? (appStatuses[app_viz_2] || null) : null;
     const sourcetypeInfo = sourcetypeData[product_id] || null;
+
+    // ── Indexer tier add-on detection ──
+    // indexerApps is null (not loaded), {} (no peers/standalone), or { appid: { version, disabled, indexerCount } }
+    const idxStatus = (indexerApps && addon) ? (indexerApps[addon] || null) : null;
+    const hasIndexerPeers = indexerApps !== null && Object.keys(indexerApps).length > 0;
+    // Determine indexer tier state for this product's addon
+    let idxTierState = null; // null = not applicable (no addon, no peers, or not loaded)
+    if (addon && hasIndexerPeers) {
+        if (!idxStatus) {
+            idxTierState = 'missing';       // addon not found on any indexer
+        } else if (idxStatus.disabled) {
+            idxTierState = 'disabled';      // addon found but disabled on indexer tier
+        } else if (appStatus?.version && idxStatus.version && appStatus.version !== idxStatus.version) {
+            idxTierState = 'mismatch';      // version differs between SH and indexer
+        } else {
+            idxTierState = 'deployed';      // addon is on indexer tier, correct version
+        }
+    }
+
     const hasLegacy = legacy_apps && legacy_apps.length > 0;
     const legacyInstalled = hasLegacy ? legacy_apps.filter(la => installedApps[la.app_id]) : [];
     const communityInstalled = (community_apps || []).filter(ca => installedApps[ca.app_id]);
@@ -1857,6 +1924,22 @@ function ProductCard({ product, installedApps, appStatuses, sourcetypeData, splu
                                     </span>
                                 );
                             })()}
+                            {/* Indexer tier alert chip */}
+                            {idxTierState === 'disabled' && (
+                                <span className="scan-idx-chip-alert" title="Add-on is DISABLED on the indexer tier — props.conf/transforms.conf will not work">
+                                    🔴 IDX Disabled
+                                </span>
+                            )}
+                            {idxTierState === 'missing' && (
+                                <span className="scan-idx-chip-warn" title="Add-on is not deployed to the indexer tier — index-time parsing will not work">
+                                    ⚠️ IDX Missing
+                                </span>
+                            )}
+                            {idxTierState === 'mismatch' && (
+                                <span className="scan-idx-chip-mismatch" title={`Version mismatch: SH has v${appStatus?.version}, Indexer has v${idxStatus?.version}`}>
+                                    ⬆ IDX Mismatch
+                                </span>
+                            )}
                         </span>
                         <span className="csc-dep-toggle">
                             {depsExpanded ? '− Hide' : '+ Details'}
@@ -1903,7 +1986,7 @@ function ProductCard({ product, installedApps, appStatuses, sourcetypeData, splu
                                             onClick={() => setDepTab('netflow')}
                                             type="button"
                                         >
-                                            <img src={createURL(`/static/app/${APP_ID}/icons/network_analytics.svg`)} alt="" style={{ width: '14px', height: '14px', verticalAlign: '-2px', marginRight: '4px' }} className="csc-filter-pill-icon" />NetFlow / Stream
+                                            <img src={createURL(`/static/app/${APP_ID}/icons/network_analytics.svg`)} alt="" style={{ width: '14px', height: '14px', verticalAlign: '-2px', marginRight: '4px' }} className="csc-filter-pill-icon" />NetFlow
                                         </button>
                                     )}
                                     {sc4s_supported && (
@@ -1921,7 +2004,7 @@ function ProductCard({ product, installedApps, appStatuses, sourcetypeData, splu
                                             className="csc-sc4s-info-trigger csc-netflow-info-trigger"
                                             onClick={(e) => { e.stopPropagation(); setNetflowInfoOpen(true); }}
                                             type="button"
-                                            title="What is NetFlow / Stream? — Learn about Splunk Stream for NetFlow collection"
+                                            title="What is NetFlow? — Learn about Splunk Stream for NetFlow collection"
                                         >
                                             <img src={createURL(`/static/app/${APP_ID}/icons/network_analytics.svg`)} alt="" style={{ width: '13px', height: '13px', verticalAlign: '-1px' }} className="csc-filter-pill-icon" /> <span style={{ fontSize: '10px', fontWeight: 600, opacity: 0.7 }}>ⓘ</span>
                                         </button>
@@ -1988,6 +2071,23 @@ function ProductCard({ product, installedApps, appStatuses, sourcetypeData, splu
                                     )}
                                     {!appStatus?.installed && !isComingSoon && (
                                         <span className="csc-dep-status-missing">not installed</span>
+                                    )}
+                                </div>
+                            )}
+                            {/* ── Indexer Tier status for the add-on ── */}
+                            {addon && hasIndexerPeers && idxTierState && (
+                                <div className={`scan-idx-tier-badge scan-idx-${idxTierState}`}>
+                                    {idxTierState === 'deployed' && (
+                                        <>✅ Indexer Tier: Deployed {idxStatus?.version ? `(v${idxStatus.version})` : ''}</>
+                                    )}
+                                    {idxTierState === 'mismatch' && (
+                                        <>⬆ Indexer Tier: v{idxStatus?.version} — SH has v{appStatus?.version}</>
+                                    )}
+                                    {idxTierState === 'missing' && (
+                                        <>⚠️ Missing from Indexer Tier</>
+                                    )}
+                                    {idxTierState === 'disabled' && (
+                                        <>🔴 DISABLED on Indexer Tier {idxStatus?.version ? `(v${idxStatus.version})` : ''}</>
                                     )}
                                 </div>
                             )}
@@ -2371,7 +2471,7 @@ function ProductCard({ product, installedApps, appStatuses, sourcetypeData, splu
                                 </>
                             )}
 
-                            {/* ── Tab content: NetFlow / Stream (tab for NetFlow-capable products) ── */}
+                            {/* ── Tab content: NetFlow (tab for NetFlow-capable products) ── */}
                             {netflow_supported && depTab === 'netflow' && (
                                 <>
                                     {/* NetFlow path is always Cisco Supported */}
@@ -3705,7 +3805,7 @@ function UniversalFinderBar({ onSearch, resultCount, totalCount, products, exter
             </div>
             <span className="search-result-count">
                 {resultCount != null && totalCount != null
-                    ? query ? `${resultCount} of ${totalCount} products` : `${totalCount} products`
+                    ? resultCount < totalCount ? `${resultCount} of ${totalCount} products` : `${totalCount} products`
                     : ''}
             </span>
         </div>
@@ -3734,7 +3834,7 @@ function FilterDrawer({
     splunkbaseData,
     csvSyncStatus, csvSyncMessage, onSyncSplunkbase,
     selectedAddon, onSelectAddon,
-    products, allProducts, categoryCounts,
+    products, allProducts, preAddonProducts, categoryCounts,
     showFullPortfolio,
 }) {
     /* ── Helper: apply platform/version compat filters ── */
@@ -3837,12 +3937,13 @@ function FilterDrawer({
         return sortVersionsDesc([...cardVersions]);
     })();
 
-    /* Addon (Powered By) groups */
+    /* Addon (Powered By) groups — derived from preAddonProducts for faceted counts */
+    const addonSource = preAddonProducts || products;
     const addonGroups = useMemo(() => {
         const map = {};
         let standalone = 0;
         let sc4sOnly = 0;
-        (products || []).forEach((p) => {
+        (addonSource || []).forEach((p) => {
             if (!p.addon) {
                 if (p.sc4s_supported) { sc4sOnly++; } else { standalone++; }
                 return;
@@ -3855,10 +3956,10 @@ function FilterDrawer({
         if (sc4sOnly > 0) entries.push(['__sc4s__', { label: 'SC4S Only', count: sc4sOnly }]);
         if (standalone > 0) entries.push(['__standalone__', { label: 'Standalone', count: standalone }]);
         return entries;
-    }, [products]);
+    }, [addonSource]);
 
     const isCrossCutting = (cat) => ['soar', 'alert_actions', 'secure_networking', 'ai_powered'].includes(cat);
-    const addonTotal = (products || []).length;
+    const addonTotal = (addonSource || []).length;
 
     return (
         <>
@@ -4061,30 +4162,37 @@ function FilterDrawer({
                                     <option value="Splunk Cloud">Splunk Cloud</option>
                                     <option value="Splunk Enterprise">Splunk Enterprise</option>
                                 </select>
-                                {versionList.length > 0 && (
-                                    <div className="scan-drawer-version-list">
-                                        <div className="scan-drawer-version-header">
-                                            <span className="scan-drawer-version-label">Splunk Version</span>
-                                            {versionFilter.length > 0 && (
-                                                <button
-                                                    className="scan-drawer-version-clear"
-                                                    onClick={() => onSelectVersion(null)}
-                                                    title="Clear all version filters"
-                                                >Clear</button>
-                                            )}
+                                {versionList.length > 0 && (() => {
+                                    const vGroups = {};
+                                    versionList.forEach(v => { const m = v.split('.')[0]; if (!vGroups[m]) vGroups[m] = []; vGroups[m].push(v); });
+                                    const gKeys = Object.keys(vGroups).sort((a, b) => parseInt(b) - parseInt(a));
+                                    return (
+                                        <div className="scan-drawer-version-list">
+                                            <div className="scan-drawer-version-header">
+                                                <span className="scan-drawer-version-label">Splunk Version</span>
+                                                {versionFilter.length > 0 && (
+                                                    <button
+                                                        className="scan-drawer-version-clear"
+                                                        onClick={() => onSelectVersion(null)}
+                                                        title="Clear all version filters"
+                                                    >Clear ({versionFilter.length})</button>
+                                                )}
+                                            </div>
+                                            {gKeys.map((major, gi) => (
+                                                <div key={major} className="scan-drawer-version-group">
+                                                    <div className="scan-drawer-version-group-label">{major}.x</div>
+                                                    {vGroups[major].map(v => (
+                                                        <label key={v} className={`scan-drawer-version-item ${versionFilter.includes(v) ? 'scan-drawer-version-item-active' : ''}`}>
+                                                            <input type="checkbox" checked={versionFilter.includes(v)} onChange={() => onSelectVersion(v)} />
+                                                            <span className="scan-drawer-version-text"><span className="scan-drawer-version-prefix">Splunk</span> {v}</span>
+                                                        </label>
+                                                    ))}
+                                                    {gi < gKeys.length - 1 && <div className="scan-drawer-version-group-divider" />}
+                                                </div>
+                                            ))}
                                         </div>
-                                        {versionList.map(v => (
-                                            <label key={v} className={`scan-drawer-version-item ${versionFilter.includes(v) ? 'scan-drawer-version-item-active' : ''}`}>
-                                                <input
-                                                    type="checkbox"
-                                                    checked={versionFilter.includes(v)}
-                                                    onChange={() => onSelectVersion(v)}
-                                                />
-                                                <span>Splunk {v}</span>
-                                            </label>
-                                        ))}
-                                    </div>
-                                )}
+                                    );
+                                })()}
                                 <div className="scan-drawer-sync-row">
                                     <button
                                         className={`scan-drawer-pill scan-util-sync ${csvSyncStatus === 'success' ? 'scan-sync-ok' : csvSyncStatus === 'error' ? 'scan-sync-err' : csvSyncStatus === 'syncing' ? 'scan-sync-busy' : ''}`}
@@ -4110,11 +4218,13 @@ function FilterDrawer({
                             </div>
                             <div className="scan-drawer-addon-list">
                                 <button
-                                    className={`scan-drawer-addon-item ${!selectedAddon ? 'scan-drawer-addon-item-active' : ''}`}
+                                    className={`scan-drawer-addon-item scan-drawer-addon-all ${!selectedAddon ? 'scan-drawer-addon-item-active' : ''}`}
                                     onClick={() => onSelectAddon(null)}
                                 >
-                                    All <span className="scan-drawer-pill-count">{addonTotal}</span>
+                                    <span className="scan-drawer-addon-name">All</span>
+                                    <span className="scan-drawer-addon-count">{addonTotal}</span>
                                 </button>
+                                <div className="scan-drawer-addon-divider" />
                                 {addonGroups.map(([id, g]) => (
                                     <button
                                         key={id}
@@ -4122,7 +4232,8 @@ function FilterDrawer({
                                         onClick={() => onSelectAddon(selectedAddon === id ? null : id)}
                                         title={g.label}
                                     >
-                                        {g.label} <span className="scan-drawer-pill-count">{g.count}</span>
+                                        <span className="scan-drawer-addon-name">{g.label}</span>
+                                        <span className="scan-drawer-addon-count">{g.count}</span>
                                     </button>
                                 ))}
                             </div>
@@ -4537,6 +4648,7 @@ function SCANProductsPage() {
     const [installedApps, setInstalledApps] = useState({});
     const [appStatuses, setAppStatuses] = useState({});
     const [sourcetypeData, setSourcetypeData] = useState({});
+    const [indexerApps, setIndexerApps] = useState(null);        // null (not loaded) | {} (no peers) | { appid: { version, disabled, indexerCount } }
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
     const [searchQuery, setSearchQuery] = useState('');
@@ -4886,6 +4998,16 @@ function SCANProductsPage() {
         detect();
     }, [products, loading]);
 
+    // ── Indexer tier detection — check add-on deployment across peer indexers ──
+    useEffect(() => {
+        if (loading) return;
+        const detect = async () => {
+            const result = await detectIndexerTierApps();
+            if (result !== null) setIndexerApps(result);
+        };
+        detect();
+    }, [loading]);
+
     // ── Load Splunkbase CSV data via inputlookup ──
     useEffect(() => {
         if (loading) return;
@@ -5168,6 +5290,16 @@ function SCANProductsPage() {
                 });
             });
         }
+        // Apply addon filter so category counts reflect the selected addon
+        if (selectedAddon) {
+            if (selectedAddon === '__standalone__') {
+                base = base.filter(p => !p.addon && !p.sc4s_supported);
+            } else if (selectedAddon === '__sc4s__') {
+                base = base.filter(p => !p.addon && p.sc4s_supported);
+            } else {
+                base = base.filter(p => p.addon === selectedAddon);
+            }
+        }
         const counts = {};
         CATEGORIES.forEach((c) => { counts[c.id] = base.filter((p) => p.category === c.id).length; });
         counts.soar = base.filter((p) => p.soar_connectors && p.soar_connectors.length > 0).length;
@@ -5175,7 +5307,7 @@ function SCANProductsPage() {
         counts.secure_networking = base.filter((p) => p.secure_networking_gtm).length;
         counts.ai_powered = base.filter((p) => p.ai_enabled).length;
         return counts;
-    }, [portfolioProducts, streamFilter, sc4sFilter, aiFilter, searchQuery, platformFilter, versionFilter, splunkbaseData]);
+    }, [portfolioProducts, streamFilter, sc4sFilter, aiFilter, searchQuery, platformFilter, versionFilter, splunkbaseData, selectedAddon]);
 
     // ── Render ──
     if (loading) {
@@ -5439,6 +5571,7 @@ function SCANProductsPage() {
                 onSelectAddon={setSelectedAddon}
                 products={portfolioProducts}
                 allProducts={products}
+                preAddonProducts={preAddonProducts}
                 categoryCounts={categoryCounts}
                 showFullPortfolio={showFullPortfolio}
             />
@@ -5462,7 +5595,7 @@ function SCANProductsPage() {
                         {configuredProducts.map((p) => (
                             <ProductCard
                                 key={p.product_id} product={p}
-                                installedApps={installedApps} appStatuses={appStatuses}
+                                installedApps={installedApps} appStatuses={appStatuses} indexerApps={indexerApps}
                                 sourcetypeData={sourcetypeData} splunkbaseData={splunkbaseData} isConfigured isComingSoon={false}
                                 platformType={platformType}
                                 onToggleConfigured={handleToggleConfigured}
@@ -5492,7 +5625,7 @@ function SCANProductsPage() {
                         {detectedProducts.map((p) => (
                             <ProductCard
                                 key={p.product_id} product={p}
-                                installedApps={installedApps} appStatuses={appStatuses}
+                                installedApps={installedApps} appStatuses={appStatuses} indexerApps={indexerApps}
                                 sourcetypeData={sourcetypeData} splunkbaseData={splunkbaseData} isConfigured={false} isComingSoon={false}
                                 platformType={platformType}
                                 onToggleConfigured={handleToggleConfigured}
@@ -5515,7 +5648,7 @@ function SCANProductsPage() {
                         {availableProducts.map((p) => (
                             <ProductCard
                                 key={p.product_id} product={p}
-                                installedApps={installedApps} appStatuses={appStatuses}
+                                installedApps={installedApps} appStatuses={appStatuses} indexerApps={indexerApps}
                                 sourcetypeData={sourcetypeData} splunkbaseData={splunkbaseData} isConfigured={false} isComingSoon={false}
                                 platformType={platformType}
                                 onToggleConfigured={handleToggleConfigured}
@@ -5545,7 +5678,7 @@ function SCANProductsPage() {
                         {unsupportedProducts.map((p) => (
                             <ProductCard
                                 key={p.product_id} product={p}
-                                installedApps={installedApps} appStatuses={appStatuses}
+                                installedApps={installedApps} appStatuses={appStatuses} indexerApps={indexerApps}
                                 sourcetypeData={sourcetypeData} splunkbaseData={splunkbaseData} isConfigured={false} isComingSoon={false}
                                 platformType={platformType}
                                 onToggleConfigured={handleToggleConfigured}
@@ -5568,7 +5701,7 @@ function SCANProductsPage() {
                         {comingSoonProducts.map((p) => (
                             <ProductCard
                                 key={p.product_id} product={p}
-                                installedApps={installedApps} appStatuses={appStatuses}
+                                installedApps={installedApps} appStatuses={appStatuses} indexerApps={indexerApps}
                                 sourcetypeData={sourcetypeData} splunkbaseData={splunkbaseData} isConfigured={false} isComingSoon
                                 platformType={platformType}
                                 onToggleConfigured={handleToggleConfigured}
@@ -5596,7 +5729,7 @@ function SCANProductsPage() {
                         {deprecatedProducts.map((p) => (
                             <ProductCard
                                 key={p.product_id} product={p}
-                                installedApps={installedApps} appStatuses={appStatuses}
+                                installedApps={installedApps} appStatuses={appStatuses} indexerApps={indexerApps}
                                 sourcetypeData={sourcetypeData} splunkbaseData={splunkbaseData} isConfigured={configuredIds.includes(p.product_id)} isComingSoon={false}
                                 platformType={platformType}
                                 onToggleConfigured={handleToggleConfigured}
@@ -5622,7 +5755,7 @@ function SCANProductsPage() {
                         {retiredProducts.map((p) => (
                             <ProductCard
                                 key={p.product_id} product={p}
-                                installedApps={installedApps} appStatuses={appStatuses}
+                                installedApps={installedApps} appStatuses={appStatuses} indexerApps={indexerApps}
                                 sourcetypeData={sourcetypeData} splunkbaseData={splunkbaseData} isConfigured={configuredIds.includes(p.product_id)} isComingSoon={false}
                                 platformType={platformType}
                                 onToggleConfigured={handleToggleConfigured}
@@ -5648,7 +5781,7 @@ function SCANProductsPage() {
                         {gtmGapProducts.map((p) => (
                             <ProductCard
                                 key={p.product_id} product={p}
-                                installedApps={installedApps} appStatuses={appStatuses}
+                                installedApps={installedApps} appStatuses={appStatuses} indexerApps={indexerApps}
                                 sourcetypeData={sourcetypeData} splunkbaseData={splunkbaseData} isConfigured={false} isComingSoon={false}
                                 platformType={platformType}
                                 onToggleConfigured={handleToggleConfigured}
