@@ -41,23 +41,35 @@ S3_BASE_URL = "https://is4s.s3.amazonaws.com/"
 LOGGER = logging.getLogger("downloadsplunkbasecsv")
 LOG_FILE_FORMAT = "%(asctime)s [%(levelname)s] %(name)s - %(message)s"
 LOG_STREAM_FORMAT = "[%(levelname)s] %(message)s"
-LOG_DATE_FORMAT = "%Y-%m-%d %H:%M:%S%z"
+LOG_DATE_FORMAT = "%Y-%m-%d %H:%M:%S"
 DEBUG = LOGGER.debug
 INFO = LOGGER.info
 ERROR = LOGGER.error
 
 
+class _UTCFormatter(logging.Formatter):
+    """Formatter that always emits UTC timestamps with +0000 suffix."""
+    converter = time.gmtime
+
+    def formatTime(self, record, datefmt=None):
+        ct = self.converter(record.created)
+        if datefmt:
+            s = time.strftime(datefmt, ct)
+        else:
+            s = time.strftime(LOG_DATE_FORMAT, ct)
+        return f"{s}+0000"
+
+
 def set_up_logging():
     if LOGGER.handlers:
         return
+    LOGGER.setLevel(logging.DEBUG)
     fh = logging.FileHandler(LOG_PATH)
-    formatter = logging.Formatter(LOG_FILE_FORMAT, LOG_DATE_FORMAT)
-    formatter.converter = time.gmtime
-    fh.setFormatter(formatter)
+    fh.setFormatter(_UTCFormatter(LOG_FILE_FORMAT, LOG_DATE_FORMAT))
     fh.setLevel(logging.DEBUG)
     LOGGER.addHandler(fh)
     sh = logging.StreamHandler(sys.stderr)
-    sh.setFormatter(logging.Formatter(LOG_STREAM_FORMAT, LOG_DATE_FORMAT))
+    sh.setFormatter(logging.Formatter(LOG_STREAM_FORMAT))
     sh.setLevel(logging.WARNING)
     LOGGER.addHandler(sh)
     LOGGER.propagate = False

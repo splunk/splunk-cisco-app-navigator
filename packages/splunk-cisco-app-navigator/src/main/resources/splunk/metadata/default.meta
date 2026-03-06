@@ -3,3 +3,11 @@
 []
 access = read : [ * ], write : [ admin, sc_admin, power ]
 export = none
+
+# Export props.conf globally so field extractions apply in all app contexts
+[props]
+export = system
+
+# Export transforms.conf globally so lookup definitions are available everywhere
+[transforms]
+export = system
