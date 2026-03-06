@@ -362,8 +362,19 @@ Products sorted with related products adjacent:
 
 ### Ecosystem Intelligence Dashboard
 - File: `ecosystem_intelligence.xml` (Dashboard Studio v2)
-- 2 base data sources + 18 chain data sources
+- **Cisco-focused**: All data filtered to Cisco ecosystem apps only (~125 apps, 53 live + 72 archived)
+- **Two tabs**: "Product Intelligence" (products.conf catalog) + "Splunkbase & Operations" (Cisco Splunkbase analytics)
+- 28 data sources: 2 base searches + 16 chain searches + 10 standalone
+- 34 visualizations: 10 section headers, 12 KPIs, 6 charts (pie/column/bar), 6 tables
+- Base searches: `SCAN - Ecosystem Summary` (products.conf) + `SCAN - Cisco Splunkbase Ecosystem` (filtered Splunkbase)
+- Tab 1 — Product Intelligence: Ecosystem Health KPIs (9), Portfolio Analysis (category/status/support charts), SOAR Connector Inventory, Add-on Family Overview, Data Quality Audit
+- Tab 2 — Splunkbase & Operations: Cisco Splunkbase KPIs (live/archived/downloads), App Freshness/Platform/Downloads charts, Installed Cisco Estate, Version Tracker, Migration Planning, Compliance & Validation
+- Support Level chart shows products.conf `support_level` distribution (not all-Splunkbase)
+- Installed Estate uses `SCAN - Installed Apps vs Catalog` (products.conf focused, not full SH audit)
+- 36 saved searches in savedsearches.conf (was 35; added `SCAN - Cisco Splunkbase Ecosystem`)
+- Each table has color-coded headers (Cisco blue, amber, purple, orange, red, green, teal)
 - Chain `extend` property must be inside `options` object (Studio v2 requirement)
+- Chain searches use `"type": "ds.chain"` (not `ds.search` — Splunk 10 requirement)
 - Navigation: accessible from SCAN nav menu
 
 ### Logging
@@ -409,14 +420,25 @@ Products sorted with related products adjacent:
 ## Session History (recent work)
 
 ### March 6, 2026
+- Completely rebuilt `ecosystem_intelligence.xml` Dashboard Studio v2 dashboard
+  - Refocused entirely on Cisco ecosystem (~125 apps, 53 live + 72 archived)
+  - Removed all-Splunkbase queries; every data source now filtered to Cisco apps only
+  - Added 2 tabs: "Product Intelligence" (products.conf) + "Splunkbase & Operations" (Cisco Splunkbase)
+  - 28 data sources (2 base + 16 chain + 10 standalone), 34 visualizations
+  - Tab 1: KPIs, Portfolio Analysis (category/status/support), SOAR, Add-on Families, Data Quality
+  - Tab 2: Cisco Splunkbase KPIs (live/archived/downloads), Freshness/Platform/Downloads charts,
+    Installed Cisco Estate, Version Tracker, Migration Planning, Compliance & Validation
+  - Support Level chart now shows products.conf `support_level` (not Splunkbase `support`)
+  - Installed Estate uses `SCAN - Installed Apps vs Catalog` (products.conf focused)
+  - Added saved search #36: `SCAN - Cisco Splunkbase Ecosystem` (subsearch-filtered by products.conf appids)
+  - Chain searches use `"type": "ds.chain"` with `extend` in `options` (Splunk 10 requirement)
+- Fixed product count display: shows "X of Y" whenever filters reduce visible products
 - Added Indexer Tier add-on detection (`detectIndexerTierApps()`) with per-card badges
   - States: deployed (green), mismatch (amber), missing (yellow), disabled (red)
   - Collapsed card summary chips + expanded dependency section badges
 - Converted version filter from single-select dropdown to multi-select checkboxes
   - `versionFilter` state changed from `null | string` to `string[]`
   - Splunkbase-style checkbox list with "Clear" link
-- Fixed all 18 chain data sources in `ecosystem_intelligence.xml`
-  - Moved `extend` from top-level into `options` (Dashboard Studio v2 requirement)
 - Implemented Sidebar Drawer (FilterDrawer) redesign for advanced filters
 - Renamed "NetFlow / Stream" → "NetFlow" across all UI labels, comments, and docs
 - Enhanced Filter Drawer UI: version checkboxes grouped by major version (10.x/9.x) with
