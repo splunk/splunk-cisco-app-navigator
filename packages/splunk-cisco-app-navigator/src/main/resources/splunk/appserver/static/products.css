@@ -363,6 +363,20 @@ html.dce-dark [data-view="views/shared/Page"] {
 .scan-tooltip-pin.pinned {
     color: #1a7f3d;
 }
+.scan-tooltip-drag {
+    cursor: grab;
+    font-size: 18px;
+    color: #b0b0b0;
+    user-select: none;
+    line-height: 1;
+}
+.scan-tooltip-drag:hover {
+    color: #666;
+}
+.scan-tooltip-drag:active {
+    cursor: grabbing;
+    color: #333;
+}
 
 /* Dark mode overrides (keyed off dce-dark only, so forced-light works) */
 :root.dce-dark .scan-info-pill {
@@ -606,6 +620,32 @@ html.dce-dark [data-view="views/shared/Page"] {
     color: #e3b341 !important;
     background: rgba(187, 128, 9, 0.15) !important;
     border-color: #9e6a03 !important;
+}
+
+/* ── Compatibility filter selects ── */
+.csc-compat-select {
+    outline: none;
+    transition: all 0.2s;
+}
+.csc-compat-select:hover {
+    border-color: #049fd9 !important;
+}
+.csc-compat-select:focus {
+    border-color: #049fd9 !important;
+    box-shadow: 0 0 0 2px rgba(4, 159, 217, 0.2);
+}
+:root.dce-dark .csc-compat-select {
+    background: rgba(255,255,255,0.06) !important;
+    color: #e0e0e0 !important;
+    border-color: #3d434a !important;
+}
+:root.dce-dark .csc-compat-select:hover,
+:root.dce-dark .csc-compat-select:focus {
+    border-color: #049fd9 !important;
+}
+:root.dce-dark .csc-compat-select option {
+    background: #1e1e1e;
+    color: #e0e0e0;
 }
 
 .header-app-icon {
@@ -1594,6 +1634,12 @@ html.dce-dark [data-view="views/shared/Page"] {
 }
 :root.dce-dark .scan-tooltip-pin.pinned {
     color: #66bb6a;
+}
+:root.dce-dark .scan-tooltip-drag {
+    color: #888;
+}
+:root.dce-dark .scan-tooltip-drag:hover {
+    color: #bbb;
 }
 :root.dce-dark .cpb-link {
     background: #2e9e56;

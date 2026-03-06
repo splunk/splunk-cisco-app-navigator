@@ -1,12 +1,14 @@
 #!/usr/bin/env bash
 # Remove stage directory entirely for a clean build.
-# Use --keep-local to preserve local/ (Splunk runtime conf overrides like custom_dashboard).
+# Always preserves local/ (Splunk runtime conf overrides like custom_dashboard).
+# Pass --wipe-local to remove local/ as well (rarely needed).
 set -e
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 STAGE_DIR="${SCRIPT_DIR}/../stage"
 
 if [[ -d "$STAGE_DIR" ]]; then
-  if [[ "$1" == "--keep-local" && -d "$STAGE_DIR/local" ]]; then
+  # Always preserve local/ unless --wipe-local is passed
+  if [[ "$1" != "--wipe-local" && -d "$STAGE_DIR/local" ]]; then
     mv "$STAGE_DIR/local" /tmp/_scan_local_backup
   fi
 
