@@ -1595,6 +1595,40 @@ html.dce-dark [data-view="views/shared/Page"] {
 :root.dce-dark .csc-dep-chip-miss {
     color: #ffab40;
 }
+:root.dce-dark .scan-idx-chip-alert {
+    background: #b91c1c;
+    color: #fff;
+}
+:root.dce-dark .scan-idx-chip-warn {
+    background: rgba(245, 158, 11, 0.2);
+    border-color: rgba(245, 158, 11, 0.5);
+    color: #fbbf24;
+}
+:root.dce-dark .scan-idx-chip-mismatch {
+    background: rgba(59, 130, 246, 0.15);
+    border-color: rgba(59, 130, 246, 0.4);
+    color: #93c5fd;
+}
+:root.dce-dark .scan-idx-deployed {
+    background: rgba(22, 101, 52, 0.25);
+    border-color: rgba(134, 239, 172, 0.4);
+    color: #86efac;
+}
+:root.dce-dark .scan-idx-mismatch {
+    background: rgba(59, 130, 246, 0.15);
+    border-color: rgba(147, 197, 253, 0.3);
+    color: #93c5fd;
+}
+:root.dce-dark .scan-idx-missing {
+    background: rgba(245, 158, 11, 0.15);
+    border-color: rgba(251, 191, 36, 0.4);
+    color: #fbbf24;
+}
+:root.dce-dark .scan-idx-disabled {
+    background: #b91c1c;
+    border-color: #991b1b;
+    color: #fff;
+}
 :root.dce-dark .csc-dep-update {
     color: #ffab40;
 }
@@ -1826,6 +1860,69 @@ html.dce-dark [data-view="views/shared/Page"] {
 }
 .csc-dep-chip-ok { color: var(--faint-color, #888); }
 .csc-dep-chip-miss { color: #bf5600; }
+
+/* ── Indexer Tier badges (collapsed card summary chips) ── */
+.scan-idx-chip-alert,
+.scan-idx-chip-warn,
+.scan-idx-chip-mismatch {
+    font-size: 10px;
+    font-weight: 700;
+    white-space: nowrap;
+    padding: 1px 6px;
+    border-radius: 8px;
+    letter-spacing: 0.3px;
+}
+.scan-idx-chip-alert {
+    color: #fff;
+    background: #dc2626;
+    animation: scan-idx-pulse 2s ease-in-out infinite;
+}
+.scan-idx-chip-warn {
+    color: #92400e;
+    background: #fef3c7;
+    border: 1px solid #f59e0b;
+}
+.scan-idx-chip-mismatch {
+    color: #1e40af;
+    background: #dbeafe;
+    border: 1px solid #3b82f6;
+}
+@keyframes scan-idx-pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.7; }
+}
+
+/* ── Indexer Tier badge (expanded dependency detail row) ── */
+.scan-idx-tier-badge {
+    font-size: 11px;
+    font-weight: 600;
+    padding: 4px 10px;
+    border-radius: 8px;
+    margin: 4px 0 2px 0;
+    display: inline-block;
+}
+.scan-idx-deployed {
+    color: #166534;
+    background: #dcfce7;
+    border: 1px solid #86efac;
+}
+.scan-idx-mismatch {
+    color: #1e40af;
+    background: #dbeafe;
+    border: 1px solid #93c5fd;
+}
+.scan-idx-missing {
+    color: #92400e;
+    background: #fef3c7;
+    border: 1px solid #fbbf24;
+}
+.scan-idx-disabled {
+    color: #fff;
+    background: #dc2626;
+    border: 1px solid #b91c1c;
+    font-weight: 700;
+}
+
 .csc-dep-toggle {
     font-size: 11px;
     color: #1a7f3d;

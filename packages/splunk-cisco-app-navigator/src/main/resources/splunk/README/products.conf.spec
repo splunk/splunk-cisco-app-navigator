@@ -402,7 +402,7 @@ sc4s_config_notes = <pipe-delimited string>
 
 netflow_supported = true | false
 * Whether this product supports network telemetry onboarding via NetFlow / Splunk Stream.
-* When true, the card displays a "NetFlow / Stream" tab in the Dual-Path Onboarding section,
+* When true, the card displays a "NetFlow" tab in the Dual-Path Onboarding section,
 * alongside the Standard and SC4S tabs (if SC4S is also supported).
 * Default: false.
 
@@ -441,12 +441,12 @@ stream_docs_url = <url>
 * Default: (empty).
 
 netflow_sourcetypes = <comma-separated list>
-* Sourcetypes specific to the NetFlow / Stream onboarding path.
+* Sourcetypes specific to the NetFlow onboarding path.
 * Example: stream:cisco_ipfix
 * Default: (empty).
 
 netflow_config_notes = <pipe-delimited string>
-* Product-specific configuration notes for the NetFlow / Stream onboarding path.
+* Product-specific configuration notes for the NetFlow onboarding path.
 * Multiple notes are separated by the pipe character (|).
 * Shown in the NetFlow tab of the Dual-Path Onboarding section.
 * Example: Configure NetFlow v9 on switches|Export to Stream Forwarder UDP port
