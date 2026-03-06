@@ -2,8 +2,8 @@
 /**
  * AUTO-GENERATED from products.conf — DO NOT EDIT BY HAND.
  * Regenerate:  node bin/generate-catalog.js
- * Generated:   2026-03-04T13:49:45.493Z
- * Products:    78
+ * Generated:   2026-03-06T02:31:05.726Z
+ * Products:    75
  */
 
 export const PRODUCT_CATALOG = [
@@ -38,7 +38,7 @@ export const PRODUCT_CATALOG = [
     "app_viz_2_splunkbase_url": "",
     "app_viz_2_docs_url": "",
     "app_viz_2_install_url": "",
-    "learn_more_url": "https://www.cisco.com/c/en/us/products/security/firewalls/index.html",
+    "learn_more_url": "https://www.cisco.com/site/us/en/products/security/firewalls/index.html",
     "legacy_apps": [
       {
         "app_id": "Splunk_TA_sourcefire",
@@ -143,7 +143,6 @@ export const PRODUCT_CATALOG = [
     ],
     "sourcetypes": [
       "cisco:asa",
-      "cisco:esa:textmail",
       "cisco:estreamer:clean",
       "cisco:estreamer:data",
       "cisco:estreamer:log",
@@ -152,13 +151,11 @@ export const PRODUCT_CATALOG = [
       "cisco:ftd",
       "cisco:ftd:syslog",
       "cisco:fwsm",
-      "cisco:ise:syslog",
       "cisco:pix",
       "cisco:sfw:estreamer",
       "cisco:sourcefire",
       "cisco:sourcefire:appliance:syslog",
       "cisco:sourcefire:defencecenter:syslog",
-      "cisco:wsa:squid",
       "estreamer",
       "snort"
     ],
@@ -180,8 +177,7 @@ export const PRODUCT_CATALOG = [
       "estreamer",
       "firesight",
       "intrusion prevention",
-      "firewall",
-      "sc4s"
+      "firewall"
     ],
     "alert_actions": [],
     "soar_connectors": [
@@ -269,7 +265,7 @@ export const PRODUCT_CATALOG = [
     "app_viz_2_splunkbase_url": "",
     "app_viz_2_docs_url": "",
     "app_viz_2_install_url": "",
-    "learn_more_url": "https://www.cisco.com/c/en/us/products/security/stealthwatch/index.html",
+    "learn_more_url": "https://www.cisco.com/site/us/en/products/security/security-analytics/secure-network-analytics/index.html",
     "legacy_apps": [
       {
         "app_id": "TA-cisco-stealthwatch",
@@ -640,7 +636,7 @@ export const PRODUCT_CATALOG = [
     "app_viz_2_splunkbase_url": "",
     "app_viz_2_docs_url": "",
     "app_viz_2_install_url": "",
-    "learn_more_url": "https://www.cisco.com/c/en/us/products/security/firewalls/encrypted-visibility-engine.html",
+    "learn_more_url": "https://www.cisco.com/site/us/en/products/security/firewalls/encrypted-visibility-engine.html",
     "legacy_apps": [],
     "prereq_apps": [],
     "community_apps": [],
@@ -722,7 +718,7 @@ export const PRODUCT_CATALOG = [
     "app_viz_2_splunkbase_url": "",
     "app_viz_2_docs_url": "",
     "app_viz_2_install_url": "",
-    "learn_more_url": "https://duo.com/?utm_source=cisco&utm_medium=referral",
+    "learn_more_url": "https://www.cisco.com/site/us/en/products/security/duo/index.html",
     "legacy_apps": [
       {
         "app_id": "duo_splunkapp",
@@ -842,7 +838,7 @@ export const PRODUCT_CATALOG = [
     "app_viz_2_splunkbase_url": "",
     "app_viz_2_docs_url": "",
     "app_viz_2_install_url": "",
-    "learn_more_url": "https://www.cisco.com/site/us/en/products/security/duo/index.html",
+    "learn_more_url": "https://www.cisco.com/site/us/en/products/security/identity-intelligence/index.html",
     "legacy_apps": [],
     "prereq_apps": [],
     "community_apps": [],
@@ -896,91 +892,6 @@ export const PRODUCT_CATALOG = [
     "netflow_config_notes": [],
     "best_practices": [],
     "sort_order": 21
-  },
-  {
-    "product_id": "cisco_pxgrid",
-    "display_name": "Cisco pxGrid (Platform Exchange Grid)",
-    "description": "Context-sharing fabric that enables Cisco ISE to publish identity, device, and security-group context to ecosystem partners in real time — allowing SIEM, SOAR, and network infrastructure to consume session attributes (user, device posture, TrustSec SGT) via WebSocket-based pub/sub or REST bulk download for adaptive policy enforcement and enriched security analytics.",
-    "value_proposition": "A dedicated Splunk TA for pxGrid could stream real-time identity context directly from ISE — enriching every Splunk event with user identity, device posture, and TrustSec tags without relying on syslog parsing or batch correlation lookups.",
-    "vendor": "Cisco",
-    "tagline": "Real-Time Identity Context Exchange",
-    "category": "security",
-    "version": "1.0.0",
-    "status": "roadmap",
-    "addon": "",
-    "addon_label": "",
-    "addon_family": "default",
-    "subcategory": "identity_access",
-    "ai_enabled": false,
-    "ai_description": "",
-    "cisco_retired": false,
-    "coverage_gap": true,
-    "addon_splunkbase_url": "",
-    "addon_docs_url": "",
-    "addon_install_url": "",
-    "app_viz": "",
-    "app_viz_label": "",
-    "app_viz_splunkbase_url": "",
-    "app_viz_docs_url": "",
-    "app_viz_install_url": "",
-    "app_viz_2": "",
-    "app_viz_2_label": "",
-    "app_viz_2_splunkbase_url": "",
-    "app_viz_2_docs_url": "",
-    "app_viz_2_install_url": "",
-    "learn_more_url": "https://developer.cisco.com/docs/pxgrid/",
-    "legacy_apps": [],
-    "prereq_apps": [],
-    "community_apps": [],
-    "sourcetypes": [],
-    "dashboard": "",
-    "custom_dashboard": "",
-    "icon_emoji": "handshake",
-    "icon_svg": "ise",
-    "aliases": [],
-    "keywords": [
-      "pxgrid",
-      "platform exchange grid",
-      "context sharing",
-      "trustsec",
-      "sgt",
-      "session directory",
-      "adaptive network control"
-    ],
-    "alert_actions": [],
-    "soar_connectors": [],
-    "itsi_content_pack": null,
-    "card_banner": "No Splunk Coverage",
-    "card_banner_color": "gray",
-    "card_banner_size": "small",
-    "card_banner_opacity": "0.12",
-    "card_accent": "#607d8b",
-    "card_bg_color": "smoke",
-    "is_new": false,
-    "secure_networking_gtm": false,
-    "support_level": "not_supported",
-    "sc4s_url": "",
-    "sc4s_label": "",
-    "sc4s_supported": false,
-    "sc4s_search_head_ta": "",
-    "sc4s_search_head_ta_label": "",
-    "sc4s_search_head_ta_splunkbase_url": "",
-    "sc4s_search_head_ta_splunkbase_id": "",
-    "sc4s_search_head_ta_install_url": "",
-    "sc4s_sourcetypes": [],
-    "sc4s_config_notes": [],
-    "netflow_supported": false,
-    "netflow_addon": "",
-    "netflow_addon_label": "",
-    "netflow_addon_splunkbase_url": "",
-    "netflow_addon_splunkbase_id": "",
-    "netflow_addon_install_url": "",
-    "netflow_addon_docs_url": "",
-    "stream_docs_url": "",
-    "netflow_sourcetypes": [],
-    "netflow_config_notes": [],
-    "best_practices": [],
-    "sort_order": 22
   },
   {
     "product_id": "cisco_secure_endpoint",
@@ -1135,7 +1046,7 @@ export const PRODUCT_CATALOG = [
     "app_viz_2_splunkbase_url": "",
     "app_viz_2_docs_url": "",
     "app_viz_2_install_url": "",
-    "learn_more_url": "https://www.cisco.com/site/us/en/products/security/secure-client/index.html",
+    "learn_more_url": "https://www.cisco.com/site/us/en/products/security/secure-client/resources.html",
     "legacy_apps": [
       {
         "app_id": "TA-Cisco-NVM",
@@ -1337,7 +1248,7 @@ export const PRODUCT_CATALOG = [
     "app_viz_2_splunkbase_url": "",
     "app_viz_2_docs_url": "",
     "app_viz_2_install_url": "",
-    "learn_more_url": "https://www.cisco.com/c/en/us/products/security/xdr/index.html",
+    "learn_more_url": "https://www.cisco.com/site/us/en/products/security/xdr/index.html",
     "legacy_apps": [],
     "prereq_apps": [],
     "community_apps": [],
@@ -1609,7 +1520,7 @@ export const PRODUCT_CATALOG = [
     "app_viz_2_splunkbase_url": "",
     "app_viz_2_docs_url": "",
     "app_viz_2_install_url": "",
-    "learn_more_url": "https://www.cisco.com/c/en/us/products/security/threat-grid/index.html",
+    "learn_more_url": "https://www.cisco.com/site/us/en/products/security/threat-grid/index.html",
     "legacy_apps": [
       {
         "app_id": "TA-cisco-secure-malware-analytics",
@@ -1814,7 +1725,7 @@ export const PRODUCT_CATALOG = [
     "app_viz_2_splunkbase_url": "",
     "app_viz_2_docs_url": "",
     "app_viz_2_install_url": "",
-    "learn_more_url": "https://www.cisco.com/c/en/us/products/security/email-security/index.html",
+    "learn_more_url": "https://www.cisco.com/site/us/en/products/security/email-security/index.html",
     "legacy_apps": [
       {
         "app_id": "Alef_TA_MIMEDecoder",
@@ -1855,8 +1766,7 @@ export const PRODUCT_CATALOG = [
       "anti-spam",
       "email gateway",
       "dlp",
-      "message tracking",
-      "sc4s"
+      "message tracking"
     ],
     "alert_actions": [],
     "soar_connectors": [
@@ -1948,7 +1858,7 @@ export const PRODUCT_CATALOG = [
     "app_viz_2_splunkbase_url": "",
     "app_viz_2_docs_url": "",
     "app_viz_2_install_url": "",
-    "learn_more_url": "https://www.cisco.com/c/en/us/products/security/secure-access/index.html",
+    "learn_more_url": "https://www.cisco.com/site/us/en/products/security/secure-access/index.html",
     "legacy_apps": [],
     "prereq_apps": [],
     "community_apps": [],
@@ -2310,7 +2220,7 @@ export const PRODUCT_CATALOG = [
     "app_viz_2_splunkbase_url": "",
     "app_viz_2_docs_url": "",
     "app_viz_2_install_url": "",
-    "learn_more_url": "https://www.cisco.com/c/en/us/products/security/cloudlock/index.html",
+    "learn_more_url": "https://www.cisco.com/site/us/en/products/security/cloudlock/index.html",
     "legacy_apps": [
       {
         "app_id": "cloudlock",
@@ -2405,7 +2315,7 @@ export const PRODUCT_CATALOG = [
     "app_viz_2_splunkbase_url": "",
     "app_viz_2_docs_url": "",
     "app_viz_2_install_url": "",
-    "learn_more_url": "https://www.cisco.com/c/en/us/products/security/multicloud-defense/index.html",
+    "learn_more_url": "https://www.cisco.com/site/us/en/products/security/multicloud-defense/index.html",
     "legacy_apps": [],
     "prereq_apps": [],
     "community_apps": [],
@@ -2676,7 +2586,7 @@ export const PRODUCT_CATALOG = [
     "app_viz_2_splunkbase_url": "",
     "app_viz_2_docs_url": "",
     "app_viz_2_install_url": "",
-    "learn_more_url": "https://www.cisco.com/c/en/us/products/security/web-security-appliance/index.html",
+    "learn_more_url": "https://www.cisco.com/site/us/en/products/security/web-security-appliance/index.html",
     "legacy_apps": [
       {
         "app_id": "Cisco_WSA_Insight",
@@ -2712,8 +2622,7 @@ export const PRODUCT_CATALOG = [
       "web proxy",
       "url filtering",
       "content filtering",
-      "ironport web",
-      "sc4s"
+      "ironport web"
     ],
     "alert_actions": [],
     "soar_connectors": [
@@ -3184,7 +3093,7 @@ export const PRODUCT_CATALOG = [
     "card_accent": "#049fd9",
     "card_bg_color": "pearl",
     "is_new": false,
-    "secure_networking_gtm": false,
+    "secure_networking_gtm": true,
     "support_level": "cisco_supported",
     "sc4s_url": "",
     "sc4s_label": "",
@@ -3240,7 +3149,7 @@ export const PRODUCT_CATALOG = [
     "app_viz_2_splunkbase_url": "",
     "app_viz_2_docs_url": "",
     "app_viz_2_install_url": "",
-    "learn_more_url": "https://www.cisco.com/site/us/en/products/security/secure-equipment-access/index.html",
+    "learn_more_url": "https://www.cisco.com/site/us/en/products/security/industrial-security/secure-equipment-access/index.html",
     "legacy_apps": [],
     "prereq_apps": [],
     "community_apps": [],
@@ -3323,7 +3232,7 @@ export const PRODUCT_CATALOG = [
     "app_viz_2_splunkbase_url": "",
     "app_viz_2_docs_url": "",
     "app_viz_2_install_url": "",
-    "learn_more_url": "https://www.cisco.com/c/en/us/products/cloud-systems-management/dna-center/index.html",
+    "learn_more_url": "https://www.cisco.com/c/en/us/products/collateral/cloud-systems-management/dna-center/nb-06-dna-center-so-cte-en.html",
     "legacy_apps": [
       {
         "app_id": "Splunk-TA-cisco-dnacenter",
@@ -3408,7 +3317,7 @@ export const PRODUCT_CATALOG = [
       "intent-based networking",
       "sd-access",
       "network assurance",
-      "sc4s"
+      "pxGrid"
     ],
     "alert_actions": [],
     "soar_connectors": [],
@@ -3448,7 +3357,9 @@ export const PRODUCT_CATALOG = [
     "netflow_addon_install_url": "/manager/splunk-cisco-app-navigator/appsremote?order=relevance&query=%22Enhanced+Netflow%22&offset=0&support=cisco",
     "netflow_addon_docs_url": "https://www.cisco.com/c/en/us/solutions/collateral/enterprise-networks/sd-wan/sd-wan-splunk-integration-ug.html",
     "stream_docs_url": "https://help.splunk.com/en/splunk-cloud-platform/collect-stream-data/install-and-configure-splunk-stream/8.1/introduction/about-splunk-stream",
-    "netflow_sourcetypes": [],
+    "netflow_sourcetypes": [
+      "stream:netflow"
+    ],
     "netflow_config_notes": [
       "Configure NetFlow v9 or IPFIX export on IOS-XE devices to point at the Stream Forwarder.",
       "Requires all 3 Stream packages: App for Stream (1809) on search heads, Add-on for Stream Forwarders (5238) on forwarders, and Add-on for Stream Wire Data (5234) on search heads and indexers.",
@@ -3545,8 +3456,7 @@ export const PRODUCT_CATALOG = [
       "catalyst 9600",
       "2960",
       "3850",
-      "campus switch",
-      "sc4s"
+      "campus switch"
     ],
     "alert_actions": [],
     "soar_connectors": [],
@@ -3584,7 +3494,9 @@ export const PRODUCT_CATALOG = [
     "netflow_addon_install_url": "/manager/splunk-cisco-app-navigator/appsremote?order=relevance&query=%22Enhanced+Netflow%22&offset=0&support=cisco",
     "netflow_addon_docs_url": "https://www.cisco.com/c/en/us/solutions/collateral/enterprise-networks/sd-wan/sd-wan-splunk-integration-ug.html",
     "stream_docs_url": "https://help.splunk.com/en/splunk-cloud-platform/collect-stream-data/install-and-configure-splunk-stream/8.1/introduction/about-splunk-stream",
-    "netflow_sourcetypes": [],
+    "netflow_sourcetypes": [
+      "stream:netflow"
+    ],
     "netflow_config_notes": [
       "Configure NetFlow v9 or IPFIX export on IOS-XE devices to point at the Stream Forwarder.",
       "Requires all 3 Stream packages: App for Stream (1809) on search heads, Add-on for Stream Forwarders (5238) on forwarders, and Add-on for Stream Wire Data (5234) on search heads and indexers.",
@@ -3624,7 +3536,7 @@ export const PRODUCT_CATALOG = [
     "app_viz_2_splunkbase_url": "",
     "app_viz_2_docs_url": "",
     "app_viz_2_install_url": "",
-    "learn_more_url": "https://www.cisco.com/c/en/us/products/security/identity-services-engine/index.html",
+    "learn_more_url": "https://www.cisco.com/site/us/en/products/security/identity-services-engine/index.html",
     "legacy_apps": [
       {
         "app_id": "Splunk_TA_cisco-ise",
@@ -3674,8 +3586,7 @@ export const PRODUCT_CATALOG = [
       "802.1x",
       "trustsec",
       "sgacl",
-      "guest access",
-      "sc4s"
+      "guest access"
     ],
     "alert_actions": [
       {
@@ -3727,10 +3638,7 @@ export const PRODUCT_CATALOG = [
     "stream_docs_url": "",
     "netflow_sourcetypes": [],
     "netflow_config_notes": [],
-    "best_practices": [
-      "On Splunk Cloud, the Cisco Catalyst Add-on cannot configure inputs directly — install it on an on-prem Heavy Forwarder instead, or use SC4S for seamless syslog ingestion.",
-      "ISE pxGrid integration requires a dedicated pxGrid node — configure inbound pxGrid feeds on the Catalyst Add-on to stream endpoint context into Splunk."
-    ],
+    "best_practices": [],
     "sort_order": 102
   },
   {
@@ -3764,7 +3672,7 @@ export const PRODUCT_CATALOG = [
     "app_viz_2_splunkbase_url": "",
     "app_viz_2_docs_url": "",
     "app_viz_2_install_url": "",
-    "learn_more_url": "https://www.cisco.com/c/en/us/products/wireless/access-points/index.html",
+    "learn_more_url": "https://www.cisco.com/site/us/en/products/wireless/access-points/index.html",
     "legacy_apps": [
       {
         "app_id": "TA-cisco_ios",
@@ -3868,7 +3776,7 @@ export const PRODUCT_CATALOG = [
     "app_viz_2_splunkbase_url": "",
     "app_viz_2_docs_url": "",
     "app_viz_2_install_url": "",
-    "learn_more_url": "https://www.cisco.com/c/en/us/products/wireless/wireless-lan-controller/index.html",
+    "learn_more_url": "https://www.cisco.com/site/us/en/products/wireless/wireless-lan-controller/index.html",
     "legacy_apps": [
       {
         "app_id": "TA-cisco_ios",
@@ -3955,7 +3863,9 @@ export const PRODUCT_CATALOG = [
     "netflow_addon_install_url": "/manager/splunk-cisco-app-navigator/appsremote?order=relevance&query=%22Enhanced+Netflow%22&offset=0&support=cisco",
     "netflow_addon_docs_url": "https://www.cisco.com/c/en/us/solutions/collateral/enterprise-networks/sd-wan/sd-wan-splunk-integration-ug.html",
     "stream_docs_url": "https://help.splunk.com/en/splunk-cloud-platform/collect-stream-data/install-and-configure-splunk-stream/8.1/introduction/about-splunk-stream",
-    "netflow_sourcetypes": [],
+    "netflow_sourcetypes": [
+      "stream:netflow"
+    ],
     "netflow_config_notes": [
       "Configure NetFlow v9 or IPFIX export on IOS-XE devices to point at the Stream Forwarder.",
       "Requires all 3 Stream packages: App for Stream (1809) on search heads, Add-on for Stream Forwarders (5238) on forwarders, and Add-on for Stream Wire Data (5234) on search heads and indexers.",
@@ -4114,8 +4024,7 @@ export const PRODUCT_CATALOG = [
       "meraki dashboard",
       "meraki api",
       "meraki sd-wan",
-      "client analytics",
-      "sc4s"
+      "client analytics"
     ],
     "alert_actions": [],
     "soar_connectors": [
@@ -4164,7 +4073,9 @@ export const PRODUCT_CATALOG = [
     "netflow_addon_install_url": "/manager/splunk-cisco-app-navigator/appsremote?order=relevance&query=%22Enhanced+Netflow%22&offset=0&support=cisco",
     "netflow_addon_docs_url": "https://www.cisco.com/c/en/us/solutions/collateral/enterprise-networks/sd-wan/sd-wan-splunk-integration-ug.html",
     "stream_docs_url": "https://help.splunk.com/en/splunk-cloud-platform/collect-stream-data/install-and-configure-splunk-stream/8.1/introduction/about-splunk-stream",
-    "netflow_sourcetypes": [],
+    "netflow_sourcetypes": [
+      "stream:netflow"
+    ],
     "netflow_config_notes": [
       "Configure NetFlow v9 or IPFIX export on IOS-XE devices to point at the Stream Forwarder.",
       "Requires all 3 Stream packages: App for Stream (1809) on search heads, Add-on for Stream Forwarders (5238) on forwarders, and Add-on for Stream Wire Data (5234) on search heads and indexers.",
@@ -4177,22 +4088,22 @@ export const PRODUCT_CATALOG = [
     "product_id": "cisco_spaces",
     "display_name": "Cisco Spaces",
     "description": "Cloud-based location services and IoT platform (successor to Cisco CMX/DNA Spaces) providing indoor positioning, asset tracking, environmental monitoring, and occupancy analytics for smart buildings and campus environments using Catalyst and Meraki AP infrastructure.",
-    "value_proposition": "Future Splunk integration could bring location analytics, occupancy trends, and IoT sensor events into Splunk — enabling facilities and security teams to correlate physical-space intelligence with network and security data.",
+    "value_proposition": "Ingest Cisco Spaces location analytics, occupancy trends, and IoT sensor events into Splunk — enabling facilities and security teams to correlate physical-space intelligence with network and security data.",
     "vendor": "Cisco",
     "tagline": "Location Services & Smart Spaces",
     "category": "networking",
     "version": "1.0.0",
-    "status": "roadmap",
-    "addon": "",
-    "addon_label": "",
-    "addon_family": "default",
+    "status": "active",
+    "addon": "ta_cisco_spaces",
+    "addon_label": "Spaces Add-On for Splunk",
+    "addon_family": "standalone",
     "subcategory": "campus_wireless",
     "ai_enabled": false,
     "ai_description": "",
     "cisco_retired": false,
-    "coverage_gap": true,
-    "addon_splunkbase_url": "",
-    "addon_docs_url": "",
+    "coverage_gap": false,
+    "addon_splunkbase_url": "https://splunkbase.splunk.com/app/8485",
+    "addon_docs_url": "https://splunkbase.splunk.com/app/8485",
     "addon_install_url": "",
     "app_viz": "",
     "app_viz_label": "",
@@ -4204,7 +4115,7 @@ export const PRODUCT_CATALOG = [
     "app_viz_2_splunkbase_url": "",
     "app_viz_2_docs_url": "",
     "app_viz_2_install_url": "",
-    "learn_more_url": "https://spaces.cisco.com/",
+    "learn_more_url": "https://www.cisco.com/c/en/us/solutions/enterprise-networks/dna-spaces/index.html",
     "legacy_apps": [],
     "prereq_apps": [],
     "community_apps": [],
@@ -4226,15 +4137,15 @@ export const PRODUCT_CATALOG = [
     "alert_actions": [],
     "soar_connectors": [],
     "itsi_content_pack": null,
-    "card_banner": "No Splunk Coverage",
-    "card_banner_color": "gray",
-    "card_banner_size": "small",
-    "card_banner_opacity": "0.12",
-    "card_accent": "#607d8b",
-    "card_bg_color": "smoke",
+    "card_banner": "",
+    "card_banner_color": "",
+    "card_banner_size": "",
+    "card_banner_opacity": "",
+    "card_accent": "#049fd9",
+    "card_bg_color": "",
     "is_new": false,
     "secure_networking_gtm": true,
-    "support_level": "not_supported",
+    "support_level": "developer_supported",
     "sc4s_url": "",
     "sc4s_label": "",
     "sc4s_supported": false,
@@ -4289,7 +4200,7 @@ export const PRODUCT_CATALOG = [
     "app_viz_2_splunkbase_url": "",
     "app_viz_2_docs_url": "",
     "app_viz_2_install_url": "",
-    "learn_more_url": "https://www.cisco.com/c/en/us/solutions/collateral/enterprise-networks/sd-wan/nb-07-enterprise-grade-wp-cte-en.html",
+    "learn_more_url": "https://www.cisco.com/site/us/en/solutions/networking/sdwan/index.html",
     "legacy_apps": [
       {
         "app_id": "ta-cisco-sdwan",
@@ -4368,8 +4279,7 @@ export const PRODUCT_CATALOG = [
       "vmanage",
       "vedge",
       "catalyst sd-wan",
-      "wan optimization",
-      "sc4s"
+      "wan optimization"
     ],
     "alert_actions": [],
     "soar_connectors": [],
@@ -4406,7 +4316,9 @@ export const PRODUCT_CATALOG = [
     "netflow_addon_install_url": "/manager/splunk-cisco-app-navigator/appsremote?order=relevance&query=%22Enhanced+Netflow%22&offset=0&support=cisco",
     "netflow_addon_docs_url": "https://www.cisco.com/c/en/us/solutions/collateral/enterprise-networks/sd-wan/sd-wan-splunk-integration-ug.html",
     "stream_docs_url": "https://help.splunk.com/en/splunk-cloud-platform/collect-stream-data/install-and-configure-splunk-stream/8.1/introduction/about-splunk-stream",
-    "netflow_sourcetypes": [],
+    "netflow_sourcetypes": [
+      "stream:netflow"
+    ],
     "netflow_config_notes": [
       "Configure NetFlow v9 or IPFIX export on IOS-XE devices (cEdge routers) to point at the Stream Forwarder.",
       "Requires all 3 Stream packages: App for Stream (1809) on search heads, Add-on for Stream Forwarders (5238) on forwarders, and Add-on for Stream Wire Data (5234) on search heads and indexers.",
@@ -4446,7 +4358,7 @@ export const PRODUCT_CATALOG = [
     "app_viz_2_splunkbase_url": "",
     "app_viz_2_docs_url": "",
     "app_viz_2_install_url": "",
-    "learn_more_url": "https://www.cisco.com/c/en/us/products/routers/asr-1000-series-aggregation-services-routers/index.html",
+    "learn_more_url": "https://www.cisco.com/site/us/en/products/routers/asr-1000-series-aggregation-services-routers/index.html",
     "legacy_apps": [
       {
         "app_id": "TA-cisco_ios",
@@ -4513,7 +4425,7 @@ export const PRODUCT_CATALOG = [
     "card_accent": "#6abf4b",
     "card_bg_color": "mint",
     "is_new": false,
-    "secure_networking_gtm": false,
+    "secure_networking_gtm": true,
     "support_level": "cisco_supported",
     "sc4s_url": "",
     "sc4s_label": "",
@@ -4533,7 +4445,9 @@ export const PRODUCT_CATALOG = [
     "netflow_addon_install_url": "/manager/splunk-cisco-app-navigator/appsremote?order=relevance&query=%22Enhanced+Netflow%22&offset=0&support=cisco",
     "netflow_addon_docs_url": "https://www.cisco.com/c/en/us/solutions/collateral/enterprise-networks/sd-wan/sd-wan-splunk-integration-ug.html",
     "stream_docs_url": "https://help.splunk.com/en/splunk-cloud-platform/collect-stream-data/install-and-configure-splunk-stream/8.1/introduction/about-splunk-stream",
-    "netflow_sourcetypes": [],
+    "netflow_sourcetypes": [
+      "stream:netflow"
+    ],
     "netflow_config_notes": [
       "Configure NetFlow v9 or IPFIX export on IOS-XE devices to point at the Stream Forwarder.",
       "Requires all 3 Stream packages: App for Stream (1809) on search heads, Add-on for Stream Forwarders (5238) on forwarders, and Add-on for Stream Wire Data (5234) on search heads and indexers.",
@@ -4659,7 +4573,9 @@ export const PRODUCT_CATALOG = [
     "netflow_addon_install_url": "/manager/splunk-cisco-app-navigator/appsremote?order=relevance&query=%22Enhanced+Netflow%22&offset=0&support=cisco",
     "netflow_addon_docs_url": "https://www.cisco.com/c/en/us/solutions/collateral/enterprise-networks/sd-wan/sd-wan-splunk-integration-ug.html",
     "stream_docs_url": "https://help.splunk.com/en/splunk-cloud-platform/collect-stream-data/install-and-configure-splunk-stream/8.1/introduction/about-splunk-stream",
-    "netflow_sourcetypes": [],
+    "netflow_sourcetypes": [
+      "stream:netflow"
+    ],
     "netflow_config_notes": [
       "Configure NetFlow v9 or IPFIX export on IOS-XE devices to point at the Stream Forwarder.",
       "Requires all 3 Stream packages: App for Stream (1809) on search heads, Add-on for Stream Forwarders (5238) on forwarders, and Add-on for Stream Wire Data (5234) on search heads and indexers.",
@@ -4699,7 +4615,7 @@ export const PRODUCT_CATALOG = [
     "app_viz_2_splunkbase_url": "",
     "app_viz_2_docs_url": "",
     "app_viz_2_install_url": "",
-    "learn_more_url": "https://www.cisco.com/c/en/us/products/routers/carrier-routing-system/index.html",
+    "learn_more_url": "https://www.cisco.com/site/us/en/products/routers/carrier-routing-system/index.html",
     "legacy_apps": [
       {
         "app_id": "TA-cisco_ios",
@@ -4765,7 +4681,7 @@ export const PRODUCT_CATALOG = [
     "card_accent": "#6abf4b",
     "card_bg_color": "mint",
     "is_new": false,
-    "secure_networking_gtm": false,
+    "secure_networking_gtm": true,
     "support_level": "cisco_supported",
     "sc4s_url": "",
     "sc4s_label": "",
@@ -4785,7 +4701,9 @@ export const PRODUCT_CATALOG = [
     "netflow_addon_install_url": "/manager/splunk-cisco-app-navigator/appsremote?order=relevance&query=%22Enhanced+Netflow%22&offset=0&support=cisco",
     "netflow_addon_docs_url": "https://www.cisco.com/c/en/us/solutions/collateral/enterprise-networks/sd-wan/sd-wan-splunk-integration-ug.html",
     "stream_docs_url": "https://help.splunk.com/en/splunk-cloud-platform/collect-stream-data/install-and-configure-splunk-stream/8.1/introduction/about-splunk-stream",
-    "netflow_sourcetypes": [],
+    "netflow_sourcetypes": [
+      "stream:netflow"
+    ],
     "netflow_config_notes": [
       "Configure NetFlow v9 or IPFIX export on IOS-XE devices to point at the Stream Forwarder.",
       "Requires all 3 Stream packages: App for Stream (1809) on search heads, Add-on for Stream Forwarders (5238) on forwarders, and Add-on for Stream Wire Data (5234) on search heads and indexers.",
@@ -4795,12 +4713,12 @@ export const PRODUCT_CATALOG = [
     "sort_order": 113
   },
   {
-    "product_id": "cisco_8000_routers",
-    "display_name": "Cisco 8000 Series Routers",
-    "description": "Carrier-grade, silicon-one-powered routers running IOS XR for service provider and large enterprise WAN/core deployments — delivering 400GbE density, segment routing, and programmable telemetry at scale for backbone and peering fabrics.",
-    "value_proposition": "Future Splunk integration could stream IOS XR model-driven telemetry (gRPC/gNMI), BGP peering events, and segment-routing policy changes — enabling SP and enterprise backbone teams to monitor WAN health at carrier scale.",
+    "product_id": "cisco_iosxr_platforms",
+    "display_name": "Cisco IOS-XR Platforms (NCS / 8000 Series)",
+    "description": "Carrier-grade routing platforms running IOS-XR — including the Network Convergence System (NCS 540, 560, 5500, 5700) for SP aggregation, metro Ethernet, and 5G backhaul, and the Silicon One-powered 8000 Series for backbone and peering fabrics — delivering 100G/400G density, segment routing, EVPN, and model-driven telemetry (gRPC/gNMI) at carrier scale.",
+    "value_proposition": "A future Splunk TA for IOS-XR could ingest syslog, model-driven telemetry, BGP peering events, and segment-routing policy changes — giving SP and enterprise NOCs unified visibility into carrier-grade routing health alongside campus and data center infrastructure already monitored in Splunk.",
     "vendor": "Cisco",
-    "tagline": "Carrier-Grade Backbone Routing",
+    "tagline": "Carrier-Grade IOS-XR Routing",
     "category": "networking",
     "version": "1.0.0",
     "status": "roadmap",
@@ -4825,23 +4743,36 @@ export const PRODUCT_CATALOG = [
     "app_viz_2_splunkbase_url": "",
     "app_viz_2_docs_url": "",
     "app_viz_2_install_url": "",
-    "learn_more_url": "https://www.cisco.com/site/us/en/products/networking/sdwan-routers/8000-series/index.html",
+    "learn_more_url": "https://www.cisco.com/site/us/en/products/routers/network-convergence-system/index.html",
     "legacy_apps": [],
     "prereq_apps": [],
     "community_apps": [],
     "sourcetypes": [],
     "dashboard": "",
     "custom_dashboard": "",
-    "icon_emoji": "satellite",
+    "icon_emoji": "satellite_antenna",
     "icon_svg": "cisco_router",
-    "aliases": [],
+    "aliases": [
+      "NCS",
+      "8000 Series"
+    ],
     "keywords": [
-      "8000 series router",
-      "silicon one",
       "ios xr",
+      "ncs",
+      "network convergence system",
+      "ncs 540",
+      "ncs 560",
+      "ncs 5500",
+      "ncs 5700",
+      "5g backhaul",
+      "metro ethernet",
+      "8000 series",
+      "silicon one",
       "carrier router",
       "400gbe",
-      "backbone router"
+      "backbone router",
+      "grpc",
+      "gnmi"
     ],
     "alert_actions": [],
     "soar_connectors": [],
@@ -4879,92 +4810,6 @@ export const PRODUCT_CATALOG = [
     "sort_order": 114
   },
   {
-    "product_id": "cisco_ncs",
-    "display_name": "Cisco Network Convergence System (NCS)",
-    "description": "Carrier-grade routing platforms (NCS 540, 560, 5500, 5700) running IOS-XR for service provider and large enterprise WAN aggregation, core routing, 5G mobile backhaul, and metro Ethernet — delivering high-density 100G/400G interfaces with segment routing and EVPN capabilities.",
-    "value_proposition": "A Splunk TA for NCS could ingest IOS-XR syslog, telemetry, and routing protocol events — giving SP and enterprise NOCs unified visibility into carrier-grade routing health alongside campus and data center infrastructure already monitored in Splunk.",
-    "vendor": "Cisco",
-    "tagline": "Carrier-Grade IOS-XR Routing",
-    "category": "networking",
-    "version": "1.0.0",
-    "status": "roadmap",
-    "addon": "",
-    "addon_label": "",
-    "addon_family": "default",
-    "subcategory": "routing_wan",
-    "ai_enabled": false,
-    "ai_description": "",
-    "cisco_retired": false,
-    "coverage_gap": true,
-    "addon_splunkbase_url": "",
-    "addon_docs_url": "",
-    "addon_install_url": "",
-    "app_viz": "",
-    "app_viz_label": "",
-    "app_viz_splunkbase_url": "",
-    "app_viz_docs_url": "",
-    "app_viz_install_url": "",
-    "app_viz_2": "",
-    "app_viz_2_label": "",
-    "app_viz_2_splunkbase_url": "",
-    "app_viz_2_docs_url": "",
-    "app_viz_2_install_url": "",
-    "learn_more_url": "https://www.cisco.com/c/en/us/products/routers/network-convergence-system/index.html",
-    "legacy_apps": [],
-    "prereq_apps": [],
-    "community_apps": [],
-    "sourcetypes": [],
-    "dashboard": "",
-    "custom_dashboard": "",
-    "icon_emoji": "satellite_antenna",
-    "icon_svg": "cisco_router",
-    "aliases": [],
-    "keywords": [
-      "ncs",
-      "network convergence system",
-      "ncs 540",
-      "ncs 560",
-      "ncs 5500",
-      "ncs 5700",
-      "5g backhaul",
-      "metro ethernet"
-    ],
-    "alert_actions": [],
-    "soar_connectors": [],
-    "itsi_content_pack": null,
-    "card_banner": "No Splunk Coverage",
-    "card_banner_color": "gray",
-    "card_banner_size": "small",
-    "card_banner_opacity": "0.12",
-    "card_accent": "#607d8b",
-    "card_bg_color": "smoke",
-    "is_new": false,
-    "secure_networking_gtm": false,
-    "support_level": "not_supported",
-    "sc4s_url": "",
-    "sc4s_label": "",
-    "sc4s_supported": false,
-    "sc4s_search_head_ta": "",
-    "sc4s_search_head_ta_label": "",
-    "sc4s_search_head_ta_splunkbase_url": "",
-    "sc4s_search_head_ta_splunkbase_id": "",
-    "sc4s_search_head_ta_install_url": "",
-    "sc4s_sourcetypes": [],
-    "sc4s_config_notes": [],
-    "netflow_supported": false,
-    "netflow_addon": "",
-    "netflow_addon_label": "",
-    "netflow_addon_splunkbase_url": "",
-    "netflow_addon_splunkbase_id": "",
-    "netflow_addon_install_url": "",
-    "netflow_addon_docs_url": "",
-    "stream_docs_url": "",
-    "netflow_sourcetypes": [],
-    "netflow_config_notes": [],
-    "best_practices": [],
-    "sort_order": 115
-  },
-  {
     "product_id": "cisco_netflow",
     "display_name": "Cisco NetFlow / IPFIX",
     "description": "Foundational network telemetry signal — NetFlow v5/v9 and IPFIX exported by virtually every Cisco router, switch, and firewall, providing per-flow traffic metadata including source/destination IPs, ports, protocols, byte/packet counts, and application identification for network behavior analytics.",
@@ -4995,7 +4840,7 @@ export const PRODUCT_CATALOG = [
     "app_viz_2_splunkbase_url": "",
     "app_viz_2_docs_url": "",
     "app_viz_2_install_url": "",
-    "learn_more_url": "https://www.cisco.com/c/en/us/products/ios-nx-os-software/ios-netflow/index.html",
+    "learn_more_url": "https://www.cisco.com/site/us/en/products/ios-nx-os-software/ios-netflow/index.html",
     "legacy_apps": [],
     "prereq_apps": [],
     "community_apps": [],
@@ -5176,7 +5021,9 @@ export const PRODUCT_CATALOG = [
     "netflow_addon_install_url": "",
     "netflow_addon_docs_url": "",
     "stream_docs_url": "https://help.splunk.com/en/splunk-cloud-platform/collect-stream-data/install-and-configure-splunk-stream/8.1/introduction/about-splunk-stream",
-    "netflow_sourcetypes": [],
+    "netflow_sourcetypes": [
+      "stream:netflow"
+    ],
     "netflow_config_notes": [
       "ACI supports SPAN and ERSPAN for packet capture and traffic mirroring to Splunk Stream.",
       "Configure ERSPAN sessions on the ACI fabric to send mirrored traffic to the Stream Forwarder.",
@@ -5217,7 +5064,7 @@ export const PRODUCT_CATALOG = [
     "app_viz_2_splunkbase_url": "",
     "app_viz_2_docs_url": "",
     "app_viz_2_install_url": "",
-    "learn_more_url": "https://www.cisco.com/c/en/us/products/switches/nexus-9000-series-switches/index.html",
+    "learn_more_url": "https://www.cisco.com/site/us/en/products/switches/nexus-9000-series-switches/index.html",
     "legacy_apps": [
       {
         "app_id": "TA_cisco-Nexus-9k",
@@ -5322,7 +5169,9 @@ export const PRODUCT_CATALOG = [
     "netflow_addon_install_url": "",
     "netflow_addon_docs_url": "",
     "stream_docs_url": "https://help.splunk.com/en/splunk-cloud-platform/collect-stream-data/install-and-configure-splunk-stream/8.1/introduction/about-splunk-stream",
-    "netflow_sourcetypes": [],
+    "netflow_sourcetypes": [
+      "stream:netflow"
+    ],
     "netflow_config_notes": [
       "Configure NetFlow v9 export on your Nexus switches to point at the Stream Forwarder.",
       "Requires all 3 Stream packages: App for Stream (1809) on search heads, Add-on for Stream Forwarders (5238) on forwarders, and Add-on for Stream Wire Data (5234) on search heads and indexers.",
@@ -5627,7 +5476,7 @@ export const PRODUCT_CATALOG = [
     "app_viz_2_splunkbase_url": "",
     "app_viz_2_docs_url": "",
     "app_viz_2_install_url": "",
-    "learn_more_url": "https://www.cisco.com/c/en/us/products/interfaces-modules/transceiver-modules/index.html",
+    "learn_more_url": "https://www.cisco.com/site/us/en/products/interfaces-modules/transceiver-modules/index.html",
     "legacy_apps": [],
     "prereq_apps": [],
     "community_apps": [],
@@ -5684,89 +5533,6 @@ export const PRODUCT_CATALOG = [
     "sort_order": 125
   },
   {
-    "product_id": "cisco_secure_ai_factory",
-    "display_name": "Cisco Secure AI Factory (SAIF)",
-    "description": "Unified AI infrastructure fabric within the Data Center portfolio — combining Hypershield (eBPF-based security), Isovalent (cloud-native networking), and Intersight (compute management) to deliver a secure, observable, and automated foundation for AI/ML workloads at data-center scale.",
-    "value_proposition": "A future Splunk integration could unify SAIF telemetry — eBPF enforcement events from Hypershield, Cilium flow logs from Isovalent, and UCS compute health from Intersight — into a single pane for AI workload security and operations, bridging the current observability-to-security gap.",
-    "vendor": "Cisco",
-    "tagline": "AI-Ready Data Center Fabric",
-    "category": "networking",
-    "version": "1.0.0",
-    "status": "roadmap",
-    "addon": "",
-    "addon_label": "",
-    "addon_family": "default",
-    "subcategory": "data_center_net",
-    "ai_enabled": false,
-    "ai_description": "",
-    "cisco_retired": false,
-    "coverage_gap": true,
-    "addon_splunkbase_url": "",
-    "addon_docs_url": "",
-    "addon_install_url": "",
-    "app_viz": "",
-    "app_viz_label": "",
-    "app_viz_splunkbase_url": "",
-    "app_viz_docs_url": "",
-    "app_viz_install_url": "",
-    "app_viz_2": "",
-    "app_viz_2_label": "",
-    "app_viz_2_splunkbase_url": "",
-    "app_viz_2_docs_url": "",
-    "app_viz_2_install_url": "",
-    "learn_more_url": "https://www.cisco.com/site/us/en/solutions/ai-infrastructure/index.html",
-    "legacy_apps": [],
-    "prereq_apps": [],
-    "community_apps": [],
-    "sourcetypes": [],
-    "dashboard": "",
-    "custom_dashboard": "",
-    "icon_emoji": "factory",
-    "icon_svg": "cloud_analytics",
-    "aliases": [],
-    "keywords": [
-      "secure ai factory",
-      "saif",
-      "ai infrastructure",
-      "ai fabric",
-      "ai workload"
-    ],
-    "alert_actions": [],
-    "soar_connectors": [],
-    "itsi_content_pack": null,
-    "card_banner": "No Splunk Coverage",
-    "card_banner_color": "gray",
-    "card_banner_size": "small",
-    "card_banner_opacity": "0.12",
-    "card_accent": "#607d8b",
-    "card_bg_color": "smoke",
-    "is_new": false,
-    "secure_networking_gtm": true,
-    "support_level": "not_supported",
-    "sc4s_url": "",
-    "sc4s_label": "",
-    "sc4s_supported": false,
-    "sc4s_search_head_ta": "",
-    "sc4s_search_head_ta_label": "",
-    "sc4s_search_head_ta_splunkbase_url": "",
-    "sc4s_search_head_ta_splunkbase_id": "",
-    "sc4s_search_head_ta_install_url": "",
-    "sc4s_sourcetypes": [],
-    "sc4s_config_notes": [],
-    "netflow_supported": false,
-    "netflow_addon": "",
-    "netflow_addon_label": "",
-    "netflow_addon_splunkbase_url": "",
-    "netflow_addon_splunkbase_id": "",
-    "netflow_addon_install_url": "",
-    "netflow_addon_docs_url": "",
-    "stream_docs_url": "",
-    "netflow_sourcetypes": [],
-    "netflow_config_notes": [],
-    "best_practices": [],
-    "sort_order": 126
-  },
-  {
     "product_id": "cisco_ucs",
     "display_name": "Cisco Unified Computing System (UCS)",
     "description": "Unified computing — server, networking, and storage access in a single integrated architecture for data center and cloud.",
@@ -5797,7 +5563,7 @@ export const PRODUCT_CATALOG = [
     "app_viz_2_splunkbase_url": "",
     "app_viz_2_docs_url": "",
     "app_viz_2_install_url": "",
-    "learn_more_url": "https://www.cisco.com/c/en/us/products/servers-unified-computing/index.html",
+    "learn_more_url": "https://www.cisco.com/site/us/en/products/servers-unified-computing/index.html",
     "legacy_apps": [],
     "prereq_apps": [],
     "community_apps": [],
@@ -5817,8 +5583,7 @@ export const PRODUCT_CATALOG = [
       "cimc",
       "ucsm",
       "c-series",
-      "b-series",
-      "sc4s"
+      "b-series"
     ],
     "alert_actions": [],
     "soar_connectors": [],
@@ -5891,7 +5656,7 @@ export const PRODUCT_CATALOG = [
     "app_viz_2_splunkbase_url": "",
     "app_viz_2_docs_url": "",
     "app_viz_2_install_url": "",
-    "learn_more_url": "https://www.cisco.com/c/en/us/products/cloud-systems-management/intersight/index.html",
+    "learn_more_url": "https://www.cisco.com/site/us/en/products/cloud-systems-management/intersight/index.html",
     "legacy_apps": [
       {
         "app_id": "TA-intersight-addon",
@@ -6041,8 +5806,7 @@ export const PRODUCT_CATALOG = [
       "bmc",
       "rack server management",
       "redfish",
-      "ipmi",
-      "sc4s"
+      "ipmi"
     ],
     "alert_actions": [],
     "soar_connectors": [],
@@ -6202,7 +5966,7 @@ export const PRODUCT_CATALOG = [
     "app_viz_2_splunkbase_url": "",
     "app_viz_2_docs_url": "",
     "app_viz_2_install_url": "",
-    "learn_more_url": "https://www.cisco.com/c/en/us/products/security/cyber-vision/index.html",
+    "learn_more_url": "https://www.cisco.com/c/en/us/products/collateral/security/cyber-vision/cyber-vision-aag.html",
     "legacy_apps": [
       {
         "app_id": "TA-cisco_cybervision",
@@ -6512,91 +6276,6 @@ export const PRODUCT_CATALOG = [
     "sort_order": 201
   },
   {
-    "product_id": "cisco_provider_connectivity_assurance",
-    "display_name": "Cisco Provider Connectivity Assurance",
-    "description": "End-to-end transport and service assurance platform (formerly Accedian Skylight) providing sub-microsecond network performance monitoring, SLA validation, and synthetic testing across carrier, enterprise, and cloud-interconnect environments.",
-    "value_proposition": "A future Splunk integration could ingest PCA performance metrics, SLA-violation events, and synthetic-test results — giving network operations teams real-time transport-quality dashboards alongside existing Splunk infrastructure data.",
-    "vendor": "Cisco",
-    "tagline": "Transport & Service Assurance",
-    "category": "observability",
-    "version": "1.0.0",
-    "status": "roadmap",
-    "addon": "",
-    "addon_label": "",
-    "addon_family": "default",
-    "subcategory": "infrastructure_monitoring",
-    "ai_enabled": false,
-    "ai_description": "",
-    "cisco_retired": false,
-    "coverage_gap": true,
-    "addon_splunkbase_url": "",
-    "addon_docs_url": "",
-    "addon_install_url": "",
-    "app_viz": "",
-    "app_viz_label": "",
-    "app_viz_splunkbase_url": "",
-    "app_viz_docs_url": "",
-    "app_viz_install_url": "",
-    "app_viz_2": "",
-    "app_viz_2_label": "",
-    "app_viz_2_splunkbase_url": "",
-    "app_viz_2_docs_url": "",
-    "app_viz_2_install_url": "",
-    "learn_more_url": "https://www.cisco.com/site/us/en/products/networking/provider-connectivity-assurance/index.html",
-    "legacy_apps": [],
-    "prereq_apps": [],
-    "community_apps": [],
-    "sourcetypes": [],
-    "dashboard": "",
-    "custom_dashboard": "",
-    "icon_emoji": "chart",
-    "icon_svg": "analytics_logging",
-    "aliases": [],
-    "keywords": [
-      "provider connectivity assurance",
-      "pca",
-      "accedian",
-      "skylight",
-      "service assurance",
-      "sla monitoring",
-      "synthetic testing"
-    ],
-    "alert_actions": [],
-    "soar_connectors": [],
-    "itsi_content_pack": null,
-    "card_banner": "No Splunk Coverage",
-    "card_banner_color": "gray",
-    "card_banner_size": "small",
-    "card_banner_opacity": "0.12",
-    "card_accent": "#607d8b",
-    "card_bg_color": "smoke",
-    "is_new": false,
-    "secure_networking_gtm": true,
-    "support_level": "not_supported",
-    "sc4s_url": "",
-    "sc4s_label": "",
-    "sc4s_supported": false,
-    "sc4s_search_head_ta": "",
-    "sc4s_search_head_ta_label": "",
-    "sc4s_search_head_ta_splunkbase_url": "",
-    "sc4s_search_head_ta_splunkbase_id": "",
-    "sc4s_search_head_ta_install_url": "",
-    "sc4s_sourcetypes": [],
-    "sc4s_config_notes": [],
-    "netflow_supported": false,
-    "netflow_addon": "",
-    "netflow_addon_label": "",
-    "netflow_addon_splunkbase_url": "",
-    "netflow_addon_splunkbase_id": "",
-    "netflow_addon_install_url": "",
-    "netflow_addon_docs_url": "",
-    "stream_docs_url": "",
-    "netflow_sourcetypes": [],
-    "netflow_config_notes": [],
-    "best_practices": [],
-    "sort_order": 202
-  },
-  {
     "product_id": "cisco_webex",
     "display_name": "Cisco Webex (Webex)",
     "description": "All-in-one collaboration - meetings, messaging, calling, and whiteboarding in a unified cloud platform.",
@@ -6851,8 +6530,7 @@ export const PRODUCT_CATALOG = [
       "voip",
       "jabber",
       "cdr",
-      "cmr",
-      "sc4s"
+      "cmr"
     ],
     "alert_actions": [],
     "soar_connectors": [],
@@ -6925,7 +6603,7 @@ export const PRODUCT_CATALOG = [
     "app_viz_2_splunkbase_url": "",
     "app_viz_2_docs_url": "",
     "app_viz_2_install_url": "",
-    "learn_more_url": "https://www.cisco.com/c/en/us/products/conferencing/meeting-server/index.html",
+    "learn_more_url": "https://www.cisco.com/site/us/en/products/conferencing/meeting-server/index.html",
     "legacy_apps": [],
     "prereq_apps": [
       {
@@ -6951,8 +6629,7 @@ export const PRODUCT_CATALOG = [
       "video conferencing",
       "h323",
       "webrtc",
-      "call bridge",
-      "sc4s"
+      "call bridge"
     ],
     "alert_actions": [],
     "soar_connectors": [],
@@ -7042,8 +6719,7 @@ export const PRODUCT_CATALOG = [
       "conference management",
       "meeting control",
       "recording",
-      "streaming",
-      "sc4s"
+      "streaming"
     ],
     "alert_actions": [],
     "soar_connectors": [],
@@ -7137,8 +6813,7 @@ export const PRODUCT_CATALOG = [
       "telepresence",
       "video communication server",
       "expressway",
-      "firewall traversal",
-      "sc4s"
+      "firewall traversal"
     ],
     "alert_actions": [],
     "soar_connectors": [],
@@ -7211,7 +6886,7 @@ export const PRODUCT_CATALOG = [
     "app_viz_2_splunkbase_url": "",
     "app_viz_2_docs_url": "",
     "app_viz_2_install_url": "",
-    "learn_more_url": "https://www.cisco.com/c/en/us/products/collaboration-endpoints/index.html",
+    "learn_more_url": "https://www.cisco.com/site/us/en/products/collaboration-endpoints/index.html",
     "legacy_apps": [],
     "prereq_apps": [],
     "community_apps": [],
@@ -7314,8 +6989,7 @@ export const PRODUCT_CATALOG = [
       "application control engine",
       "load balancer",
       "adc",
-      "ssl offload",
-      "sc4s"
+      "ssl offload"
     ],
     "alert_actions": [],
     "soar_connectors": [],
@@ -7853,8 +7527,7 @@ export const PRODUCT_CATALOG = [
       "tacacs",
       "radius",
       "aaa",
-      "authentication authorization accounting",
-      "sc4s"
+      "authentication authorization accounting"
     ],
     "alert_actions": [],
     "soar_connectors": [],
@@ -8110,13 +7783,6 @@ export const PRODUCT_CATALOG = [
         "uid": "3497",
         "addon_splunkbase_url": "https://splunkbase.splunk.com/app/3497",
         "status": "archived"
-      },
-      {
-        "app_id": "ta_cisco_spaces",
-        "display_name": "Spaces Add-On for Splunk",
-        "uid": "8485",
-        "addon_splunkbase_url": "https://splunkbase.splunk.com/app/8485",
-        "status": "archived"
       }
     ],
     "prereq_apps": [],
@@ -8260,5 +7926,105 @@ export const PRODUCT_CATALOG = [
     "netflow_config_notes": [],
     "best_practices": [],
     "sort_order": 909
+  },
+  {
+    "product_id": "cisco_provider_connectivity_assurance",
+    "display_name": "Cisco Provider Connectivity Assurance",
+    "description": "End-to-end transport and service assurance platform (formerly Accedian Skylight) providing sub-microsecond network performance monitoring, SLA validation, and synthetic testing across carrier, enterprise, and cloud-interconnect environments. NOTE: The Accedian Skylight apps are archived and no longer maintained.",
+    "value_proposition": "Previously integrated PCA performance metrics, SLA-violation events, and synthetic-test results into Splunk for network operations transport-quality dashboards.",
+    "vendor": "Cisco",
+    "tagline": "Transport & Service Assurance",
+    "category": "observability",
+    "version": "1.0.0",
+    "status": "deprecated",
+    "addon": "TA-skylight-for-splunk",
+    "addon_label": "TA Accedian Skylight powered Security",
+    "addon_family": "standalone",
+    "subcategory": "infrastructure_monitoring",
+    "ai_enabled": false,
+    "ai_description": "",
+    "cisco_retired": false,
+    "coverage_gap": false,
+    "addon_splunkbase_url": "https://splunkbase.splunk.com/app/5409",
+    "addon_docs_url": "https://splunkbase.splunk.com/app/5409",
+    "addon_install_url": "/manager/splunk-cisco-app-navigator/appsremote?order=relevance&query=%22Accedian+Skylight%22&offset=0",
+    "app_viz": "",
+    "app_viz_label": "",
+    "app_viz_splunkbase_url": "",
+    "app_viz_docs_url": "",
+    "app_viz_install_url": "",
+    "app_viz_2": "",
+    "app_viz_2_label": "",
+    "app_viz_2_splunkbase_url": "",
+    "app_viz_2_docs_url": "",
+    "app_viz_2_install_url": "",
+    "learn_more_url": "https://www.cisco.com/site/us/en/products/networking/provider-connectivity-assurance/index.html",
+    "legacy_apps": [
+      {
+        "app_id": "skylight_security_for_splunk",
+        "display_name": "Accedian Skylight powered Security",
+        "uid": "4691",
+        "addon_splunkbase_url": "https://splunkbase.splunk.com/app/4691",
+        "status": "archived"
+      },
+      {
+        "app_id": "sa_sse_accedian",
+        "display_name": "SA SSE Accedian Skylight",
+        "uid": "4851",
+        "addon_splunkbase_url": "https://splunkbase.splunk.com/app/4851",
+        "status": "archived"
+      }
+    ],
+    "prereq_apps": [],
+    "community_apps": [],
+    "sourcetypes": [],
+    "dashboard": "",
+    "custom_dashboard": "",
+    "icon_emoji": "chart",
+    "icon_svg": "analytics_logging",
+    "aliases": [],
+    "keywords": [
+      "provider connectivity assurance",
+      "pca",
+      "accedian",
+      "skylight",
+      "service assurance",
+      "sla monitoring",
+      "synthetic testing"
+    ],
+    "alert_actions": [],
+    "soar_connectors": [],
+    "itsi_content_pack": null,
+    "card_banner": "Add-on Archived",
+    "card_banner_color": "red",
+    "card_banner_size": "small",
+    "card_banner_opacity": "0.12",
+    "card_accent": "#9e9e9e",
+    "card_bg_color": "smoke",
+    "is_new": false,
+    "secure_networking_gtm": true,
+    "support_level": "community_supported",
+    "sc4s_url": "",
+    "sc4s_label": "",
+    "sc4s_supported": false,
+    "sc4s_search_head_ta": "",
+    "sc4s_search_head_ta_label": "",
+    "sc4s_search_head_ta_splunkbase_url": "",
+    "sc4s_search_head_ta_splunkbase_id": "",
+    "sc4s_search_head_ta_install_url": "",
+    "sc4s_sourcetypes": [],
+    "sc4s_config_notes": [],
+    "netflow_supported": false,
+    "netflow_addon": "",
+    "netflow_addon_label": "",
+    "netflow_addon_splunkbase_url": "",
+    "netflow_addon_splunkbase_id": "",
+    "netflow_addon_install_url": "",
+    "netflow_addon_docs_url": "",
+    "stream_docs_url": "",
+    "netflow_sourcetypes": [],
+    "netflow_config_notes": [],
+    "best_practices": [],
+    "sort_order": 910
   }
 ];

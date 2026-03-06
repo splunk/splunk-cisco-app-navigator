@@ -33,6 +33,7 @@ import CollapsiblePanel from '@splunk/react-ui/CollapsiblePanel';
 import WaitSpinner from '@splunk/react-ui/WaitSpinner';
 import Message from '@splunk/react-ui/Message';
 import Modal from '@splunk/react-ui/Modal';
+import Card from '@splunk/react-ui/Card';
 import Tooltip from '@splunk/react-ui/Tooltip';
 
 // ─────────────────────────────  CONSTANTS  ─────────────────────────────
@@ -48,6 +49,9 @@ const PORTFOLIO_STORAGE_KEY = 'scan_show_full_portfolio'; // 'true' | 'false'
 const DEVMODE_STORAGE_KEY = 'scan_developer_mode'; // 'true' | 'false'
 const PERSONA_STORAGE_KEY = 'scan_persona_shown'; // 'true' once persona modal dismissed
 const SUPPORTED_LEVELS = new Set(['cisco_supported', 'splunk_supported']);
+
+/** Toggle to show/hide value proposition text on the card face (always visible in ⓘ tooltip) */
+const SHOW_VALUE_PROP_ON_CARD = false;
 
 /** Persona presets — each maps a role to a category filter + suggested product IDs */
 const PERSONA_PRESETS = [
@@ -202,6 +206,47 @@ function splunkFetch(url, options = {}) {
 function csvToArray(val) {
     if (!val) return [];
     return val.split(',').map(s => s.trim()).filter(Boolean);
+}
+
+/**
+ * Extract the numeric UID from a Splunkbase URL.
+ * e.g. "https://splunkbase.splunk.com/app/7404" → "7404"
+ */
+function extractSplunkbaseUid(url) {
+    if (!url) return null;
+    const m = url.match(/\/app\/(\d+)/);
+    return m ? m[1] : null;
+}
+
+/**
+ * Collect all Splunkbase UIDs associated with a product.
+ * Looks at addon, app_viz, app_viz_2 URLs.
+ */
+function getProductUids(product) {
+    const uids = new Set();
+    const addonUid = extractSplunkbaseUid(product.addon_splunkbase_url);
+    if (addonUid) uids.add(addonUid);
+    const vizUid = extractSplunkbaseUid(product.app_viz_splunkbase_url);
+    if (vizUid) uids.add(vizUid);
+    const viz2Uid = extractSplunkbaseUid(product.app_viz_2_splunkbase_url);
+    if (viz2Uid) uids.add(viz2Uid);
+    return [...uids];
+}
+
+/**
+ * Sort version strings in descending order (latest first).
+ * Handles formats like "10.1", "9.4", "8.2" etc.
+ */
+function sortVersionsDesc(versions) {
+    return [...versions].sort((a, b) => {
+        const ap = a.split('.').map(Number);
+        const bp = b.split('.').map(Number);
+        for (let i = 0; i < Math.max(ap.length, bp.length); i++) {
+            const diff = (bp[i] || 0) - (ap[i] || 0);
+            if (diff !== 0) return diff;
+        }
+        return 0;
+    });
 }
 
 /**
@@ -373,48 +418,88 @@ function formatCount(n) {
  * Shared by detectAllSourcetypeData and buildSourcetypeSearchUrl.
  */
 function buildSourcetypePatterns(sourcetypes) {
-    const prefixes = new Set();
+    // Use exact sourcetype names. Only roll up to a prefix when 3+
+    // sourcetypes share the same two-segment prefix (e.g. cisco:esa:*).
+    const prefixGroups = new Map();
+    const exact = new Set();
     sourcetypes.forEach(st => {
         const parts = st.split(':');
         if (parts.length <= 2) {
-            prefixes.add(st);
+            exact.add(st);
         } else {
-            prefixes.add(parts.slice(0, 2).join(':') + ':');
+            const prefix = parts.slice(0, 2).join(':') + ':';
+            if (!prefixGroups.has(prefix)) prefixGroups.set(prefix, []);
+            prefixGroups.get(prefix).push(st);
         }
     });
-    const sorted = [...prefixes].sort((a, b) => a.length - b.length);
-    return sorted.filter((p, i) => !sorted.slice(0, i).some(shorter => p.startsWith(shorter)));
+    // Only collapse to prefix if 3+ sourcetypes share it; otherwise keep exact
+    prefixGroups.forEach((members, prefix) => {
+        if (members.length >= 3) {
+            exact.add(prefix);
+        } else {
+            members.forEach(st => exact.add(st));
+        }
+    });
+    const sorted = [...exact].sort((a, b) => a.length - b.length);
+    return sorted.filter((p, i) => !sorted.slice(0, i).some(shorter =>
+        shorter.endsWith(':') ? p.startsWith(shorter) : p === shorter
+    ));
 }
 
 /**
  * Detect sourcetype data for ALL products in a single metadata search.
  *
  * Runs ONE search:
- *   | metadata type=sourcetypes index=*
- *   | where lastTime > relative_time(now(), "-24h")
+ *   | metadata type=sourcetypes
+ *   | where lastTime > relative_time(now(), "-7d")
  *   | table sourcetype totalCount
  *
+ * No index= filter so it covers ALL indexes (including restricted ones).
  * Then matches each product's sourcetype patterns client-side.
  * This replaces the previous per-product approach (52 searches → 1).
  */
 async function detectAllSourcetypeData(products) {
     const noData = { hasData: false, eventCount: 0, detail: 'No sourcetypes defined' };
     const withST = products.filter(p => p.sourcetypes && p.sourcetypes.length > 0);
-    if (withST.length === 0) return {};
-    if (!getCSRFToken()) {
+    if (withST.length === 0) { console.log('[SCAN] Detection skipped — no products have sourcetypes'); return {}; }
+    const csrf = getCSRFToken();
+    if (!csrf) {
+        console.warn('[SCAN] Detection skipped — CSRF token unavailable');
         const r = {};
         withST.forEach(p => { r[p.product_id] = { hasData: false, eventCount: 0, detail: 'CSRF token unavailable' }; });
         return r;
     }
+    console.log(`[SCAN] Starting sourcetype detection for ${withST.length} products with sourcetypes...`);
     try {
-        const searchStr = '| metadata type=sourcetypes index=* | where lastTime > relative_time(now(), "-24h") | table sourcetype totalCount';
+        const searchStr = '| metadata type=sourcetypes | where lastTime > relative_time(now(), "-7d") | table sourcetype totalCount';
+        console.log(`[SCAN] Search: ${searchStr}`);
         const res = await splunkFetch(SEARCH_ENDPOINT, {
             method: 'POST',
             headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
             body: `search=${encodeURIComponent(searchStr)}&output_mode=json&exec_mode=oneshot&count=0&timeout=120`,
         });
-        const data = await res.json();
-        const rows = data.results || []; // [{ sourcetype: '...', totalCount: '123' }, ...]
+        console.log(`[SCAN] Response status: ${res.status} ${res.statusText}`);
+        if (!res.ok) {
+            const errText = await res.text();
+            console.error(`[SCAN] Search failed (HTTP ${res.status}):`, errText.substring(0, 500));
+            const r = {};
+            withST.forEach(p => { r[p.product_id] = { hasData: false, eventCount: 0, detail: `Search error (HTTP ${res.status})` }; });
+            return r;
+        }
+        const rawText = await res.text();
+        let data;
+        try { data = JSON.parse(rawText); } catch (parseErr) {
+            console.error('[SCAN] Failed to parse JSON response:', rawText.substring(0, 500));
+            const r = {};
+            withST.forEach(p => { r[p.product_id] = { hasData: false, eventCount: 0, detail: 'Invalid response from Splunk' }; });
+            return r;
+        }
+        console.log(`[SCAN] Response keys: ${Object.keys(data).join(', ')}`);
+        const rows = data.results || [];
+        console.log(`[SCAN] Sourcetype metadata returned ${rows.length} active sourcetypes from Splunk`);
+        if (rows.length > 0) {
+            console.log(`[SCAN] Sample row: ${JSON.stringify(rows[0])}`);
+        }
 
         // Build a quick lookup: sourcetype → totalCount
         const stMap = new Map();
@@ -426,16 +511,24 @@ async function detectAllSourcetypeData(products) {
             const patterns = buildSourcetypePatterns(p.sourcetypes);
             let stCount = 0;
             let eventCount = 0;
+            const matchedSTs = [];
             stMap.forEach((count, st) => {
                 if (patterns.some(pat => pat.endsWith(':') ? st.startsWith(pat) : st === pat || st.startsWith(pat + ':'))) {
                     stCount++;
                     eventCount += count;
+                    matchedSTs.push(st);
                 }
             });
+            if (stCount > 0) {
+                console.log(`[SCAN] ${p.product_id}: ${stCount} sourcetype(s) matched — ${matchedSTs.join(', ')}`);
+            }
             results[p.product_id] = stCount > 0
                 ? { hasData: true, eventCount, detail: `${stCount} sourcetype${stCount !== 1 ? 's' : ''} active · ${formatCount(eventCount)} events` }
-                : { hasData: false, eventCount: 0, detail: 'No data in the last 24 hours' };
+                : { hasData: false, eventCount: 0, detail: 'No data in the last 7 days' };
         });
+
+        const detected = Object.values(results).filter(r => r.hasData).length;
+        console.log(`[SCAN] Detection complete: ${detected} product(s) with active data out of ${withST.length} checked`);
 
         // Fill in products that have no sourcetypes
         products.forEach(p => {
@@ -443,6 +536,7 @@ async function detectAllSourcetypeData(products) {
         });
         return results;
     } catch (e) {
+        console.error('[SCAN] Sourcetype detection failed:', e);
         const r = {};
         withST.forEach(p => { r[p.product_id] = { hasData: false, eventCount: 0, detail: 'Could not query sourcetypes' }; });
         return r;
@@ -451,13 +545,13 @@ async function detectAllSourcetypeData(products) {
 
 /**
  * Build a Splunk search URL that runs:
- *   | metadata type=sourcetypes index=* | where match(sourcetype, "pattern")
+ *   | metadata type=sourcetypes | where match(sourcetype, "pattern")
  */
 function buildSourcetypeSearchUrl(sourcetypes) {
     if (!sourcetypes || sourcetypes.length === 0) return null;
     const filtered = buildSourcetypePatterns(sourcetypes);
     const pattern = filtered.join('|');
-    const spl = `| metadata type=sourcetypes index=* | where match(sourcetype, "${pattern}")`;
+    const spl = `| metadata type=sourcetypes | where match(sourcetype, "${pattern}")`;
     return createURL(`/app/search/search?q=${encodeURIComponent(spl)}`);
 }
 
@@ -649,7 +743,7 @@ function IntelligenceBadges({ appStatus, vizAppStatus, vizApp2Status, sourcetype
         } else if (sourcetypeInfo.hasData && !appStatus?.installed) {
             items.push({ cls: 'data-ok', label: `Data found (${sourcetypeInfo.detail})`, key: 'data-no-ta', url: sourcetypeSearchUrl });
         } else if (!sourcetypeInfo.hasData) {
-            items.push({ cls: 'data-none', label: sourcetypeInfo.detail || 'No data (24h)', key: 'data-none', url: sourcetypeSearchUrl });
+            items.push({ cls: 'data-none', label: sourcetypeInfo.detail || 'No data (7d)', key: 'data-none', url: sourcetypeSearchUrl });
         }
     }
     if (legacyInstalled && legacyInstalled.length > 0) {
@@ -1354,12 +1448,28 @@ function InfoTooltip({ placement = 'bottom', width = 500, delay = 400, content, 
             if (!wrapperRef.current) return;
             const r = wrapperRef.current.getBoundingClientRect();
             const vw = window.innerWidth;
+            const vh = window.innerHeight;
             const gap = 10;
-            const pos = {
-                top: placement === 'bottom' ? r.bottom + gap + window.scrollY : r.top - gap + window.scrollY,
-                left: r.left + window.scrollX,
-            };
-            pos.left = Math.max(gap, Math.min(pos.left, vw - width - gap + window.scrollX));
+            let pos;
+            if (placement === 'right') {
+                // Position to the right of the trigger element
+                pos = {
+                    top: r.top + window.scrollY,
+                    left: r.right + gap + window.scrollX,
+                };
+                // If it would overflow the right edge, flip to left side
+                if (pos.left + width + gap > vw + window.scrollX) {
+                    pos.left = r.left - width - gap + window.scrollX;
+                }
+                // Keep vertically on screen
+                pos.left = Math.max(gap, pos.left);
+            } else {
+                pos = {
+                    top: placement === 'bottom' ? r.bottom + gap + window.scrollY : r.top - gap + window.scrollY,
+                    left: r.left + window.scrollX,
+                };
+                pos.left = Math.max(gap, Math.min(pos.left, vw - width - gap + window.scrollX));
+            }
             setCoords(pos);
             setVisible(true);
         }, delay);
@@ -1387,17 +1497,15 @@ function InfoTooltip({ placement = 'bottom', width = 500, delay = 400, content, 
                 pointerEvents: visible ? 'auto' : 'none',
             }}
         >
-            <div className="scan-tooltip-card">
-                <div className="scan-tooltip-header">
-                    <span>Splunk Cisco App Navigator</span>
-                    <span className={`scan-tooltip-pin${pinned ? ' pinned' : ''}`}
-                        title={pinned ? 'Unpin' : 'Pin open'}
-                        onClick={e => { e.stopPropagation(); if (pinned) { setPinned(false); setVisible(false); } else setPinned(true); }}>
-                        {pinned ? '📌' : '📌'}
-                    </span>
-                </div>
-                <div className="scan-tooltip-body">{content}</div>
-            </div>
+            <Card style={{ width, boxShadow: '0 8px 28px rgba(0,0,0,0.18)' }}>
+                <Card.Header
+                    title="Splunk Cisco App Navigator"
+                    className="scan-tooltip-card-header"
+                />
+                <Card.Body className="scan-tooltip-card-body">
+                    {content}
+                </Card.Body>
+            </Card>
         </div>
     );
 
@@ -1411,9 +1519,11 @@ function InfoTooltip({ placement = 'bottom', width = 500, delay = 400, content, 
     );
 }
 
+// CardInfoPopover removed — now using InfoTooltip portal popup instead
+
 // ────────────────────────  PRODUCT CARD  ─────────────────────
 
-function ProductCard({ product, installedApps, appStatuses, sourcetypeData, isConfigured, isComingSoon, platformType, onToggleConfigured, onShowBestPractices, onViewLegacy, onSetCustomDashboard, devMode, onViewConfig }) {
+function ProductCard({ product, installedApps, appStatuses, sourcetypeData, splunkbaseData, isConfigured, isComingSoon, platformType, onToggleConfigured, onShowBestPractices, onViewLegacy, onSetCustomDashboard, devMode, onViewConfig }) {
     const {
         product_id, display_name, version, status, description, value_proposition, vendor, tagline,
         icon_emoji, icon_svg, learn_more_url, addon_splunkbase_url, addon_docs_url, addon_troubleshoot_url, addon_install_url,
@@ -1500,8 +1610,15 @@ function ProductCard({ product, installedApps, appStatuses, sourcetypeData, isCo
         }
     };
     const handleLaunchCustom = () => {
-        const cd = product.custom_dashboard || '';
-        if (cd) {
+        let cd = (product.custom_dashboard || '').trim();
+        if (!cd) { setLaunchMenuOpen(false); return; }
+        // If the user pasted a full URL, open it directly
+        if (/^https?:\/\//i.test(cd)) {
+            window.open(cd, '_blank');
+        // If it already starts with /en- or /app/, it's an absolute Splunk path
+        } else if (cd.startsWith('/')) {
+            window.open(createURL(cd), '_blank');
+        } else {
             const parts = cd.split('/');
             if (parts.length >= 2) {
                 window.open(createURL(`/app/${parts[0]}/${parts.slice(1).join('/')}`), '_blank');
@@ -1603,31 +1720,34 @@ function ProductCard({ product, installedApps, appStatuses, sourcetypeData, isCo
                 <div className="csc-card-title-block">
                     <span className="csc-card-name">
                         {display_name}
-                        {hasItsi && <span className="csc-itsi-badge"><img src={createURL(`/static/app/${APP_ID}/icon-itsi.svg`)} alt="" className="badge-icon" /> ITSI</span>}
-                        {soar_connectors && soar_connectors.length > 0 && <span className="csc-soar-badge" title={`${soar_connectors.length} SOAR connector${soar_connectors.length > 1 ? 's' : ''} available`}><img src={createURL(`/static/app/${APP_ID}/icon-soar.svg`)} alt="" className="badge-icon" /> SOAR</span>}
-                        {alert_actions && alert_actions.length > 0 && <span className="csc-alert-badge" title={`${alert_actions.length} alert action${alert_actions.length > 1 ? 's' : ''} available`}>🔔 Alert Action</span>}
-                        {product.ai_enabled && (() => {
-                            const aiText = product.ai_description || 'This product leverages AI technologies';
-                            return (
-                                <span className="csc-ai-badge csc-ai-badge-hover" tabIndex={0} aria-label={aiText}>
-                                    <img src={createURL(`/static/app/${APP_ID}/icons/cat-ai.svg`)} alt="" style={{ width: '14px', height: '14px', verticalAlign: '-2px' }} /> AI
-                                    <span className="csc-ai-tooltip">{aiText}</span>
-                                </span>
-                            );
-                        })()}
                         {description && (
-                            <Tooltip
+                            <InfoTooltip
+                                placement="right"
+                                width={420}
+                                delay={300}
                                 content={
-                                    <div className="csc-tooltip-content">
-                                        <div className="csc-tooltip-desc">{renderFormattedText(description)}</div>
+                                    <div>
+                                        <div className="csc-info-popover-section">
+                                            <div className="csc-info-popover-label">Description</div>
+                                            <div className="csc-info-popover-text">{renderFormattedText(description)}</div>
+                                        </div>
                                         {value_proposition && (
-                                            <div className="csc-tooltip-vp">
-                                                <strong>Value:</strong> {renderFormattedText(value_proposition)}
+                                            <div className="csc-info-popover-section csc-info-popover-value">
+                                                <div className="csc-info-popover-label">Value</div>
+                                                <div className="csc-info-popover-text">{renderFormattedText(value_proposition)}</div>
+                                            </div>
+                                        )}
+                                        {product.aliases && product.aliases.length > 0 && (
+                                            <div className="csc-info-popover-section csc-info-popover-aliases">
+                                                <div className="csc-info-popover-label">Former Names</div>
+                                                <div className="csc-info-popover-text">{product.aliases.join(', ')}</div>
                                             </div>
                                         )}
                                     </div>
                                 }
-                            />
+                            >
+                                <span className="csc-info-trigger" title="Hover for product details">ⓘ</span>
+                            </InfoTooltip>
                         )}
                     </span>
                     <span className="csc-card-subtitle">
@@ -1644,16 +1764,11 @@ function ProductCard({ product, installedApps, appStatuses, sourcetypeData, isCo
                             {tagline}
                         </span>
                     )}
-                    {product.aliases && product.aliases.length > 0 && (
-                        <span className="csc-card-aliases">
-                            Formerly: {product.aliases.join(', ')}
-                        </span>
-                    )}
                 </div>
             </div>
 
-            {/* ── Value Proposition ── */}
-            {value_proposition && (
+            {/* ── Value Proposition (toggle via SHOW_VALUE_PROP_ON_CARD) ── */}
+            {SHOW_VALUE_PROP_ON_CARD && value_proposition && (
                 <div className="csc-card-value-prop">
                     {value_proposition}
                 </div>
@@ -1955,6 +2070,61 @@ function ProductCard({ product, installedApps, appStatuses, sourcetypeData, isCo
                                     })}
                                 </>
                             )}
+                            {/* ── Splunkbase Compatibility (collapsible) ── */}
+                            {splunkbaseData && (() => {
+                                const uids = getProductUids(product);
+                                const compatEntries = uids.map(uid => {
+                                    const entry = splunkbaseData[uid];
+                                    if (!entry) console.debug(`[SCAN] No splunkbaseData for UID ${uid} (product: ${product.display_name})`);
+                                    return entry ? { ...entry, uid } : null;
+                                }).filter(Boolean);
+                                if (uids.length > 0) console.debug(`[SCAN] Compat check: ${product.display_name} uids=[${uids}] matched=${compatEntries.length} splunkbaseDataKeys=${Object.keys(splunkbaseData).length}`);
+                                if (compatEntries.length === 0) return null;
+                                return (
+                                    <>
+                                    <hr className="csc-dep-divider" />
+                                    <details className="csc-dep-details">
+                                        <summary className="csc-dep-details-summary">
+                                            Compatibility ({compatEntries.length})
+                                        </summary>
+                                        <div className="csc-dep-details-body">
+                                            {compatEntries.map((entry, idx) => {
+                                                const versions = sortVersionsDesc(
+                                                    entry.version_compatibility.split(/[|,]/).map(v => v.trim()).filter(Boolean)
+                                                );
+                                                const platforms = entry.product_compatibility
+                                                    .split(/[|,]/).map(v => v.trim()).filter(Boolean);
+                                                return (
+                                                    <div key={entry.uid || idx} className="csc-compat-entry">
+                                                        {compatEntries.length > 1 && entry.title && (
+                                                            <span className="csc-dep-label">{entry.title}</span>
+                                                        )}
+                                                        {entry.app_version && (
+                                                            <div className="csc-compat-row">
+                                                                <span className="csc-compat-label">Latest Version</span>
+                                                                <span className="csc-compat-value">v{entry.app_version}</span>
+                                                            </div>
+                                                        )}
+                                                        {platforms.length > 0 && (
+                                                            <div className="csc-compat-row">
+                                                                <span className="csc-compat-label">Platform</span>
+                                                                <span className="csc-compat-value">{platforms.join(', ')}</span>
+                                                            </div>
+                                                        )}
+                                                        {versions.length > 0 && (
+                                                            <div className="csc-compat-row">
+                                                                <span className="csc-compat-label">Splunk Versions</span>
+                                                                <span className="csc-compat-value">{versions.join(', ')}</span>
+                                                            </div>
+                                                        )}
+                                                    </div>
+                                                );
+                                            })}
+                                        </div>
+                                    </details>
+                                    </>
+                                );
+                            })()}
                             {/* ── Secondary integrations (collapsible) ── */}
                             {((soar_connectors && soar_connectors.length > 0) || (alert_actions && alert_actions.length > 0) || (community_apps && community_apps.length > 0)) && (() => {
                                 const intCount = (soar_connectors?.length || 0) + (alert_actions?.length || 0);
@@ -2337,7 +2507,7 @@ function ProductCard({ product, installedApps, appStatuses, sourcetypeData, isCo
             {sourcetypeInfo && !sourcetypeInfo.hasData && appStatus?.installed && (
                 <div className="csc-data-warning">
                     <div className="csc-data-warn-summary" onClick={() => setDataWarnExpanded((v) => !v)} role="button" tabIndex={0}>
-                        <span>No data detected (24h)</span>
+                        <span>No data detected (7d)</span>
                         <span className="csc-dep-toggle">
                             {dataWarnExpanded ? '− Hide' : '+ Details'}
                         </span>
@@ -2511,7 +2681,7 @@ function ProductCard({ product, installedApps, appStatuses, sourcetypeData, isCo
                     </div>
                 )}
                 {/* Add to My Products */}
-                {!isComingSoon && !isConfigured && (
+                {!isComingSoon && !isConfigured && !coverage_gap && (
                     <button className="csc-btn csc-btn-green" onClick={() => onToggleConfigured(product_id)}
                         title="Add to My Products">
                         Add
@@ -3203,8 +3373,21 @@ const KNOWN_LATEST_VERSIONS = {
     'webpack-merge': '6.0.1',
     'copy-webpack-plugin': '13.0.0',
     'eslint': '9.21.0',
+    // Python libraries (from PyPI / GitHub)
+    'splunklib (Splunk SDK)': '2.1.1',
+    'requests': '2.32.5',
 };
-const LATEST_VERSIONS_CHECKED = '2026-03-01';
+
+/**
+ * Python libraries bundled with / used by SCAN.
+ * These are NOT in package.json so they are listed separately.
+ */
+const PYTHON_LIBRARY_VERSIONS = {
+    'splunklib (Splunk SDK)': '2.1.1',   // bundled in bin/splunklib/
+    'requests': '2.31.0',               // ships with Splunk Python
+};
+
+const LATEST_VERSIONS_CHECKED = '2026-03-05';
 
 /** Compare two semver strings. Returns -1 (behind), 0 (match), 1+ (ahead) */
 function compareSemver(current, latest) {
@@ -3243,13 +3426,23 @@ function TechStackModal({ open, onClose }) {
         }
     });
 
+    // Python libraries (not in package.json — hardcoded)
+    const pythonDeps = [];
+    Object.entries(PYTHON_LIBRARY_VERSIONS).forEach(([name, version]) => {
+        const entry = { name, current: version };
+        entry.latest = KNOWN_LATEST_VERSIONS[name] || null;
+        entry.cmp = entry.latest ? compareSemver(version, entry.latest) : 0;
+        pythonDeps.push(entry);
+    });
+
     // Sort: outdated first, then alphabetical
     const sortDeps = (arr) => arr.sort((a, b) => (a.cmp || 0) - (b.cmp || 0) || a.name.localeCompare(b.name));
     sortDeps(splunkDeps);
     sortDeps(reactDeps);
     sortDeps(buildDeps);
+    sortDeps(pythonDeps);
 
-    const allDeps = [...splunkDeps, ...reactDeps, ...buildDeps];
+    const allDeps = [...splunkDeps, ...reactDeps, ...buildDeps, ...pythonDeps];
     const allTracked = allDeps.filter(d => d.latest);
     const allOutdated = allTracked.filter(d => d.cmp < 0).length;
     const allCurrent = allTracked.filter(d => d.cmp >= 0).length;
@@ -3267,6 +3460,7 @@ function TechStackModal({ open, onClose }) {
         addSection('Splunk UI Packages', splunkDeps);
         addSection('React / UI Framework', reactDeps);
         addSection('Build Tools', buildDeps);
+        addSection('Python Libraries', pythonDeps);
         const text = lines.join('\n');
         if (navigator.clipboard?.writeText) {
             navigator.clipboard.writeText(text).then(() => { setCopied(true); setTimeout(() => setCopied(false), 2000); });
@@ -3320,7 +3514,7 @@ function TechStackModal({ open, onClose }) {
                 <div className="scan-ts-summary">
                     <span className="scan-ts-summary-pill scan-ts-summary-current">✅ {allCurrent} current</span>
                     {allOutdated > 0 && <span className="scan-ts-summary-pill scan-ts-summary-outdated">❌ {allOutdated} outdated</span>}
-                    <span className="scan-ts-summary-pill scan-ts-summary-total">📦 {Object.keys(deps).length} total deps</span>
+                    <span className="scan-ts-summary-pill scan-ts-summary-total">📦 {allDeps.length} total deps</span>
                     <button className="csc-devmode-copy" onClick={handleCopy} style={{ marginLeft: 'auto' }}>
                         {copied ? '✓ Copied!' : '📋 Copy'}
                     </button>
@@ -3328,8 +3522,9 @@ function TechStackModal({ open, onClose }) {
                 {renderSection('Splunk UI Packages', '🔷', splunkDeps)}
                 {renderSection('React / UI Framework', '⚛️', reactDeps)}
                 {renderSection('Build Tools', '🔧', buildDeps)}
+                {renderSection('Python Libraries', '🐍', pythonDeps)}
                 <div className="scan-ts-footer-note">
-                    Splunk UI versions from <a href="https://splunkui.splunk.com/Packages" target="_blank" rel="noopener noreferrer">splunkui.splunk.com/Packages</a> · Other versions from <a href="https://www.npmjs.com" target="_blank" rel="noopener noreferrer">npmjs.com</a> · Last checked {LATEST_VERSIONS_CHECKED}
+                    Splunk UI versions from <a href="https://splunkui.splunk.com/Packages" target="_blank" rel="noopener noreferrer">splunkui.splunk.com/Packages</a> · JS from <a href="https://www.npmjs.com" target="_blank" rel="noopener noreferrer">npmjs.com</a> · Python from <a href="https://pypi.org" target="_blank" rel="noopener noreferrer">PyPI</a> · Last checked {LATEST_VERSIONS_CHECKED}
                 </div>
             </Modal.Body>
             <Modal.Footer>
@@ -3610,7 +3805,7 @@ function PersonaModal({ open, onClose, onSelectPersona, products }) {
 
 // ──────────────────────  CATEGORY FILTER  ────────────────────
 
-function CategoryFilterBar({ selectedCategory, onSelectCategory, selectedSubCategory, onSelectSubCategory, aiFilter, onToggleAiFilter, streamFilter, onToggleStreamFilter, sc4sFilter, onToggleSc4sFilter, categoryCounts, products, allProducts, advancedFiltersOpen, onToggleAdvancedFilters, supportLevelFilter, onSelectSupportLevel, showRetired, onToggleShowRetired, showDeprecated, onToggleShowDeprecated, showComingSoon, onToggleShowComingSoon, showFullPortfolio, showGtmRoadmap, onToggleShowGtmRoadmap }) {
+function CategoryFilterBar({ selectedCategory, onSelectCategory, selectedSubCategory, onSelectSubCategory, aiFilter, onToggleAiFilter, streamFilter, onToggleStreamFilter, sc4sFilter, onToggleSc4sFilter, categoryCounts, products, allProducts, advancedFiltersOpen, onToggleAdvancedFilters, supportLevelFilter, onSelectSupportLevel, showRetired, onToggleShowRetired, showDeprecated, onToggleShowDeprecated, showComingSoon, onToggleShowComingSoon, showFullPortfolio, showGtmRoadmap, onToggleShowGtmRoadmap, platformFilter, onSelectPlatform, versionFilter, onSelectVersion, splunkbaseData, csvSyncStatus, csvSyncMessage, onSyncSplunkbase }) {
     // Cisco official category SVG icons (from cisco.com CDN)
     const catIconMap = { security: 'cat-security', observability: 'cat-observability', networking: 'cat-networking', collaboration: 'cat-collaboration' };
     const renderCatIcon = (catId, active) => {
@@ -3709,6 +3904,19 @@ function CategoryFilterBar({ selectedCategory, onSelectCategory, selectedSubCate
                             {secNetCount}
                         </span>
                     </button>
+                    <a
+                        href="https://www.cisco.com/c/en/us/solutions/collateral/transform-infrastructure/secure-networking-so.html"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        title="Cisco Secure Networking Solution Overview — opens cisco.com"
+                        className="csc-secnet-doc-link"
+                    >
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                            <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6" />
+                            <polyline points="15 3 21 3 21 9" />
+                            <line x1="10" y1="14" x2="21" y2="3" />
+                        </svg>
+                    </a>
                 </>
             )}
             {/* ── SOAR cross-cutting filter ── */}
@@ -3870,12 +4078,22 @@ function CategoryFilterBar({ selectedCategory, onSelectCategory, selectedSubCate
                 ? rawBase
                 : rawBase.filter(p => SUPPORTED_LEVELS.has(p.support_level));
 
-            /* Support pill counts: apply visibility filters but NOT the support-level filter */
-            let supportCountBase = portfolioBase;
+            /* Apply category filter so all advanced counts respect the selected category */
+            let catBase = portfolioBase;
+            if (selectedCategory === 'soar') catBase = catBase.filter(p => p.soar_connectors && p.soar_connectors.length > 0);
+            else if (selectedCategory === 'alert_actions') catBase = catBase.filter(p => p.alert_actions && p.alert_actions.length > 0);
+            else if (selectedCategory === 'secure_networking') catBase = catBase.filter(p => p.secure_networking_gtm);
+            else if (selectedCategory === 'ai_powered') catBase = catBase.filter(p => p.ai_enabled);
+            else if (selectedCategory) catBase = catBase.filter(p => p.category === selectedCategory);
+
+            /* Support pill counts: apply category + visibility + onboarding (but NOT the support filter) */
+            let supportCountBase = catBase;
             if (!showRetired) supportCountBase = supportCountBase.filter(p => p.status !== 'retired');
             if (!showDeprecated) supportCountBase = supportCountBase.filter(p => p.status !== 'deprecated');
             if (!showComingSoon) supportCountBase = supportCountBase.filter(p => p.status !== 'under_development');
             if (!showGtmRoadmap) supportCountBase = supportCountBase.filter(p => !p.coverage_gap);
+            if (streamFilter) supportCountBase = supportCountBase.filter(p => p.netflow_supported);
+            if (sc4sFilter) supportCountBase = supportCountBase.filter(p => p.sc4s_supported);
 
             const supportCounts = {
                 cisco_supported: supportCountBase.filter(p => p.support_level === 'cisco_supported').length,
@@ -3885,14 +4103,26 @@ function CategoryFilterBar({ selectedCategory, onSelectCategory, selectedSubCate
             };
             const supportTotal = supportCountBase.length;
 
-            /* Visibility pill counts: apply support filter but NOT the visibility filters */
-            let visCountBase = portfolioBase;
+            /* Visibility pill counts: apply category + support + onboarding (but NOT the visibility filters) */
+            let visCountBase = catBase;
             if (supportLevelFilter) visCountBase = visCountBase.filter(p => p.support_level === supportLevelFilter);
+            if (streamFilter) visCountBase = visCountBase.filter(p => p.netflow_supported);
+            if (sc4sFilter) visCountBase = visCountBase.filter(p => p.sc4s_supported);
 
             const retiredCount = visCountBase.filter(p => p.status === 'retired').length;
             const deprecatedCount = visCountBase.filter(p => p.status === 'deprecated').length;
             const comingSoonCount = visCountBase.filter(p => p.status === 'under_development').length;
             const gtmRoadmapCount = visCountBase.filter(p => p.coverage_gap).length;
+
+            /* Onboarding pill counts: apply category + support + visibility (each excludes itself) */
+            let onboardingBase = catBase;
+            if (supportLevelFilter) onboardingBase = onboardingBase.filter(p => p.support_level === supportLevelFilter);
+            if (!showRetired) onboardingBase = onboardingBase.filter(p => p.status !== 'retired');
+            if (!showDeprecated) onboardingBase = onboardingBase.filter(p => p.status !== 'deprecated');
+            if (!showComingSoon) onboardingBase = onboardingBase.filter(p => p.status !== 'under_development');
+            if (!showGtmRoadmap) onboardingBase = onboardingBase.filter(p => !p.coverage_gap);
+            const streamCount = (sc4sFilter ? onboardingBase.filter(p => p.sc4s_supported) : onboardingBase).filter(p => p.netflow_supported).length;
+            const sc4sCount = (streamFilter ? onboardingBase.filter(p => p.netflow_supported) : onboardingBase).filter(p => p.sc4s_supported).length;
 
             const supportPill = (level, label, emoji, activeClass) => {
                 const active = supportLevelFilter === level;
@@ -3926,21 +4156,21 @@ function CategoryFilterBar({ selectedCategory, onSelectCategory, selectedSubCate
                         className={`csc-subcategory-pill csc-visibility-pill ${showRetired ? 'csc-visibility-pill-on' : 'csc-visibility-pill-off'}`}
                         title={showRetired ? 'Retired products are shown — click to hide' : 'Retired products are hidden — click to show'}
                     >
-                        {showRetired ? '👁' : '🚫'} Retired <span className="csc-subcategory-count">{retiredCount}</span>
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ verticalAlign: '-2px', textDecoration: 'none' }}><polyline points="21 8 21 21 3 21 3 8"/><rect x="1" y="3" width="22" height="5"/><line x1="10" y1="12" x2="14" y2="12"/></svg> Retired <span className="csc-subcategory-count">{retiredCount}</span>
                     </button>
                     <button
                         onClick={() => onToggleShowDeprecated(!showDeprecated)}
                         className={`csc-subcategory-pill csc-visibility-pill ${showDeprecated ? 'csc-visibility-pill-on' : 'csc-visibility-pill-off'}`}
                         title={showDeprecated ? 'Deprecated products are shown — click to hide' : 'Deprecated products are hidden — click to show'}
                     >
-                        {showDeprecated ? '👁' : '🚫'} Deprecated <span className="csc-subcategory-count">{deprecatedCount}</span>
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ verticalAlign: '-2px', textDecoration: 'none' }}><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg> Deprecated <span className="csc-subcategory-count">{deprecatedCount}</span>
                     </button>
                     <button
                         onClick={() => onToggleShowComingSoon(!showComingSoon)}
                         className={`csc-subcategory-pill csc-visibility-pill ${showComingSoon ? 'csc-visibility-pill-on' : 'csc-visibility-pill-off'}`}
                         title={showComingSoon ? 'Coming Soon products are shown — click to hide' : 'Coming Soon products are hidden — click to show'}
                     >
-                        {showComingSoon ? '👁' : '🚫'} Coming Soon <span className="csc-subcategory-count">{comingSoonCount}</span>
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ verticalAlign: '-2px', textDecoration: 'none' }}><path d="M4.5 16.5c-1.5 1.26-2 5-2 5s3.74-.5 5-2c.71-.84.7-2.13-.09-2.91a2.18 2.18 0 00-2.91-.09z"/><path d="M12 15l-3-3a22 22 0 012-3.95A12.88 12.88 0 0122 2c0 2.72-.78 7.5-6 11a22.35 22.35 0 01-4 2z"/><path d="M9 12H4s.55-3.03 2-4c1.62-1.08 3 0 3 0"/><path d="M12 15v5s3.03-.55 4-2c1.08-1.62 0-3 0-3"/></svg> Coming Soon <span className="csc-subcategory-count">{comingSoonCount}</span>
                     </button>
                     {gtmRoadmapCount > 0 && (
                         <button
@@ -3948,39 +4178,100 @@ function CategoryFilterBar({ selectedCategory, onSelectCategory, selectedSubCate
                             className={`csc-subcategory-pill csc-visibility-pill ${showGtmRoadmap ? 'csc-visibility-pill-on' : 'csc-visibility-pill-off'}`}
                             title={showGtmRoadmap ? 'GTM Roadmap products are shown — click to hide' : 'GTM Roadmap products are hidden — click to show'}
                         >
-                            {showGtmRoadmap ? '👁' : '🚫'} GTM Roadmap <span className="csc-subcategory-count">{gtmRoadmapCount}</span>
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ verticalAlign: '-2px', textDecoration: 'none' }}><path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"/><line x1="4" y1="22" x2="4" y2="15"/></svg> GTM Roadmap <span className="csc-subcategory-count">{gtmRoadmapCount}</span>
                         </button>
                     )}
                     {/* ── Onboarding Path filters ── */}
-                    {(() => {
-                        const streamCount = visCountBase.filter(p => p.netflow_supported).length;
-                        const sc4sCount = visCountBase.filter(p => p.sc4s_supported).length;
-                        if (streamCount === 0 && sc4sCount === 0) return null;
+                    {(streamCount > 0 || sc4sCount > 0) && (
+                        <>
+                            <span style={{ borderLeft: '1.5px solid var(--card-border, #ddd)', height: '18px', margin: '0 4px' }} />
+                            <span style={{ fontSize: '11px', color: 'var(--faint-color, #888)', fontWeight: 500, marginRight: '4px' }}>Onboarding:</span>
+                            {sc4sCount > 0 && (
+                                <button
+                                    onClick={() => onToggleSc4sFilter(!sc4sFilter)}
+                                    className={`csc-subcategory-pill csc-sc4s-filter-pill ${sc4sFilter ? 'csc-sc4s-filter-pill-active' : ''}`}
+                                    title={sc4sFilter ? 'Showing SC4S-supported products — click to clear' : 'Show only products with SC4S onboarding'}
+                                >
+                                    {sc4sFilter && <span style={{ fontSize: '11px', fontWeight: 700 }}>✓</span>} 📡 SC4S <span className="csc-subcategory-count">{sc4sCount}</span>
+                                </button>
+                            )}
+                            {streamCount > 0 && (
+                                <button
+                                    onClick={() => onToggleStreamFilter(!streamFilter)}
+                                    className={`csc-subcategory-pill csc-stream-pill ${streamFilter ? 'csc-stream-pill-active' : ''}`}
+                                    title={streamFilter ? 'Showing Stream/NetFlow products — click to clear' : 'Show only products with Stream/NetFlow onboarding'}
+                                >
+                                    {streamFilter && <span style={{ fontSize: '11px', fontWeight: 700 }}>✓</span>} <img src={createURL(`/static/app/${APP_ID}/icons/network_analytics.svg`)} alt="" className="csc-filter-pill-icon" style={{ width: '14px', height: '14px', verticalAlign: '-2px' }} /> Stream <span className="csc-subcategory-count">{streamCount}</span>
+                                </button>
+                            )}
+                        </>
+                    )}
+                    {/* ── Splunkbase Compatibility filters ── */}
+                    {splunkbaseData && Object.keys(splunkbaseData).length > 0 && (() => {
+                        /* Collect all unique platforms and versions from the splunkbaseData */
+                        const allPlatforms = new Set();
+                        const allVersions = new Set();
+                        Object.values(splunkbaseData).forEach(entry => {
+                            if (entry.product_compatibility) {
+                                entry.product_compatibility.split(/[|,]/).map(v => v.trim()).filter(Boolean).forEach(p => allPlatforms.add(p));
+                            }
+                            if (entry.version_compatibility) {
+                                entry.version_compatibility.split(/[|,]/).map(v => v.trim()).filter(Boolean).forEach(v => allVersions.add(v));
+                            }
+                        });
+                        const platformList = [...allPlatforms].sort();
+                        const versionList = sortVersionsDesc([...allVersions]);
+                        if (platformList.length === 0 && versionList.length === 0) return null;
                         return (
                             <>
                                 <span style={{ borderLeft: '1.5px solid var(--card-border, #ddd)', height: '18px', margin: '0 4px' }} />
-                                <span style={{ fontSize: '11px', color: 'var(--faint-color, #888)', fontWeight: 500, marginRight: '4px' }}>Onboarding:</span>
-                                {sc4sCount > 0 && (
-                                    <button
-                                        onClick={() => onToggleSc4sFilter(!sc4sFilter)}
-                                        className={`csc-subcategory-pill csc-sc4s-filter-pill ${sc4sFilter ? 'csc-sc4s-filter-pill-active' : ''}`}
-                                        title={sc4sFilter ? 'Showing SC4S-supported products — click to clear' : 'Show only products with SC4S onboarding'}
+                                <span style={{ fontSize: '11px', color: 'var(--faint-color, #888)', fontWeight: 500, marginRight: '4px' }}>Compatibility:</span>
+                                {platformList.length > 0 && (
+                                    <select
+                                        value={platformFilter || ''}
+                                        onChange={e => onSelectPlatform(e.target.value || null)}
+                                        className="csc-subcategory-pill csc-compat-select"
+                                        title="Filter by platform compatibility"
+                                        style={{ cursor: 'pointer', fontSize: '12px', fontWeight: 600, padding: '4px 8px', borderRadius: '14px', border: `2px solid ${platformFilter ? '#049fd9' : 'var(--card-border, #ddd)'}`, background: platformFilter ? '#e0f4fd' : 'var(--card-bg, #f5f5f5)', color: platformFilter ? '#0277bd' : 'var(--page-color, #333)', appearance: 'auto', minWidth: '100px' }}
                                     >
-                                        📡 SC4S <span className="csc-subcategory-count">{sc4sCount}</span>
-                                    </button>
+                                        <option value="">All Platforms</option>
+                                        {platformList.map(p => <option key={p} value={p}>{p}</option>)}
+                                    </select>
                                 )}
-                                {streamCount > 0 && (
-                                    <button
-                                        onClick={() => onToggleStreamFilter(!streamFilter)}
-                                        className={`csc-subcategory-pill csc-stream-pill ${streamFilter ? 'csc-stream-pill-active' : ''}`}
-                                        title={streamFilter ? 'Showing Stream/NetFlow products — click to clear' : 'Show only products with Stream/NetFlow onboarding'}
+                                {versionList.length > 0 && (
+                                    <select
+                                        value={versionFilter || ''}
+                                        onChange={e => onSelectVersion(e.target.value || null)}
+                                        className="csc-subcategory-pill csc-compat-select"
+                                        title="Filter by Splunk version compatibility"
+                                        style={{ cursor: 'pointer', fontSize: '12px', fontWeight: 600, padding: '4px 8px', borderRadius: '14px', border: `2px solid ${versionFilter ? '#049fd9' : 'var(--card-border, #ddd)'}`, background: versionFilter ? '#e0f4fd' : 'var(--card-bg, #f5f5f5)', color: versionFilter ? '#0277bd' : 'var(--page-color, #333)', appearance: 'auto', minWidth: '80px' }}
                                     >
-                                        🌊 Stream <span className="csc-subcategory-count">{streamCount}</span>
-                                    </button>
+                                        <option value="">All Versions</option>
+                                        {versionList.map(v => <option key={v} value={v}>Splunk {v}</option>)}
+                                    </select>
                                 )}
                             </>
                         );
                     })()}
+                    {/* ── Sync Splunkbase button (inside Advanced) ── */}
+                    <span style={{ borderLeft: '1.5px solid var(--card-border, #ddd)', height: '18px', margin: '0 4px' }} />
+                    <button
+                        className={`csc-subcategory-pill scan-util-sync ${csvSyncStatus === 'success' ? 'scan-sync-ok' : csvSyncStatus === 'error' ? 'scan-sync-err' : csvSyncStatus === 'syncing' ? 'scan-sync-busy' : ''}`}
+                        onClick={onSyncSplunkbase}
+                        disabled={csvSyncStatus === 'syncing'}
+                        title={csvSyncStatus === 'success' ? `✓ ${csvSyncMessage}` : csvSyncStatus === 'error' ? `✗ ${csvSyncMessage}` : csvSyncStatus === 'syncing' ? 'Downloading…' : 'Sync Splunkbase catalog from S3 — updates compatibility data for all products'}
+                        style={{ cursor: csvSyncStatus === 'syncing' ? 'wait' : 'pointer' }}
+                    >
+                        {csvSyncStatus === 'syncing' ? '⏳' : csvSyncStatus === 'success' ? '✅' : csvSyncStatus === 'error' ? '❌' : '🔄'} Sync
+                    </button>
+                    <button
+                        className="csc-subcategory-pill"
+                        onClick={() => alert('Sync Splunkbase Catalog\n\nDownloads the latest Splunkbase app catalog from Cisco\'s S3 repository and saves it as a Splunk lookup.\n\nThis enables:\n• Platform compatibility info (Splunk Cloud, Enterprise)\n• Splunk version compatibility (10.2, 10.1, 9.4, etc.)\n• Latest app version detection\n\nThe catalog is stored locally as a compressed lookup file. No data leaves your Splunk instance — this is a one-way download.\n\nRe-sync periodically to pick up newly published app versions.')}
+                        title="What does Sync do?"
+                        style={{ cursor: 'pointer', padding: '4px 8px', minWidth: 'auto' }}
+                    >
+                        ℹ️
+                    </button>
                 </div>
             );
         })()}
@@ -4011,6 +4302,7 @@ function SCANProductsPage() {
     const [feedbackOpen, setFeedbackOpen] = useState(false);
     const [removeAllModalOpen, setRemoveAllModalOpen] = useState(false);
     const removeAllReturnRef = useRef(null);
+    const [cardLegendOpen, setCardLegendOpen] = useState(false);
     const [appVersion, setAppVersion] = useState('');
     const [appUpdateVersion, setAppUpdateVersion] = useState('');
     const [platformType, setPlatformType] = useState('');
@@ -4034,6 +4326,12 @@ function SCANProductsPage() {
     const [personaModalOpen, setPersonaModalOpen] = useState(() => {
         try { return localStorage.getItem(PERSONA_STORAGE_KEY) !== 'true'; } catch { return false; }
     });
+    const [splunkbaseData, setSplunkbaseData] = useState({});    // uid → { version_compatibility, product_compatibility, app_version, title }
+    const [splunkbaseLoaded, setSplunkbaseLoaded] = useState(false);
+    const [csvSyncStatus, setCsvSyncStatus] = useState(null);    // null | 'syncing' | 'success' | 'error'
+    const [csvSyncMessage, setCsvSyncMessage] = useState('');
+    const [platformFilter, setPlatformFilter] = useState(null);    // null | 'Splunk Cloud' | 'Splunk Enterprise' | ...
+    const [versionFilter, setVersionFilter] = useState(null);      // null | '10.2' | '10.1' | ...
 
     // ── Theme detection — read Splunk's preference and store it ──
     useEffect(() => {
@@ -4324,6 +4622,96 @@ function SCANProductsPage() {
         detect();
     }, [products, loading]);
 
+    // ── Load Splunkbase CSV data via inputlookup ──
+    useEffect(() => {
+        if (loading) return;
+        const loadSplunkbaseData = async () => {
+            try {
+                const searchStr = '| inputlookup scan_splunkbase_apps | table uid version_compatibility product_compatibility app_version title';
+                console.log('[SCAN] Loading Splunkbase data:', searchStr);
+                // Use app-namespaced endpoint so transforms.conf stanza is resolved
+                const sbEndpoint = `/splunkd/__raw/servicesNS/-/${APP_ID}/search/jobs`;
+                const res = await splunkFetch(sbEndpoint, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                    body: `search=${encodeURIComponent(searchStr)}&output_mode=json&exec_mode=oneshot&count=0&timeout=60`,
+                });
+                console.log('[SCAN] Splunkbase lookup response status:', res.status);
+                if (!res.ok) { console.warn('[SCAN] Splunkbase lookup not available (not yet synced?)', res.status, res.statusText); return; }
+                const data = await res.json();
+                const rows = data.results || [];
+                console.log('[SCAN] Splunkbase lookup raw rows:', rows.length, 'sample:', rows.slice(0, 3));
+                const lookup = {};
+                rows.forEach(r => {
+                    if (r.uid) {
+                        lookup[String(r.uid)] = {
+                            version_compatibility: r.version_compatibility || '',
+                            product_compatibility: r.product_compatibility || '',
+                            app_version: r.app_version || '',
+                            title: r.title || '',
+                        };
+                    }
+                });
+                setSplunkbaseData(lookup);
+                setSplunkbaseLoaded(true);
+                console.log(`[SCAN] Loaded ${Object.keys(lookup).length} Splunkbase entries, sample keys:`, Object.keys(lookup).slice(0, 10));
+            } catch (e) {
+                console.error('[SCAN] Could not load Splunkbase data:', e);
+            }
+        };
+        loadSplunkbaseData();
+    }, [loading]);
+
+    // ── Splunkbase CSV sync handler ──
+    const handleSyncSplunkbase = useCallback(async () => {
+        setCsvSyncStatus('syncing');
+        setCsvSyncMessage('Downloading from S3...');
+        try {
+            const searchStr = '| downloadsplunkbasecsv input_csv=splunkbase_assets/splunkbase_apps.csv.gz output_csv=scan_splunkbase_apps.csv.gz';
+            // Use app-namespaced endpoint so the custom command is always found
+            const syncEndpoint = `/splunkd/__raw/servicesNS/-/${APP_ID}/search/jobs`;
+            const res = await splunkFetch(syncEndpoint, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                body: `search=${encodeURIComponent(searchStr)}&output_mode=json&exec_mode=oneshot&count=0&timeout=180`,
+            });
+            if (!res.ok) {
+                setCsvSyncStatus('error');
+                setCsvSyncMessage(`HTTP ${res.status}`);
+                return;
+            }
+            const data = await res.json();
+            const results = data.results || [];
+            if (results.length > 0 && (results[0].status === 'success' || results[0].status_code === '200' || results[0].bytes_written)) {
+                setCsvSyncStatus('success');
+                setCsvSyncMessage(results[0].message || `Downloaded ${results[0].csv_name || 'CSV'} (${results[0].bytes_written || '?'} bytes)`);
+                // Reload the Splunkbase data
+                const reloadSearch = '| inputlookup scan_splunkbase_apps | table uid version_compatibility product_compatibility app_version title';
+                const rRes = await splunkFetch(`/splunkd/__raw/servicesNS/-/${APP_ID}/search/jobs`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                    body: `search=${encodeURIComponent(reloadSearch)}&output_mode=json&exec_mode=oneshot&count=0&timeout=60`,
+                });
+                if (rRes.ok) {
+                    const rData = await rRes.json();
+                    const rows = rData.results || [];
+                    const lookup = {};
+                    rows.forEach(r => { if (r.uid) lookup[String(r.uid)] = { version_compatibility: r.version_compatibility || '', product_compatibility: r.product_compatibility || '', app_version: r.app_version || '', title: r.title || '' }; });
+                    setSplunkbaseData(lookup);
+                    setSplunkbaseLoaded(true);
+                    console.log(`[SCAN] Reloaded ${Object.keys(lookup).length} Splunkbase entries after sync`);
+                }
+            } else {
+                setCsvSyncStatus('error');
+                setCsvSyncMessage(results[0]?.message || 'Download failed');
+            }
+        } catch (e) {
+            console.error('[SCAN] Splunkbase sync failed:', e);
+            setCsvSyncStatus('error');
+            setCsvSyncMessage(e.message || 'Unknown error');
+        }
+    }, []);
+
     // ── Portfolio toggle handler ──
     const handlePortfolioToggle = useCallback(() => {
         setShowFullPortfolio((prev) => {
@@ -4343,7 +4731,7 @@ function SCANProductsPage() {
         if (supportLevelFilter) {
             base = base.filter((p) => p.support_level === supportLevelFilter);
         } else if (!showFullPortfolio) {
-            base = base.filter((p) => SUPPORTED_LEVELS.has(p.support_level));
+            base = base.filter((p) => SUPPORTED_LEVELS.has(p.support_level) && p.status !== 'under_development');
         }
         if (!showRetired) {
             base = base.filter((p) => p.status !== 'retired');
@@ -4360,8 +4748,8 @@ function SCANProductsPage() {
         return base;
     }, [products, supportLevelFilter, showFullPortfolio, showRetired, showDeprecated, showComingSoon, showGtmRoadmap]);
 
-    // ── Filtering ──
-    const filteredProducts = useMemo(() => {
+    // ── Filtering (two-stage: preAddon for faceted dropdown, then full) ──
+    const preAddonProducts = useMemo(() => {
         let filtered = portfolioProducts;
         if (selectedCategory === 'soar') {
             filtered = filtered.filter((p) => p.soar_connectors && p.soar_connectors.length > 0);
@@ -4392,15 +4780,6 @@ function SCANProductsPage() {
         if (sc4sFilter) {
             filtered = filtered.filter((p) => p.sc4s_supported);
         }
-        if (selectedAddon) {
-            if (selectedAddon === '__standalone__') {
-                filtered = filtered.filter((p) => !p.addon && !p.sc4s_supported);
-            } else if (selectedAddon === '__sc4s__') {
-                filtered = filtered.filter((p) => !p.addon && p.sc4s_supported);
-            } else {
-                filtered = filtered.filter((p) => p.addon === selectedAddon);
-            }
-        }
         if (searchQuery) {
             const q = searchQuery.toLowerCase().trim();
             filtered = filtered.filter((p) => {
@@ -4411,11 +4790,49 @@ function SCANProductsPage() {
                 return `${p.display_name} ${p.tagline} ${p.description} ${p.vendor} ${p.product_id}`.toLowerCase().includes(q);
             });
         }
+        // ── Splunkbase platform filter ──
+        if (platformFilter && splunkbaseData && Object.keys(splunkbaseData).length > 0) {
+            filtered = filtered.filter((p) => {
+                const uids = getProductUids(p);
+                if (uids.length === 0) return false;
+                return uids.some(uid => {
+                    const entry = splunkbaseData[uid];
+                    if (!entry || !entry.product_compatibility) return false;
+                    const platforms = entry.product_compatibility.split(/[|,]/).map(v => v.trim());
+                    return platforms.some(pl => pl.toLowerCase().includes(platformFilter.toLowerCase()));
+                });
+            });
+        }
+        // ── Splunkbase version compatibility filter ──
+        if (versionFilter && splunkbaseData && Object.keys(splunkbaseData).length > 0) {
+            filtered = filtered.filter((p) => {
+                const uids = getProductUids(p);
+                if (uids.length === 0) return false;
+                return uids.some(uid => {
+                    const entry = splunkbaseData[uid];
+                    if (!entry || !entry.version_compatibility) return false;
+                    const versions = entry.version_compatibility.split(/[|,]/).map(v => v.trim());
+                    return versions.includes(versionFilter);
+                });
+            });
+        }
         return filtered;
-    }, [portfolioProducts, selectedCategory, selectedSubCategory, aiFilter, streamFilter, sc4sFilter, selectedAddon, searchQuery]);
+    }, [portfolioProducts, selectedCategory, selectedSubCategory, aiFilter, streamFilter, sc4sFilter, searchQuery, platformFilter, versionFilter, splunkbaseData]);
+
+    const filteredProducts = useMemo(() => {
+        if (!selectedAddon) return preAddonProducts;
+        if (selectedAddon === '__standalone__') {
+            return preAddonProducts.filter((p) => !p.addon && !p.sc4s_supported);
+        } else if (selectedAddon === '__sc4s__') {
+            return preAddonProducts.filter((p) => !p.addon && p.sc4s_supported);
+        }
+        return preAddonProducts.filter((p) => p.addon === selectedAddon);
+    }, [preAddonProducts, selectedAddon]);
 
     const configuredProducts = filteredProducts.filter((p) => p.status !== 'under_development' && p.status !== 'retired' && p.status !== 'deprecated' && !p.coverage_gap && configuredIds.includes(p.product_id));
-    const availableProducts = filteredProducts.filter((p) => p.status !== 'under_development' && p.status !== 'retired' && p.status !== 'deprecated' && !p.coverage_gap && p.support_level !== 'not_supported' && !configuredIds.includes(p.product_id));
+    const detectedProducts = filteredProducts.filter((p) => p.status !== 'under_development' && p.status !== 'retired' && p.status !== 'deprecated' && !p.coverage_gap && p.support_level !== 'not_supported' && !configuredIds.includes(p.product_id) && sourcetypeData[p.product_id] && sourcetypeData[p.product_id].hasData);
+    const detectedIds = new Set(detectedProducts.map((p) => p.product_id));
+    const availableProducts = filteredProducts.filter((p) => p.status !== 'under_development' && p.status !== 'retired' && p.status !== 'deprecated' && !p.coverage_gap && p.support_level !== 'not_supported' && !configuredIds.includes(p.product_id) && !detectedIds.has(p.product_id));
     const unsupportedProducts = filteredProducts.filter((p) => p.status !== 'under_development' && p.status !== 'retired' && p.status !== 'deprecated' && !p.coverage_gap && p.support_level === 'not_supported' && !configuredIds.includes(p.product_id));
     const comingSoonProducts = filteredProducts.filter((p) => p.status === 'under_development');
     const deprecatedProducts = filteredProducts.filter((p) => p.status === 'deprecated');
@@ -4423,7 +4840,21 @@ function SCANProductsPage() {
     const gtmGapProducts = filteredProducts.filter((p) => p.coverage_gap);
 
     const categoryCounts = useMemo(() => {
-        const base = portfolioProducts;
+        let base = portfolioProducts;
+        // Apply cross-cutting filters so category counts reflect the active filter state
+        if (streamFilter) base = base.filter((p) => p.netflow_supported);
+        if (sc4sFilter) base = base.filter((p) => p.sc4s_supported);
+        if (aiFilter) base = base.filter((p) => p.ai_enabled);
+        if (searchQuery) {
+            const q = searchQuery.toLowerCase().trim();
+            base = base.filter((p) => {
+                const kws = (p.keywords || []).map((k) => k.toLowerCase());
+                if (kws.some((k) => k.includes(q) || q.includes(k))) return true;
+                const als = (p.aliases || []).map((a) => a.toLowerCase());
+                if (als.some((a) => a.includes(q) || q.includes(a))) return true;
+                return `${p.display_name} ${p.tagline} ${p.description} ${p.vendor} ${p.product_id}`.toLowerCase().includes(q);
+            });
+        }
         const counts = {};
         CATEGORIES.forEach((c) => { counts[c.id] = base.filter((p) => p.category === c.id).length; });
         counts.soar = base.filter((p) => p.soar_connectors && p.soar_connectors.length > 0).length;
@@ -4431,7 +4862,7 @@ function SCANProductsPage() {
         counts.secure_networking = base.filter((p) => p.secure_networking_gtm).length;
         counts.ai_powered = base.filter((p) => p.ai_enabled).length;
         return counts;
-    }, [portfolioProducts]);
+    }, [portfolioProducts, streamFilter, sc4sFilter, aiFilter, searchQuery]);
 
     // ── Render ──
     if (loading) {
@@ -4544,6 +4975,13 @@ function SCANProductsPage() {
                         </span>
                     </button>
                     <button
+                        className="scan-util-pill"
+                        onClick={() => setCardLegendOpen(true)}
+                        title="How to use Splunk Cisco App Navigator"
+                    >
+                        ❓ Guide
+                    </button>
+                    <button
                         className="scan-util-pill scan-util-persona"
                         onClick={() => setPersonaModalOpen(true)}
                         title="Quick Start — Choose or change your role"
@@ -4637,13 +5075,21 @@ function SCANProductsPage() {
                     showFullPortfolio={showFullPortfolio}
                     showGtmRoadmap={showGtmRoadmap}
                     onToggleShowGtmRoadmap={setShowGtmRoadmap}
+                    platformFilter={platformFilter}
+                    onSelectPlatform={setPlatformFilter}
+                    versionFilter={versionFilter}
+                    onSelectVersion={setVersionFilter}
+                    splunkbaseData={splunkbaseData}
+                    csvSyncStatus={csvSyncStatus}
+                    csvSyncMessage={csvSyncMessage}
+                    onSyncSplunkbase={handleSyncSplunkbase}
                 />
             </div>
 
             <AddonFilterBar
                 selectedAddon={selectedAddon}
                 onSelectAddon={setSelectedAddon}
-                products={portfolioProducts}
+                products={preAddonProducts}
             />
 
             {/* Section 1: Configured */}
@@ -4666,7 +5112,7 @@ function SCANProductsPage() {
                             <ProductCard
                                 key={p.product_id} product={p}
                                 installedApps={installedApps} appStatuses={appStatuses}
-                                sourcetypeData={sourcetypeData} isConfigured isComingSoon={false}
+                                sourcetypeData={sourcetypeData} splunkbaseData={splunkbaseData} isConfigured isComingSoon={false}
                                 platformType={platformType}
                                 onToggleConfigured={handleToggleConfigured}
                                 onShowBestPractices={handleShowBestPractices}
@@ -4684,6 +5130,32 @@ function SCANProductsPage() {
             </CollapsiblePanel>
             </div>
 
+            {/* Section 1b: Data Detected — products with flowing sourcetypes not yet configured */}
+            {detectedProducts.length > 0 && (
+                <div id="detected_products">
+                <CollapsiblePanel title={`Data Detected (${detectedProducts.length})`} defaultOpen panelId="detected_products">
+                    <div style={{ padding: '8px 12px', marginBottom: '12px', background: 'var(--vp-bg, #f0f9ff)', borderLeft: '4px solid #049fd9', borderRadius: '4px', fontSize: '13px', color: 'var(--page-color, #333)' }}>
+                        📡 These products have <strong>active sourcetype data flowing</strong> into your Splunk environment but haven't been added to your configured list yet. Click <strong>Add to My Products</strong> to start managing them.
+                    </div>
+                    <div className="csc-card-grid">
+                        {detectedProducts.map((p) => (
+                            <ProductCard
+                                key={p.product_id} product={p}
+                                installedApps={installedApps} appStatuses={appStatuses}
+                                sourcetypeData={sourcetypeData} splunkbaseData={splunkbaseData} isConfigured={false} isComingSoon={false}
+                                platformType={platformType}
+                                onToggleConfigured={handleToggleConfigured}
+                                onShowBestPractices={handleShowBestPractices}
+                                onViewLegacy={handleViewLegacy}
+                                onSetCustomDashboard={handleSetCustomDashboard}
+                                devMode={devMode} onViewConfig={handleOpenConfigViewer}
+                            />
+                        ))}
+                    </div>
+                </CollapsiblePanel>
+                </div>
+            )}
+
             {/* Section 2: Available */}
             <div id="available_products">
             <CollapsiblePanel title={`Available Products (${availableProducts.length})`} defaultOpen panelId="available_products">
@@ -4693,7 +5165,7 @@ function SCANProductsPage() {
                             <ProductCard
                                 key={p.product_id} product={p}
                                 installedApps={installedApps} appStatuses={appStatuses}
-                                sourcetypeData={sourcetypeData} isConfigured={false} isComingSoon={false}
+                                sourcetypeData={sourcetypeData} splunkbaseData={splunkbaseData} isConfigured={false} isComingSoon={false}
                                 platformType={platformType}
                                 onToggleConfigured={handleToggleConfigured}
                                 onShowBestPractices={handleShowBestPractices}
@@ -4723,7 +5195,7 @@ function SCANProductsPage() {
                             <ProductCard
                                 key={p.product_id} product={p}
                                 installedApps={installedApps} appStatuses={appStatuses}
-                                sourcetypeData={sourcetypeData} isConfigured={false} isComingSoon={false}
+                                sourcetypeData={sourcetypeData} splunkbaseData={splunkbaseData} isConfigured={false} isComingSoon={false}
                                 platformType={platformType}
                                 onToggleConfigured={handleToggleConfigured}
                                 onShowBestPractices={handleShowBestPractices}
@@ -4746,7 +5218,7 @@ function SCANProductsPage() {
                             <ProductCard
                                 key={p.product_id} product={p}
                                 installedApps={installedApps} appStatuses={appStatuses}
-                                sourcetypeData={sourcetypeData} isConfigured={false} isComingSoon
+                                sourcetypeData={sourcetypeData} splunkbaseData={splunkbaseData} isConfigured={false} isComingSoon
                                 platformType={platformType}
                                 onToggleConfigured={handleToggleConfigured}
                                 onShowBestPractices={handleShowBestPractices}
@@ -4774,7 +5246,7 @@ function SCANProductsPage() {
                             <ProductCard
                                 key={p.product_id} product={p}
                                 installedApps={installedApps} appStatuses={appStatuses}
-                                sourcetypeData={sourcetypeData} isConfigured={configuredIds.includes(p.product_id)} isComingSoon={false}
+                                sourcetypeData={sourcetypeData} splunkbaseData={splunkbaseData} isConfigured={configuredIds.includes(p.product_id)} isComingSoon={false}
                                 platformType={platformType}
                                 onToggleConfigured={handleToggleConfigured}
                                 onShowBestPractices={handleShowBestPractices}
@@ -4800,7 +5272,7 @@ function SCANProductsPage() {
                             <ProductCard
                                 key={p.product_id} product={p}
                                 installedApps={installedApps} appStatuses={appStatuses}
-                                sourcetypeData={sourcetypeData} isConfigured={configuredIds.includes(p.product_id)} isComingSoon={false}
+                                sourcetypeData={sourcetypeData} splunkbaseData={splunkbaseData} isConfigured={configuredIds.includes(p.product_id)} isComingSoon={false}
                                 platformType={platformType}
                                 onToggleConfigured={handleToggleConfigured}
                                 onShowBestPractices={handleShowBestPractices}
@@ -4826,7 +5298,7 @@ function SCANProductsPage() {
                             <ProductCard
                                 key={p.product_id} product={p}
                                 installedApps={installedApps} appStatuses={appStatuses}
-                                sourcetypeData={sourcetypeData} isConfigured={false} isComingSoon={false}
+                                sourcetypeData={sourcetypeData} splunkbaseData={splunkbaseData} isConfigured={false} isComingSoon={false}
                                 platformType={platformType}
                                 onToggleConfigured={handleToggleConfigured}
                                 onShowBestPractices={handleShowBestPractices}
@@ -4878,6 +5350,51 @@ function SCANProductsPage() {
                 products={products}
             />
             <FeedbackModal open={feedbackOpen} onClose={() => setFeedbackOpen(false)} />
+
+            {/* Usage Guide Modal */}
+            {cardLegendOpen && (
+                <Modal open onRequestClose={() => setCardLegendOpen(false)} style={{ maxWidth: '620px' }}>
+                    <Modal.Header title="How to Use SCAN" onRequestClose={() => setCardLegendOpen(false)} />
+                    <Modal.Body>
+                        <div style={{ fontSize: '13.5px', lineHeight: '1.7', color: 'var(--page-color, #333)' }}>
+
+                            <div style={{ marginBottom: '18px' }}>
+                                <div style={{ fontWeight: 700, fontSize: '15px', marginBottom: '6px', color: '#049fd9' }}>1. Browse the Catalog</div>
+                                <p style={{ margin: 0 }}>Use the <strong>category tabs</strong> (Security, Networking, etc.) to filter products. The <strong>search bar</strong> matches product names, keywords, aliases, and sourcetypes. Use cross-cutting filters like <strong>SOAR</strong>, <strong>AI-Powered</strong>, or <strong>Secure Networking</strong> to narrow results further.</p>
+                            </div>
+
+                            <div style={{ marginBottom: '18px' }}>
+                                <div style={{ fontWeight: 700, fontSize: '15px', marginBottom: '6px', color: '#049fd9' }}>2. Configure Your Products</div>
+                                <p style={{ margin: 0 }}>Click <strong>Add to My Products</strong> on any card to mark it as configured. Configured products appear in a dedicated section at the top. Use the <strong>✅ Supported Only / 📂 All Products</strong> toggle to control which products are shown.</p>
+                            </div>
+
+                            <div style={{ marginBottom: '18px' }}>
+                                <div style={{ fontWeight: 700, fontSize: '15px', marginBottom: '6px', color: '#049fd9' }}>3. Check Data Flow</div>
+                                <p style={{ margin: 0 }}>SCAN automatically detects <strong>sourcetype data flowing</strong> into your Splunk environment (last 7 days). Products with detected data appear in the <strong>Data Detected</strong> section — even if you haven't configured them yet. Green checkmarks on cards indicate live data.</p>
+                            </div>
+
+                            <div style={{ marginBottom: '18px' }}>
+                                <div style={{ fontWeight: 700, fontSize: '15px', marginBottom: '6px', color: '#049fd9' }}>4. Install &amp; Launch</div>
+                                <p style={{ margin: 0 }}>Each card shows <strong>install status</strong> for its add-on, dashboard app, and prerequisites. Click <strong>+ Details</strong> to see the full tech stack. Use <strong>Launch ▾</strong> to jump directly into the Splunk dashboard or Splunkbase page.</p>
+                            </div>
+
+                            <div style={{ marginBottom: '18px' }}>
+                                <div style={{ fontWeight: 700, fontSize: '15px', marginBottom: '6px', color: '#049fd9' }}>5. Best Practices</div>
+                                <p style={{ margin: 0 }}>Click the <strong>?</strong> button on any card for platform-specific best practices and SC4S configuration links. Hover the <strong>ⓘ</strong> icon for product descriptions and value propositions.</p>
+                            </div>
+
+                            <div style={{ marginBottom: '4px' }}>
+                                <div style={{ fontWeight: 700, fontSize: '15px', marginBottom: '6px', color: '#049fd9' }}>6. Roles &amp; Themes</div>
+                                <p style={{ margin: 0 }}>Use the <strong>👤 Role</strong> button to select a persona (SOC Analyst, Network Engineer, etc.) for a curated quick-start. Toggle between <strong>Light</strong>, <strong>Dark</strong>, and <strong>Auto</strong> themes with the theme button.</p>
+                            </div>
+
+                        </div>
+                    </Modal.Body>
+                    <Modal.Footer>
+                        <Button appearance="secondary" label="Close" onClick={() => setCardLegendOpen(false)} />
+                    </Modal.Footer>
+                </Modal>
+            )}
 
             {/* Remove All Confirmation Modal */}
             {removeAllModalOpen && (
