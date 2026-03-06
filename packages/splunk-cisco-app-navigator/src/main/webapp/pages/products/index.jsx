@@ -5471,7 +5471,7 @@ function SCANProductsPage() {
                 onSearch={handleSearchInput}
                 resultCount={filteredProducts.length}
                 totalCount={portfolioProducts.length}
-                products={products}
+                products={portfolioProducts}
                 externalQuery={searchBarQuery}
             />
             <div style={{ marginBottom: '20px' }}>

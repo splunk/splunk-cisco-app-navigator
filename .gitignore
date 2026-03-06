@@ -31,3 +31,4 @@ docs/
 # === Cisco brand assets (large binaries, reference only) ===
 /cisco
 /scripts
+/reference_design

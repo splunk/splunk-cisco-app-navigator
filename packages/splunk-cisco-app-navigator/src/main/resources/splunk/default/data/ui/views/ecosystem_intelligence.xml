@@ -1,623 +1,1089 @@
+
 <dashboard version="2" theme="light">
     <label>Cisco Ecosystem Intelligence</label>
-    <description>Comprehensive analysis of installed Cisco apps, version health, update status, and Splunkbase intelligence — enriched with product catalog data</description>
+    <description>Comprehensive Cisco ecosystem analytics — product catalog health, Splunkbase intelligence, deployment readiness, and compliance</description>
     <definition><![CDATA[
 {
-    "dataSources": {
-        "ds_base_enriched": {
-            "type": "ds.search",
-            "options": {
-                "query": "| rest splunk_server=local /services/apps/local | rename title as appid, label as app_label | fields appid app_label version disabled | join type=left appid [| inputlookup scan_splunkbase_apps | fields appid uid title type support is_archived archive_status app_version product_compatibility version_compatibility categories download_count updated_time] | join type=left appid [| rest splunk_server=local /servicesNS/-/-/configs/conf-products | eval appids=mvappend(addon, app_viz, app_viz_2) | mvexpand appids | eval appid=trim(appids) | where isnotnull(appid) AND appid!=\"\" | dedup appid | rename display_name as cisco_product, category as cisco_category | fields appid cisco_product cisco_category] | eval is_cisco=if(isnotnull(uid), \"Cisco Ecosystem\", \"Other\") | eval update_status=case(isnull(app_version), \"No Splunkbase Data\", version==app_version, \"Current\", 1==1, \"Update Available\") | eval app_health=case(is_archived==\"true\", \"Archived\", archive_status==\"archived_manually\", \"Deprecated\", disabled==\"1\", \"Disabled\", 1==1, \"Active\") | eval days_since_update=if(isnotnull(updated_time), round((now()-updated_time)/86400), null()) | eval staleness=case(isnull(days_since_update), \"Unknown\", days_since_update<=90, \"Fresh\", days_since_update<=365, \"Current\", days_since_update<=730, \"Aging\", 1==1, \"Stale\")",
-                "queryParameters": {
-                    "earliest": "-15m",
-                    "latest": "now"
-                }
-            }
-        },
-        "ds_kpi_total": {
-            "type": "ds.search",
-            "options": {
-                "query": "| stats count as total",
-                "extend": "ds_base_enriched"
-            }
-        },
-        "ds_kpi_cisco": {
-            "type": "ds.search",
-            "options": {
-                "query": "| search is_cisco=\"Cisco Ecosystem\" | stats count as total",
-                "extend": "ds_base_enriched"
-            }
-        },
-        "ds_kpi_other": {
-            "type": "ds.search",
-            "options": {
-                "query": "| search is_cisco=\"Other\" | stats count as total",
-                "extend": "ds_base_enriched"
-            }
-        },
-        "ds_kpi_updates": {
-            "type": "ds.search",
-            "options": {
-                "query": "| search update_status=\"Update Available\" | stats count as total",
-                "extend": "ds_base_enriched"
-            }
-        },
-        "ds_kpi_archived": {
-            "type": "ds.search",
-            "options": {
-                "query": "| search app_health=\"Archived\" OR app_health=\"Deprecated\" | stats count as total",
-                "extend": "ds_base_enriched"
-            }
-        },
-        "ds_pie_ecosystem": {
-            "type": "ds.search",
-            "options": {
-                "query": "| stats count by is_cisco",
-                "extend": "ds_base_enriched"
-            }
-        },
-        "ds_bar_support": {
-            "type": "ds.search",
-            "options": {
-                "query": "| search is_cisco=\"Cisco Ecosystem\" | stats count by support | sort - count",
-                "extend": "ds_base_enriched"
-            }
-        },
-        "ds_col_update": {
-            "type": "ds.search",
-            "options": {
-                "query": "| search is_cisco=\"Cisco Ecosystem\" | stats count by update_status",
-                "extend": "ds_base_enriched"
-            }
-        },
-        "ds_col_staleness": {
-            "type": "ds.search",
-            "options": {
-                "query": "| search is_cisco=\"Cisco Ecosystem\" | stats count by staleness",
-                "extend": "ds_base_enriched"
-            }
-        },
-        "ds_table_cisco": {
-            "type": "ds.search",
-            "options": {
-                "query": "| search is_cisco=\"Cisco Ecosystem\" | rename appid as AppID, app_label as Name, cisco_product as Product, cisco_category as Category, version as Installed, app_version as Latest, update_status as UpdateStatus, app_health as Health, days_since_update as DaysSince | table AppID Name Product Category type support Installed Latest UpdateStatus Health staleness DaysSince | sort 0 type support AppID",
-                "extend": "ds_base_enriched"
-            }
-        },
-        "ds_table_updates": {
-            "type": "ds.search",
-            "options": {
-                "query": "| search is_cisco=\"Cisco Ecosystem\" AND update_status=\"Update Available\" | eval version_gap=version.\" → \".app_version | rename appid as AppID, app_label as Name, cisco_product as Product, support as Support, version as Installed, app_version as Latest, version_gap as Migration, days_since_update as DaysSince | table AppID Name Product Support Installed Latest Migration DaysSince | sort 0 Support AppID",
-                "extend": "ds_base_enriched"
-            }
-        },
-        "ds_bar_type": {
-            "type": "ds.search",
-            "options": {
-                "query": "| search is_cisco=\"Cisco Ecosystem\" | stats count by type | sort - count",
-                "extend": "ds_base_enriched"
-            }
-        },
-        "ds_base_catalog": {
-            "type": "ds.search",
-            "options": {
-                "query": "| rest splunk_server=local /servicesNS/-/-/configs/conf-products | rename eai:acl.app as app | where app=\"splunk-cisco-app-navigator\" | fields title display_name category status support_level addon addon_label sourcetypes ai_enabled secure_networking_gtm soar_connector_label itsi_content_pack_label alert_action_label",
-                "queryParameters": {
-                    "earliest": "-15m",
-                    "latest": "now"
-                }
-            }
-        },
-        "ds_pie_catalog_cat": {
-            "type": "ds.search",
-            "options": {
-                "query": "| stats count by category | sort - count",
-                "extend": "ds_base_catalog"
-            }
-        },
-        "ds_col_catalog_status": {
-            "type": "ds.search",
-            "options": {
-                "query": "| stats count by status | sort - count",
-                "extend": "ds_base_catalog"
-            }
-        },
-        "ds_col_catalog_support": {
-            "type": "ds.search",
-            "options": {
-                "query": "| stats count by support_level | sort - count",
-                "extend": "ds_base_catalog"
-            }
-        },
-        "ds_kpi_catalog_total": {
-            "type": "ds.search",
-            "options": {
-                "query": "| stats count as total",
-                "extend": "ds_base_catalog"
-            }
-        },
-        "ds_kpi_catalog_active": {
-            "type": "ds.search",
-            "options": {
-                "query": "| search status=\"active\" | stats count as total",
-                "extend": "ds_base_catalog"
-            }
-        },
-        "ds_kpi_catalog_soar": {
-            "type": "ds.search",
-            "options": {
-                "query": "| where isnotnull(soar_connector_label) AND soar_connector_label!=\"\" | stats count as total",
-                "extend": "ds_base_catalog"
-            }
-        },
-        "ds_kpi_catalog_ai": {
-            "type": "ds.search",
-            "options": {
-                "query": "| search ai_enabled=\"true\" OR ai_enabled=\"1\" | stats count as total",
-                "extend": "ds_base_catalog"
-            }
-        }
-    },
-    "defaults": {
-        "dataSources": {
-            "ds.search": {
-                "options": {
-                    "queryParameters": {
-                        "earliest": "-15m",
-                        "latest": "now"
-                    }
-                }
-            }
-        }
-    },
-    "inputs": {},
-    "layout": {
-        "type": "absolute",
-        "options": {
-            "display": "auto-scale",
-            "width": 1440,
-            "height": 3200
-        },
-        "structure": [
-            {
-                "item": "viz_header_overview",
-                "type": "block",
-                "position": { "x": 20, "y": 10, "w": 1400, "h": 60 }
-            },
-            {
-                "item": "viz_kpi_total",
-                "type": "block",
-                "position": { "x": 20, "y": 80, "w": 268, "h": 120 }
-            },
-            {
-                "item": "viz_kpi_cisco",
-                "type": "block",
-                "position": { "x": 298, "y": 80, "w": 268, "h": 120 }
-            },
-            {
-                "item": "viz_kpi_other",
-                "type": "block",
-                "position": { "x": 576, "y": 80, "w": 268, "h": 120 }
-            },
-            {
-                "item": "viz_kpi_updates",
-                "type": "block",
-                "position": { "x": 854, "y": 80, "w": 268, "h": 120 }
-            },
-            {
-                "item": "viz_kpi_archived",
-                "type": "block",
-                "position": { "x": 1132, "y": 80, "w": 268, "h": 120 }
-            },
-            {
-                "item": "viz_header_breakdown",
-                "type": "block",
-                "position": { "x": 20, "y": 220, "w": 1400, "h": 50 }
-            },
-            {
-                "item": "viz_pie_ecosystem",
-                "type": "block",
-                "position": { "x": 20, "y": 280, "w": 690, "h": 350 }
-            },
-            {
-                "item": "viz_bar_support",
-                "type": "block",
-                "position": { "x": 730, "y": 280, "w": 690, "h": 350 }
-            },
-            {
-                "item": "viz_header_health",
-                "type": "block",
-                "position": { "x": 20, "y": 650, "w": 1400, "h": 50 }
-            },
-            {
-                "item": "viz_col_update",
-                "type": "block",
-                "position": { "x": 20, "y": 710, "w": 460, "h": 350 }
-            },
-            {
-                "item": "viz_col_staleness",
-                "type": "block",
-                "position": { "x": 500, "y": 710, "w": 460, "h": 350 }
-            },
-            {
-                "item": "viz_bar_type",
-                "type": "block",
-                "position": { "x": 980, "y": 710, "w": 440, "h": 350 }
-            },
-            {
-                "item": "viz_header_inventory",
-                "type": "block",
-                "position": { "x": 20, "y": 1080, "w": 1400, "h": 50 }
-            },
-            {
-                "item": "viz_table_cisco",
-                "type": "block",
-                "position": { "x": 20, "y": 1140, "w": 1400, "h": 500 }
-            },
-            {
-                "item": "viz_header_updates",
-                "type": "block",
-                "position": { "x": 20, "y": 1660, "w": 1400, "h": 50 }
-            },
-            {
-                "item": "viz_table_updates",
-                "type": "block",
-                "position": { "x": 20, "y": 1720, "w": 1400, "h": 400 }
-            },
-            {
-                "item": "viz_header_catalog",
-                "type": "block",
-                "position": { "x": 20, "y": 2140, "w": 1400, "h": 60 }
-            },
-            {
-                "item": "viz_kpi_cat_total",
-                "type": "block",
-                "position": { "x": 20, "y": 2210, "w": 340, "h": 120 }
-            },
-            {
-                "item": "viz_kpi_cat_active",
-                "type": "block",
-                "position": { "x": 380, "y": 2210, "w": 340, "h": 120 }
-            },
-            {
-                "item": "viz_kpi_cat_soar",
-                "type": "block",
-                "position": { "x": 740, "y": 2210, "w": 340, "h": 120 }
-            },
-            {
-                "item": "viz_kpi_cat_ai",
-                "type": "block",
-                "position": { "x": 1100, "y": 2210, "w": 320, "h": 120 }
-            },
-            {
-                "item": "viz_pie_catalog_cat",
-                "type": "block",
-                "position": { "x": 20, "y": 2350, "w": 460, "h": 380 }
-            },
-            {
-                "item": "viz_col_catalog_status",
-                "type": "block",
-                "position": { "x": 500, "y": 2350, "w": 460, "h": 380 }
-            },
-            {
-                "item": "viz_col_catalog_support",
-                "type": "block",
-                "position": { "x": 980, "y": 2350, "w": 440, "h": 380 }
-            }
-        ],
-        "globalInputs": []
-    },
-    "visualizations": {
-        "viz_header_overview": {
-            "type": "splunk.markdown",
-            "options": {
-                "markdown": "## 🔍 Splunk Instance — App Inventory\nAll installed apps cross-referenced with the Splunkbase catalog and SCAN product catalog"
-            }
-        },
-        "viz_kpi_total": {
-            "type": "splunk.singlevalue",
-            "dataSources": {
-                "primary": "ds_kpi_total"
-            },
-            "title": "Total Installed Apps",
-            "options": {
-                "majorColor": "#333333",
-                "backgroundColor": "#f4f5f7",
-                "sparklineDisplay": "off",
-                "trendDisplay": "off",
-                "unit": "apps",
-                "unitPosition": "after"
-            }
-        },
-        "viz_kpi_cisco": {
-            "type": "splunk.singlevalue",
-            "dataSources": {
-                "primary": "ds_kpi_cisco"
-            },
-            "title": "Cisco Ecosystem Apps",
-            "options": {
-                "majorColor": "#049fd9",
-                "backgroundColor": "#e8f6fc",
-                "sparklineDisplay": "off",
-                "trendDisplay": "off",
-                "unit": "apps",
-                "unitPosition": "after"
-            }
-        },
-        "viz_kpi_other": {
-            "type": "splunk.singlevalue",
-            "dataSources": {
-                "primary": "ds_kpi_other"
-            },
-            "title": "Non-Cisco Apps",
-            "options": {
-                "majorColor": "#6B7280",
-                "backgroundColor": "#f0f0f2",
-                "sparklineDisplay": "off",
-                "trendDisplay": "off",
-                "unit": "apps",
-                "unitPosition": "after"
-            }
-        },
-        "viz_kpi_updates": {
-            "type": "splunk.singlevalue",
-            "dataSources": {
-                "primary": "ds_kpi_updates"
-            },
-            "title": "Updates Available",
-            "options": {
-                "majorColor": "#d97706",
-                "backgroundColor": "#fef3c7",
-                "sparklineDisplay": "off",
-                "trendDisplay": "off",
-                "unit": "apps",
-                "unitPosition": "after"
-            }
-        },
-        "viz_kpi_archived": {
-            "type": "splunk.singlevalue",
-            "dataSources": {
-                "primary": "ds_kpi_archived"
-            },
-            "title": "Archived / Deprecated",
-            "options": {
-                "majorColor": "#dc2626",
-                "backgroundColor": "#fef2f2",
-                "sparklineDisplay": "off",
-                "trendDisplay": "off",
-                "unit": "installed",
-                "unitPosition": "after"
-            }
-        },
-        "viz_header_breakdown": {
-            "type": "splunk.markdown",
-            "options": {
-                "markdown": "## 📊 Ecosystem Breakdown\nCisco Ecosystem vs Other installed apps · Support level distribution"
-            }
-        },
-        "viz_pie_ecosystem": {
-            "type": "splunk.pie",
-            "dataSources": {
-                "primary": "ds_pie_ecosystem"
-            },
-            "title": "Cisco Ecosystem vs Other",
-            "options": {
-                "showDonutHole": true,
-                "seriesColors": ["#049fd9", "#94bec4"]
-            }
-        },
-        "viz_bar_support": {
-            "type": "splunk.column",
-            "dataSources": {
-                "primary": "ds_bar_support"
-            },
-            "title": "Support Level (Cisco Apps Only)",
-            "options": {
-                "xAxisTitleVisibility": "hide",
-                "yAxisTitleVisibility": "hide",
-                "seriesColors": ["#049fd9"],
-                "dataValuesDisplay": "all"
-            }
-        },
-        "viz_header_health": {
-            "type": "splunk.markdown",
-            "options": {
-                "markdown": "## 🩺 Version & Update Health\nAre your Cisco apps current? How fresh are the Splunkbase releases?"
-            }
-        },
-        "viz_col_update": {
-            "type": "splunk.column",
-            "dataSources": {
-                "primary": "ds_col_update"
-            },
-            "title": "Update Status",
-            "options": {
-                "xAxisTitleVisibility": "hide",
-                "yAxisTitleVisibility": "hide",
-                "seriesColors": ["#049fd9"],
-                "dataValuesDisplay": "all"
-            }
-        },
-        "viz_col_staleness": {
-            "type": "splunk.column",
-            "dataSources": {
-                "primary": "ds_col_staleness"
-            },
-            "title": "App Freshness",
-            "options": {
-                "xAxisTitleVisibility": "hide",
-                "yAxisTitleVisibility": "hide",
-                "seriesColors": ["#049fd9"],
-                "dataValuesDisplay": "all"
-            }
-        },
-        "viz_bar_type": {
-            "type": "splunk.column",
-            "dataSources": {
-                "primary": "ds_bar_type"
-            },
-            "title": "By App Type",
-            "options": {
-                "xAxisTitleVisibility": "hide",
-                "yAxisTitleVisibility": "hide",
-                "seriesColors": ["#049fd9"],
-                "dataValuesDisplay": "all"
-            }
-        },
-        "viz_header_inventory": {
-            "type": "splunk.markdown",
-            "options": {
-                "markdown": "## 📋 Cisco App Inventory\nEvery installed Cisco ecosystem app — enriched with Splunkbase intelligence and product catalog mapping"
-            }
-        },
-        "viz_table_cisco": {
-            "type": "splunk.table",
-            "dataSources": {
-                "primary": "ds_table_cisco"
-            },
-            "title": "Installed Cisco Ecosystem Apps",
-            "options": {
-                "count": 50,
-                "dataOverlayMode": "none",
-                "drilldown": "none",
-                "showRowNumbers": true,
-                "tableFormat": {
-                    "rowBackgroundColors": "> table | seriesByIndex(0) | pick(#f4f8fb,#ffffff)",
-                    "headerBackgroundColor": "#049fd9",
-                    "headerFontColor": "#ffffff"
-                }
-            }
-        },
-        "viz_header_updates": {
-            "type": "splunk.markdown",
-            "options": {
-                "markdown": "## ⚠️ Apps Needing Update\nCisco ecosystem apps with newer versions available on Splunkbase"
-            }
-        },
-        "viz_table_updates": {
-            "type": "splunk.table",
-            "dataSources": {
-                "primary": "ds_table_updates"
-            },
-            "title": "Update Required — Version Comparison",
-            "options": {
-                "count": 50,
-                "dataOverlayMode": "none",
-                "drilldown": "none",
-                "showRowNumbers": true,
-                "tableFormat": {
-                    "rowBackgroundColors": "> table | seriesByIndex(0) | pick(#fef3c7,#ffffff)",
-                    "headerBackgroundColor": "#d97706",
-                    "headerFontColor": "#ffffff"
-                }
-            }
-        },
-        "viz_header_catalog": {
-            "type": "splunk.markdown",
-            "options": {
-                "markdown": "## 🛡️ Product Catalog Intelligence\nSCAN product catalog analysis — 79 Cisco products across Security, Networking, Observability, and Collaboration"
-            }
-        },
-        "viz_kpi_cat_total": {
-            "type": "splunk.singlevalue",
-            "dataSources": {
-                "primary": "ds_kpi_catalog_total"
-            },
-            "title": "Total Products",
-            "options": {
-                "majorColor": "#049fd9",
-                "backgroundColor": "#e8f6fc",
-                "sparklineDisplay": "off",
-                "trendDisplay": "off",
-                "unit": "products",
-                "unitPosition": "after"
-            }
-        },
-        "viz_kpi_cat_active": {
-            "type": "splunk.singlevalue",
-            "dataSources": {
-                "primary": "ds_kpi_catalog_active"
-            },
-            "title": "Active Products",
-            "options": {
-                "majorColor": "#16a34a",
-                "backgroundColor": "#f0fdf4",
-                "sparklineDisplay": "off",
-                "trendDisplay": "off",
-                "unit": "active",
-                "unitPosition": "after"
-            }
-        },
-        "viz_kpi_cat_soar": {
-            "type": "splunk.singlevalue",
-            "dataSources": {
-                "primary": "ds_kpi_catalog_soar"
-            },
-            "title": "SOAR Connectors",
-            "options": {
-                "majorColor": "#7c3aed",
-                "backgroundColor": "#f5f3ff",
-                "sparklineDisplay": "off",
-                "trendDisplay": "off",
-                "unit": "products",
-                "unitPosition": "after"
-            }
-        },
-        "viz_kpi_cat_ai": {
-            "type": "splunk.singlevalue",
-            "dataSources": {
-                "primary": "ds_kpi_catalog_ai"
-            },
-            "title": "AI-Powered",
-            "options": {
-                "majorColor": "#0891b2",
-                "backgroundColor": "#ecfeff",
-                "sparklineDisplay": "off",
-                "trendDisplay": "off",
-                "unit": "products",
-                "unitPosition": "after"
-            }
-        },
-        "viz_pie_catalog_cat": {
-            "type": "splunk.pie",
-            "dataSources": {
-                "primary": "ds_pie_catalog_cat"
-            },
-            "title": "Products by Category",
-            "options": {
-                "showDonutHole": true,
-                "seriesColors": ["#0284c7", "#16a34a", "#7c3aed", "#d97706"]
-            }
-        },
-        "viz_col_catalog_status": {
-            "type": "splunk.column",
-            "dataSources": {
-                "primary": "ds_col_catalog_status"
-            },
-            "title": "Products by Status",
-            "options": {
-                "xAxisTitleVisibility": "hide",
-                "yAxisTitleVisibility": "hide",
-                "seriesColors": ["#049fd9"],
-                "dataValuesDisplay": "all"
-            }
-        },
-        "viz_col_catalog_support": {
-            "type": "splunk.column",
-            "dataSources": {
-                "primary": "ds_col_catalog_support"
-            },
-            "title": "Products by Support Level",
-            "options": {
-                "xAxisTitleVisibility": "hide",
-                "yAxisTitleVisibility": "hide",
-                "seriesColors": ["#049fd9"],
-                "dataValuesDisplay": "all"
-            }
-        }
-    },
-    "title": "Cisco Ecosystem Intelligence",
-    "description": "Comprehensive analysis of installed Cisco apps, version health, update status, and Splunkbase intelligence — enriched with product catalog data"
+	"title": "Cisco Ecosystem Intelligence",
+	"description": "Comprehensive Cisco ecosystem analytics — product catalog health, Splunkbase intelligence, deployment readiness, and compliance",
+	"inputs": {},
+	"defaults": {
+		"dataSources": {
+			"ds.search": {
+				"options": {
+					"queryParameters": {
+						"earliest": "-15m",
+						"latest": "now"
+					}
+				}
+			}
+		}
+	},
+	"visualizations": {
+		"viz_header_health": {
+			"options": {
+				"markdown": "## 📊 Ecosystem Health\nCisco product catalog rollup — 79 products across Security, Networking, Observability, and Collaboration"
+			},
+			"type": "splunk.markdown"
+		},
+		"viz_kpi_total": {
+			"dataSources": {
+				"primary": "ds_kpi_total_products"
+			},
+			"options": {
+				"backgroundColor": "#e8f6fc",
+				"majorColor": "#049fd9",
+				"sparklineDisplay": "off",
+				"trendDisplay": "off",
+				"unit": "products",
+				"unitPosition": "after"
+			},
+			"title": "Total Products",
+			"type": "splunk.singlevalue"
+		},
+		"viz_kpi_active": {
+			"dataSources": {
+				"primary": "ds_kpi_active"
+			},
+			"options": {
+				"backgroundColor": "#f0fdf4",
+				"majorColor": "#16a34a",
+				"sparklineDisplay": "off",
+				"trendDisplay": "off",
+				"unit": "active",
+				"unitPosition": "after"
+			},
+			"title": "Active Products",
+			"type": "splunk.singlevalue"
+		},
+		"viz_kpi_sourcetypes": {
+			"dataSources": {
+				"primary": "ds_kpi_sourcetypes"
+			},
+			"options": {
+				"backgroundColor": "#f5f3ff",
+				"majorColor": "#7c3aed",
+				"sparklineDisplay": "off",
+				"trendDisplay": "off",
+				"unit": "sourcetypes",
+				"unitPosition": "after"
+			},
+			"title": "Total Sourcetypes",
+			"type": "splunk.singlevalue"
+		},
+		"viz_kpi_families": {
+			"dataSources": {
+				"primary": "ds_kpi_addon_families"
+			},
+			"options": {
+				"backgroundColor": "#ecfeff",
+				"majorColor": "#0891b2",
+				"sparklineDisplay": "off",
+				"trendDisplay": "off",
+				"unit": "families",
+				"unitPosition": "after"
+			},
+			"title": "Add-on Families",
+			"type": "splunk.singlevalue"
+		},
+		"viz_kpi_viz": {
+			"dataSources": {
+				"primary": "ds_kpi_viz_apps"
+			},
+			"options": {
+				"backgroundColor": "#eef2ff",
+				"majorColor": "#4f46e5",
+				"sparklineDisplay": "off",
+				"trendDisplay": "off",
+				"unit": "products",
+				"unitPosition": "after"
+			},
+			"title": "With Viz Apps",
+			"type": "splunk.singlevalue"
+		},
+		"viz_kpi_soar": {
+			"dataSources": {
+				"primary": "ds_kpi_soar"
+			},
+			"options": {
+				"backgroundColor": "#f5f3ff",
+				"majorColor": "#7c3aed",
+				"sparklineDisplay": "off",
+				"trendDisplay": "off",
+				"unit": "products",
+				"unitPosition": "after"
+			},
+			"title": "SOAR-Enabled",
+			"type": "splunk.singlevalue"
+		},
+		"viz_kpi_alert": {
+			"dataSources": {
+				"primary": "ds_kpi_alert_actions"
+			},
+			"options": {
+				"backgroundColor": "#fef3c7",
+				"majorColor": "#d97706",
+				"sparklineDisplay": "off",
+				"trendDisplay": "off",
+				"unit": "products",
+				"unitPosition": "after"
+			},
+			"title": "Alert Actions",
+			"type": "splunk.singlevalue"
+		},
+		"viz_kpi_legacy": {
+			"dataSources": {
+				"primary": "ds_kpi_legacy"
+			},
+			"options": {
+				"backgroundColor": "#fef9c3",
+				"majorColor": "#b45309",
+				"sparklineDisplay": "off",
+				"trendDisplay": "off",
+				"unit": "to migrate",
+				"unitPosition": "after"
+			},
+			"title": "Legacy Apps",
+			"type": "splunk.singlevalue"
+		},
+		"viz_kpi_deprecated": {
+			"dataSources": {
+				"primary": "ds_kpi_deprecated"
+			},
+			"options": {
+				"backgroundColor": "#fef2f2",
+				"majorColor": "#dc2626",
+				"sparklineDisplay": "off",
+				"trendDisplay": "off",
+				"unit": "products",
+				"unitPosition": "after"
+			},
+			"title": "Deprecated",
+			"type": "splunk.singlevalue"
+		},
+		"viz_header_portfolio": {
+			"options": {
+				"markdown": "## 🏢 Portfolio Analysis\nCategory distribution, lifecycle status, and support level across the Cisco product catalog"
+			},
+			"type": "splunk.markdown"
+		},
+		"viz_pie_category": {
+			"dataSources": {
+				"primary": "ds_chart_category"
+			},
+			"options": {
+				"seriesColors": [
+					"#0284c7",
+					"#16a34a",
+					"#7c3aed",
+					"#d97706"
+				],
+				"showDonutHole": true
+			},
+			"title": "Products by Category",
+			"type": "splunk.pie"
+		},
+		"viz_col_status": {
+			"dataSources": {
+				"primary": "ds_chart_status"
+			},
+			"options": {
+				"dataValuesDisplay": "all",
+				"seriesColors": [
+					"#049fd9"
+				],
+				"xAxisTitleVisibility": "hide",
+				"yAxisTitleVisibility": "hide"
+			},
+			"title": "Products by Status",
+			"type": "splunk.column"
+		},
+		"viz_col_support": {
+			"dataSources": {
+				"primary": "ds_chart_support"
+			},
+			"options": {
+				"dataValuesDisplay": "all",
+				"seriesColors": [
+					"#049fd9"
+				],
+				"xAxisTitleVisibility": "hide",
+				"yAxisTitleVisibility": "hide"
+			},
+			"title": "Support Level",
+			"type": "splunk.column"
+		},
+		"viz_header_soar": {
+			"options": {
+				"markdown": "## 🤖 SOAR Connector Inventory\nCisco products with Splunk SOAR automation connectors — identify automation opportunities across your Cisco estate"
+			},
+			"type": "splunk.markdown"
+		},
+		"viz_table_soar": {
+			"dataSources": {
+				"primary": "ds_table_soar"
+			},
+			"options": {
+				"count": 20,
+				"dataOverlayMode": "none",
+				"drilldown": "none",
+				"showRowNumbers": true,
+				"tableFormat": {
+					"headerBackgroundColor": "#7c3aed",
+					"headerFontColor": "#ffffff",
+					"rowBackgroundColors": "> table | seriesByIndex(0) | pick(#f5f3ff,#ffffff)"
+				}
+			},
+			"title": "Products with SOAR Connectors",
+			"type": "splunk.table"
+		},
+		"viz_header_addon_family": {
+			"options": {
+				"markdown": "## 📦 Add-on Family Overview\nProducts grouped by shared Splunk add-on — multiple Cisco products often share a single TA for data collection"
+			},
+			"type": "splunk.markdown"
+		},
+		"viz_table_addon_family": {
+			"dataSources": {
+				"primary": "ds_table_addon_family"
+			},
+			"options": {
+				"count": 25,
+				"dataOverlayMode": "none",
+				"drilldown": "none",
+				"showRowNumbers": true,
+				"tableFormat": {
+					"headerBackgroundColor": "#0891b2",
+					"headerFontColor": "#ffffff",
+					"rowBackgroundColors": "> table | seriesByIndex(0) | pick(#ecfeff,#ffffff)"
+				}
+			},
+			"title": "Add-on Families & Shared Products",
+			"type": "splunk.table"
+		},
+		"viz_header_quality": {
+			"options": {
+				"markdown": "## 🔍 Data Quality Audit\nProducts with missing critical fields in the SCAN catalog — run after catalog edits to catch data quality issues"
+			},
+			"type": "splunk.markdown"
+		},
+		"viz_table_quality": {
+			"dataSources": {
+				"primary": "ds_table_quality"
+			},
+			"options": {
+				"count": 30,
+				"dataOverlayMode": "none",
+				"drilldown": "none",
+				"showRowNumbers": true,
+				"tableFormat": {
+					"headerBackgroundColor": "#ea580c",
+					"headerFontColor": "#ffffff",
+					"rowBackgroundColors": "> table | seriesByIndex(0) | pick(#fff7ed,#ffffff)"
+				}
+			},
+			"title": "Missing Fields Audit",
+			"type": "splunk.table"
+		},
+		"viz_header_splunkbase": {
+			"options": {
+				"markdown": "## 🌐 Cisco Splunkbase Intelligence\nApp freshness, platform compatibility, and download analytics for the Cisco ecosystem apps on Splunkbase — filtered exclusively to apps referenced in the SCAN product catalog"
+			},
+			"type": "splunk.markdown"
+		},
+		"viz_kpi_live_apps": {
+			"dataSources": {
+				"primary": "ds_kpi_cisco_live"
+			},
+			"options": {
+				"backgroundColor": "#f0fdf4",
+				"majorColor": "#16a34a",
+				"sparklineDisplay": "off",
+				"trendDisplay": "off",
+				"unit": "live",
+				"unitPosition": "after"
+			},
+			"title": "Cisco Apps (Live)",
+			"type": "splunk.singlevalue"
+		},
+		"viz_kpi_archived_apps": {
+			"dataSources": {
+				"primary": "ds_kpi_cisco_archived"
+			},
+			"options": {
+				"backgroundColor": "#fef2f2",
+				"majorColor": "#dc2626",
+				"sparklineDisplay": "off",
+				"trendDisplay": "off",
+				"unit": "archived",
+				"unitPosition": "after"
+			},
+			"title": "Cisco Apps (Archived)",
+			"type": "splunk.singlevalue"
+		},
+		"viz_kpi_total_downloads": {
+			"dataSources": {
+				"primary": "ds_kpi_cisco_downloads"
+			},
+			"options": {
+				"backgroundColor": "#eef2ff",
+				"majorColor": "#4f46e5",
+				"sparklineDisplay": "off",
+				"trendDisplay": "off",
+				"unit": "downloads",
+				"unitPosition": "after"
+			},
+			"title": "Total Downloads",
+			"type": "splunk.singlevalue"
+		},
+		"viz_pie_freshness": {
+			"dataSources": {
+				"primary": "ds_cisco_freshness"
+			},
+			"options": {
+				"seriesColors": [
+					"#22c55e",
+					"#eab308",
+					"#f97316",
+					"#ef4444"
+				],
+				"showDonutHole": true
+			},
+			"title": "Cisco App Freshness",
+			"type": "splunk.pie"
+		},
+		"viz_pie_platform": {
+			"dataSources": {
+				"primary": "ds_cisco_platform"
+			},
+			"options": {
+				"seriesColors": [
+					"#0891b2",
+					"#0284c7",
+					"#16a34a",
+					"#9ca3af"
+				],
+				"showDonutHole": true
+			},
+			"title": "Platform Compatibility",
+			"type": "splunk.pie"
+		},
+		"viz_bar_downloads": {
+			"dataSources": {
+				"primary": "ds_cisco_top_downloads"
+			},
+			"options": {
+				"dataValuesDisplay": "all",
+				"seriesColors": [
+					"#049fd9"
+				],
+				"xAxisTitleVisibility": "hide",
+				"yAxisTitleVisibility": "hide"
+			},
+			"title": "Top 10 Cisco Apps by Downloads",
+			"type": "splunk.bar"
+		},
+		"viz_header_installed": {
+			"options": {
+				"markdown": "## 📋 Installed Cisco Estate\nLocally installed Splunk apps cross-referenced against the Cisco product catalog — shows add-on deployment status and legacy TA presence"
+			},
+			"type": "splunk.markdown"
+		},
+		"viz_table_installed": {
+			"dataSources": {
+				"primary": "ds_table_installed"
+			},
+			"options": {
+				"count": 50,
+				"dataOverlayMode": "none",
+				"drilldown": "none",
+				"showRowNumbers": true,
+				"tableFormat": {
+					"headerBackgroundColor": "#049fd9",
+					"headerFontColor": "#ffffff",
+					"rowBackgroundColors": "> table | seriesByIndex(0) | pick(#f4f8fb,#ffffff)"
+				}
+			},
+			"title": "Cisco Add-on Deployment Status",
+			"type": "splunk.table"
+		},
+		"viz_header_version": {
+			"options": {
+				"markdown": "## 🔄 Version & Update Health\nCisco ecosystem apps sorted by days since last Splunkbase update — identify stale integrations requiring attention"
+			},
+			"type": "splunk.markdown"
+		},
+		"viz_table_version": {
+			"dataSources": {
+				"primary": "ds_cisco_version"
+			},
+			"options": {
+				"count": 25,
+				"dataOverlayMode": "none",
+				"drilldown": "none",
+				"showRowNumbers": true,
+				"tableFormat": {
+					"headerBackgroundColor": "#d97706",
+					"headerFontColor": "#ffffff",
+					"rowBackgroundColors": "> table | seriesByIndex(0) | pick(#fef9ee,#ffffff)"
+				}
+			},
+			"title": "Cisco Apps — Staleness Tracker",
+			"type": "splunk.table"
+		},
+		"viz_header_migration": {
+			"options": {
+				"markdown": "## 📦 Migration Planning\nDeprecated and archived Cisco apps mapped to their modern replacements — essential for planning TA migrations"
+			},
+			"type": "splunk.markdown"
+		},
+		"viz_table_migration": {
+			"dataSources": {
+				"primary": "ds_table_migration"
+			},
+			"options": {
+				"count": 30,
+				"dataOverlayMode": "none",
+				"drilldown": "none",
+				"showRowNumbers": true,
+				"tableFormat": {
+					"headerBackgroundColor": "#dc2626",
+					"headerFontColor": "#ffffff",
+					"rowBackgroundColors": "> table | seriesByIndex(0) | pick(#fef2f2,#ffffff)"
+				}
+			},
+			"title": "Deprecated App Migration Paths",
+			"type": "splunk.table"
+		},
+		"viz_header_compliance": {
+			"options": {
+				"markdown": "## ✅ Compliance & Validation\nAppInspect, FedRAMP, and FIPS validation status for Cisco ecosystem apps on Splunkbase"
+			},
+			"type": "splunk.markdown"
+		},
+		"viz_table_compliance": {
+			"dataSources": {
+				"primary": "ds_cisco_compliance"
+			},
+			"options": {
+				"count": 30,
+				"dataOverlayMode": "none",
+				"drilldown": "none",
+				"showRowNumbers": true,
+				"tableFormat": {
+					"headerBackgroundColor": "#16a34a",
+					"headerFontColor": "#ffffff",
+					"rowBackgroundColors": "> table | seriesByIndex(0) | pick(#f0fdf4,#ffffff)"
+				}
+			},
+			"title": "Cisco Validation & Compliance Status",
+			"type": "splunk.table"
+		}
+	},
+	"dataSources": {
+		"ds_ecosystem_summary": {
+			"name": "Ecosystem Summary",
+			"options": {
+				"query": "| savedsearch \"SCAN - Ecosystem Summary\"",
+				"queryParameters": {
+					"earliest": "-15m",
+					"latest": "now"
+				}
+			},
+			"type": "ds.search"
+		},
+		"ds_kpi_total_products": {
+			"name": "KPI Total Products",
+			"options": {
+				"extend": "ds_ecosystem_summary",
+				"query": "| fields total_products | rename total_products as total"
+			},
+			"type": "ds.chain"
+		},
+		"ds_kpi_active": {
+			"name": "KPI Active Products",
+			"options": {
+				"extend": "ds_ecosystem_summary",
+				"query": "| fields active | rename active as total"
+			},
+			"type": "ds.chain"
+		},
+		"ds_kpi_sourcetypes": {
+			"name": "KPI Sourcetypes",
+			"options": {
+				"extend": "ds_ecosystem_summary",
+				"query": "| fields total_sourcetypes | rename total_sourcetypes as total"
+			},
+			"type": "ds.chain"
+		},
+		"ds_kpi_addon_families": {
+			"name": "KPI Add-on Families",
+			"options": {
+				"extend": "ds_ecosystem_summary",
+				"query": "| fields addon_families | rename addon_families as total"
+			},
+			"type": "ds.chain"
+		},
+		"ds_kpi_viz_apps": {
+			"name": "KPI Viz Apps",
+			"options": {
+				"extend": "ds_ecosystem_summary",
+				"query": "| fields products_with_viz_app | rename products_with_viz_app as total"
+			},
+			"type": "ds.chain"
+		},
+		"ds_kpi_soar": {
+			"name": "KPI SOAR-Enabled",
+			"options": {
+				"extend": "ds_ecosystem_summary",
+				"query": "| fields products_with_soar | rename products_with_soar as total"
+			},
+			"type": "ds.chain"
+		},
+		"ds_kpi_alert_actions": {
+			"name": "KPI Alert Actions",
+			"options": {
+				"extend": "ds_ecosystem_summary",
+				"query": "| fields products_with_alert_action | rename products_with_alert_action as total"
+			},
+			"type": "ds.chain"
+		},
+		"ds_kpi_legacy": {
+			"name": "KPI Legacy Apps",
+			"options": {
+				"extend": "ds_ecosystem_summary",
+				"query": "| fields total_legacy_apps | rename total_legacy_apps as total"
+			},
+			"type": "ds.chain"
+		},
+		"ds_kpi_deprecated": {
+			"name": "KPI Deprecated",
+			"options": {
+				"extend": "ds_ecosystem_summary",
+				"query": "| fields deprecated | rename deprecated as total"
+			},
+			"type": "ds.chain"
+		},
+		"ds_chart_category": {
+			"name": "Chart Products by Category",
+			"options": {
+				"query": "| savedsearch \"SCAN - Product Catalog - By Category\" | fields category total | rename total as Count"
+			},
+			"type": "ds.search"
+		},
+		"ds_chart_status": {
+			"name": "Chart Products by Status",
+			"options": {
+				"extend": "ds_ecosystem_summary",
+				"query": "| eval _r=1 | table _r active deprecated coming_soon | rename active as Active, deprecated as Deprecated, coming_soon as \"Under Development\" | untable _r Status Count | fields Status Count"
+			},
+			"type": "ds.chain"
+		},
+		"ds_chart_support": {
+			"name": "Chart Support Level",
+			"options": {
+				"query": "| rest splunk_server=local /servicesNS/-/-/configs/conf-products | fields support_level | eval Support=case(support_level==\"cisco_supported\",\"Cisco\",support_level==\"splunk_supported\",\"Splunk\",support_level==\"developer_supported\",\"Developer\",support_level==\"community_supported\",\"Community\",1==1,\"Not Supported\") | stats count as Count by Support | sort - Count"
+			},
+			"type": "ds.search"
+		},
+		"ds_table_soar": {
+			"name": "Table SOAR Inventory",
+			"options": {
+				"query": "| savedsearch \"SCAN - SOAR Connector Inventory\""
+			},
+			"type": "ds.search"
+		},
+		"ds_table_addon_family": {
+			"name": "Table Add-on Families",
+			"options": {
+				"query": "| savedsearch \"SCAN - Product Catalog - By Add-on Family\""
+			},
+			"type": "ds.search"
+		},
+		"ds_table_quality": {
+			"name": "Table Data Quality Audit",
+			"options": {
+				"query": "| savedsearch \"SCAN - Data Quality - Missing Fields Audit\""
+			},
+			"type": "ds.search"
+		},
+		"ds_cisco_splunkbase": {
+			"name": "Cisco Splunkbase Ecosystem",
+			"options": {
+				"query": "| savedsearch \"SCAN - Cisco Splunkbase Ecosystem\"",
+				"queryParameters": {
+					"earliest": "-15m",
+					"latest": "now"
+				}
+			},
+			"type": "ds.search"
+		},
+		"ds_kpi_cisco_live": {
+			"name": "KPI Cisco Live Apps",
+			"options": {
+				"extend": "ds_cisco_splunkbase",
+				"query": "| search is_archived=false type IN (\"app\",\"addon\") | stats count as total"
+			},
+			"type": "ds.chain"
+		},
+		"ds_kpi_cisco_archived": {
+			"name": "KPI Cisco Archived Apps",
+			"options": {
+				"extend": "ds_cisco_splunkbase",
+				"query": "| search is_archived=true | stats count as total"
+			},
+			"type": "ds.chain"
+		},
+		"ds_kpi_cisco_downloads": {
+			"name": "KPI Cisco Total Downloads",
+			"options": {
+				"extend": "ds_cisco_splunkbase",
+				"query": "| search is_archived=false | eval dl=tonumber(download_count) | stats sum(dl) as total"
+			},
+			"type": "ds.chain"
+		},
+		"ds_cisco_freshness": {
+			"name": "Chart Cisco App Freshness",
+			"options": {
+				"extend": "ds_cisco_splunkbase",
+				"query": "| search is_archived=false type IN (\"app\",\"addon\") | eval days=round((now()-updated_time)/86400) | eval health=case(days<=180,\"🟢 Fresh\",days<=365,\"🟡 Current\",days<=730,\"🟠 Aging\",1==1,\"🔴 Stale\") | stats count by health | sort - count"
+			},
+			"type": "ds.chain"
+		},
+		"ds_cisco_platform": {
+			"name": "Chart Cisco Platform Compatibility",
+			"options": {
+				"extend": "ds_cisco_splunkbase",
+				"query": "| search is_archived=false type IN (\"app\",\"addon\") | eval platform=case(like(product_compatibility,\"%Cloud%\") AND like(product_compatibility,\"%Enterprise%\"),\"Cloud + Enterprise\",like(product_compatibility,\"%Cloud%\"),\"Cloud Only\",like(product_compatibility,\"%Enterprise%\"),\"Enterprise Only\",1==1,\"Unknown\") | stats count by platform"
+			},
+			"type": "ds.chain"
+		},
+		"ds_cisco_top_downloads": {
+			"name": "Chart Cisco Top Downloads",
+			"options": {
+				"extend": "ds_cisco_splunkbase",
+				"query": "| search is_archived=false type IN (\"app\",\"addon\") | eval downloads=tonumber(download_count) | sort - downloads | head 10 | fields title downloads | rename title as App, downloads as Downloads"
+			},
+			"type": "ds.chain"
+		},
+		"ds_table_installed": {
+			"name": "Table Installed Cisco Estate",
+			"options": {
+				"query": "| savedsearch \"SCAN - Installed Apps vs Catalog\""
+			},
+			"type": "ds.search"
+		},
+		"ds_cisco_version": {
+			"name": "Table Cisco Version Tracker",
+			"options": {
+				"extend": "ds_cisco_splunkbase",
+				"query": "| search is_archived=false | eval days=round((now()-updated_time)/86400) | eval staleness=case(days<=90,\"🟢 Fresh\",days<=365,\"🟡 Current\",days<=730,\"🟠 Aging\",1==1,\"🔴 Stale\") | eval updated_date=strftime(updated_time,\"%Y-%m-%d\") | table title type support app_version days staleness updated_date | sort - days | head 30"
+			},
+			"type": "ds.chain"
+		},
+		"ds_table_migration": {
+			"name": "Table Migration Map",
+			"options": {
+				"query": "| savedsearch \"SCAN - Deprecated Migration Map\""
+			},
+			"type": "ds.search"
+		},
+		"ds_cisco_compliance": {
+			"name": "Table Cisco Compliance",
+			"options": {
+				"extend": "ds_cisco_splunkbase",
+				"query": "| search is_archived=false type IN (\"app\",\"addon\") | eval validation_status=case(passed_validation==\"true\" AND appinspect_passed==\"true\",\"✅ Fully Validated\",passed_validation==\"true\",\"✅ Passed Validation\",appinspect_passed==\"true\",\"⚠️ AppInspect Only\",1==1,\"❌ Not Validated\") | eval compliance=mvappend(if(fedramp_validation==\"yes\",\"FedRAMP\",null()),if(fips_compatibility==\"yes\",\"FIPS\",null())) | table title type support validation_status compliance app_version | sort 0 validation_status title"
+			},
+			"type": "ds.chain"
+		}
+	},
+	"layout": {
+		"globalInputs": [],
+		"layoutDefinitions": {
+			"layout_tab1": {
+				"options": {
+					"display": "auto-scale",
+					"height": 1840,
+					"width": 1440
+				},
+				"structure": [
+					{
+						"item": "viz_header_health",
+						"position": {
+							"h": 50,
+							"w": 1400,
+							"x": 20,
+							"y": 10
+						},
+						"type": "block"
+					},
+					{
+						"item": "viz_kpi_total",
+						"position": {
+							"h": 110,
+							"w": 272,
+							"x": 20,
+							"y": 70
+						},
+						"type": "block"
+					},
+					{
+						"item": "viz_kpi_active",
+						"position": {
+							"h": 110,
+							"w": 272,
+							"x": 302,
+							"y": 70
+						},
+						"type": "block"
+					},
+					{
+						"item": "viz_kpi_sourcetypes",
+						"position": {
+							"h": 110,
+							"w": 272,
+							"x": 584,
+							"y": 70
+						},
+						"type": "block"
+					},
+					{
+						"item": "viz_kpi_families",
+						"position": {
+							"h": 110,
+							"w": 272,
+							"x": 866,
+							"y": 70
+						},
+						"type": "block"
+					},
+					{
+						"item": "viz_kpi_viz",
+						"position": {
+							"h": 110,
+							"w": 272,
+							"x": 1148,
+							"y": 70
+						},
+						"type": "block"
+					},
+					{
+						"item": "viz_kpi_soar",
+						"position": {
+							"h": 110,
+							"w": 342,
+							"x": 20,
+							"y": 190
+						},
+						"type": "block"
+					},
+					{
+						"item": "viz_kpi_alert",
+						"position": {
+							"h": 110,
+							"w": 342,
+							"x": 372,
+							"y": 190
+						},
+						"type": "block"
+					},
+					{
+						"item": "viz_kpi_legacy",
+						"position": {
+							"h": 110,
+							"w": 342,
+							"x": 724,
+							"y": 190
+						},
+						"type": "block"
+					},
+					{
+						"item": "viz_kpi_deprecated",
+						"position": {
+							"h": 110,
+							"w": 344,
+							"x": 1076,
+							"y": 190
+						},
+						"type": "block"
+					},
+					{
+						"item": "viz_header_portfolio",
+						"position": {
+							"h": 45,
+							"w": 1400,
+							"x": 20,
+							"y": 310
+						},
+						"type": "block"
+					},
+					{
+						"item": "viz_pie_category",
+						"position": {
+							"h": 320,
+							"w": 453,
+							"x": 20,
+							"y": 365
+						},
+						"type": "block"
+					},
+					{
+						"item": "viz_col_status",
+						"position": {
+							"h": 320,
+							"w": 453,
+							"x": 493,
+							"y": 365
+						},
+						"type": "block"
+					},
+					{
+						"item": "viz_col_support",
+						"position": {
+							"h": 320,
+							"w": 454,
+							"x": 966,
+							"y": 365
+						},
+						"type": "block"
+					},
+					{
+						"item": "viz_header_soar",
+						"position": {
+							"h": 45,
+							"w": 1400,
+							"x": 20,
+							"y": 695
+						},
+						"type": "block"
+					},
+					{
+						"item": "viz_table_soar",
+						"position": {
+							"h": 300,
+							"w": 1400,
+							"x": 20,
+							"y": 750
+						},
+						"type": "block"
+					},
+					{
+						"item": "viz_header_addon_family",
+						"position": {
+							"h": 45,
+							"w": 1400,
+							"x": 20,
+							"y": 1060
+						},
+						"type": "block"
+					},
+					{
+						"item": "viz_table_addon_family",
+						"position": {
+							"h": 350,
+							"w": 1400,
+							"x": 20,
+							"y": 1115
+						},
+						"type": "block"
+					},
+					{
+						"item": "viz_header_quality",
+						"position": {
+							"h": 45,
+							"w": 1400,
+							"x": 20,
+							"y": 1475
+						},
+						"type": "block"
+					},
+					{
+						"item": "viz_table_quality",
+						"position": {
+							"h": 300,
+							"w": 1400,
+							"x": 20,
+							"y": 1530
+						},
+						"type": "block"
+					}
+				],
+				"type": "absolute"
+			},
+			"layout_tab2": {
+				"options": {
+					"display": "auto-scale",
+					"height": 2230,
+					"width": 1440
+				},
+				"structure": [
+					{
+						"item": "viz_header_splunkbase",
+						"position": {
+							"h": 50,
+							"w": 1400,
+							"x": 20,
+							"y": 10
+						},
+						"type": "block"
+					},
+					{
+						"item": "viz_kpi_live_apps",
+						"position": {
+							"h": 110,
+							"w": 453,
+							"x": 20,
+							"y": 70
+						},
+						"type": "block"
+					},
+					{
+						"item": "viz_kpi_archived_apps",
+						"position": {
+							"h": 110,
+							"w": 453,
+							"x": 493,
+							"y": 70
+						},
+						"type": "block"
+					},
+					{
+						"item": "viz_kpi_total_downloads",
+						"position": {
+							"h": 110,
+							"w": 454,
+							"x": 966,
+							"y": 70
+						},
+						"type": "block"
+					},
+					{
+						"item": "viz_pie_freshness",
+						"position": {
+							"h": 320,
+							"w": 453,
+							"x": 20,
+							"y": 190
+						},
+						"type": "block"
+					},
+					{
+						"item": "viz_pie_platform",
+						"position": {
+							"h": 320,
+							"w": 453,
+							"x": 493,
+							"y": 190
+						},
+						"type": "block"
+					},
+					{
+						"item": "viz_bar_downloads",
+						"position": {
+							"h": 320,
+							"w": 454,
+							"x": 966,
+							"y": 190
+						},
+						"type": "block"
+					},
+					{
+						"item": "viz_header_installed",
+						"position": {
+							"h": 45,
+							"w": 1400,
+							"x": 20,
+							"y": 520
+						},
+						"type": "block"
+					},
+					{
+						"item": "viz_table_installed",
+						"position": {
+							"h": 400,
+							"w": 1400,
+							"x": 20,
+							"y": 575
+						},
+						"type": "block"
+					},
+					{
+						"item": "viz_header_version",
+						"position": {
+							"h": 45,
+							"w": 1400,
+							"x": 20,
+							"y": 985
+						},
+						"type": "block"
+					},
+					{
+						"item": "viz_table_version",
+						"position": {
+							"h": 350,
+							"w": 1400,
+							"x": 20,
+							"y": 1040
+						},
+						"type": "block"
+					},
+					{
+						"item": "viz_header_migration",
+						"position": {
+							"h": 45,
+							"w": 1400,
+							"x": 20,
+							"y": 1400
+						},
+						"type": "block"
+					},
+					{
+						"item": "viz_table_migration",
+						"position": {
+							"h": 350,
+							"w": 1400,
+							"x": 20,
+							"y": 1455
+						},
+						"type": "block"
+					},
+					{
+						"item": "viz_header_compliance",
+						"position": {
+							"h": 45,
+							"w": 1400,
+							"x": 20,
+							"y": 1815
+						},
+						"type": "block"
+					},
+					{
+						"item": "viz_table_compliance",
+						"position": {
+							"h": 350,
+							"w": 1400,
+							"x": 20,
+							"y": 1870
+						},
+						"type": "block"
+					}
+				],
+				"type": "absolute"
+			}
+		},
+		"tabs": {
+			"items": [
+				{
+					"label": "Product Intelligence",
+					"layoutId": "layout_tab1"
+				},
+				{
+					"label": "Splunkbase & Operations",
+					"layoutId": "layout_tab2"
+				}
+			]
+		}
+	}
 }
     ]]></definition>
 </dashboard>
