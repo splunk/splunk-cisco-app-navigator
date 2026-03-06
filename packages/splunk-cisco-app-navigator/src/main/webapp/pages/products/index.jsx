@@ -461,7 +461,7 @@ function buildSourcetypePatterns(sourcetypes) {
 async function detectAllSourcetypeData(products) {
     const noData = { hasData: false, eventCount: 0, detail: 'No sourcetypes defined' };
     const withST = products.filter(p => p.sourcetypes && p.sourcetypes.length > 0);
-    if (withST.length === 0) { console.log('[SCAN] Detection skipped — no products have sourcetypes'); return {}; }
+    if (withST.length === 0) { /* console.log('[SCAN] Detection skipped — no products have sourcetypes'); */ return {}; }
     const csrf = getCSRFToken();
     if (!csrf) {
         console.warn('[SCAN] Detection skipped — CSRF token unavailable');
@@ -469,16 +469,16 @@ async function detectAllSourcetypeData(products) {
         withST.forEach(p => { r[p.product_id] = { hasData: false, eventCount: 0, detail: 'CSRF token unavailable' }; });
         return r;
     }
-    console.log(`[SCAN] Starting sourcetype detection for ${withST.length} products with sourcetypes...`);
+    // console.log(`[SCAN] Starting sourcetype detection for ${withST.length} products with sourcetypes...`);
     try {
         const searchStr = '| metadata type=sourcetypes | where lastTime > relative_time(now(), "-7d") | table sourcetype totalCount';
-        console.log(`[SCAN] Search: ${searchStr}`);
+        // console.log(`[SCAN] Search: ${searchStr}`);
         const res = await splunkFetch(SEARCH_ENDPOINT, {
             method: 'POST',
             headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
             body: `search=${encodeURIComponent(searchStr)}&output_mode=json&exec_mode=oneshot&count=0&timeout=120`,
         });
-        console.log(`[SCAN] Response status: ${res.status} ${res.statusText}`);
+        // console.log(`[SCAN] Response status: ${res.status} ${res.statusText}`);
         if (!res.ok) {
             const errText = await res.text();
             console.error(`[SCAN] Search failed (HTTP ${res.status}):`, errText.substring(0, 500));
@@ -494,11 +494,11 @@ async function detectAllSourcetypeData(products) {
             withST.forEach(p => { r[p.product_id] = { hasData: false, eventCount: 0, detail: 'Invalid response from Splunk' }; });
             return r;
         }
-        console.log(`[SCAN] Response keys: ${Object.keys(data).join(', ')}`);
+        // console.log(`[SCAN] Response keys: ${Object.keys(data).join(', ')}`);
         const rows = data.results || [];
-        console.log(`[SCAN] Sourcetype metadata returned ${rows.length} active sourcetypes from Splunk`);
+        // console.log(`[SCAN] Sourcetype metadata returned ${rows.length} active sourcetypes from Splunk`);
         if (rows.length > 0) {
-            console.log(`[SCAN] Sample row: ${JSON.stringify(rows[0])}`);
+            // console.log(`[SCAN] Sample row: ${JSON.stringify(rows[0])}`);
         }
 
         // Build a quick lookup: sourcetype → totalCount
@@ -520,7 +520,7 @@ async function detectAllSourcetypeData(products) {
                 }
             });
             if (stCount > 0) {
-                console.log(`[SCAN] ${p.product_id}: ${stCount} sourcetype(s) matched — ${matchedSTs.join(', ')}`);
+                // console.log(`[SCAN] ${p.product_id}: ${stCount} sourcetype(s) matched — ${matchedSTs.join(', ')}`);
             }
             results[p.product_id] = stCount > 0
                 ? { hasData: true, eventCount, detail: `${stCount} sourcetype${stCount !== 1 ? 's' : ''} active · ${formatCount(eventCount)} events` }
@@ -528,7 +528,7 @@ async function detectAllSourcetypeData(products) {
         });
 
         const detected = Object.values(results).filter(r => r.hasData).length;
-        console.log(`[SCAN] Detection complete: ${detected} product(s) with active data out of ${withST.length} checked`);
+        // console.log(`[SCAN] Detection complete: ${detected} product(s) with active data out of ${withST.length} checked`);
 
         // Fill in products that have no sourcetypes
         products.forEach(p => {
@@ -2124,10 +2124,10 @@ function ProductCard({ product, installedApps, appStatuses, sourcetypeData, splu
                                 const uids = getProductUids(product);
                                 const compatEntries = uids.map(uid => {
                                     const entry = splunkbaseData[uid];
-                                    if (!entry) console.debug(`[SCAN] No splunkbaseData for UID ${uid} (product: ${product.display_name})`);
+                                    // if (!entry) console.debug(`[SCAN] No splunkbaseData for UID ${uid} (product: ${product.display_name})`);
                                     return entry ? { ...entry, uid } : null;
                                 }).filter(Boolean);
-                                if (uids.length > 0) console.debug(`[SCAN] Compat check: ${product.display_name} uids=[${uids}] matched=${compatEntries.length} splunkbaseDataKeys=${Object.keys(splunkbaseData).length}`);
+                                // if (uids.length > 0) console.debug(`[SCAN] Compat check: ${product.display_name} uids=[${uids}] matched=${compatEntries.length} splunkbaseDataKeys=${Object.keys(splunkbaseData).length}`);
                                 if (compatEntries.length === 0) return null;
                                 return (
                                     <>
@@ -2431,7 +2431,7 @@ function ProductCard({ product, installedApps, appStatuses, sourcetypeData, splu
                                     {streamPrereqs.length > 0 && (
                                         <>
                                             <hr className="csc-dep-divider" />
-                                            <span className="csc-dep-label csc-dep-label-netflow">Stream Prerequisites</span>
+                                            <span className="csc-dep-label csc-dep-label-netflow">NetFlow Prerequisites</span>
                                             {streamPrereqs.map((pa) => {
                                                 const paStatus = appStatuses[pa.app_id] || null;
                                                 return (
@@ -2501,7 +2501,7 @@ function ProductCard({ product, installedApps, appStatuses, sourcetypeData, splu
                                 return (
                                     <>
                                         <hr className="csc-dep-divider" />
-                                        <span className="csc-dep-label csc-dep-label-netflow">Stream Dashboard App</span>
+                                        <span className="csc-dep-label csc-dep-label-netflow">NetFlow Dashboard App</span>
                                         <div className="csc-dep-detail">
                                             {svStatus?.installed ? (
                                                 <a href={createURL(`/app/${streamVizApp.app_id}/`)} target="_blank" rel="noopener noreferrer" className="csc-dep-name csc-dep-name-link" title={`Open ${streamVizApp.display_name}`}>{streamVizApp.display_name}</a>
@@ -3712,6 +3712,505 @@ function UniversalFinderBar({ onSearch, resultCount, totalCount, products, exter
     );
 }
 
+// ──────────────────────  FILTER DRAWER  ─────────────────────
+
+/**
+ * Slide-out sidebar panel (right edge) that houses ALL advanced filters.
+ * Replaces the inline Advanced panel in CategoryFilterBar.
+ * Sections: Cross-Cutting, Support Level, Visibility, Onboarding, Compatibility, Powered By.
+ */
+function FilterDrawer({
+    open, onClose,
+    selectedCategory, onSelectCategory,
+    supportLevelFilter, onSelectSupportLevel,
+    showRetired, onToggleShowRetired,
+    showDeprecated, onToggleShowDeprecated,
+    showComingSoon, onToggleShowComingSoon,
+    showGtmRoadmap, onToggleShowGtmRoadmap,
+    streamFilter, onToggleStreamFilter,
+    sc4sFilter, onToggleSc4sFilter,
+    platformFilter, onSelectPlatform,
+    versionFilter, onSelectVersion,
+    splunkbaseData,
+    csvSyncStatus, csvSyncMessage, onSyncSplunkbase,
+    selectedAddon, onSelectAddon,
+    products, allProducts, categoryCounts,
+    showFullPortfolio,
+}) {
+    /* ── Helper: apply platform/version compat filters ── */
+    const applyCompatFilters = (list) => {
+        let result = list;
+        if (platformFilter && splunkbaseData && Object.keys(splunkbaseData).length > 0) {
+            result = result.filter((p) => {
+                const uids = getProductUids(p);
+                return uids.some(uid => {
+                    const entry = splunkbaseData[uid];
+                    if (!entry || !entry.product_compatibility) return false;
+                    return entry.product_compatibility.split(/[|,]/).map(v => v.trim()).some(pl => pl.toLowerCase().includes(platformFilter.toLowerCase()));
+                });
+            });
+        }
+        if (versionFilter.length > 0 && splunkbaseData && Object.keys(splunkbaseData).length > 0) {
+            result = result.filter((p) => {
+                const uids = getProductUids(p);
+                return uids.some(uid => {
+                    const entry = splunkbaseData[uid];
+                    if (!entry || !entry.version_compatibility) return false;
+                    const versions = entry.version_compatibility.split(/[|,]/).map(v => v.trim());
+                    return versionFilter.some(vf => versions.includes(vf));
+                });
+            });
+        }
+        return result;
+    };
+
+    /* ── Counter logic (replicated from old Advanced panel) ── */
+    const rawBase = applyCompatFilters(allProducts || products);
+    const portfolioBase = showFullPortfolio
+        ? rawBase
+        : rawBase.filter(p => SUPPORTED_LEVELS.has(p.support_level) && p.status !== 'under_development');
+
+    let catBase = portfolioBase;
+    if (selectedCategory === 'soar') catBase = catBase.filter(p => p.soar_connectors && p.soar_connectors.length > 0);
+    else if (selectedCategory === 'alert_actions') catBase = catBase.filter(p => p.alert_actions && p.alert_actions.length > 0);
+    else if (selectedCategory === 'secure_networking') catBase = catBase.filter(p => p.secure_networking_gtm);
+    else if (selectedCategory === 'ai_powered') catBase = catBase.filter(p => p.ai_enabled);
+    else if (selectedCategory) catBase = catBase.filter(p => p.category === selectedCategory);
+
+    /* Support counts */
+    let supportCountBase = catBase;
+    if (!showRetired) supportCountBase = supportCountBase.filter(p => p.status !== 'retired');
+    if (!showDeprecated) supportCountBase = supportCountBase.filter(p => p.status !== 'deprecated');
+    if (!showComingSoon) supportCountBase = supportCountBase.filter(p => p.status !== 'under_development');
+    if (!showGtmRoadmap) supportCountBase = supportCountBase.filter(p => !p.coverage_gap);
+    if (streamFilter) supportCountBase = supportCountBase.filter(p => p.netflow_supported);
+    if (sc4sFilter) supportCountBase = supportCountBase.filter(p => p.sc4s_supported);
+    const supportCounts = {
+        cisco_supported: supportCountBase.filter(p => p.support_level === 'cisco_supported').length,
+        splunk_supported: supportCountBase.filter(p => p.support_level === 'splunk_supported').length,
+        developer_supported: supportCountBase.filter(p => p.support_level === 'developer_supported').length,
+        not_supported: supportCountBase.filter(p => p.support_level === 'not_supported').length,
+    };
+    const supportTotal = supportCountBase.length;
+
+    /* Visibility counts */
+    let visCountBase = catBase;
+    if (supportLevelFilter) visCountBase = visCountBase.filter(p => p.support_level === supportLevelFilter);
+    if (streamFilter) visCountBase = visCountBase.filter(p => p.netflow_supported);
+    if (sc4sFilter) visCountBase = visCountBase.filter(p => p.sc4s_supported);
+    const retiredCount = visCountBase.filter(p => p.status === 'retired').length;
+    const deprecatedCount = visCountBase.filter(p => p.status === 'deprecated').length;
+    const comingSoonCount = visCountBase.filter(p => p.status === 'under_development').length;
+    const gtmRoadmapCount = visCountBase.filter(p => p.coverage_gap).length;
+
+    /* Onboarding counts */
+    let onboardingBase = catBase;
+    if (supportLevelFilter) onboardingBase = onboardingBase.filter(p => p.support_level === supportLevelFilter);
+    if (!showRetired) onboardingBase = onboardingBase.filter(p => p.status !== 'retired');
+    if (!showDeprecated) onboardingBase = onboardingBase.filter(p => p.status !== 'deprecated');
+    if (!showComingSoon) onboardingBase = onboardingBase.filter(p => p.status !== 'under_development');
+    if (!showGtmRoadmap) onboardingBase = onboardingBase.filter(p => !p.coverage_gap);
+    const streamCount = (sc4sFilter ? onboardingBase.filter(p => p.sc4s_supported) : onboardingBase).filter(p => p.netflow_supported).length;
+    const sc4sCount = (streamFilter ? onboardingBase.filter(p => p.netflow_supported) : onboardingBase).filter(p => p.sc4s_supported).length;
+
+    /* Cross-cutting counts */
+    const soarCount = categoryCounts?.soar || 0;
+    const alertCount = categoryCounts?.alert_actions || 0;
+    const secNetCount = categoryCounts?.secure_networking || 0;
+    const aiPoweredCount = categoryCounts?.ai_powered || 0;
+
+    /* Compatibility version list */
+    const versionList = (() => {
+        if (!splunkbaseData || Object.keys(splunkbaseData).length === 0) return [];
+        const productUidSet = new Set();
+        (products || []).forEach(p => { getProductUids(p).forEach(uid => productUidSet.add(uid)); });
+        const cardVersions = new Set();
+        productUidSet.forEach(uid => {
+            const entry = splunkbaseData[uid];
+            if (entry && entry.version_compatibility) {
+                entry.version_compatibility.split(/[|,]/).map(v => v.trim()).filter(Boolean).forEach(v => {
+                    const major = parseFloat(v);
+                    if (!isNaN(major) && major > 9.0) cardVersions.add(v);
+                });
+            }
+        });
+        return sortVersionsDesc([...cardVersions]);
+    })();
+
+    /* Addon (Powered By) groups */
+    const addonGroups = useMemo(() => {
+        const map = {};
+        let standalone = 0;
+        let sc4sOnly = 0;
+        (products || []).forEach((p) => {
+            if (!p.addon) {
+                if (p.sc4s_supported) { sc4sOnly++; } else { standalone++; }
+                return;
+            }
+            if (!map[p.addon]) map[p.addon] = { label: p.addon_label || p.addon, count: 0 };
+            map[p.addon].count++;
+        });
+        const entries = Object.entries(map)
+            .sort((a, b) => b[1].count - a[1].count || a[1].label.localeCompare(b[1].label));
+        if (sc4sOnly > 0) entries.push(['__sc4s__', { label: 'SC4S Only', count: sc4sOnly }]);
+        if (standalone > 0) entries.push(['__standalone__', { label: 'Standalone', count: standalone }]);
+        return entries;
+    }, [products]);
+
+    const isCrossCutting = (cat) => ['soar', 'alert_actions', 'secure_networking', 'ai_powered'].includes(cat);
+    const addonTotal = (products || []).length;
+
+    return (
+        <>
+            {open && <div className="scan-drawer-overlay" onClick={onClose} />}
+            <div className={`scan-drawer ${open ? 'scan-drawer-open' : ''}`}>
+                <div className="scan-drawer-header">
+                    <span className="scan-drawer-title">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"/></svg>
+                        Filters
+                    </span>
+                    <button className="scan-drawer-close" onClick={onClose} title="Close filters">✕</button>
+                </div>
+                <div className="scan-drawer-body">
+
+                    {/* ── Cross-Cutting Filters ── */}
+                    <div className="scan-drawer-section">
+                        <div className="scan-drawer-section-title">
+                            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 014 10 15.3 15.3 0 01-4 10 15.3 15.3 0 01-4-10 15.3 15.3 0 014-10z"/></svg>
+                            Cross-Cutting
+                        </div>
+                        <div className="scan-drawer-pill-grid">
+                            {secNetCount > 0 && (
+                                <button
+                                    className={`scan-drawer-pill ${selectedCategory === 'secure_networking' ? 'scan-drawer-pill-secnet-active' : ''}`}
+                                    onClick={() => { onSelectCategory(selectedCategory === 'secure_networking' ? null : 'secure_networking'); }}
+                                    title="Cisco Secure Networking GTM"
+                                >
+                                    <img src={createURL(`/static/app/${APP_ID}/icons/cat-secnet.svg`)} alt="" /> Secure Networking
+                                    <span className="scan-drawer-pill-count">{secNetCount}</span>
+                                </button>
+                            )}
+                            {soarCount > 0 && (
+                                <button
+                                    className={`scan-drawer-pill ${selectedCategory === 'soar' ? 'scan-drawer-pill-soar-active' : ''}`}
+                                    onClick={() => { onSelectCategory(selectedCategory === 'soar' ? null : 'soar'); }}
+                                    title="Products with Splunk SOAR connectors"
+                                >
+                                    <img src={createURL(`/static/app/${APP_ID}/icon-soar.svg`)} alt="" /> SOAR
+                                    <span className="scan-drawer-pill-count">{soarCount}</span>
+                                </button>
+                            )}
+                            {alertCount > 0 && (
+                                <button
+                                    className={`scan-drawer-pill ${selectedCategory === 'alert_actions' ? 'scan-drawer-pill-alert-active' : ''}`}
+                                    onClick={() => { onSelectCategory(selectedCategory === 'alert_actions' ? null : 'alert_actions'); }}
+                                    title="Products with custom alert actions"
+                                >
+                                    <img src={createURL(`/static/app/${APP_ID}/icons/cat-alert.svg`)} alt="" /> Alert Actions
+                                    <span className="scan-drawer-pill-count">{alertCount}</span>
+                                </button>
+                            )}
+                            {aiPoweredCount > 0 && (
+                                <button
+                                    className={`scan-drawer-pill ${selectedCategory === 'ai_powered' ? 'scan-drawer-pill-ai-active' : ''}`}
+                                    onClick={() => { onSelectCategory(selectedCategory === 'ai_powered' ? null : 'ai_powered'); }}
+                                    title="Products leveraging AI/ML technologies"
+                                >
+                                    <img src={createURL(`/static/app/${APP_ID}/icons/cat-ai.svg`)} alt="" /> AI-Powered
+                                    <span className="scan-drawer-pill-count">{aiPoweredCount}</span>
+                                </button>
+                            )}
+                        </div>
+                    </div>
+                    <div className="scan-drawer-divider" />
+
+                    {/* ── Support Level ── */}
+                    <div className="scan-drawer-section">
+                        <div className="scan-drawer-section-title">
+                            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+                            Support Level
+                        </div>
+                        <div className="scan-drawer-pill-grid">
+                            <button
+                                className={`scan-drawer-pill ${!supportLevelFilter ? 'scan-drawer-pill-active' : ''}`}
+                                onClick={() => onSelectSupportLevel(null)}
+                            >
+                                All <span className="scan-drawer-pill-count">{supportTotal}</span>
+                            </button>
+                            <button
+                                className={`scan-drawer-pill ${supportLevelFilter === 'cisco_supported' ? 'scan-drawer-pill-cisco-active' : ''}`}
+                                onClick={() => onSelectSupportLevel(supportLevelFilter === 'cisco_supported' ? null : 'cisco_supported')}
+                                title="Show only Cisco-supported products"
+                            >
+                                🟢 Cisco <span className="scan-drawer-pill-count">{supportCounts.cisco_supported}</span>
+                            </button>
+                            <button
+                                className={`scan-drawer-pill ${supportLevelFilter === 'splunk_supported' ? 'scan-drawer-pill-splunk-active' : ''}`}
+                                onClick={() => onSelectSupportLevel(supportLevelFilter === 'splunk_supported' ? null : 'splunk_supported')}
+                                title="Show only Splunk-supported products"
+                            >
+                                🔵 Splunk <span className="scan-drawer-pill-count">{supportCounts.splunk_supported}</span>
+                            </button>
+                            <button
+                                className={`scan-drawer-pill ${supportLevelFilter === 'developer_supported' ? 'scan-drawer-pill-dev-active' : ''}`}
+                                onClick={() => onSelectSupportLevel(supportLevelFilter === 'developer_supported' ? null : 'developer_supported')}
+                                title="Show only Developer-supported products"
+                            >
+                                🟠 Developer <span className="scan-drawer-pill-count">{supportCounts.developer_supported}</span>
+                            </button>
+                            <button
+                                className={`scan-drawer-pill ${supportLevelFilter === 'not_supported' ? 'scan-drawer-pill-unsupported-active' : ''}`}
+                                onClick={() => onSelectSupportLevel(supportLevelFilter === 'not_supported' ? null : 'not_supported')}
+                                title="Show only unsupported products"
+                            >
+                                ⚪ Unsupported <span className="scan-drawer-pill-count">{supportCounts.not_supported}</span>
+                            </button>
+                        </div>
+                    </div>
+                    <div className="scan-drawer-divider" />
+
+                    {/* ── Visibility ── */}
+                    <div className="scan-drawer-section">
+                        <div className="scan-drawer-section-title">
+                            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+                            Visibility
+                        </div>
+                        <div className="scan-drawer-pill-grid">
+                            <button
+                                className={`scan-drawer-pill ${showRetired ? 'scan-drawer-pill-vis-on' : 'scan-drawer-pill-vis-off'}`}
+                                onClick={() => onToggleShowRetired(!showRetired)}
+                                title={showRetired ? 'Retired products are shown — click to hide' : 'Retired products are hidden — click to show'}
+                            >
+                                📦 Retired <span className="scan-drawer-pill-count">{retiredCount}</span>
+                            </button>
+                            <button
+                                className={`scan-drawer-pill ${showDeprecated ? 'scan-drawer-pill-vis-on' : 'scan-drawer-pill-vis-off'}`}
+                                onClick={() => onToggleShowDeprecated(!showDeprecated)}
+                                title={showDeprecated ? 'Deprecated products are shown — click to hide' : 'Deprecated products are hidden — click to show'}
+                            >
+                                ⚠️ Deprecated <span className="scan-drawer-pill-count">{deprecatedCount}</span>
+                            </button>
+                            <button
+                                className={`scan-drawer-pill ${showComingSoon ? 'scan-drawer-pill-vis-on' : 'scan-drawer-pill-vis-off'}`}
+                                onClick={() => onToggleShowComingSoon(!showComingSoon)}
+                                title={showComingSoon ? 'Coming Soon products are shown — click to hide' : 'Coming Soon products are hidden — click to show'}
+                            >
+                                🚀 Coming Soon <span className="scan-drawer-pill-count">{comingSoonCount}</span>
+                            </button>
+                            {gtmRoadmapCount > 0 && (
+                                <button
+                                    className={`scan-drawer-pill ${showGtmRoadmap ? 'scan-drawer-pill-vis-on' : 'scan-drawer-pill-vis-off'}`}
+                                    onClick={() => onToggleShowGtmRoadmap(!showGtmRoadmap)}
+                                    title={showGtmRoadmap ? 'GTM Roadmap products are shown — click to hide' : 'GTM Roadmap products are hidden — click to show'}
+                                >
+                                    🚩 GTM Roadmap <span className="scan-drawer-pill-count">{gtmRoadmapCount}</span>
+                                </button>
+                            )}
+                        </div>
+                    </div>
+                    <div className="scan-drawer-divider" />
+
+                    {/* ── Onboarding ── */}
+                    {(streamCount > 0 || sc4sCount > 0) && (
+                        <>
+                            <div className="scan-drawer-section">
+                                <div className="scan-drawer-section-title">
+                                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M22 11.08V12a10 10 0 11-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+                                    Onboarding Path
+                                </div>
+                                <div className="scan-drawer-pill-grid">
+                                    {sc4sCount > 0 && (
+                                        <button
+                                            className={`scan-drawer-pill ${sc4sFilter ? 'scan-drawer-pill-sc4s-active' : ''}`}
+                                            onClick={() => onToggleSc4sFilter(!sc4sFilter)}
+                                            title={sc4sFilter ? 'Showing SC4S products — click to clear' : 'Show only SC4S-supported products'}
+                                        >
+                                            {sc4sFilter && <span style={{ fontSize: '11px', fontWeight: 700 }}>✓</span>} 📡 SC4S <span className="scan-drawer-pill-count">{sc4sCount}</span>
+                                        </button>
+                                    )}
+                                    {streamCount > 0 && (
+                                        <button
+                                            className={`scan-drawer-pill ${streamFilter ? 'scan-drawer-pill-stream-active' : ''}`}
+                                            onClick={() => onToggleStreamFilter(!streamFilter)}
+                                            title={streamFilter ? 'Showing NetFlow products — click to clear' : 'Show only NetFlow-supported products'}
+                                        >
+                                            {streamFilter && <span style={{ fontSize: '11px', fontWeight: 700 }}>✓</span>} <img src={createURL(`/static/app/${APP_ID}/icons/network_analytics.svg`)} alt="" className="csc-filter-pill-icon" /> NetFlow <span className="scan-drawer-pill-count">{streamCount}</span>
+                                        </button>
+                                    )}
+                                </div>
+                            </div>
+                            <div className="scan-drawer-divider" />
+                        </>
+                    )}
+
+                    {/* ── Compatibility ── */}
+                    {splunkbaseData && Object.keys(splunkbaseData).length > 0 && (
+                        <>
+                            <div className="scan-drawer-section">
+                                <div className="scan-drawer-section-title">
+                                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
+                                    Compatibility
+                                </div>
+                                <select
+                                    value={platformFilter || ''}
+                                    onChange={e => onSelectPlatform(e.target.value || null)}
+                                    className={`scan-drawer-select ${platformFilter ? 'scan-drawer-select-active' : ''}`}
+                                    title="Filter by platform"
+                                >
+                                    <option value="">All Platforms</option>
+                                    <option value="Splunk Cloud">Splunk Cloud</option>
+                                    <option value="Splunk Enterprise">Splunk Enterprise</option>
+                                </select>
+                                {versionList.length > 0 && (
+                                    <div className="scan-drawer-version-list">
+                                        <div className="scan-drawer-version-header">
+                                            <span className="scan-drawer-version-label">Splunk Version</span>
+                                            {versionFilter.length > 0 && (
+                                                <button
+                                                    className="scan-drawer-version-clear"
+                                                    onClick={() => onSelectVersion(null)}
+                                                    title="Clear all version filters"
+                                                >Clear</button>
+                                            )}
+                                        </div>
+                                        {versionList.map(v => (
+                                            <label key={v} className={`scan-drawer-version-item ${versionFilter.includes(v) ? 'scan-drawer-version-item-active' : ''}`}>
+                                                <input
+                                                    type="checkbox"
+                                                    checked={versionFilter.includes(v)}
+                                                    onChange={() => onSelectVersion(v)}
+                                                />
+                                                <span>Splunk {v}</span>
+                                            </label>
+                                        ))}
+                                    </div>
+                                )}
+                                <div className="scan-drawer-sync-row">
+                                    <button
+                                        className={`scan-drawer-pill scan-util-sync ${csvSyncStatus === 'success' ? 'scan-sync-ok' : csvSyncStatus === 'error' ? 'scan-sync-err' : csvSyncStatus === 'syncing' ? 'scan-sync-busy' : ''}`}
+                                        onClick={onSyncSplunkbase}
+                                        disabled={csvSyncStatus === 'syncing'}
+                                        title={csvSyncStatus === 'success' ? `✓ ${csvSyncMessage}` : csvSyncStatus === 'error' ? `✗ ${csvSyncMessage}` : csvSyncStatus === 'syncing' ? 'Downloading…' : 'Sync Splunkbase catalog from S3'}
+                                        style={{ cursor: csvSyncStatus === 'syncing' ? 'wait' : 'pointer' }}
+                                    >
+                                        {csvSyncStatus === 'syncing' ? '⏳' : csvSyncStatus === 'success' ? '✅' : csvSyncStatus === 'error' ? '❌' : '🔄'} Sync Catalog
+                                    </button>
+                                </div>
+                            </div>
+                            <div className="scan-drawer-divider" />
+                        </>
+                    )}
+
+                    {/* ── Powered By (Addon Filter) ── */}
+                    {addonGroups.length > 1 && (
+                        <div className="scan-drawer-section">
+                            <div className="scan-drawer-section-title">
+                                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
+                                Powered By
+                            </div>
+                            <div className="scan-drawer-addon-list">
+                                <button
+                                    className={`scan-drawer-addon-item ${!selectedAddon ? 'scan-drawer-addon-item-active' : ''}`}
+                                    onClick={() => onSelectAddon(null)}
+                                >
+                                    All <span className="scan-drawer-pill-count">{addonTotal}</span>
+                                </button>
+                                {addonGroups.map(([id, g]) => (
+                                    <button
+                                        key={id}
+                                        className={`scan-drawer-addon-item ${selectedAddon === id ? 'scan-drawer-addon-item-active' : ''}`}
+                                        onClick={() => onSelectAddon(selectedAddon === id ? null : id)}
+                                        title={g.label}
+                                    >
+                                        {g.label} <span className="scan-drawer-pill-count">{g.count}</span>
+                                    </button>
+                                ))}
+                            </div>
+                        </div>
+                    )}
+                </div>
+            </div>
+        </>
+    );
+}
+
+// ──────────────────────  ACTIVE FILTER CHIPS  ─────────────────
+
+/**
+ * Compact bar below category pills showing active advanced filters as
+ * removable chips. Only renders when at least one filter is active.
+ */
+function ActiveFilterChips({
+    selectedCategory, onSelectCategory,
+    supportLevelFilter, onSelectSupportLevel,
+    showRetired, onToggleShowRetired,
+    showDeprecated, onToggleShowDeprecated,
+    showComingSoon, onToggleShowComingSoon,
+    showGtmRoadmap, onToggleShowGtmRoadmap,
+    streamFilter, onToggleStreamFilter,
+    sc4sFilter, onToggleSc4sFilter,
+    platformFilter, onSelectPlatform,
+    versionFilter, onSelectVersion,
+    selectedAddon, onSelectAddon,
+    addonLabel,
+}) {
+    const chips = [];
+
+    // Cross-cutting category filters
+    const crossCutLabels = { soar: 'SOAR', alert_actions: 'Alert Actions', secure_networking: 'Secure Networking GTM', ai_powered: 'AI-Powered' };
+    if (selectedCategory && crossCutLabels[selectedCategory]) {
+        chips.push({ label: crossCutLabels[selectedCategory], onRemove: () => onSelectCategory(null) });
+    }
+    if (supportLevelFilter) {
+        const labels = { cisco_supported: '🟢 Cisco', splunk_supported: '🔵 Splunk', developer_supported: '🟠 Developer', not_supported: '⚪ Unsupported' };
+        chips.push({ label: labels[supportLevelFilter] || supportLevelFilter, onRemove: () => onSelectSupportLevel(null) });
+    }
+    if (!showRetired) chips.push({ label: 'Hide Retired', onRemove: () => onToggleShowRetired(true) });
+    if (!showDeprecated) chips.push({ label: 'Hide Deprecated', onRemove: () => onToggleShowDeprecated(true) });
+    if (!showComingSoon) chips.push({ label: 'Hide Coming Soon', onRemove: () => onToggleShowComingSoon(true) });
+    if (!showGtmRoadmap) chips.push({ label: 'Hide GTM Roadmap', onRemove: () => onToggleShowGtmRoadmap(true) });
+    if (streamFilter) chips.push({ label: 'NetFlow', onRemove: () => onToggleStreamFilter(false) });
+    if (sc4sFilter) chips.push({ label: 'SC4S', onRemove: () => onToggleSc4sFilter(false) });
+    if (platformFilter) chips.push({ label: platformFilter, onRemove: () => onSelectPlatform(null) });
+    if (versionFilter.length > 0) {
+        versionFilter.forEach(v => {
+            chips.push({ label: `Splunk ${v}`, onRemove: () => onSelectVersion(v) });
+        });
+    }
+    if (selectedAddon) chips.push({ label: `Powered By: ${addonLabel || selectedAddon}`, onRemove: () => onSelectAddon(null) });
+
+    if (chips.length === 0) return null;
+
+    const clearAll = () => {
+        if (crossCutLabels[selectedCategory]) onSelectCategory(null);
+        onSelectSupportLevel(null);
+        onToggleShowRetired(true);
+        onToggleShowDeprecated(true);
+        onToggleShowComingSoon(true);
+        onToggleShowGtmRoadmap(true);
+        onToggleStreamFilter(false);
+        onToggleSc4sFilter(false);
+        onSelectPlatform(null);
+        onSelectVersion(null);
+        onSelectAddon(null);
+    };
+
+    return (
+        <div className="scan-active-chips">
+            <span className="scan-active-chips-label">Active:</span>
+            {chips.map((chip, i) => (
+                <span key={i} className="scan-active-chip">
+                    {chip.label}
+                    <button className="scan-active-chip-close" onClick={chip.onRemove} title={`Remove ${chip.label} filter`}>×</button>
+                </span>
+            ))}
+            {chips.length > 1 && (
+                <button className="scan-active-chips-clear" onClick={clearAll}>Clear all</button>
+            )}
+        </div>
+    );
+}
+
 // ──────────────────────  ADDON  FILTER  ─────────────────────
 
 /**
@@ -3854,7 +4353,14 @@ function PersonaModal({ open, onClose, onSelectPersona, products }) {
 
 // ──────────────────────  CATEGORY FILTER  ────────────────────
 
-function CategoryFilterBar({ selectedCategory, onSelectCategory, selectedSubCategory, onSelectSubCategory, aiFilter, onToggleAiFilter, streamFilter, onToggleStreamFilter, sc4sFilter, onToggleSc4sFilter, categoryCounts, products, allProducts, advancedFiltersOpen, onToggleAdvancedFilters, supportLevelFilter, onSelectSupportLevel, showRetired, onToggleShowRetired, showDeprecated, onToggleShowDeprecated, showComingSoon, onToggleShowComingSoon, showFullPortfolio, showGtmRoadmap, onToggleShowGtmRoadmap, platformFilter, onSelectPlatform, versionFilter, onSelectVersion, splunkbaseData, csvSyncStatus, csvSyncMessage, onSyncSplunkbase }) {
+function CategoryFilterBar({
+    selectedCategory, onSelectCategory,
+    selectedSubCategory, onSelectSubCategory,
+    aiFilter, onToggleAiFilter,
+    categoryCounts, products,
+    onOpenFilterDrawer, activeFilterCount,
+    platformFilter, versionFilter, splunkbaseData,
+}) {
     // ── Helper: apply platform/version compat filters to a product list ──
     const applyCompatFilters = (list) => {
         let result = list;
@@ -3868,20 +4374,21 @@ function CategoryFilterBar({ selectedCategory, onSelectCategory, selectedSubCate
                 });
             });
         }
-        if (versionFilter && splunkbaseData && Object.keys(splunkbaseData).length > 0) {
+        if (versionFilter.length > 0 && splunkbaseData && Object.keys(splunkbaseData).length > 0) {
             result = result.filter((p) => {
                 const uids = getProductUids(p);
                 return uids.some(uid => {
                     const entry = splunkbaseData[uid];
                     if (!entry || !entry.version_compatibility) return false;
-                    return entry.version_compatibility.split(/[|,]/).map(v => v.trim()).includes(versionFilter);
+                    const versions = entry.version_compatibility.split(/[|,]/).map(v => v.trim());
+                    return versionFilter.some(vf => versions.includes(vf));
                 });
             });
         }
         return result;
     };
 
-    // Cisco official category SVG icons (from cisco.com CDN)
+    // Cisco official category SVG icons
     const catIconMap = { security: 'cat-security', observability: 'cat-observability', networking: 'cat-networking', collaboration: 'cat-collaboration' };
     const renderCatIcon = (catId, active) => {
         const svgName = catIconMap[catId];
@@ -3893,42 +4400,18 @@ function CategoryFilterBar({ selectedCategory, onSelectCategory, selectedSubCate
             style: { width: '18px', height: '18px', filter: active ? 'brightness(0) saturate(100%) invert(15%) sepia(70%) saturate(6000%) hue-rotate(200deg)' : 'none', transition: 'filter 0.2s' },
         });
     };
-    const btnStyle = (active, variant) => {
-        const isAmber = variant === 'soar';
-        const isTeal = variant === 'alert';
-        const isSecNet = variant === 'secnet';
-        const isAi = variant === 'ai';
-        const isAdvanced = variant === 'advanced';
-        let activeColor, activeBg, activeBorder, activeText;
-        if (isAmber) {
-            activeBg = '#fef3c7'; activeBorder = '#f59e0b'; activeText = '#92400e';
-        } else if (isTeal) {
-            activeBg = '#dbeafe'; activeBorder = '#3b82f6'; activeText = '#1e40af';
-        } else if (isSecNet) {
-            activeBg = '#e0f2f1'; activeBorder = '#00897b'; activeText = '#004d40';
-        } else if (isAi) {
-            activeBg = '#ede9fe'; activeBorder = '#7c3aed'; activeText = '#5b21b6';
-        } else if (isAdvanced) {
-            activeBg = '#e8eaf6'; activeBorder = '#5c6bc0'; activeText = '#283593';
-        } else {
-            activeBg = '#049fd9'; activeBorder = '#049fd9'; activeText = '#fff';
-        }
-        return {
-            display: 'flex', alignItems: 'center', gap: '6px', whiteSpace: 'nowrap',
-            padding: '7px 14px', borderRadius: '20px', border: '2px solid',
-            borderColor: active ? activeBorder : 'var(--card-border, #ddd)',
-            background: active ? activeBg : 'var(--card-bg, #f5f5f5)',
-            color: active ? activeText : 'var(--page-color, #333)',
-            cursor: 'pointer', fontWeight: 600, fontSize: '13px',
-            transition: 'all 0.2s', flexShrink: 0,
-        };
-    };
+    const btnStyle = (active) => ({
+        display: 'flex', alignItems: 'center', gap: '6px', whiteSpace: 'nowrap',
+        padding: '7px 14px', borderRadius: '20px', border: '2px solid',
+        borderColor: active ? '#049fd9' : 'var(--card-border, #ddd)',
+        background: active ? '#049fd9' : 'var(--card-bg, #f5f5f5)',
+        color: active ? '#fff' : 'var(--page-color, #333)',
+        cursor: 'pointer', fontWeight: 600, fontSize: '13px',
+        transition: 'all 0.2s', flexShrink: 0,
+    });
 
-    const totalCount = categoryCounts ? Object.keys(categoryCounts).reduce((sum, k) => (k === 'soar' || k === 'alert_actions' || k === 'secure_networking' || k === 'ai_powered') ? sum : sum + categoryCounts[k], 0) : null;
-    const soarCount = categoryCounts?.soar || 0;
-    const alertCount = categoryCounts?.alert_actions || 0;
-    const secNetCount = categoryCounts?.secure_networking || 0;
-    const aiPoweredCount = categoryCounts?.ai_powered || 0;
+    const isCrossCutting = ['soar', 'alert_actions', 'secure_networking', 'ai_powered'].includes(selectedCategory);
+    const totalCount = categoryCounts ? Object.keys(categoryCounts).reduce((sum, k) => (['soar', 'alert_actions', 'secure_networking', 'ai_powered'].includes(k)) ? sum : sum + categoryCounts[k], 0) : null;
 
     return (<>
         <div style={{ display: 'flex', gap: '8px', overflowX: 'auto', paddingBottom: '4px', scrollBehavior: 'smooth', alignItems: 'center' }}>
@@ -3961,124 +4444,22 @@ function CategoryFilterBar({ selectedCategory, onSelectCategory, selectedSubCate
                     </button>
                 );
             })}
-            {/* ── Secure Networking GTM cross-cutting filter ── */}
-            {secNetCount > 0 && (
-                <>
-                    <span style={{ width: '2px', height: '28px', background: 'var(--pill-divider, #b0b0b0)', flexShrink: 0, margin: '0 4px', borderRadius: '1px' }} />
-                    <button
-                        onClick={() => onSelectCategory(selectedCategory === 'secure_networking' ? null : 'secure_networking')}
-                        title="Cisco Secure Networking GTM — show products in the Secure Networking go-to-market strategy"
-                        style={btnStyle(selectedCategory === 'secure_networking', 'secnet')}
-                    >
-                        <img src={createURL(`/static/app/${APP_ID}/icons/cat-secnet.svg`)} alt="" className="csc-filter-pill-icon" style={{ width: '16px', height: '16px', verticalAlign: '-3px' }} /> Secure Networking GTM
-                        <span style={{
-                            fontSize: '10px',
-                            background: selectedCategory === 'secure_networking' ? 'rgba(255,255,255,0.25)' : 'var(--version-bg, #e8e8e8)',
-                            padding: '1px 6px', borderRadius: '10px',
-                        }}>
-                            {secNetCount}
-                        </span>
-                    </button>
-                    <a
-                        href="https://www.cisco.com/c/en/us/solutions/collateral/transform-infrastructure/secure-networking-so.html"
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        title="Cisco Secure Networking Solution Overview — opens cisco.com"
-                        className="csc-secnet-doc-link"
-                    >
-                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                            <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6" />
-                            <polyline points="15 3 21 3 21 9" />
-                            <line x1="10" y1="14" x2="21" y2="3" />
-                        </svg>
-                    </a>
-                </>
-            )}
-            {/* ── SOAR cross-cutting filter ── */}
-            {soarCount > 0 && (
-                <>
-                    <span style={{ width: '2px', height: '28px', background: 'var(--pill-divider, #b0b0b0)', flexShrink: 0, margin: '0 4px', borderRadius: '1px' }} />
-                    <button
-                        className={selectedCategory === 'soar' ? 'csc-soar-filter-active' : ''}
-                        onClick={() => onSelectCategory(selectedCategory === 'soar' ? null : 'soar')}
-                        title="Show only products with Splunk SOAR connectors available"
-                        style={btnStyle(selectedCategory === 'soar', 'soar')}
-                    >
-                        <img src={createURL(`/static/app/${APP_ID}/icon-soar.svg`)} alt="" className="csc-filter-pill-icon" style={{ width: '16px', height: '16px', verticalAlign: '-3px' }} /> SOAR
-                        <span className={selectedCategory === 'soar' ? 'csc-soar-filter-count' : ''} style={{
-                            fontSize: '10px',
-                            background: selectedCategory === 'soar' ? 'rgba(146,64,14,0.15)' : 'var(--version-bg, #e8e8e8)',
-                            padding: '1px 6px', borderRadius: '10px',
-                        }}>
-                            {soarCount}
-                        </span>
-                    </button>
-                </>
-            )}
-            {/* ── Alert Actions cross-cutting filter ── */}
-            {alertCount > 0 && (
-                <>
-                    {soarCount === 0 && <span style={{ width: '2px', height: '28px', background: 'var(--pill-divider, #b0b0b0)', flexShrink: 0, margin: '0 4px', borderRadius: '1px' }} />}
-                    <button
-                        className={selectedCategory === 'alert_actions' ? 'csc-alert-filter-active' : ''}
-                        onClick={() => onSelectCategory(selectedCategory === 'alert_actions' ? null : 'alert_actions')}
-                        title="Show only products with custom alert actions available"
-                        style={btnStyle(selectedCategory === 'alert_actions', 'alert')}
-                    >
-                        <img src={createURL(`/static/app/${APP_ID}/icons/cat-alert.svg`)} alt="" className="csc-filter-pill-icon" style={{ width: '16px', height: '16px', verticalAlign: '-3px' }} /> Alert Actions
-                        <span className={selectedCategory === 'alert_actions' ? 'csc-alert-filter-count' : ''} style={{
-                            fontSize: '10px',
-                            background: selectedCategory === 'alert_actions' ? 'rgba(30,64,175,0.12)' : 'var(--version-bg, #e8e8e8)',
-                            padding: '1px 6px', borderRadius: '10px',
-                        }}>
-                            {alertCount}
-                        </span>
-                    </button>
-                </>
-            )}
-            {/* ── AI-Powered cross-cutting filter ── */}
-            {aiPoweredCount > 0 && (
-                <>
-                    <span style={{ width: '2px', height: '28px', background: 'var(--pill-divider, #b0b0b0)', flexShrink: 0, margin: '0 4px', borderRadius: '1px' }} />
-                    <button
-                        onClick={() => onSelectCategory(selectedCategory === 'ai_powered' ? null : 'ai_powered')}
-                        title="Show products that leverage AI/ML technologies"
-                        style={btnStyle(selectedCategory === 'ai_powered', 'ai')}
-                    >
-                        <img src={createURL(`/static/app/${APP_ID}/icons/cat-ai.svg`)} alt="" className="csc-filter-pill-icon" style={{ width: '16px', height: '16px', verticalAlign: '-2px' }} /> AI-Powered
-                        <span style={{
-                            fontSize: '10px',
-                            background: selectedCategory === 'ai_powered' ? 'rgba(91,33,182,0.12)' : 'var(--version-bg, #e8e8e8)',
-                            padding: '1px 6px', borderRadius: '10px',
-                        }}>
-                            {aiPoweredCount}
-                        </span>
-                    </button>
-                </>
-            )}
-            {/* ── Advanced Filters toggle ── */}
+            {/* ── Filters drawer trigger ── */}
             <span style={{ width: '2px', height: '28px', background: 'var(--pill-divider, #b0b0b0)', flexShrink: 0, margin: '0 4px', borderRadius: '1px' }} />
-            {(() => {
-                const hasActiveFilter = supportLevelFilter || !showRetired || !showDeprecated || !showComingSoon || !showGtmRoadmap || streamFilter || sc4sFilter || platformFilter || versionFilter;
-                return (
-                    <button
-                        onClick={() => onToggleAdvancedFilters(!advancedFiltersOpen)}
-                        title="Advanced filtering by support level and product status"
-                        style={{
-                            ...btnStyle(advancedFiltersOpen || hasActiveFilter, 'advanced'),
-                            position: 'relative',
-                        }}
-                    >
-                        ⚙️ Advanced
-                        {hasActiveFilter && !advancedFiltersOpen && (
-                            <span style={{ width: '6px', height: '6px', borderRadius: '50%', background: '#5c6bc0', position: 'absolute', top: '4px', right: '4px' }} />
-                        )}
-                    </button>
-                );
-            })()}
+            <button
+                className={`scan-filter-trigger ${activeFilterCount > 0 ? 'scan-filter-trigger-active' : ''}`}
+                onClick={onOpenFilterDrawer}
+                title="Open filter panel"
+            >
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"/></svg>
+                Filters
+                {activeFilterCount > 0 && (
+                    <span className="scan-filter-trigger-badge">{activeFilterCount}</span>
+                )}
+            </button>
         </div>
         {/* ── Sub-category pills ── */}
-        {selectedCategory && SUB_CATEGORIES[selectedCategory] && (() => {
+        {selectedCategory && !isCrossCutting && SUB_CATEGORIES[selectedCategory] && (() => {
             const subs = SUB_CATEGORIES[selectedCategory];
             const base = applyCompatFilters(products || []);
             const catProducts = base.filter(p => p.category === selectedCategory);
@@ -4111,7 +4492,7 @@ function CategoryFilterBar({ selectedCategory, onSelectCategory, selectedSubCate
                             📦 Other <span className="csc-subcategory-count">{unassigned}</span>
                         </button>
                     )}
-                    {/* ── AI filter pill (always visible, end of pill row) ── */}
+                    {/* ── AI filter pill ── */}
                     {(() => {
                         const aiCount = catProducts.filter(p => p.ai_enabled).length;
                         if (aiCount === 0) return null;
@@ -4130,7 +4511,7 @@ function CategoryFilterBar({ selectedCategory, onSelectCategory, selectedSubCate
             );
         })()}
         {/* ── AI pill for categories without sub-categories ── */}
-        {selectedCategory && !SUB_CATEGORIES[selectedCategory] && (() => {
+        {selectedCategory && !isCrossCutting && !SUB_CATEGORIES[selectedCategory] && (() => {
             const base = applyCompatFilters(products || []);
             const catProducts = base.filter(p => p.category === selectedCategory);
             const aiCount = catProducts.filter(p => p.ai_enabled).length;
@@ -4142,230 +4523,6 @@ function CategoryFilterBar({ selectedCategory, onSelectCategory, selectedSubCate
                         title="Filter products that leverage AI technologies">
                         <img src={createURL(`/static/app/${APP_ID}/icons/cat-ai.svg`)} alt="" style={{ width: '14px', height: '14px', verticalAlign: '-2px' }} /> AI-Powered <span className="csc-subcategory-count">{aiCount}</span>
                     </button>
-                </div>
-            );
-        })()}
-        {/* ── Advanced Filters sub-row ── */}
-        {advancedFiltersOpen && (() => {
-            /* Compute a portfolio-aware base (respects Supported/All toggle + compat filters) */
-            const rawBase = applyCompatFilters(allProducts || products);
-            const portfolioBase = showFullPortfolio
-                ? rawBase
-                : rawBase.filter(p => SUPPORTED_LEVELS.has(p.support_level));
-
-            /* Apply category filter so all advanced counts respect the selected category */
-            let catBase = portfolioBase;
-            if (selectedCategory === 'soar') catBase = catBase.filter(p => p.soar_connectors && p.soar_connectors.length > 0);
-            else if (selectedCategory === 'alert_actions') catBase = catBase.filter(p => p.alert_actions && p.alert_actions.length > 0);
-            else if (selectedCategory === 'secure_networking') catBase = catBase.filter(p => p.secure_networking_gtm);
-            else if (selectedCategory === 'ai_powered') catBase = catBase.filter(p => p.ai_enabled);
-            else if (selectedCategory) catBase = catBase.filter(p => p.category === selectedCategory);
-
-            /* Support pill counts: apply category + visibility + onboarding (but NOT the support filter) */
-            let supportCountBase = catBase;
-            if (!showRetired) supportCountBase = supportCountBase.filter(p => p.status !== 'retired');
-            if (!showDeprecated) supportCountBase = supportCountBase.filter(p => p.status !== 'deprecated');
-            if (!showComingSoon) supportCountBase = supportCountBase.filter(p => p.status !== 'under_development');
-            if (!showGtmRoadmap) supportCountBase = supportCountBase.filter(p => !p.coverage_gap);
-            if (streamFilter) supportCountBase = supportCountBase.filter(p => p.netflow_supported);
-            if (sc4sFilter) supportCountBase = supportCountBase.filter(p => p.sc4s_supported);
-
-            const supportCounts = {
-                cisco_supported: supportCountBase.filter(p => p.support_level === 'cisco_supported').length,
-                splunk_supported: supportCountBase.filter(p => p.support_level === 'splunk_supported').length,
-                developer_supported: supportCountBase.filter(p => p.support_level === 'developer_supported').length,
-                not_supported: supportCountBase.filter(p => p.support_level === 'not_supported').length,
-            };
-            const supportTotal = supportCountBase.length;
-
-            /* Visibility pill counts: apply category + support + onboarding (but NOT the visibility filters) */
-            let visCountBase = catBase;
-            if (supportLevelFilter) visCountBase = visCountBase.filter(p => p.support_level === supportLevelFilter);
-            if (streamFilter) visCountBase = visCountBase.filter(p => p.netflow_supported);
-            if (sc4sFilter) visCountBase = visCountBase.filter(p => p.sc4s_supported);
-
-            const retiredCount = visCountBase.filter(p => p.status === 'retired').length;
-            const deprecatedCount = visCountBase.filter(p => p.status === 'deprecated').length;
-            const comingSoonCount = visCountBase.filter(p => p.status === 'under_development').length;
-            const gtmRoadmapCount = visCountBase.filter(p => p.coverage_gap).length;
-
-            /* Onboarding pill counts: apply category + support + visibility (each excludes itself) */
-            let onboardingBase = catBase;
-            if (supportLevelFilter) onboardingBase = onboardingBase.filter(p => p.support_level === supportLevelFilter);
-            if (!showRetired) onboardingBase = onboardingBase.filter(p => p.status !== 'retired');
-            if (!showDeprecated) onboardingBase = onboardingBase.filter(p => p.status !== 'deprecated');
-            if (!showComingSoon) onboardingBase = onboardingBase.filter(p => p.status !== 'under_development');
-            if (!showGtmRoadmap) onboardingBase = onboardingBase.filter(p => !p.coverage_gap);
-            const streamCount = (sc4sFilter ? onboardingBase.filter(p => p.sc4s_supported) : onboardingBase).filter(p => p.netflow_supported).length;
-            const sc4sCount = (streamFilter ? onboardingBase.filter(p => p.netflow_supported) : onboardingBase).filter(p => p.sc4s_supported).length;
-
-            const supportPill = (level, label, emoji, activeClass) => {
-                const active = supportLevelFilter === level;
-                return (
-                    <button
-                        onClick={() => onSelectSupportLevel(active ? null : level)}
-                        className={`csc-subcategory-pill csc-support-pill ${active ? activeClass : ''}`}
-                        title={`Show only ${label} products`}
-                    >
-                        {emoji} {label} <span className="csc-subcategory-count">{supportCounts[level]}</span>
-                    </button>
-                );
-            };
-            return (
-                <div className="csc-subcategory-bar csc-advanced-filter-bar" style={{ display: 'flex', gap: '6px', marginTop: '8px', paddingLeft: '8px', flexWrap: 'wrap', alignItems: 'center' }}>
-                    <span style={{ fontSize: '11px', color: 'var(--faint-color, #888)', fontWeight: 500, marginRight: '4px' }}>Support:</span>
-                    <button
-                        onClick={() => onSelectSupportLevel(null)}
-                        className={`csc-subcategory-pill ${!supportLevelFilter ? 'csc-subcategory-pill-active' : ''}`}
-                    >
-                        All <span className="csc-subcategory-count">{supportTotal}</span>
-                    </button>
-                    {supportPill('cisco_supported', 'Cisco', '🟢', 'csc-support-pill-cisco-active')}
-                    {supportPill('splunk_supported', 'Splunk', '🔵', 'csc-support-pill-splunk-active')}
-                    {supportPill('developer_supported', 'Developer', '🟠', 'csc-support-pill-dev-active')}
-                    {supportPill('not_supported', 'Unsupported', '⚪', 'csc-support-pill-unsupported-active')}
-                    <span style={{ borderLeft: '1.5px solid var(--card-border, #ddd)', height: '18px', margin: '0 4px' }} />
-                    <span style={{ fontSize: '11px', color: 'var(--faint-color, #888)', fontWeight: 500, marginRight: '4px' }}>Visibility:</span>
-                    <button
-                        onClick={() => onToggleShowRetired(!showRetired)}
-                        className={`csc-subcategory-pill csc-visibility-pill ${showRetired ? 'csc-visibility-pill-on' : 'csc-visibility-pill-off'}`}
-                        title={showRetired ? 'Retired products are shown — click to hide' : 'Retired products are hidden — click to show'}
-                    >
-                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ verticalAlign: '-2px', textDecoration: 'none' }}><polyline points="21 8 21 21 3 21 3 8"/><rect x="1" y="3" width="22" height="5"/><line x1="10" y1="12" x2="14" y2="12"/></svg> Retired <span className="csc-subcategory-count">{retiredCount}</span>
-                    </button>
-                    <button
-                        onClick={() => onToggleShowDeprecated(!showDeprecated)}
-                        className={`csc-subcategory-pill csc-visibility-pill ${showDeprecated ? 'csc-visibility-pill-on' : 'csc-visibility-pill-off'}`}
-                        title={showDeprecated ? 'Deprecated products are shown — click to hide' : 'Deprecated products are hidden — click to show'}
-                    >
-                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ verticalAlign: '-2px', textDecoration: 'none' }}><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg> Deprecated <span className="csc-subcategory-count">{deprecatedCount}</span>
-                    </button>
-                    <button
-                        onClick={() => onToggleShowComingSoon(!showComingSoon)}
-                        className={`csc-subcategory-pill csc-visibility-pill ${showComingSoon ? 'csc-visibility-pill-on' : 'csc-visibility-pill-off'}`}
-                        title={showComingSoon ? 'Coming Soon products are shown — click to hide' : 'Coming Soon products are hidden — click to show'}
-                    >
-                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ verticalAlign: '-2px', textDecoration: 'none' }}><path d="M4.5 16.5c-1.5 1.26-2 5-2 5s3.74-.5 5-2c.71-.84.7-2.13-.09-2.91a2.18 2.18 0 00-2.91-.09z"/><path d="M12 15l-3-3a22 22 0 012-3.95A12.88 12.88 0 0122 2c0 2.72-.78 7.5-6 11a22.35 22.35 0 01-4 2z"/><path d="M9 12H4s.55-3.03 2-4c1.62-1.08 3 0 3 0"/><path d="M12 15v5s3.03-.55 4-2c1.08-1.62 0-3 0-3"/></svg> Coming Soon <span className="csc-subcategory-count">{comingSoonCount}</span>
-                    </button>
-                    {gtmRoadmapCount > 0 && (
-                        <button
-                            onClick={() => onToggleShowGtmRoadmap(!showGtmRoadmap)}
-                            className={`csc-subcategory-pill csc-visibility-pill ${showGtmRoadmap ? 'csc-visibility-pill-on' : 'csc-visibility-pill-off'}`}
-                            title={showGtmRoadmap ? 'GTM Roadmap products are shown — click to hide' : 'GTM Roadmap products are hidden — click to show'}
-                        >
-                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ verticalAlign: '-2px', textDecoration: 'none' }}><path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"/><line x1="4" y1="22" x2="4" y2="15"/></svg> GTM Roadmap <span className="csc-subcategory-count">{gtmRoadmapCount}</span>
-                        </button>
-                    )}
-                    {/* ── Onboarding Path filters ── */}
-                    {(streamCount > 0 || sc4sCount > 0) && (
-                        <>
-                            <span style={{ borderLeft: '1.5px solid var(--card-border, #ddd)', height: '18px', margin: '0 4px' }} />
-                            <span style={{ fontSize: '11px', color: 'var(--faint-color, #888)', fontWeight: 500, marginRight: '4px' }}>Onboarding:</span>
-                            {sc4sCount > 0 && (
-                                <button
-                                    onClick={() => onToggleSc4sFilter(!sc4sFilter)}
-                                    className={`csc-subcategory-pill csc-sc4s-filter-pill ${sc4sFilter ? 'csc-sc4s-filter-pill-active' : ''}`}
-                                    title={sc4sFilter ? 'Showing SC4S-supported products — click to clear' : 'Show only products with SC4S onboarding'}
-                                >
-                                    {sc4sFilter && <span style={{ fontSize: '11px', fontWeight: 700 }}>✓</span>} 📡 SC4S <span className="csc-subcategory-count">{sc4sCount}</span>
-                                </button>
-                            )}
-                            {streamCount > 0 && (
-                                <button
-                                    onClick={() => onToggleStreamFilter(!streamFilter)}
-                                    className={`csc-subcategory-pill csc-stream-pill ${streamFilter ? 'csc-stream-pill-active' : ''}`}
-                                    title={streamFilter ? 'Showing Stream/NetFlow products — click to clear' : 'Show only products with Stream/NetFlow onboarding'}
-                                >
-                                    {streamFilter && <span style={{ fontSize: '11px', fontWeight: 700 }}>✓</span>} <img src={createURL(`/static/app/${APP_ID}/icons/network_analytics.svg`)} alt="" className="csc-filter-pill-icon" style={{ width: '14px', height: '14px', verticalAlign: '-2px' }} /> Stream <span className="csc-subcategory-count">{streamCount}</span>
-                                </button>
-                            )}
-                        </>
-                    )}
-                    {/* ── Splunkbase Compatibility filters ── */}
-                    {splunkbaseData && Object.keys(splunkbaseData).length > 0 && (() => {
-                        /* Collect versions only from UIDs that power the product cards */
-                        const PLATFORM_OPTIONS = ['Splunk Cloud', 'Splunk Enterprise'];
-                        const productUidSet = new Set();
-                        const allProducts = products || [];
-                        allProducts.forEach(p => {
-                            getProductUids(p).forEach(uid => productUidSet.add(uid));
-                        });
-                        const cardVersions = new Set();
-                        productUidSet.forEach(uid => {
-                            const entry = splunkbaseData[uid];
-                            if (entry && entry.version_compatibility) {
-                                entry.version_compatibility.split(/[|,]/).map(v => v.trim()).filter(Boolean).forEach(v => {
-                                    const major = parseFloat(v);
-                                    if (!isNaN(major) && major > 9.0) cardVersions.add(v);
-                                });
-                            }
-                        });
-                        const versionList = sortVersionsDesc([...cardVersions]);
-                        return (
-                            <>
-                                <span style={{ borderLeft: '1.5px solid var(--card-border, #ddd)', height: '18px', margin: '0 4px' }} />
-                                <span style={{ fontSize: '11px', color: 'var(--faint-color, #888)', fontWeight: 500, marginRight: '4px' }}>Compatibility:</span>
-                                <select
-                                    value={platformFilter || ''}
-                                    onChange={e => onSelectPlatform(e.target.value || null)}
-                                    className="csc-subcategory-pill csc-compat-select"
-                                    title="Filter by platform compatibility"
-                                    style={{ cursor: 'pointer', fontSize: '12px', fontWeight: 600, padding: '4px 8px', borderRadius: '14px', border: `2px solid ${platformFilter ? '#049fd9' : 'var(--card-border, #ddd)'}`, background: platformFilter ? '#e0f4fd' : 'var(--card-bg, #f5f5f5)', color: platformFilter ? '#0277bd' : 'var(--page-color, #333)', appearance: 'auto', minWidth: '100px' }}
-                                >
-                                    <option value="">All Platforms</option>
-                                    {PLATFORM_OPTIONS.map(p => <option key={p} value={p}>{p}</option>)}
-                                </select>
-                                {versionList.length > 0 && (
-                                    <select
-                                        value={versionFilter || ''}
-                                        onChange={e => onSelectVersion(e.target.value || null)}
-                                        className="csc-subcategory-pill csc-compat-select"
-                                        title="Filter by Splunk version compatibility"
-                                        style={{ cursor: 'pointer', fontSize: '12px', fontWeight: 600, padding: '4px 8px', borderRadius: '14px', border: `2px solid ${versionFilter ? '#049fd9' : 'var(--card-border, #ddd)'}`, background: versionFilter ? '#e0f4fd' : 'var(--card-bg, #f5f5f5)', color: versionFilter ? '#0277bd' : 'var(--page-color, #333)', appearance: 'auto', minWidth: '80px' }}
-                                    >
-                                        <option value="">All Versions</option>
-                                        {versionList.map(v => <option key={v} value={v}>Splunk {v}</option>)}
-                                    </select>
-                                )}
-                            </>
-                        );
-                    })()}
-                    {/* ── Sync Splunkbase button (inside Advanced) ── */}
-                    <span style={{ borderLeft: '1.5px solid var(--card-border, #ddd)', height: '18px', margin: '0 4px' }} />
-                    <button
-                        className={`csc-subcategory-pill scan-util-sync ${csvSyncStatus === 'success' ? 'scan-sync-ok' : csvSyncStatus === 'error' ? 'scan-sync-err' : csvSyncStatus === 'syncing' ? 'scan-sync-busy' : ''}`}
-                        onClick={onSyncSplunkbase}
-                        disabled={csvSyncStatus === 'syncing'}
-                        title={csvSyncStatus === 'success' ? `✓ ${csvSyncMessage}` : csvSyncStatus === 'error' ? `✗ ${csvSyncMessage}` : csvSyncStatus === 'syncing' ? 'Downloading…' : 'Sync Splunkbase catalog from S3 — updates compatibility data for all products'}
-                        style={{ cursor: csvSyncStatus === 'syncing' ? 'wait' : 'pointer' }}
-                    >
-                        {csvSyncStatus === 'syncing' ? '⏳' : csvSyncStatus === 'success' ? '✅' : csvSyncStatus === 'error' ? '❌' : '🔄'} Sync
-                    </button>
-                    <InfoTooltip
-                        placement="bottom"
-                        width={520}
-                        delay={300}
-                        persistent
-                        title="Sync Splunkbase Catalog"
-                        content={
-                            <span>
-                                <p>Downloads the latest Splunkbase app catalog from Cisco's S3 repository and saves it as a compressed Splunk lookup.</p>
-                                <p><b>This enables:</b></p>
-                                <ul>
-                                    <li>Platform compatibility info (Splunk Cloud, Enterprise)</li>
-                                    <li>Splunk version compatibility (10.2, 10.1, 9.4, etc.)</li>
-                                    <li>Latest app version detection</li>
-                                    <li>Platform and Version compatibility filters</li>
-                                </ul>
-                                <p>The catalog is stored locally as a compressed lookup file. <b>No data leaves your Splunk instance</b> — this is a one-way download.</p>
-                                <p style={{ fontSize: '12px', color: 'var(--faint-color, #888)' }}>Re-sync periodically to pick up newly published app versions.</p>
-                            </span>
-                        }
-                    >
-                        <span className="scan-info-pill" style={{ padding: '2px 8px', fontSize: '11px' }}>
-                            <span className="scan-info-pill-icon" style={{ fontSize: '14px' }}>&#9432;</span>
-                        </span>
-                    </InfoTooltip>
                 </div>
             );
         })()}
@@ -4412,6 +4569,7 @@ function SCANProductsPage() {
     const [techStackOpen, setTechStackOpen] = useState(false);
     const [searchBarQuery, setSearchBarQuery] = useState('');
     const [advancedFiltersOpen, setAdvancedFiltersOpen] = useState(false);
+    const [filterDrawerOpen, setFilterDrawerOpen] = useState(false);
     const [supportLevelFilter, setSupportLevelFilter] = useState(null);
     const [showRetired, setShowRetired] = useState(true);
     const [showDeprecated, setShowDeprecated] = useState(true);
@@ -4425,7 +4583,19 @@ function SCANProductsPage() {
     const [csvSyncStatus, setCsvSyncStatus] = useState(null);    // null | 'syncing' | 'success' | 'error'
     const [csvSyncMessage, setCsvSyncMessage] = useState('');
     const [platformFilter, setPlatformFilter] = useState(null);    // null | 'Splunk Cloud' | 'Splunk Enterprise' | ...
-    const [versionFilter, setVersionFilter] = useState(null);      // null | '10.2' | '10.1' | ...
+    const [versionFilter, setVersionFilter] = useState([]);        // [] | ['10.2', '10.1', ...]
+
+    /** Toggle a version in/out of the multi-select filter. Pass null to clear all. */
+    const handleVersionToggle = (version) => {
+        if (version === null) {
+            setVersionFilter([]);
+        } else {
+            setVersionFilter(prev => prev.includes(version)
+                ? prev.filter(v => v !== version)
+                : [...prev, version]
+            );
+        }
+    };
 
     // ── Theme detection — read Splunk's preference and store it ──
     useEffect(() => {
@@ -4722,7 +4892,7 @@ function SCANProductsPage() {
         const loadSplunkbaseData = async () => {
             try {
                 const searchStr = '| inputlookup scan_splunkbase_apps | table uid version_compatibility product_compatibility app_version title';
-                console.log('[SCAN] Loading Splunkbase data:', searchStr);
+                // console.log('[SCAN] Loading Splunkbase data:', searchStr);
                 // Use app-namespaced endpoint so transforms.conf stanza is resolved
                 const sbEndpoint = `/splunkd/__raw/servicesNS/-/${APP_ID}/search/jobs`;
                 const res = await splunkFetch(sbEndpoint, {
@@ -4730,11 +4900,11 @@ function SCANProductsPage() {
                     headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
                     body: `search=${encodeURIComponent(searchStr)}&output_mode=json&exec_mode=oneshot&count=0&timeout=60`,
                 });
-                console.log('[SCAN] Splunkbase lookup response status:', res.status);
+                // console.log('[SCAN] Splunkbase lookup response status:', res.status);
                 if (!res.ok) { console.warn('[SCAN] Splunkbase lookup not available (not yet synced?)', res.status, res.statusText); return; }
                 const data = await res.json();
                 const rows = data.results || [];
-                console.log('[SCAN] Splunkbase lookup raw rows:', rows.length, 'sample:', rows.slice(0, 3));
+                // console.log('[SCAN] Splunkbase lookup raw rows:', rows.length, 'sample:', rows.slice(0, 3));
                 const lookup = {};
                 rows.forEach(r => {
                     if (r.uid) {
@@ -4748,7 +4918,7 @@ function SCANProductsPage() {
                 });
                 setSplunkbaseData(lookup);
                 setSplunkbaseLoaded(true);
-                console.log(`[SCAN] Loaded ${Object.keys(lookup).length} Splunkbase entries, sample keys:`, Object.keys(lookup).slice(0, 10));
+                // console.log(`[SCAN] Loaded ${Object.keys(lookup).length} Splunkbase entries, sample keys:`, Object.keys(lookup).slice(0, 10));
             } catch (e) {
                 console.error('[SCAN] Could not load Splunkbase data:', e);
             }
@@ -4793,7 +4963,7 @@ function SCANProductsPage() {
                     rows.forEach(r => { if (r.uid) lookup[String(r.uid)] = { version_compatibility: r.version_compatibility || '', product_compatibility: r.product_compatibility || '', app_version: r.app_version || '', title: r.title || '' }; });
                     setSplunkbaseData(lookup);
                     setSplunkbaseLoaded(true);
-                    console.log(`[SCAN] Reloaded ${Object.keys(lookup).length} Splunkbase entries after sync`);
+                    // console.log(`[SCAN] Reloaded ${Object.keys(lookup).length} Splunkbase entries after sync`);
                 }
             } else {
                 setCsvSyncStatus('error');
@@ -4897,8 +5067,8 @@ function SCANProductsPage() {
                 });
             });
         }
-        // ── Splunkbase version compatibility filter ──
-        if (versionFilter && splunkbaseData && Object.keys(splunkbaseData).length > 0) {
+        // ── Splunkbase version compatibility filter (multi-select) ──
+        if (versionFilter.length > 0 && splunkbaseData && Object.keys(splunkbaseData).length > 0) {
             filtered = filtered.filter((p) => {
                 const uids = getProductUids(p);
                 if (uids.length === 0) return false;
@@ -4906,7 +5076,7 @@ function SCANProductsPage() {
                     const entry = splunkbaseData[uid];
                     if (!entry || !entry.version_compatibility) return false;
                     const versions = entry.version_compatibility.split(/[|,]/).map(v => v.trim());
-                    return versions.includes(versionFilter);
+                    return versionFilter.some(vf => versions.includes(vf));
                 });
             });
         }
@@ -4922,6 +5092,34 @@ function SCANProductsPage() {
         }
         return preAddonProducts.filter((p) => p.addon === selectedAddon);
     }, [preAddonProducts, selectedAddon]);
+
+    /* Active filter count for the "Filters" button badge */
+    const crossCutLabels = { soar: 1, alert_actions: 1, secure_networking: 1, ai_powered: 1 };
+    const activeFilterCount = useMemo(() => {
+        let count = 0;
+        if (selectedCategory && crossCutLabels[selectedCategory]) count++;
+        if (supportLevelFilter) count++;
+        if (!showRetired) count++;
+        if (!showDeprecated) count++;
+        if (!showComingSoon) count++;
+        if (!showGtmRoadmap) count++;
+        if (streamFilter) count++;
+        if (sc4sFilter) count++;
+        if (platformFilter) count++;
+        if (versionFilter.length > 0) count++;
+        if (selectedAddon) count++;
+        return count;
+    }, [selectedCategory, supportLevelFilter, showRetired, showDeprecated, showComingSoon, showGtmRoadmap, streamFilter, sc4sFilter, platformFilter, versionFilter, selectedAddon]);
+
+    /* Addon label for active chip display */
+    const activeAddonLabel = useMemo(() => {
+        if (!selectedAddon || !preAddonProducts) return '';
+        // Derive label from a product that has this addon
+        if (selectedAddon === '__standalone__') return 'Standalone';
+        if (selectedAddon === '__sc4s__') return 'SC4S Only';
+        const match = preAddonProducts.find(p => p.addon === selectedAddon);
+        return match ? (match.addon_label || match.addon) : selectedAddon;
+    }, [selectedAddon, preAddonProducts]);
 
     const configuredProducts = filteredProducts.filter((p) => p.status !== 'under_development' && p.status !== 'retired' && p.status !== 'deprecated' && !p.coverage_gap && configuredIds.includes(p.product_id));
     const detectedProducts = filteredProducts.filter((p) => p.status !== 'under_development' && p.status !== 'retired' && p.status !== 'deprecated' && !p.coverage_gap && p.support_level !== 'not_supported' && !configuredIds.includes(p.product_id) && sourcetypeData[p.product_id] && sourcetypeData[p.product_id].hasData);
@@ -4959,13 +5157,14 @@ function SCANProductsPage() {
                 });
             });
         }
-        if (versionFilter && splunkbaseData && Object.keys(splunkbaseData).length > 0) {
+        if (versionFilter.length > 0 && splunkbaseData && Object.keys(splunkbaseData).length > 0) {
             base = base.filter((p) => {
                 const uids = getProductUids(p);
                 return uids.some(uid => {
                     const entry = splunkbaseData[uid];
                     if (!entry || !entry.version_compatibility) return false;
-                    return entry.version_compatibility.split(/[|,]/).map(v => v.trim()).includes(versionFilter);
+                    const versions = entry.version_compatibility.split(/[|,]/).map(v => v.trim());
+                    return versionFilter.some(vf => versions.includes(vf));
                 });
             });
         }
@@ -5150,10 +5349,7 @@ function SCANProductsPage() {
                         setSelectedCategory(cat);
                         setSelectedSubCategory(null);
                         setAiFilter(false);
-                        setStreamFilter(false);
-                        setSc4sFilter(false);
                         if (!cat) {
-                            // "All" clicked — clear every downstream filter so the user sees the full list
                             setSelectedAddon(null);
                             setSearchQuery('');
                             setSearchBarQuery('');
@@ -5163,49 +5359,88 @@ function SCANProductsPage() {
                     onSelectSubCategory={setSelectedSubCategory}
                     aiFilter={aiFilter}
                     onToggleAiFilter={setAiFilter}
-                    streamFilter={streamFilter}
-                    onToggleStreamFilter={setStreamFilter}
-                    sc4sFilter={sc4sFilter}
-                    onToggleSc4sFilter={setSc4sFilter}
                     categoryCounts={categoryCounts}
                     products={portfolioProducts}
-                    allProducts={products}
-                    advancedFiltersOpen={advancedFiltersOpen}
-                    onToggleAdvancedFilters={setAdvancedFiltersOpen}
-                    supportLevelFilter={supportLevelFilter}
-                    onSelectSupportLevel={(level) => {
-                        setSupportLevelFilter(level);
-                        // When selecting a non-supported tier, auto-switch to 'All Products'
-                        // so they remain visible after the pill is later cleared.
-                        if (level && !SUPPORTED_LEVELS.has(level) && !showFullPortfolio) {
-                            setShowFullPortfolio(true);
-                            savePortfolioPreference(true);
-                        }
+                    onOpenFilterDrawer={() => setFilterDrawerOpen(true)}
+                    activeFilterCount={activeFilterCount}
+                    platformFilter={platformFilter}
+                    versionFilter={versionFilter}
+                    splunkbaseData={splunkbaseData}
+                />
+                <ActiveFilterChips
+                    selectedCategory={selectedCategory}
+                    onSelectCategory={(cat) => {
+                        setSelectedCategory(cat);
+                        setSelectedSubCategory(null);
+                        setAiFilter(false);
                     }}
+                    supportLevelFilter={supportLevelFilter}
+                    onSelectSupportLevel={setSupportLevelFilter}
                     showRetired={showRetired}
                     onToggleShowRetired={setShowRetired}
                     showDeprecated={showDeprecated}
                     onToggleShowDeprecated={setShowDeprecated}
                     showComingSoon={showComingSoon}
                     onToggleShowComingSoon={setShowComingSoon}
-                    showFullPortfolio={showFullPortfolio}
                     showGtmRoadmap={showGtmRoadmap}
                     onToggleShowGtmRoadmap={setShowGtmRoadmap}
+                    streamFilter={streamFilter}
+                    onToggleStreamFilter={setStreamFilter}
+                    sc4sFilter={sc4sFilter}
+                    onToggleSc4sFilter={setSc4sFilter}
                     platformFilter={platformFilter}
                     onSelectPlatform={setPlatformFilter}
                     versionFilter={versionFilter}
-                    onSelectVersion={setVersionFilter}
-                    splunkbaseData={splunkbaseData}
-                    csvSyncStatus={csvSyncStatus}
-                    csvSyncMessage={csvSyncMessage}
-                    onSyncSplunkbase={handleSyncSplunkbase}
+                    onSelectVersion={handleVersionToggle}
+                    selectedAddon={selectedAddon}
+                    onSelectAddon={setSelectedAddon}
+                    addonLabel={activeAddonLabel}
                 />
             </div>
 
-            <AddonFilterBar
+            <FilterDrawer
+                open={filterDrawerOpen}
+                onClose={() => setFilterDrawerOpen(false)}
+                selectedCategory={selectedCategory}
+                onSelectCategory={(cat) => {
+                    setSelectedCategory(cat);
+                    setSelectedSubCategory(null);
+                    setAiFilter(false);
+                }}
+                supportLevelFilter={supportLevelFilter}
+                onSelectSupportLevel={(level) => {
+                    setSupportLevelFilter(level);
+                    if (level && !SUPPORTED_LEVELS.has(level) && !showFullPortfolio) {
+                        setShowFullPortfolio(true);
+                        savePortfolioPreference(true);
+                    }
+                }}
+                showRetired={showRetired}
+                onToggleShowRetired={setShowRetired}
+                showDeprecated={showDeprecated}
+                onToggleShowDeprecated={setShowDeprecated}
+                showComingSoon={showComingSoon}
+                onToggleShowComingSoon={setShowComingSoon}
+                showGtmRoadmap={showGtmRoadmap}
+                onToggleShowGtmRoadmap={setShowGtmRoadmap}
+                streamFilter={streamFilter}
+                onToggleStreamFilter={setStreamFilter}
+                sc4sFilter={sc4sFilter}
+                onToggleSc4sFilter={setSc4sFilter}
+                platformFilter={platformFilter}
+                onSelectPlatform={setPlatformFilter}
+                versionFilter={versionFilter}
+                onSelectVersion={handleVersionToggle}
+                splunkbaseData={splunkbaseData}
+                csvSyncStatus={csvSyncStatus}
+                csvSyncMessage={csvSyncMessage}
+                onSyncSplunkbase={handleSyncSplunkbase}
                 selectedAddon={selectedAddon}
                 onSelectAddon={setSelectedAddon}
-                products={preAddonProducts}
+                products={portfolioProducts}
+                allProducts={products}
+                categoryCounts={categoryCounts}
+                showFullPortfolio={showFullPortfolio}
             />
 
             {/* Section 1: Configured */}
