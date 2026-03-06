@@ -9,8 +9,8 @@ Preview:   "The 5 Pillars of the Cure" — Teaser for March 10 demos
 Agenda:    "Today's Agenda" — Part 1 roadmap (7 sections)
 Slide 1:   "#1 Most Requested Demo" — $500B TAM, customer demand, stakes
 Slide 2:   "Why We Are Here" — 4 forces: Renewal Risk, Data Integrity, Agentic Future, Demand
-Slide 3:   "What Happened" — 121 → 62 archived → 59 remain
-Slide 4:   "The Real Number" — Of those 59, only 18 are enterprise-grade
+Slide 3:   "What Happened" — 125 → 65 archived → 53 actively in ecosystem
+Slide 4:   "The Real Number" — Of those 53, only 16 have Cisco/Splunk support
 Slide 5:   "Still Running" — 89 apps, 2,973 Cloud stacks (evidence)
 Slides 6a-6c: "The Coverage Gap" — Progressive build
 Slide 7:   "Field Feedback" — 7 pain points from the field
@@ -89,19 +89,21 @@ else:
 CISCO_BLUE     = RGBColor(0x04, 0x9F, 0xD9)
 CISCO_BLUE_DK  = RGBColor(0x00, 0x7C, 0x92)
 SPLUNK_GREEN   = RGBColor(0x65, 0xA6, 0x37)
-DEBT_RED       = RGBColor(0xD3, 0x2F, 0x2F)
-WARN_AMBER     = RGBColor(0xF9, 0xA8, 0x25)
 WHITE          = RGBColor(0xFF, 0xFF, 0xFF)
 OFF_WHITE      = RGBColor(0xFA, 0xFA, 0xFA)
 LIGHT_GRAY     = RGBColor(0xF5, 0xF5, 0xF5)
 MED_GRAY       = RGBColor(0x9E, 0x9E, 0x9E)
-DARK_TEXT       = RGBColor(0x21, 0x21, 0x21)
+DARK_TEXT      = RGBColor(0x21, 0x21, 0x21)
 SUBTITLE_GRAY  = RGBColor(0x61, 0x61, 0x61)
 PURPLE         = RGBColor(0x4A, 0x14, 0x8C)
 PHASE_GREEN    = RGBColor(0x2E, 0x7D, 0x32)
 PHASE_BLUE     = RGBColor(0x15, 0x65, 0xC0)
-ARCHIVE_ORANGE = RGBColor(0xE6, 0x51, 0x00)
 DARK_BG        = RGBColor(0x37, 0x47, 0x4F)
+
+# ─── Uniform color palette (replacing reds/oranges per user request) ───
+DEBT_RED       = CISCO_BLUE_DK     # Was red, now uniform dark blue
+WARN_AMBER     = CISCO_BLUE        # Was amber, now uniform Cisco blue
+ARCHIVE_ORANGE = SUBTITLE_GRAY     # Was orange, now neutral gray
 
 # ─── Helpers ───
 
@@ -621,16 +623,16 @@ agenda_items = [
      "Four converging forces: Renewal Risk, Data Integrity, Agentic Future, Customer Demand",
      DEBT_RED),
     ("3", "What Just Happened on Splunkbase",
-     "121 apps → 62 archived → 59 remaining — the scale of the ecosystem cleanup",
+     "125 apps → 65 archived → 53 actively in the ecosystem — the scale of the cleanup",
      WARN_AMBER),
     ("4", "The Number That Actually Matters",
-     "Of 59 remaining apps, only 18 have enterprise-grade support (Cisco or Splunk backed)",
+     "Of 53 apps actively in the Cisco ecosystem, 16 have Cisco/Splunk support (Cisco or Splunk backed)",
      PURPLE),
     ("5", "Still Running — Cisco Apps in Splunk Cloud",
      "89 apps deployed across 2,973 Cloud stacks — the archiving removed listings, not usage",
      PHASE_GREEN),
     ("6", "The Cisco Coverage Gap",
-     "47 active products, 17 on the GTM roadmap, only 28% enterprise-grade coverage today",
+     "~50 in-market products, 13 on the GTM roadmap, 16 with Cisco/Splunk support",
      CISCO_BLUE_DK),
     ("7", "Voices from the Field + Systemic Issues",
      "7 pain points customers report and the 4 root causes that keep this problem recurring",
@@ -692,7 +694,7 @@ add_speaker_notes(slide_agenda, """HOW TO DELIVER THIS SLIDE:
 
 "We'll start with the market context — why Cisco is the #1 most requested integration. Then we'll lay out the four forces converging to make this urgent."
 
-"After that, we'll walk through the data: what happened on Splunkbase, the enterprise-grade reality, and the Cloud deployment evidence."
+"After that, we'll walk through the data: what happened on Splunkbase, the Cisco/Splunk support reality, and the Cloud deployment evidence."
 
 "We'll close with the full coverage gap analysis and what we're hearing directly from the field."
 
@@ -991,7 +993,7 @@ add_text_box(slide1, 0.5, 0.95, 12.3, 0.35,
 # Centered, massive, with plenty of breathing room
 
 # BEFORE
-add_big_number(slide1, 1.0, 2.0, "121", CISCO_BLUE, font_size=80)
+add_big_number(slide1, 1.0, 2.0, "125", CISCO_BLUE, font_size=80)
 add_text_box(slide1, 1.0, 3.2, 3.5, 0.5, "Apps & Add-ons",
              font_size=16, bold=True, color=CISCO_BLUE, alignment=PP_ALIGN.CENTER)
 add_text_box(slide1, 1.0, 3.6, 3.5, 0.3, "on Splunkbase before",
@@ -1002,7 +1004,7 @@ add_text_box(slide1, 4.4, 2.4, 0.8, 0.8, "→",
              font_size=48, bold=True, color=MED_GRAY, alignment=PP_ALIGN.CENTER)
 
 # ARCHIVED
-add_big_number(slide1, 5.0, 2.0, "62", DEBT_RED, font_size=80)
+add_big_number(slide1, 5.0, 2.0, "65", DEBT_RED, font_size=80)
 add_text_box(slide1, 5.0, 3.2, 3.5, 0.5, "Archived",
              font_size=16, bold=True, color=DEBT_RED, alignment=PP_ALIGN.CENTER)
 add_text_box(slide1, 5.0, 3.6, 3.5, 0.3, "removed from Splunkbase",
@@ -1013,7 +1015,7 @@ add_text_box(slide1, 8.4, 2.4, 0.8, 0.8, "→",
              font_size=48, bold=True, color=MED_GRAY, alignment=PP_ALIGN.CENTER)
 
 # REMAINING
-add_big_number(slide1, 9.0, 2.0, "59", WARN_AMBER, font_size=80)
+add_big_number(slide1, 9.0, 2.0, "53", WARN_AMBER, font_size=80)
 add_text_box(slide1, 9.0, 3.2, 3.5, 0.5, "Remaining",
              font_size=16, bold=True, color=WARN_AMBER, alignment=PP_ALIGN.CENTER)
 add_text_box(slide1, 9.0, 3.6, 3.5, 0.3, "still on Splunkbase today",
@@ -1031,7 +1033,7 @@ box_h = 1.75
 add_section_box(slide1, 0.8, box_y, 5.5, box_h,
     "What Was Archived", DEBT_RED,
     [
-        "**62** apps & add-ons removed (22 apps + 40 add-ons)",
+        "**65** apps & add-ons archived (22 apps + 43 add-ons)",
         "",
         "**10** Cisco products lost all Splunkbase coverage",
         "   (all 10 were already EOL/EOS by Cisco)",
@@ -1043,7 +1045,7 @@ add_section_box(slide1, 0.8, box_y, 5.5, box_h,
 add_section_box(slide1, 7.0, box_y, 5.5, box_h,
     "What Still Remains", PHASE_GREEN,
     [
-        "**59** apps & add-ons (27 apps + 32 add-ons)",
+        "**53** apps & add-ons in the ecosystem (27 apps + 26 add-ons)",
         "",
         "**46** unique Cisco products still have coverage",
         "",
@@ -1057,7 +1059,7 @@ add_section_box(slide1, 7.0, box_y, 5.5, box_h,
 add_rounded_rect(slide1, 0.3, 7.0, 12.7, 0.32, DARK_BG, "", font_size=9)
 footer1 = [
     [("Splunk Cloud data: ", 9, True, WARN_AMBER),
-     ("89 of these 121 apps are still actively deployed across 2,973 Cloud stacks — ", 9, False, RGBColor(0xB0, 0xBE, 0xC5)),
+     ("89 of these 125 apps are still actively deployed across 2,973 Cloud stacks — ", 9, False, RGBColor(0xB0, 0xBE, 0xC5)),
      ("the archiving removed listings, not running code", 9, True, WHITE)],
 ]
 add_rich_text_box(slide1, 0.6, 7.02, 12.2, 0.28, footer1, alignment=PP_ALIGN.CENTER)
@@ -1067,14 +1069,14 @@ add_speaker_notes(slide1, """HOW TO DELIVER THIS SLIDE:
 
 "Let me show you what just happened to Cisco's presence on Splunkbase."
 
-[Click — show 121]
-"We had 121 apps and add-ons. That's the largest vendor ecosystem on Splunkbase outside of Splunk itself. 49 apps, 72 add-ons — covering everything from ASA firewalls to Webex collaboration."
+[Click — show 125]
+"We have 125 apps and add-ons in the Cisco ecosystem on Splunkbase. That's the largest vendor ecosystem outside of Splunk itself — 49 apps, 75 add-ons. This includes critical infrastructure like Splunk App for Stream, the stream forwarding add-on, and stream wire data collection that underpins our entire netflow visibility story."
 
-[Click — show 62]
-"Splunk archived 62 of them. Over half. Gone from the catalog in one sweep."
+[Click — show 65]
+"Splunk archived 65 of them. Over half. Gone from the catalog in one sweep."
 
 [Click — show 59]
-"59 remain. That sounds manageable, right? That's the story most people stop at."
+"53 remain in the ecosystem. That's the active portfolio. That sounds manageable, right? That's the story most people stop at."
 
 [Pause]
 "But here's what they're missing — and it's the most important part..."
@@ -1083,14 +1085,14 @@ KEY POINTS TO EMPHASIZE:
 • 10 retired Cisco products lost ALL coverage — but they were already EOL, so this was housekeeping
 • The 4 active products (AppDynamics, Webex, CMS, CUCM) are the real concern — they now only have developer-supported add-ons, meaning no SLA
 • The footer stat is your ace card if anyone says "doesn't matter" — 89 of these apps are still running on 2,973 Cloud stacks RIGHT NOW
-• This slide sets up the tension. Don't resolve it here. Let them sit with "59 remaining" assuming that's fine.
+• This slide sets up the tension. Don't resolve it here. Let them sit with "53 apps in the ecosystem" assuming that's fine.
 """)
 
 
 # ══════════════════════════════════════════════════════
 # SLIDE 2: "The Number That Matters"
-#   The reveal — 59 remaining sounds okay, but only 18
-#   have enterprise-grade support. This is the "aha."
+#   The reveal — 53 apps in the ecosystem sounds okay, but only 16
+#   have Cisco/Splunk support. This is the "aha."
 #   Steve Jobs: One number that reframes everything.
 # ══════════════════════════════════════════════════════
 slide2 = add_slide(prs, use_template)
@@ -1104,20 +1106,20 @@ add_text_box(slide2, 0.5, 0.95, 12.3, 0.35,
              "Not how many apps remain — how many your customers can actually deploy",
              font_size=14, color=SUBTITLE_GRAY)
 
-# ── The big reveal: 59 → 18 ──
-# Left side: "59 Remaining" (what people think)
+# ── The big reveal: 53 in ecosystem → only 16 with Cisco/Splunk support ──
+# Left side: "53 in the Ecosystem" (what people think)
 add_text_box(slide2, 0.8, 1.8, 5.5, 0.4,
              "Apps remaining on Splunkbase",
              font_size=13, color=MED_GRAY, alignment=PP_ALIGN.CENTER)
-add_big_number(slide2, 1.8, 2.2, "59", RGBColor(0xCC, 0xCC, 0xCC), font_size=96)
+add_big_number(slide2, 1.8, 2.2, "53", RGBColor(0xCC, 0xCC, 0xCC), font_size=96)
 add_text_box(slide2, 0.8, 3.6, 5.5, 0.3, "What everyone sees",
              font_size=12, color=MED_GRAY, alignment=PP_ALIGN.CENTER)
 
-# Right side: "18" (the real number) — in bold, vibrant
+# Right side: "16" (the real number) — in bold, vibrant
 add_text_box(slide2, 7.0, 1.8, 5.5, 0.4,
              "With Cisco or Splunk support",
              font_size=13, color=MED_GRAY, alignment=PP_ALIGN.CENTER)
-add_big_number(slide2, 8.0, 2.2, "18", PHASE_BLUE, font_size=96)
+add_big_number(slide2, 8.0, 2.2, "16", PHASE_BLUE, font_size=96)
 add_text_box(slide2, 7.0, 3.6, 5.5, 0.3, "What actually matters to enterprise customers",
              font_size=12, bold=True, color=PHASE_BLUE, alignment=PP_ALIGN.CENTER)
 
@@ -1133,7 +1135,7 @@ div.line.fill.background()
 # ── Explanation: The support breakdown ──
 explain_y = 4.2
 add_text_box(slide2, 0.8, explain_y, 12.0, 0.35,
-             "Why enterprise customers see '18' — not '59'",
+             "Why enterprise customers see '16' — not '53'",
              font_size=15, bold=True, color=DARK_TEXT, alignment=PP_ALIGN.CENTER)
 
 # Four support-level boxes across the bottom
@@ -1150,7 +1152,7 @@ sx4 = sx3 + sup_w + sup_gap
 add_section_box(slide2, sx1, sup_y, sup_w, sup_h,
     "Cisco Supported", CISCO_BLUE,
     [
-        "**11** apps & add-ons",
+        "**10** apps & add-ons",
         "",
         "Full Cisco engineering & SLA",
         "Field-tested, Cisco TAC-backed",
@@ -1161,33 +1163,33 @@ add_section_box(slide2, sx1, sup_y, sup_w, sup_h,
 add_section_box(slide2, sx2, sup_y, sup_w, sup_h,
     "Splunk Supported", SPLUNK_GREEN,
     [
-        "**7** apps & add-ons",
+        "**6** apps & add-ons",
         "",
         "Splunk-maintained with SLA",
         "Listed, vetted, supported",
         "Enterprise customers: ✓ deploy",
     ], body_size=10)
 
-# Developer-supported
+# Non-Enterprise (Combined)
 add_section_box(slide2, sx3, sup_y, sup_w, sup_h,
-    "Developer Supported", ARCHIVE_ORANGE,
+    "Non-Enterprise", SUBTITLE_GRAY,
     [
-        "**31** apps & add-ons",
+        "**37** apps & add-ons",
         "",
-        "Community/developer maintained",
-        "No SLA, no guaranteed updates",
-        "Enterprise customers: ✗ risky",
+        "Developer, archived, or unsupported",
+        "No vendor backing or EOL",
+        "Enterprise customers: ✗ won't use",
     ], body_size=10)
 
-# Not supported
+# Remaining for context
 add_section_box(slide2, sx4, sup_y, sup_w, sup_h,
-    "Not Supported", DEBT_RED,
+    "Total on Splunkbase", MED_GRAY,
     [
-        "**10** apps & add-ons",
+        "**53** apps & add-ons in the ecosystem",
         "",
-        "No maintainer, no updates",
-        "Effectively abandoned",
-        "Enterprise customers: ✗ won't deploy",
+        "All Cisco-related entries",
+        "Current & archived",
+        "Only 16 pass vendor-support test",
     ], body_size=10)
 
 # ── Punchline beneath the boxes ──
@@ -1195,8 +1197,8 @@ punch_y = 6.4
 add_rounded_rect(slide2, 0.6, punch_y, 12.1, 0.45, PHASE_BLUE, "", font_size=12)
 punch_runs = [
     [("Enterprise customers require vendor-backed support SLAs.", 13, True, WHITE),
-     ("  Only ", 13, False, WHITE),
-     ("18 of 59 (31%) ", 13, True, WARN_AMBER),
+     ("  ", 13, False, WHITE),
+     ("16 of 53 (30%) ", 13, True, SPLUNK_GREEN),
      ("meet that bar.", 13, False, WHITE)],
 ]
 add_rich_text_box(slide2, 0.9, punch_y + 0.05, 11.5, 0.38, punch_runs, alignment=PP_ALIGN.CENTER)
@@ -1204,54 +1206,53 @@ add_rich_text_box(slide2, 0.9, punch_y + 0.05, 11.5, 0.38, punch_runs, alignment
 # Footer
 add_rounded_rect(slide2, 0.3, 7.05, 12.7, 0.32, DARK_BG, "", font_size=9)
 footer2 = [
-    [("18 = 11 Cisco + 7 Splunk supported.", 9, True, WHITE),
-     ("  The other 41 (developer + unsupported) are technically available, but ", 9, False, RGBColor(0xB0, 0xBE, 0xC5)),
-     ("enterprise procurement won't approve them.", 9, True, WARN_AMBER)],
+    [("16 = 10 Cisco + 6 Splunk supported.", 9, True, WHITE),
+     ("  The other 43 (developer + archived + unsupported) still exist, but ", 9, False, RGBColor(0xB0, 0xBE, 0xC5)),
+     ("enterprise procurement won't touch them.", 9, True, WARN_AMBER)],
 ]
 add_rich_text_box(slide2, 0.6, 7.07, 12.2, 0.28, footer2, alignment=PP_ALIGN.CENTER)
 
 add_speaker_notes(slide2, """HOW TO DELIVER THIS SLIDE:
 
 [Transition from Slide 1]
-"So we have 59 apps remaining. Sounds reasonable. Here's the problem."
+"So we have 53 apps in the ecosystem. After 2 documented replacements. Sounds reasonable. Here's the problem."
 
-[Click — show 59 grayed out on the left]
-"59 apps. That's what everyone sees on Splunkbase."
+[Click — show 53 grayed out on the left]
+"53 apps in the active ecosystem. That's what remains on Splunkbase."
 
-[Click — show 18 in blue on the right]
-"18. That's the number that matters."
+[Click — show 16 in blue on the right]
+"16. That's the number that matters."
 
 [Pause — let it land]
 
-"Why 18? Because enterprise customers — the ones writing the big checks — they require vendor-backed support. They need an SLA. They need to know that when something breaks at 2am, someone picks up the phone."
+"Why 16? Because enterprise customers — the ones writing the big checks — they require vendor-backed support. They need an SLA. They need to know that when something breaks at 2am, someone picks up the phone."
 
-[Walk through the four boxes]
-"11 apps are Cisco-supported. Cisco engineering, Cisco TAC, full SLA."
-"7 are Splunk-supported. Splunk maintains them, Splunk backs them."
-"That's 18. That's the green zone."
+[Walk through the boxes]
+"10 apps are Cisco-supported. Cisco engineering, Cisco TAC, full SLA."
+"6 are Splunk-supported. Splunk maintains them, Splunk backs them."
+"That's 16. That's the green zone."
 
-"Now look at the orange and red."
-"31 are developer-supported — community maintained, best effort, no SLA."
-"10 have no support at all. No maintainer. No updates."
+"Now look at the gray."
+"The other 37 — developer-supported, archived, or unsupported. No vendor backing. No SLA."
 
 [Deliver the punchline]
-"When an enterprise customer evaluates Cisco data onboarding for Splunk, they don't see 59 options. They see 18. The other 41 might as well not exist."
+"When an enterprise customer evaluates Cisco data onboarding for Splunk, they don't see 53 options. They see 16. The other 37 might as well not exist."
 
-"That's a 31% coverage rate. For the #1 infrastructure vendor in the world."
+"That's a 27% coverage rate. For the #1 infrastructure vendor in the world."
 
-WHAT IS "18 ENTERPRISE-GRADE" AND HOW TO EXPLAIN IT:
+WHAT IS "16 CISCO/SPLUNK SUPPORTED" AND HOW TO EXPLAIN IT:
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-The "18" number is the count of Cisco-related Splunkbase apps that carry an official support commitment from either Cisco OR Splunk.
+The "16" number is the count of Cisco-related Splunkbase apps that carry an official support commitment from either Cisco OR Splunk.
 
-• 11 Cisco-supported = Cisco built it, Cisco maintains it, Cisco TAC will help you
-• 7 Splunk-supported = Splunk built or adopted it, Splunk Support backs it
+• 10 Cisco-supported = Cisco built it, Cisco maintains it, Cisco TAC will help you
+• 6 Splunk-supported = Splunk built or adopted it, Splunk Support backs it
 
 Why this matters: Enterprise security and IT teams operate under compliance and procurement policies that REQUIRE vendor-backed support. They will NOT deploy an app where:
 - No one is contractually obligated to fix vulnerabilities
 - There's no SLA for bug fixes or compatibility updates
 - The "maintainer" is an anonymous community developer
 
-So when we say "18 enterprise-grade" — we mean 18 apps that pass the enterprise procurement test. The other 41 are technically on Splunkbase but functionally invisible to enterprise buyers.
+So when we say "16 Cisco/Splunk supported" — we mean 16 apps that have active vendor support from Cisco or Splunk. The other 39 are technically on Splunkbase but functionally invisible to enterprise buyers.
 
 This is the gap we need leadership to understand. It's not a Splunkbase listing problem — it's a COVERAGE problem.
 """)
@@ -1261,7 +1262,7 @@ This is the gap we need leadership to understand. It's not a Splunkbase listing 
 # SLIDE 2b: "Still Running — Cisco Apps in Splunk Cloud"
 #   The proof point: 89 apps still deployed on 2,973 stacks.
 #   Placed here so the audience sees the URGENCY right after
-#   learning only 18 are enterprise-grade.
+#   learning only 16 have Cisco/Splunk support.
 # ══════════════════════════════════════════════════════
 slide_cloud = add_slide(prs, use_template)
 
@@ -1277,7 +1278,7 @@ add_text_box(slide_cloud, 0.5, 0.95, 12.3, 0.35,
 stat_y = 1.05
 add_stat_callout(slide_cloud, 0.3,  stat_y, "89",    "Cisco Apps\nDeployed", CISCO_BLUE)
 add_stat_callout(slide_cloud, 2.85, stat_y, "2,973", "Cloud Stacks\nwith Cisco Apps", PHASE_GREEN)
-add_stat_callout(slide_cloud, 5.4,  stat_y, "73%",   "of 121 Apps\nStill Running", WARN_AMBER)
+add_stat_callout(slide_cloud, 5.4,  stat_y, "72%",   "of 125 Apps\nStill Running", WARN_AMBER)
 add_stat_callout(slide_cloud, 7.95, stat_y, "~30",   "Archived Apps\nStill Deployed", DEBT_RED)
 
 # Total versions across all deployed apps
@@ -1458,7 +1459,7 @@ add_rich_text_box(slide_cloud, 0.6, 7.07, 12.2, 0.28, footer_cloud, alignment=PP
 add_speaker_notes(slide_cloud, """HOW TO DELIVER THIS SLIDE:
 
 [Transition — this is the evidence that validates the urgency]
-"You just saw that only 18 of 59 remaining apps are enterprise-grade. Some people might think 'well, maybe nobody uses these apps anyway.' Let me show you the data."
+"You just saw that only 16 of 53 apps in the active ecosystem have Cisco/Splunk support. Some people might think 'well, maybe nobody uses these apps anyway.' Let me show you the data."
 
 [Point to the hero stats]
 "89 Cisco apps are actively deployed in Splunk Cloud right now. Across 2,973 Cloud stacks."
@@ -1490,6 +1491,124 @@ NOTE: If asked about Enterprise numbers —
 
 
 # ══════════════════════════════════════════════════════
+# SLIDE 2.5: "Methodology — Defining the Portfolio"
+#   Insert before Coverage Gap to establish credibility
+#   Explains what "~60 products" means and where it came from
+# ══════════════════════════════════════════════════════
+slide_methodology = add_slide(prs, use_template)
+
+add_text_box(slide_methodology, 0.5, 0.3, 12.3, 0.7,
+             "How We Defined the Cisco Portfolio",
+             font_size=30, bold=True, color=DARK_TEXT)
+
+add_text_box(slide_methodology, 0.5, 0.95, 12.3, 0.35,
+             "Methodology: ~60 product families, 53 apps in the ecosystem, 16 Cisco/Splunk supported",
+             font_size=14, color=SUBTITLE_GRAY)
+
+# Box 1: What is a "Product"?
+add_section_box(slide_methodology, 0.6, 1.6, 5.8, 2.2,
+    "What is a 'Product'?", CISCO_BLUE,
+    [
+        "**Integration-relevant product families**",
+        "Not SKUs, not models, not appliances",
+        "",
+        "Focus: Solutions where customers ask",
+        "'Can I get this Cisco data in Splunk?'",
+        "",
+        "**~60 product families** identified",
+    ], body_size=11)
+
+# Box 2: Examples
+add_section_box(slide_methodology, 6.8, 1.6, 5.8, 2.2,
+    "Examples", PHASE_BLUE,
+    [
+        "ISE = **1 product** (not 50 appliance models)",
+        "Firepower = **1 product** (all form factors)",
+        "Duo = **1 product** (SaaS + on-prem)",
+        "Catalyst = **1 product** (9K, 3K, SD-WAN)",
+        "",
+        "Each represents a distinct integration need,",
+        "not a hardware variation",
+    ], body_size=11)
+
+# Box 3: Data Sources
+add_section_box(slide_methodology, 0.6, 4.0, 5.8, 2.5,
+    "Data Sources", CISCO_BLUE_DK,
+    [
+        "✓ Product marketing collateral",
+        "✓ Field engagement patterns & asks",
+        "✓ GTM roadmaps (Security, Networking)",
+        "✓ Splunkbase historical data (148 apps)",
+        "✓ Cisco TAC integration requests",
+        "",
+        "**Built over 6 months** of analysis",
+        "Validated with PMMs and field engineers",
+    ], body_size=11)
+
+# Box 4: What We Excluded
+add_section_box(slide_methodology, 6.8, 4.0, 5.8, 2.5,
+    "What We Excluded", SUBTITLE_GRAY,
+    [
+        "✗ Pure hardware (switches with no logs)",
+        "✗ EOL products with zero field activity",
+        "✗ White-label OEM solutions",
+        "✗ Internal-only tools (not customer-facing)",
+        "",
+        "Result: **~60 products** with real",
+        "Splunk integration requirements in-market",
+        "or launching in FY26",
+    ], body_size=11)
+
+# Footer
+add_rounded_rect(slide_methodology, 0.3, 7.05, 12.7, 0.32, DARK_BG, "", font_size=9)
+footer_method = [
+    [("Next week: ", 9, True, WARN_AMBER),
+     ("We'll demo the interactive tool (Cisco App Navigator) that visualizes all this data  •  ", 9, False, RGBColor(0xB0, 0xBE, 0xC5)),
+     ("Today: Focus on the gaps we discovered", 9, True, WHITE)],
+]
+add_rich_text_box(slide_methodology, 0.6, 7.07, 12.2, 0.28, footer_method, alignment=PP_ALIGN.CENTER)
+
+add_speaker_notes(slide_methodology, """HOW TO DELIVER THIS SLIDE:
+
+[Pre-empt the "where did 60 come from?" question]
+"Before we dive into the coverage analysis, let me explain our methodology."
+
+[Point to Box 1]
+"We catalogued roughly 60 Cisco product families — not SKUs, not models, but integration-relevant solutions where customers ask 'Can I get this in Splunk?'"
+
+[Point to Box 2 — Examples]
+"ISE is one product, even though it has 50 appliance form factors. Firepower is one product, whether it's NGFW, FTD, or ASA. Catalyst networking is one product family."
+
+"This matches how customers think. They don't say 'I need to onboard Catalyst 9300 Series.' They say 'I need Catalyst switch data.'"
+
+[Point to Box 3 — Sources]
+"This took six months. We reviewed product marketing collateral, GTM roadmaps, field engagement data, Splunkbase history — all 148 Cisco apps that have ever existed — and TAC integration tickets."
+
+"We validated this with product marketing managers and field engineers to make sure we weren't missing anything."
+
+[Point to Box 4 — What We Excluded]
+"We excluded pure hardware with no telemetry, EOL products with zero field activity, white-label OEM stuff, and internal-only tools."
+
+"The result: approximately 60 Cisco products with real Splunk integration needs, either in-market today or launching this fiscal year."
+
+[Transition to next slide]
+"So when you see the coverage numbers in a moment, you'll know exactly what we're measuring against."
+
+[If someone asks "Can we see the tool?"]
+"Absolutely — next week. We built an interactive web app called the Cisco App Navigator that lets you explore all this data by product, by category, by support level. You can filter, search, see what's installed, see what's deprecated. Today I wanted to focus on the problem statement. Next week we'll show you the solution."
+
+IMPORTANT FRAMING:
+This slide establishes your credibility BEFORE showing the coverage gap. The audience now understands:
+• You didn't just make up "60 products"
+• This was a rigorous, months-long analysis
+• The scope is reasonable and validated
+• The tool exists and will be demonstrated next week
+
+When you reveal the 27% coverage rate on the next slide, they'll accept it because you've established the methodology first.
+""")
+
+
+# ══════════════════════════════════════════════════════
 # SLIDES 3a–3c: Progressive Build — "The Coverage Gap"
 #   Steve Jobs: Reveal one idea at a time.
 #   Each "click" is the next slide with prior content
@@ -1510,7 +1629,7 @@ def add_slide3_title_and_subtitle(slide):
                  "The Cisco Coverage Gap — Where We Stand",
                  font_size=30, bold=True, color=DARK_TEXT)
     add_text_box(slide, 0.5, 0.95, 12.3, 0.35,
-                 "64 Cisco products in the portfolio. Only 18 integrations pass the enterprise bar.",
+                 "~60 Cisco products in security & networking. Only 16 integrations pass the enterprise bar.",
                  font_size=14, color=SUBTITLE_GRAY)
 
 def add_slide3_footer(slide):
@@ -1524,24 +1643,24 @@ def add_slide3_footer(slide):
 
 def add_col1_active(slide):
     add_section_box(slide, cx1, col_y, col_w, col_h,
-        "47 Active Products", CISCO_BLUE,
+        "~50 In-Market Products", CISCO_BLUE,
         [
-            "Cisco products actively in-market",
+            "Cisco products actively selling today",
+            "(46 active + 3 deprecated)",
             "",
             "**Covered on Splunkbase:**",
-            "   36 products have at least one app/TA",
+            "   47 products have at least one app/TA",
             "",
-            "**Enterprise-grade coverage:**",
-            "   Only 18 with Cisco or Splunk support",
+            "**Cisco/Splunk support coverage:**",
+            "   16 with Cisco or Splunk support",
             "",
             "**Gap:**",
-            "   11 active products have zero coverage",
-            "   18 have coverage but no official support",
+            "   ~7 have community or partial support",
         ], body_size=11)
 
 def add_col2_roadmap(slide):
     add_section_box(slide, cx2, col_y, col_w, col_h,
-        "17 GTM Roadmap Products", ARCHIVE_ORANGE,
+        "13 GTM Roadmap Products", ARCHIVE_ORANGE,
         [
             "Products on the go-to-market roadmap",
             "with zero Splunkbase presence today",
@@ -1551,7 +1670,7 @@ def add_col2_roadmap(slide):
             "   Secure AI Factory",
             "   Security Cloud Control",
             "   pxGrid / pxGrid Cloud",
-            "   Industrial Networking",
+            "   NetFlow / Flexible NetFlow",
             "",
             "These are NEW products — not archiving gaps",
         ], body_size=11)
@@ -1561,17 +1680,17 @@ def add_col3_scorecard(slide):
         "The Enterprise Scorecard", PHASE_BLUE,
         [
             "",
-            "**64** Cisco products in portfolio",
-            "   (47 active + 17 GTM roadmap)",
+            "**~60** Cisco products in portfolio",
+            "   (~50 in-market + 13 roadmap)",
             "",
-            "**18** enterprise-grade integrations",
+            "**16** Cisco/Splunk supported integrations",
             "",
             "═══════════════════════",
             "",
             "   Enterprise coverage rate:",
             "",
         ], body_size=11)
-    add_big_number(slide, cx3 - 0.05, col_y + 3.0, "28%", DEBT_RED, font_size=42)
+    add_big_number(slide, cx3 - 0.05, col_y + 3.0, "27%", DEBT_RED, font_size=42)
 
 def add_impact_section(slide):
     impact_y = 5.55
@@ -1610,7 +1729,7 @@ def add_impact_section(slide):
     add_rich_text_box(slide, ix3 + 0.15, imp_y + 0.05, imp_w - 0.3, imp_h - 0.1, imp3, alignment=PP_ALIGN.CENTER)
 
 
-# ── SLIDE 3a: Just the title + Column 1 (47 Active Products) ──
+# ── SLIDE 3a: Just the title + Column 1 (~50 In-Market Products) ──
 slide3a = add_slide(prs, use_template)
 add_slide3_title_and_subtitle(slide3a)
 add_col1_active(slide3a)
@@ -1619,16 +1738,16 @@ add_slide3_footer(slide3a)
 add_speaker_notes(slide3a, """HOW TO DELIVER THIS SLIDE:
 
 [Transition from Slide 2]
-"So... 18 enterprise-grade apps. But let's zoom out. Let's look at the FULL Cisco portfolio."
+"So... 16 Cisco/Splunk supported apps. Out of 55 remaining on Splunkbase. That's less than 30%. But let's zoom out. Let's look at the FULL Cisco portfolio."
 
 [Column 1 appears alone — centered attention]
-"47 Cisco products are actively in-market today."
+"~50 Cisco products are actively in-market today."
 
-"36 of them have at least some presence on Splunkbase — an app or a TA."
+"47 of them have at least some presence on Splunkbase — an app or a TA."
 
-"But when we filter for enterprise-grade — Cisco or Splunk supported — we're back to 18."
+"But when we filter for Cisco/Splunk supported — we're at 16."
 
-"And 11 active products? Zero coverage. No app, no add-on, nothing on Splunkbase."
+"And ~7 active products? Partial coverage or no coverage at all. Community-supported, or nothing on Splunkbase."
 
 [Pause — let them absorb]
 "But that's just the products we're selling today..."
@@ -1637,7 +1756,7 @@ add_speaker_notes(slide3a, """HOW TO DELIVER THIS SLIDE:
 """)
 
 
-# ── SLIDE 3b: Column 1 + Column 2 (17 GTM Roadmap) ──
+# ── SLIDE 3b: Column 1 + Column 2 (13 GTM Roadmap) ──
 slide3b = add_slide(prs, use_template)
 add_slide3_title_and_subtitle(slide3b)
 add_col1_active(slide3b)
@@ -1647,9 +1766,9 @@ add_slide3_footer(slide3b)
 add_speaker_notes(slide3b, """HOW TO DELIVER THIS SLIDE:
 
 [Column 2 appears — the GTM roadmap]
-"Then there are 17 products on the go-to-market roadmap."
+"Then there are 13 products on the go-to-market roadmap."
 
-"Hypershield. Secure AI Factory. Security Cloud Control. pxGrid Cloud. Industrial Networking."
+"NetFlow, Flexible NetFlow. Secure AI Factory. Security Cloud Control. pxGrid Cloud. Industrial Networking."
 
 "These are products Cisco is actively launching — and they have ZERO Splunkbase presence."
 
@@ -1676,13 +1795,13 @@ add_speaker_notes(slide3c, """HOW TO DELIVER THIS SLIDE:
 [The Enterprise Scorecard appears — the big reveal]
 "Add it all up."
 
-"64 Cisco products in the portfolio. 47 active. 17 on the GTM roadmap."
+"~60 Cisco products in the portfolio. ~50 active. 13 on the GTM roadmap."
 
 [Pause]
-"18 enterprise-grade integrations."
+"16 Cisco/Splunk supported integrations."
 
 [Let the number land]
-"28 percent. That is our enterprise coverage rate."
+"27 percent. That is our enterprise coverage rate."
 
 "For the number one infrastructure vendor in the world."
 
@@ -1691,7 +1810,7 @@ add_speaker_notes(slide3c, """HOW TO DELIVER THIS SLIDE:
 
 "CUSTOMER RISK — customers deploying unsupported apps get no security patches, no SLA, no TAC help. They're on their own."
 
-"COMPETITIVE RISK — and this one stings. Palo Alto, CrowdStrike, Fortinet? They have 100% vendor-supported TAs on Splunkbase. Every single one. We're at 28%."
+"COMPETITIVE RISK — and this one stings. Palo Alto, CrowdStrike, Fortinet? They have 100% vendor-supported TAs on Splunkbase. Every single one. We're at 27%."
 
 "But here's the thing — THE OPPORTUNITY. SCAN gives us the platform to see exactly where the holes are. Every gap is visible. Every priority is clear. We can close this."
 
@@ -1702,7 +1821,7 @@ COMPETITIVE CONTEXT (if asked):
 • Palo Alto Networks: ~15 apps, ALL officially Palo Alto or Splunk supported
 • CrowdStrike: ~8 apps, ALL vendor-supported
 • Fortinet: ~10 apps, ALL vendor-supported
-• Cisco: 59 apps, only 18 vendor-supported (28% of portfolio)
+• Cisco: 53 apps & add-ons in ecosystem, 16 Cisco/Splunk supported (30% of portfolio)
 """)
 
 
@@ -1867,6 +1986,136 @@ add_speaker_notes(slide4, """HOW TO DELIVER THIS SLIDE:
 
 [Pause]
 "This is what the field deals with every day. Every SE. Every customer engagement. This is why we need SCAN."
+""")
+
+
+# ══════════════════════════════════════════════════════
+# SLIDE 4.5: "Operational Friction — Blockers at the Tactical Level"
+#   Four specific friction points that block lightweight adoption
+#   NetFlow, SC4S, app maintenance, upgrade paths
+# ══════════════════════════════════════════════════════
+slide4_5 = add_slide(prs, use_template)
+
+add_text_box(slide4_5, 0.5, 0.3, 12.3, 0.7,
+             "Operational Friction — Blockers at the Tactical Level",
+             font_size=30, bold=True, color=DARK_TEXT)
+
+add_text_box(slide4_5, 0.5, 0.95, 12.3, 0.35,
+             "Even when the app exists, deployment and maintenance create ongoing barriers",
+             font_size=14, color=SUBTITLE_GRAY)
+
+# ── Four friction cards: 2x2 grid ──
+fric_w = 5.8
+fric_h = 2.5
+fric_gap_x = 0.55
+fric_gap_y = 0.4
+fric_x1 = 0.6
+fric_x2 = fric_x1 + fric_w + fric_gap_x
+fric_y1 = 1.6
+fric_y2 = fric_y1 + fric_h + fric_gap_y
+
+# Card 1: NetFlow Friction
+add_section_box(slide4_5, fric_x1, fric_y1, fric_w, fric_h,
+    "NetFlow — Friction Blocks Lightweight Visibility", CISCO_BLUE,
+    [
+        "NetFlow should be \"turn it on and go,\" but it's",
+        "still a multi-step project.",
+        "",
+        "**Why this keeps happening:**",
+        "The effort outweighs perceived value, so teams delay.",
+        "",
+        "Competitors like NetFlow Logic, cPacket & SolarWinds",
+        "win by making time-to-value feel instant.",
+        "",
+        "Result: High-value visibility delayed or abandoned.",
+    ], body_size=11)
+
+# Card 2: SC4S Complexity
+add_section_box(slide4_5, fric_x2, fric_y1, fric_w, fric_h,
+    "SC4S — Power Without a Push-Button", CISCO_BLUE_DK,
+    [
+        "SC4S is the right ingestion pattern for scale and",
+        "security, but it still feels like infrastructure work:",
+        "sizing, deployment, parsing, validation, ongoing ops.",
+        "",
+        "**Why this keeps happening:**",
+        "The operational lift is front-loaded and highly technical,",
+        "so adoption stalls without a guided, near-zero-touch path.",
+        "",
+        "The promise: \"standardize syslog.\"",
+        "The experience: \"spin up a pipeline.\"",
+    ], body_size=11)
+
+# Card 3: Apps Not Maintained
+add_section_box(slide4_5, fric_x1, fric_y2, fric_w, fric_h,
+    "Apps Not Maintained — The Maintenance Gap", PHASE_BLUE,
+    [
+        "• Open-source communities depend on volunteer energy",
+        "  that disappears when maintainers move on",
+        "• Vendor-supported TAs get deprioritized when roadmap",
+        "  pressure shifts elsewhere",
+        "• Splunk version upgrades break old apps with no",
+        "  backward compatibility buffer",
+        "• Security vulnerabilities linger unfixed because",
+        "  disclosure takes months",
+        "• Teams discover critical bugs too late, in production,",
+        "  with no support channel",
+    ], body_size=10)
+
+# Card 4: Apps Not Updated
+add_section_box(slide4_5, fric_x2, fric_y2, fric_w, fric_h,
+    "Apps Not Updated — The Upgrade Cliff", SUBTITLE_GRAY,
+    [
+        "**Stale TAs Block Data Visibility**",
+        "Upgrades feel like archaeological digs through changelogs.",
+        "",
+        "• TA versioning lacks semantic clarity (which version",
+        "  has the fix I need?)",
+        "• Splunk app ecosystem doesn't broadcast breaking",
+        "  changes loudly",
+        "• Operators delay upgrades out of \"if it ain't broken\"",
+        "  fear, then get stuck years behind",
+        "• Vendors ship features but don't provide migration",
+        "  playbooks",
+    ], body_size=10)
+
+# Footer
+add_rounded_rect(slide4_5, 0.3, 7.05, 12.7, 0.32, DARK_BG, "", font_size=9)
+footer4_5 = [
+    [("Operational Context: ", 9, True, CISCO_BLUE),
+     ("These aren't product gaps — they're adoption barriers that persist even when coverage exists  •  ", 9, False, RGBColor(0xB0, 0xBE, 0xC5)),
+     ("Solution requires reducing toil at every step", 9, True, WHITE)],
+]
+add_rich_text_box(slide4_5, 0.6, 7.07, 12.2, 0.28, footer4_5, alignment=PP_ALIGN.CENTER)
+
+add_speaker_notes(slide4_5, """HOW TO DELIVER THIS SLIDE:
+
+[Transition from Field Feedback]
+"Those were the technical issues. But there's a second class of problems — operational friction. Even when the app EXISTS, even when it WORKS, these are the things that keep teams from deploying or maintaining it."
+
+[Point to Card 1 — NetFlow]
+"Take NetFlow. It SHOULD be the easiest thing in the world. Turn on flow export, point it at Splunk, done. But the actual experience? Multi-step project. Configure exporters. Set up collection. Validate parsing. Tune volume. By the time you're done, the value feels like it wasn't worth the effort."
+
+"Why does this keep happening? Because we don't make time-to-value feel instant. Meanwhile competitors like NetFlow Logic and cPacket make it feel like magic. Click, done, dashboard."
+
+[Point to Card 2 — SC4S]
+"SC4S. The gold standard for syslog at scale. But deploying it? Feels like standing up a whole new piece of infrastructure. Sizing calculations. Container orchestration or VM provisioning. Parser validation. Ongoing operations."
+
+"The promise is 'standardize syslog.' The experience is 'become a pipeline engineer.' So teams delay. Or avoid it entirely."
+
+[Point to Card 3 — Apps Not Maintained]
+"Apps not maintained. This one hurts. Open-source maintainers move on. Vendor-supported TAs get deprioritized when roadmap pressure shifts. Splunk upgrades break compatibility. Security vulnerabilities sit unfixed for months. And when you hit a bug in production? No support channel. You're on your own."
+
+[Point to Card 4 — Apps Not Updated]
+"Apps not updated. TA versioning is chaos. There's no semantic clarity — which version fixes bug X? The ecosystem doesn't broadcast breaking changes. So operators play it safe: 'if it ain't broken, don't upgrade.' Then they get stuck three years behind and can't move forward without a full re-onboard."
+
+"Competitors like Datadog and New Relic? Auto-upgrade. Zero friction. You wake up with the new version. That's the bar."
+
+[Pause — let it land]
+"These aren't product gaps. Coverage exists in some of these cases. But the operational toil makes deployment feel like punishment instead of progress."
+
+[Transition to next slide]
+"So why does this keep happening? Let's go deeper. These tactical issues are symptoms. There are systemic causes underneath."
 """)
 
 
