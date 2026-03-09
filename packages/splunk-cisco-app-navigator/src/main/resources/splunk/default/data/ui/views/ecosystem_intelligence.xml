@@ -31,8 +31,8 @@
 				"primary": "ds_kpi_total_products"
 			},
 			"options": {
-				"backgroundColor": "#e8f6fc",
-				"majorColor": "#049fd9",
+				"backgroundColor": "#ebfbff",
+				"majorColor": "#027494",
 				"sparklineDisplay": "off",
 				"trendDisplay": "off",
 				"unit": "products",
@@ -46,8 +46,8 @@
 				"primary": "ds_kpi_active"
 			},
 			"options": {
-				"backgroundColor": "#f0fdf4",
-				"majorColor": "#16a34a",
+				"backgroundColor": "#e3f7da",
+				"majorColor": "#3D851C",
 				"sparklineDisplay": "off",
 				"trendDisplay": "off",
 				"unit": "active",
@@ -61,8 +61,8 @@
 				"primary": "ds_kpi_sourcetypes"
 			},
 			"options": {
-				"backgroundColor": "#f5f3ff",
-				"majorColor": "#7c3aed",
+				"backgroundColor": "#e0eeff",
+				"majorColor": "#0A60FF",
 				"sparklineDisplay": "off",
 				"trendDisplay": "off",
 				"unit": "sourcetypes",
@@ -76,8 +76,8 @@
 				"primary": "ds_kpi_addon_families"
 			},
 			"options": {
-				"backgroundColor": "#ecfeff",
-				"majorColor": "#0891b2",
+				"backgroundColor": "#ebfbff",
+				"majorColor": "#027494",
 				"sparklineDisplay": "off",
 				"trendDisplay": "off",
 				"unit": "families",
@@ -91,8 +91,8 @@
 				"primary": "ds_kpi_viz_apps"
 			},
 			"options": {
-				"backgroundColor": "#eef2ff",
-				"majorColor": "#4f46e5",
+				"backgroundColor": "#e0eeff",
+				"majorColor": "#0A60FF",
 				"sparklineDisplay": "off",
 				"trendDisplay": "off",
 				"unit": "products",
@@ -106,8 +106,8 @@
 				"primary": "ds_kpi_soar"
 			},
 			"options": {
-				"backgroundColor": "#f5f3ff",
-				"majorColor": "#7c3aed",
+				"backgroundColor": "#e0eeff",
+				"majorColor": "#0A60FF",
 				"sparklineDisplay": "off",
 				"trendDisplay": "off",
 				"unit": "products",
@@ -121,8 +121,8 @@
 				"primary": "ds_kpi_alert_actions"
 			},
 			"options": {
-				"backgroundColor": "#fef3c7",
-				"majorColor": "#d97706",
+				"backgroundColor": "#fff8f0",
+				"majorColor": "#d97a00",
 				"sparklineDisplay": "off",
 				"trendDisplay": "off",
 				"unit": "products",
@@ -136,8 +136,8 @@
 				"primary": "ds_kpi_legacy"
 			},
 			"options": {
-				"backgroundColor": "#fef9c3",
-				"majorColor": "#b45309",
+				"backgroundColor": "#fff4d1",
+				"majorColor": "#a16205",
 				"sparklineDisplay": "off",
 				"trendDisplay": "off",
 				"unit": "to migrate",
@@ -151,8 +151,8 @@
 				"primary": "ds_kpi_deprecated"
 			},
 			"options": {
-				"backgroundColor": "#fef2f2",
-				"majorColor": "#dc2626",
+				"backgroundColor": "#ffe8ea",
+				"majorColor": "#d91821",
 				"sparklineDisplay": "off",
 				"trendDisplay": "off",
 				"unit": "products",
@@ -173,10 +173,10 @@
 			},
 			"options": {
 				"seriesColors": [
-					"#0284c7",
-					"#16a34a",
-					"#7c3aed",
-					"#d97706"
+					"#0A60FF",
+					"#3D851C",
+					"#0A60FF",
+					"#d97a00"
 				],
 				"showDonutHole": true
 			},
@@ -190,7 +190,7 @@
 			"options": {
 				"dataValuesDisplay": "all",
 				"seriesColors": [
-					"#049fd9"
+					"#027494"
 				],
 				"xAxisTitleVisibility": "hide",
 				"yAxisTitleVisibility": "hide"
@@ -205,7 +205,7 @@
 			"options": {
 				"dataValuesDisplay": "all",
 				"seriesColors": [
-					"#049fd9"
+					"#027494"
 				],
 				"xAxisTitleVisibility": "hide",
 				"yAxisTitleVisibility": "hide"
@@ -229,9 +229,9 @@
 				"drilldown": "none",
 				"showRowNumbers": true,
 				"tableFormat": {
-					"headerBackgroundColor": "#7c3aed",
+					"headerBackgroundColor": "#0A60FF",
 					"headerFontColor": "#ffffff",
-					"rowBackgroundColors": "> table | seriesByIndex(0) | pick(#f5f3ff,#ffffff)"
+					"rowBackgroundColors": "> table | seriesByIndex(0) | pick(#e0eeff,#ffffff)"
 				}
 			},
 			"title": "Products with SOAR Connectors",
@@ -253,9 +253,9 @@
 				"drilldown": "none",
 				"showRowNumbers": true,
 				"tableFormat": {
-					"headerBackgroundColor": "#0891b2",
+					"headerBackgroundColor": "#027494",
 					"headerFontColor": "#ffffff",
-					"rowBackgroundColors": "> table | seriesByIndex(0) | pick(#ecfeff,#ffffff)"
+					"rowBackgroundColors": "> table | seriesByIndex(0) | pick(#ebfbff,#ffffff)"
 				}
 			},
 			"title": "Add-on Families & Shared Products",
@@ -277,9 +277,9 @@
 				"drilldown": "none",
 				"showRowNumbers": true,
 				"tableFormat": {
-					"headerBackgroundColor": "#ea580c",
+					"headerBackgroundColor": "#FF9000",
 					"headerFontColor": "#ffffff",
-					"rowBackgroundColors": "> table | seriesByIndex(0) | pick(#fff7ed,#ffffff)"
+					"rowBackgroundColors": "> table | seriesByIndex(0) | pick(#fff8f0,#ffffff)"
 				}
 			},
 			"title": "Missing Fields Audit",
@@ -296,8 +296,8 @@
 				"primary": "ds_kpi_cisco_live"
 			},
 			"options": {
-				"backgroundColor": "#f0fdf4",
-				"majorColor": "#16a34a",
+				"backgroundColor": "#e3f7da",
+				"majorColor": "#3D851C",
 				"sparklineDisplay": "off",
 				"trendDisplay": "off",
 				"unit": "live",
@@ -311,8 +311,8 @@
 				"primary": "ds_kpi_cisco_archived"
 			},
 			"options": {
-				"backgroundColor": "#fef2f2",
-				"majorColor": "#dc2626",
+				"backgroundColor": "#ffe8ea",
+				"majorColor": "#d91821",
 				"sparklineDisplay": "off",
 				"trendDisplay": "off",
 				"unit": "archived",
@@ -326,8 +326,8 @@
 				"primary": "ds_kpi_cisco_downloads"
 			},
 			"options": {
-				"backgroundColor": "#eef2ff",
-				"majorColor": "#4f46e5",
+				"backgroundColor": "#e0eeff",
+				"majorColor": "#0A60FF",
 				"sparklineDisplay": "off",
 				"trendDisplay": "off",
 				"unit": "downloads",
@@ -342,10 +342,10 @@
 			},
 			"options": {
 				"seriesColors": [
-					"#22c55e",
-					"#eab308",
-					"#f97316",
-					"#ef4444"
+					"#5cad37",
+					"#e5ac00",
+					"#FF9000",
+					"#d91821"
 				],
 				"showDonutHole": true
 			},
@@ -358,10 +358,10 @@
 			},
 			"options": {
 				"seriesColors": [
-					"#0891b2",
-					"#0284c7",
-					"#16a34a",
-					"#9ca3af"
+					"#027494",
+					"#0A60FF",
+					"#3D851C",
+					"#a1a9b2"
 				],
 				"showDonutHole": true
 			},
@@ -375,7 +375,7 @@
 			"options": {
 				"dataValuesDisplay": "all",
 				"seriesColors": [
-					"#049fd9"
+					"#027494"
 				],
 				"xAxisTitleVisibility": "hide",
 				"yAxisTitleVisibility": "hide"
@@ -399,9 +399,9 @@
 				"drilldown": "none",
 				"showRowNumbers": true,
 				"tableFormat": {
-					"headerBackgroundColor": "#049fd9",
+					"headerBackgroundColor": "#027494",
 					"headerFontColor": "#ffffff",
-					"rowBackgroundColors": "> table | seriesByIndex(0) | pick(#f4f8fb,#ffffff)"
+					"rowBackgroundColors": "> table | seriesByIndex(0) | pick(#f2f5f7,#ffffff)"
 				}
 			},
 			"title": "Cisco Add-on Deployment Status",
@@ -423,9 +423,9 @@
 				"drilldown": "none",
 				"showRowNumbers": true,
 				"tableFormat": {
-					"headerBackgroundColor": "#d97706",
+					"headerBackgroundColor": "#d97a00",
 					"headerFontColor": "#ffffff",
-					"rowBackgroundColors": "> table | seriesByIndex(0) | pick(#fef9ee,#ffffff)"
+					"rowBackgroundColors": "> table | seriesByIndex(0) | pick(#fff8f0,#ffffff)"
 				}
 			},
 			"title": "Cisco Apps — Staleness Tracker",
@@ -447,9 +447,9 @@
 				"drilldown": "none",
 				"showRowNumbers": true,
 				"tableFormat": {
-					"headerBackgroundColor": "#dc2626",
+					"headerBackgroundColor": "#d91821",
 					"headerFontColor": "#ffffff",
-					"rowBackgroundColors": "> table | seriesByIndex(0) | pick(#fef2f2,#ffffff)"
+					"rowBackgroundColors": "> table | seriesByIndex(0) | pick(#ffe8ea,#ffffff)"
 				}
 			},
 			"title": "Deprecated App Migration Paths",
@@ -471,9 +471,9 @@
 				"drilldown": "none",
 				"showRowNumbers": true,
 				"tableFormat": {
-					"headerBackgroundColor": "#16a34a",
+					"headerBackgroundColor": "#3D851C",
 					"headerFontColor": "#ffffff",
-					"rowBackgroundColors": "> table | seriesByIndex(0) | pick(#f0fdf4,#ffffff)"
+					"rowBackgroundColors": "> table | seriesByIndex(0) | pick(#e3f7da,#ffffff)"
 				}
 			},
 			"title": "Cisco Validation & Compliance Status",
@@ -490,8 +490,8 @@
 				"primary": "ds_product_version_support"
 			},
 			"options": {
-				"backgroundColor": "#f0fdf4",
-				"majorColor": "#16a34a",
+				"backgroundColor": "#e3f7da",
+				"majorColor": "#3D851C",
 				"sparklineDisplay": "off",
 				"trendDisplay": "off",
 				"unit": "products",
@@ -510,9 +510,9 @@
 				"drilldown": "none",
 				"showRowNumbers": true,
 				"tableFormat": {
-					"headerBackgroundColor": "#0891b2",
+					"headerBackgroundColor": "#027494",
 					"headerFontColor": "#ffffff",
-					"rowBackgroundColors": "> table | seriesByIndex(0) | pick(#ecfeff,#ffffff)"
+					"rowBackgroundColors": "> table | seriesByIndex(0) | pick(#ebfbff,#ffffff)"
 				}
 			},
 			"title": "Cisco Products — Splunk Version Support Matrix",
@@ -528,12 +528,102 @@
 				"drilldown": "none",
 				"showRowNumbers": true,
 				"tableFormat": {
-					"headerBackgroundColor": "#dc2626",
+					"headerBackgroundColor": "#d91821",
 					"headerFontColor": "#ffffff",
-					"rowBackgroundColors": "> table | seriesByIndex(0) | pick(#fef2f2,#ffffff)"
+					"rowBackgroundColors": "> table | seriesByIndex(0) | pick(#ffe8ea,#ffffff)"
 				}
 			},
 			"title": "Product Version Coverage Gaps (Active Products Without Support)",
+			"type": "splunk.table"
+		},
+		"viz_header_magic6": {
+			"options": {
+				"markdown": "## 🔮 Magic Six Audit\n**Props.conf Best Practices:** Audits every Cisco product sourcetype against the Magic Six props.conf settings — SHOULD_LINEMERGE, LINE_BREAKER, TRUNCATE, TIME_FORMAT, TIME_PREFIX, MAX_TIMESTAMP_LOOKAHEAD. Identifies configuration gaps that can cause parsing failures, timestamp issues, and data quality problems."
+			},
+			"type": "splunk.markdown"
+		},
+		"viz_kpi_magic6_complete": {
+			"dataSources": {
+				"primary": "ds_magic6_kpi_complete"
+			},
+			"options": {
+				"backgroundColor": "#e3f7da",
+				"majorColor": "#3D851C",
+				"sparklineDisplay": "off",
+				"trendDisplay": "off",
+				"unit": "sourcetypes",
+				"unitPosition": "after"
+			},
+			"title": "Complete (6/6)",
+			"type": "splunk.singlevalue"
+		},
+		"viz_kpi_magic6_partial": {
+			"dataSources": {
+				"primary": "ds_magic6_kpi_partial"
+			},
+			"options": {
+				"backgroundColor": "#fff4d1",
+				"majorColor": "#e5ac00",
+				"sparklineDisplay": "off",
+				"trendDisplay": "off",
+				"unit": "sourcetypes",
+				"unitPosition": "after"
+			},
+			"title": "Partial / Minimal",
+			"type": "splunk.singlevalue"
+		},
+		"viz_kpi_magic6_none": {
+			"dataSources": {
+				"primary": "ds_magic6_kpi_none"
+			},
+			"options": {
+				"backgroundColor": "#ffe8ea",
+				"majorColor": "#d91821",
+				"sparklineDisplay": "off",
+				"trendDisplay": "off",
+				"unit": "sourcetypes",
+				"unitPosition": "after"
+			},
+			"title": "No Coverage (0/6)",
+			"type": "splunk.singlevalue"
+		},
+		"viz_chart_magic6_grade": {
+			"dataSources": {
+				"primary": "ds_magic6_chart_grade"
+			},
+			"options": {
+				"chart": "pie",
+				"seriesColors": ["#3D851C", "#e5ac00", "#FF9000", "#d91821"]
+			},
+			"title": "Compliance Grade Distribution",
+			"type": "splunk.pie"
+		},
+		"viz_chart_magic6_category": {
+			"dataSources": {
+				"primary": "ds_magic6_chart_category"
+			},
+			"options": {
+				"chart": "column"
+			},
+			"title": "Avg Magic Six Settings by Category",
+			"type": "splunk.column"
+		},
+		"viz_table_magic6": {
+			"dataSources": {
+				"primary": "ds_magic6_audit"
+			},
+			"options": {
+				"count": 50,
+				"dataOverlayMode": "none",
+				"drilldown": "none",
+				"showRowNumbers": true,
+				"tableFormat": {
+					"headerBackgroundColor": "#0A60FF",
+					"headerFontColor": "#ffffff",
+					"rowBackgroundColors": "> table | seriesByIndex(0) | pick(#e0eeff,#ffffff)"
+				}
+			},
+			"title": "Magic Six Compliance — All Cisco Product Sourcetypes",
 			"type": "splunk.table"
 		}
 	},
@@ -766,6 +856,53 @@
 				"query": "| savedsearch \"SCAN - Products WITHOUT Version Support\""
 			},
 			"type": "ds.search"
+		},
+		"ds_magic6_audit": {
+			"name": "Magic Six Audit",
+			"options": {
+				"query": "| savedsearch \"SCAN - Magic Six Audit\""
+			},
+			"type": "ds.search"
+		},
+		"ds_magic6_kpi_complete": {
+			"name": "KPI Magic Six Complete",
+			"options": {
+				"extend": "ds_magic6_audit",
+				"query": "| search grade=\"🟢 Complete\" | stats dc(Sourcetype) as total"
+			},
+			"type": "ds.chain"
+		},
+		"ds_magic6_kpi_partial": {
+			"name": "KPI Magic Six Partial",
+			"options": {
+				"extend": "ds_magic6_audit",
+				"query": "| search grade=\"🟡 Partial\" OR grade=\"🟠 Minimal\" | stats dc(Sourcetype) as total"
+			},
+			"type": "ds.chain"
+		},
+		"ds_magic6_kpi_none": {
+			"name": "KPI Magic Six None",
+			"options": {
+				"extend": "ds_magic6_audit",
+				"query": "| search grade=\"🔴 None\" | stats dc(Sourcetype) as total"
+			},
+			"type": "ds.chain"
+		},
+		"ds_magic6_chart_grade": {
+			"name": "Chart Magic Six Grade Distribution",
+			"options": {
+				"extend": "ds_magic6_audit",
+				"query": "| stats dc(Sourcetype) as Count by grade | rename grade as Grade"
+			},
+			"type": "ds.chain"
+		},
+		"ds_magic6_chart_category": {
+			"name": "Chart Magic Six by Category",
+			"options": {
+				"extend": "ds_magic6_audit",
+				"query": "| stats avg(tonumber(mvindex(split(score,\"/\"),0))) as avg_score by Category | eval avg_score=round(avg_score,1) | rename avg_score as \"Avg Settings\" | sort - \"Avg Settings\""
+			},
+			"type": "ds.chain"
 		}
 	},
 	"layout": {
@@ -1140,9 +1277,8 @@
 					}
 				],
 				"type": "absolute"
-			}
-		},
-		"layout_tab3": {
+			},
+			"layout_tab3": {
 			"options": {
 				"display": "auto-scale",
 				"height": 1400,
@@ -1192,6 +1328,87 @@
 			],
 			"type": "absolute"
 		},
+		"layout_tab4": {
+			"options": {
+				"display": "auto-scale",
+				"height": 1400,
+				"width": 1440
+			},
+			"structure": [
+				{
+					"item": "viz_header_magic6",
+					"position": {
+						"h": 110,
+						"w": 1400,
+						"x": 20,
+						"y": 10
+					},
+					"type": "block"
+				},
+				{
+					"item": "viz_kpi_magic6_complete",
+					"position": {
+						"h": 110,
+						"w": 440,
+						"x": 20,
+						"y": 130
+					},
+					"type": "block"
+				},
+				{
+					"item": "viz_kpi_magic6_partial",
+					"position": {
+						"h": 110,
+						"w": 440,
+						"x": 500,
+						"y": 130
+					},
+					"type": "block"
+				},
+				{
+					"item": "viz_kpi_magic6_none",
+					"position": {
+						"h": 110,
+						"w": 440,
+						"x": 980,
+						"y": 130
+					},
+					"type": "block"
+				},
+				{
+					"item": "viz_chart_magic6_grade",
+					"position": {
+						"h": 300,
+						"w": 680,
+						"x": 20,
+						"y": 260
+					},
+					"type": "block"
+				},
+				{
+					"item": "viz_chart_magic6_category",
+					"position": {
+						"h": 300,
+						"w": 680,
+						"x": 740,
+						"y": 260
+					},
+					"type": "block"
+				},
+				{
+					"item": "viz_table_magic6",
+					"position": {
+						"h": 780,
+						"w": 1400,
+						"x": 20,
+						"y": 580
+					},
+					"type": "block"
+				}
+			],
+			"type": "absolute"
+		}
+		},
 		"tabs": {
 			"items": [
 				{
@@ -1205,6 +1422,10 @@
 				{
 					"label": "Version Support Analysis",
 					"layoutId": "layout_tab3"
+				},
+				{
+					"label": "Magic 6 Audit",
+					"layoutId": "layout_tab4"
 				}
 			]
 		}

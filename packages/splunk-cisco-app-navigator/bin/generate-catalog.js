@@ -71,19 +71,8 @@ function parseConf(text) {
 // ── Build product object (same shape as loadProductsFromConf in index.jsx) ──
 
 function buildProduct(name, c) {
-    const laIds = csvToArray(c.legacy_apps);
-    const laLabels = csvToArray(c.legacy_labels);
     const laUids = csvToArray(c.legacy_uids);
-    const laUrls = csvToArray(c.legacy_urls);
-    const laStatuses = csvToArray(c.legacy_statuses);
-    const paIds = csvToArray(c.prereq_apps);
-    const paLabels = csvToArray(c.prereq_labels);
-    const paUids = csvToArray(c.prereq_uids);
-    const paUrls = csvToArray(c.prereq_urls);
-    const caIds = csvToArray(c.community_apps);
-    const caLabels = csvToArray(c.community_labels);
     const caUids = csvToArray(c.community_uids);
-    const caUrls = csvToArray(c.community_urls);
 
     return {
         product_id: name,
@@ -103,39 +92,25 @@ function buildProduct(name, c) {
         ai_description: c.ai_description || '',
         cisco_retired: c.cisco_retired === 'true' || c.cisco_retired === '1',
         coverage_gap: c.coverage_gap === 'true' || c.coverage_gap === '1',
-        addon_splunkbase_url: c.addon_splunkbase_url || '',
+        addon_splunkbase_uid: c.addon_splunkbase_uid || '',
         addon_docs_url: c.addon_docs_url || '',
+        addon_troubleshoot_url: c.addon_troubleshoot_url || '',
         addon_install_url: c.addon_install_url || '',
         app_viz: c.app_viz || '',
         app_viz_label: c.app_viz_label || '',
-        app_viz_splunkbase_url: c.app_viz_splunkbase_url || '',
+        app_viz_splunkbase_uid: c.app_viz_splunkbase_uid || '',
         app_viz_docs_url: c.app_viz_docs_url || '',
+        app_viz_troubleshoot_url: c.app_viz_troubleshoot_url || '',
         app_viz_install_url: c.app_viz_install_url || '',
         app_viz_2: c.app_viz_2 || '',
         app_viz_2_label: c.app_viz_2_label || '',
-        app_viz_2_splunkbase_url: c.app_viz_2_splunkbase_url || '',
+        app_viz_2_splunkbase_uid: c.app_viz_2_splunkbase_uid || '',
         app_viz_2_docs_url: c.app_viz_2_docs_url || '',
+        app_viz_2_troubleshoot_url: c.app_viz_2_troubleshoot_url || '',
         app_viz_2_install_url: c.app_viz_2_install_url || '',
         learn_more_url: c.learn_more_url || '',
-        legacy_apps: laIds.map((appId, i) => ({
-            app_id: appId,
-            display_name: laLabels[i] || appId,
-            uid: laUids[i] || '',
-            addon_splunkbase_url: laUrls[i] || '',
-            status: laStatuses[i] || 'active',
-        })),
-        prereq_apps: paIds.map((appId, i) => ({
-            app_id: appId,
-            display_name: paLabels[i] || appId,
-            uid: paUids[i] || '',
-            addon_splunkbase_url: paUrls[i] || '',
-        })),
-        community_apps: caIds.map((appId, i) => ({
-            app_id: appId,
-            display_name: caLabels[i] || appId,
-            uid: caUids[i] || '',
-            url: caUrls[i] || '',
-        })),
+        legacy_uids: laUids.filter(Boolean),
+        community_uids: caUids.filter(Boolean),
         sourcetypes: csvToArray(c.sourcetypes),
         dashboard: (c.dashboards || '').trim(),
         custom_dashboard: c.custom_dashboard || '',
@@ -143,22 +118,9 @@ function buildProduct(name, c) {
         icon_svg: c.icon_svg || '',
         aliases: csvToArray(c.aliases),
         keywords: csvToArray(c.keywords),
-        alert_actions: [
-            c.alert_action_label ? { label: c.alert_action_label, uid: c.alert_action_uid || '', url: c.alert_action_url || '' } : null,
-            c.alert_action_2_label ? { label: c.alert_action_2_label, uid: c.alert_action_2_uid || '', url: c.alert_action_2_url || '' } : null,
-        ].filter(Boolean),
-        soar_connectors: [
-            c.soar_connector_label ? { label: c.soar_connector_label, uid: c.soar_connector_uid || '', url: c.soar_connector_url || '' } : null,
-            c.soar_connector_2_label ? { label: c.soar_connector_2_label, uid: c.soar_connector_2_uid || '', url: c.soar_connector_2_url || '' } : null,
-            c.soar_connector_3_label ? { label: c.soar_connector_3_label, uid: c.soar_connector_3_uid || '', url: c.soar_connector_3_url || '' } : null,
-        ].filter(Boolean),
+        alert_action_uids: csvToArray(c.alert_action_uids),
+        soar_connector_uids: csvToArray(c.soar_connector_uids),
         itsi_content_pack: c.itsi_content_pack_label ? { label: c.itsi_content_pack_label, docs_url: c.itsi_content_pack_docs_url || '' } : null,
-        card_banner: c.card_banner || '',
-        card_banner_color: c.card_banner_color || '',
-        card_banner_size: c.card_banner_size || '',
-        card_banner_opacity: c.card_banner_opacity || '',
-        card_accent: c.card_accent || '',
-        card_bg_color: c.card_bg_color || '',
         is_new: c.is_new === 'true' || c.is_new === '1',
         secure_networking_gtm: c.secure_networking_gtm === 'true' || c.secure_networking_gtm === '1',
         support_level: c.support_level || '',
@@ -167,7 +129,7 @@ function buildProduct(name, c) {
         sc4s_supported: c.sc4s_supported === 'true' || c.sc4s_supported === '1',
         sc4s_search_head_ta: c.sc4s_search_head_ta || '',
         sc4s_search_head_ta_label: c.sc4s_search_head_ta_label || '',
-        sc4s_search_head_ta_splunkbase_url: c.sc4s_search_head_ta_splunkbase_url || '',
+        sc4s_search_head_ta_splunkbase_url: '',
         sc4s_search_head_ta_splunkbase_id: c.sc4s_search_head_ta_splunkbase_id || '',
         sc4s_search_head_ta_install_url: c.sc4s_search_head_ta_install_url || '',
         sc4s_sourcetypes: csvToArray(c.sc4s_sourcetypes),
@@ -175,7 +137,7 @@ function buildProduct(name, c) {
         netflow_supported: c.netflow_supported === 'true' || c.netflow_supported === '1',
         netflow_addon: c.netflow_addon || '',
         netflow_addon_label: c.netflow_addon_label || '',
-        netflow_addon_splunkbase_url: c.netflow_addon_splunkbase_url || '',
+        netflow_addon_splunkbase_url: '',
         netflow_addon_splunkbase_id: c.netflow_addon_splunkbase_id || '',
         netflow_addon_install_url: c.netflow_addon_install_url || '',
         netflow_addon_docs_url: c.netflow_addon_docs_url || '',
@@ -184,6 +146,11 @@ function buildProduct(name, c) {
         netflow_config_notes: (c.netflow_config_notes || '').split('|').map(s => s.trim()).filter(Boolean),
         best_practices: (c.best_practices || '').split('|').map(s => s.trim()).filter(Boolean),
         sort_order: parseInt(c.sort_order || '100', 10),
+        es_compatible: c.es_compatible === 'true' || c.es_compatible === '1',
+        es_cim_data_models: csvToArray(c.es_cim_data_models),
+        escu_analytic_stories: csvToArray(c.escu_analytic_stories),
+        escu_detection_count: parseInt(c.escu_detection_count || '0', 10),
+        escu_detections: csvToArray(c.escu_detections),
     };
 }
 

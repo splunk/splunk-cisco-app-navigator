@@ -230,6 +230,11 @@ alert_action_2_uid = <integer>
 alert_action_2_url = <string>
 * Splunkbase URL for the second alert action.
 
+alert_action_uids = <comma-separated list>
+* Comma-separated Splunkbase numeric app IDs for all alert actions associated
+* with this product. Used by the UI to look up alert action metadata from the
+* Splunkbase CSV catalog.
+
 community_apps = <comma-separated list>
 * Comma-separated folder names of third-party community add-ons that shadow
 * or duplicate the official Cisco add-on for this product.
@@ -274,6 +279,11 @@ soar_connector_3_uid = <integer>
 
 soar_connector_3_url = <string>
 * Splunkbase URL for the third SOAR connector.
+
+soar_connector_uids = <comma-separated list>
+* Comma-separated Splunkbase numeric app IDs for all SOAR connectors associated
+* with this product. Used by the UI to look up SOAR connector metadata from the
+* Splunkbase CSV catalog.
 
 itsi_content_pack_label = <string>
 * Optional. Human-readable label for an ITSI Content Pack associated with this product.
@@ -457,4 +467,42 @@ best_practices = <pipe-delimited string>
 * Multiple tips are separated by the pipe character (|).
 * These appear after the auto-generated generic tips (platform, add-on, sourcetypes, legacy).
 * Example: Tip one goes here|Tip two goes here|Third tip
+
+# ── Splunk Enterprise Security (ES) & CIM ───────────────────────────────────
+
+es_compatible = true | false
+* Whether this product's add-on maps its sourcetypes to CIM data models via
+* eventtypes.conf and tags.conf, making the data usable by Splunk Enterprise
+* Security correlation searches and dashboards.
+* When true, the card displays an "ES" badge.
+* Default: false.
+
+es_cim_data_models = <comma-separated list>
+* CIM data models that this product's add-on maps to via tags.conf.
+* Only list models the TA genuinely tags — do not fabricate mappings.
+* Valid values: Alerts, Authentication, Certificates, Change, DLP, Email,
+*   Endpoint, Intrusion_Detection, Malware, Network_Resolution,
+*   Network_Sessions, Network_Traffic, Vulnerabilities, Web
+* Example: Authentication,Network_Traffic,Intrusion_Detection
+* Default: (empty).
+
+# ── ESCU (Enterprise Security Content Update) ───────────────────────────────
+
+escu_analytic_stories = <comma-separated list>
+* Comma-separated names of ESCU analytic story(ies) that ship pre-built
+* detections for this product. Only populate for products that have
+* actual ESCU detections (matched by macro/sourcetype).
+* Example: Cisco Duo Suspicious Activity
+* Default: (empty).
+
+escu_detection_count = <integer>
+* Number of ESCU detection searches that target this product's sourcetypes.
+* Must match the actual count from ESCU content analysis.
+* Default: (empty / 0).
+
+escu_detections = <comma-separated list>
+* Comma-separated names of individual ESCU detection searches for this product.
+* These are the savedsearch names from DA-ESS-ContentUpdate.
+* Example: Cisco Duo Admin Login Unusual Browser,Cisco Duo Bulk Policy Deletion
+* Default: (empty).
 * Default: (empty).
