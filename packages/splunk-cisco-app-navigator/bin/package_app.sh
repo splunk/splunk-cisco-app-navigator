@@ -20,9 +20,11 @@ PKG_PATH="${PKG_ROOT}/${APP_NAME}-${VERSION}.tar.gz"
 
 if [[ ! -d "$STAGE_DIR" ]]; then
   echo "stage/ not found; running clean:build first..."
-  bash "${SCRIPT_DIR}/clean_build.sh"
-  node "${PKG_ROOT}/bin/build.js" build
 fi
+
+# Always run clean build (preserving local) to ensure package is fresh
+bash "${SCRIPT_DIR}/clean_build.sh"
+node "${PKG_ROOT}/bin/build.js" build
 
 # Stage into a temp directory with the correct app directory name
 TMP_DIR="$(mktemp -d)"

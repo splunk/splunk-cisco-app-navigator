@@ -2,7 +2,7 @@
 /**
  * AUTO-GENERATED from products.conf — DO NOT EDIT BY HAND.
  * Regenerate:  node bin/generate-catalog.js
- * Generated:   2026-03-06T09:56:02.925Z
+ * Generated:   2026-03-07T05:19:02.646Z
  * Products:    75
  */
 
@@ -25,7 +25,7 @@ export const PRODUCT_CATALOG = [
     "ai_description": "Integrates AI for advanced threat detection and automated security actions.",
     "cisco_retired": false,
     "coverage_gap": false,
-    "addon_splunkbase_url": "https://splunkbase.splunk.com/app/7404",
+    "addon_splunkbase_url": "",
     "addon_docs_url": "https://www.cisco.com/c/en/us/td/docs/security/cisco-secure-cloud-app/user-guide/cisco-security-cloud-user-guide/m_configure_cisco_products_in_cisco_security_cloud.html#secure-firewall",
     "addon_install_url": "/manager/splunk-cisco-app-navigator/appsremote?order=relevance&query=\"Security+Cloud\"&offset=0&support=cisco&type=addon&category=security_compliance&category=firewall",
     "app_viz": "",
@@ -44,91 +44,91 @@ export const PRODUCT_CATALOG = [
         "app_id": "Splunk_TA_sourcefire",
         "display_name": "Splunk Add-on for Cisco FireSIGHT",
         "uid": "1808",
-        "addon_splunkbase_url": "https://splunkbase.splunk.com/app/1808",
+        "addon_splunkbase_url": "",
         "status": "archived"
       },
       {
         "app_id": "TA-eStreamer",
         "display_name": "Cisco Secure eStreamer Client Add-On for Splunk",
         "uid": "3662",
-        "addon_splunkbase_url": "https://splunkbase.splunk.com/app/3662",
+        "addon_splunkbase_url": "",
         "status": "active"
       },
       {
         "app_id": "eStreamer-Dashboard",
         "display_name": "Cisco Firepower eNcore App for Splunk",
         "uid": "3663",
-        "addon_splunkbase_url": "https://splunkbase.splunk.com/app/3663",
+        "addon_splunkbase_url": "",
         "status": "active"
       },
       {
         "app_id": "firepower_dashboard",
         "display_name": "Cisco Secure Firewall App for Splunk",
         "uid": "4388",
-        "addon_splunkbase_url": "https://splunkbase.splunk.com/app/4388",
+        "addon_splunkbase_url": "",
         "status": "active"
       },
       {
         "app_id": "Splunk_TA_cisco-asa",
         "display_name": "Splunk Add-on for Cisco ASA",
         "uid": "1620",
-        "addon_splunkbase_url": "https://splunkbase.splunk.com/app/1620",
+        "addon_splunkbase_url": "",
         "status": "active"
       },
       {
         "app_id": "Splunk_TA_cisco-estreamer_Enosys",
         "display_name": "Enosys Add-on for Cisco Firepower eStreamer",
         "uid": "4785",
-        "addon_splunkbase_url": "https://splunkbase.splunk.com/app/4785",
+        "addon_splunkbase_url": "",
         "status": "archived"
       },
       {
         "app_id": "TA-cisco-firepower-threat-defense-ftd-sourcetype",
         "display_name": "Cisco Firepower Threat Defense FTD sourcetype",
         "uid": "3955",
-        "addon_splunkbase_url": "https://splunkbase.splunk.com/app/3955",
+        "addon_splunkbase_url": "",
         "status": "archived"
       },
       {
         "app_id": "TA-cisco-firepower-threat-defense-ftd-dashboards",
         "display_name": "Cisco Firepower Threat Defense FTD Dashboards",
         "uid": "4010",
-        "addon_splunkbase_url": "https://splunkbase.splunk.com/app/4010",
+        "addon_splunkbase_url": "",
         "status": "archived"
       },
       {
         "app_id": "TA-cisco-firepower-pcap-add-on",
         "display_name": "Cisco Firepower pcap Add-on",
         "uid": "5322",
-        "addon_splunkbase_url": "https://splunkbase.splunk.com/app/5322",
+        "addon_splunkbase_url": "",
         "status": "archived"
       },
       {
         "app_id": "eStreamer",
         "display_name": "Cisco eStreamer Client for Splunk",
         "uid": "1629",
-        "addon_splunkbase_url": "https://splunkbase.splunk.com/app/1629",
+        "addon_splunkbase_url": "",
         "status": "archived"
       },
       {
         "app_id": "firegen_cisco_asa",
         "display_name": "Firegen Log Analyzer for Cisco ASA",
         "uid": "3800",
-        "addon_splunkbase_url": "https://splunkbase.splunk.com/app/3800",
+        "addon_splunkbase_url": "",
         "status": "archived"
       },
       {
         "app_id": "Splunk_CiscoSecuritySuite",
         "display_name": "Cisco Security Suite",
         "uid": "525",
-        "addon_splunkbase_url": "https://splunkbase.splunk.com/app/525",
+        "addon_splunkbase_url": "",
         "status": "archived"
       },
       {
         "app_id": "Cisco-suite-for-splunk",
         "display_name": "Cisco Suite for Splunk",
         "uid": "5743",
-        "addon_splunkbase_url": "https://splunkbase.splunk.com/app/5743",
+        "addon_splunkbase_url": "",
         "status": "archived"
       }
     ],
@@ -138,7 +138,7 @@ export const PRODUCT_CATALOG = [
         "app_id": "Splunk_TA_CCX_Unified_Cisco_Firepower_eStreamer",
         "display_name": "Splunk TA CCX Unified Cisco Firepower eStreamer",
         "uid": "5543",
-        "url": "https://splunkbase.splunk.com/app/5543"
+        "url": ""
       }
     ],
     "sourcetypes": [
@@ -184,12 +184,12 @@ export const PRODUCT_CATALOG = [
       {
         "label": "Cisco Firepower SOAR Connector",
         "uid": "5995",
-        "url": "https://splunkbase.splunk.com/app/5995"
+        "url": ""
       },
       {
         "label": "Cisco Secure Firewall SOAR Connector",
         "uid": "7745",
-        "url": "https://splunkbase.splunk.com/app/7745"
+        "url": ""
       }
     ],
     "itsi_content_pack": null,
@@ -207,7 +207,7 @@ export const PRODUCT_CATALOG = [
     "sc4s_supported": true,
     "sc4s_search_head_ta": "Splunk_TA_cisco-asa",
     "sc4s_search_head_ta_label": "Splunk Add-on for Cisco ASA",
-    "sc4s_search_head_ta_splunkbase_url": "https://splunkbase.splunk.com/app/1620",
+    "sc4s_search_head_ta_splunkbase_url": "",
     "sc4s_search_head_ta_splunkbase_id": "1620",
     "sc4s_search_head_ta_install_url": "/manager/splunk-cisco-app-navigator/appsremote?order=relevance&query=ASA&offset=0&support=splunk",
     "sc4s_sourcetypes": [
@@ -252,7 +252,7 @@ export const PRODUCT_CATALOG = [
     "ai_description": "Uses AI for network threat detection and analytics.",
     "cisco_retired": false,
     "coverage_gap": false,
-    "addon_splunkbase_url": "https://splunkbase.splunk.com/app/7404",
+    "addon_splunkbase_url": "",
     "addon_docs_url": "https://www.cisco.com/c/en/us/td/docs/security/cisco-secure-cloud-app/user-guide/cisco-security-cloud-user-guide/m_configure_cisco_products_in_cisco_security_cloud.html#secure-network-analytics",
     "addon_install_url": "/manager/splunk-cisco-app-navigator/appsremote?order=relevance&query=\"Security+Cloud\"&offset=0&support=cisco&type=addon&category=security_compliance&category=firewall",
     "app_viz": "",
@@ -271,21 +271,21 @@ export const PRODUCT_CATALOG = [
         "app_id": "TA-cisco-stealthwatch",
         "display_name": "Cisco StealthWatch Add-On",
         "uid": "3827",
-        "addon_splunkbase_url": "https://splunkbase.splunk.com/app/3827",
+        "addon_splunkbase_url": "",
         "status": "archived"
       },
       {
         "app_id": "TA-stealthwatch_dataexporter",
         "display_name": "Technology Add-on for Cisco Stealthwatch Data Exporter",
         "uid": "3848",
-        "addon_splunkbase_url": "https://splunkbase.splunk.com/app/3848",
+        "addon_splunkbase_url": "",
         "status": "archived"
       },
       {
         "app_id": "cisco_sna_app",
         "display_name": "Cisco Secure Network Analytics App for Splunk Enterprise",
         "uid": "6398",
-        "addon_splunkbase_url": "https://splunkbase.splunk.com/app/6398",
+        "addon_splunkbase_url": "",
         "status": "archived"
       }
     ],
@@ -295,7 +295,7 @@ export const PRODUCT_CATALOG = [
         "app_id": "Splunk_TA_CCX_Cisco_Secure_Network_Analytics",
         "display_name": "CCX Add-on for Cisco Secure Network Analytics (Stealthwatch)",
         "uid": "7092",
-        "url": "https://splunkbase.splunk.com/app/7092"
+        "url": ""
       }
     ],
     "sourcetypes": [
@@ -705,7 +705,7 @@ export const PRODUCT_CATALOG = [
     "ai_description": "Incorporates AI for identity and access management, including anomaly detection.",
     "cisco_retired": false,
     "coverage_gap": false,
-    "addon_splunkbase_url": "https://splunkbase.splunk.com/app/7404",
+    "addon_splunkbase_url": "",
     "addon_docs_url": "https://www.cisco.com/c/en/us/td/docs/security/cisco-secure-cloud-app/user-guide/cisco-security-cloud-user-guide/m_configure_cisco_products_in_cisco_security_cloud.html#duo",
     "addon_install_url": "/manager/splunk-cisco-app-navigator/appsremote?order=relevance&query=\"Security+Cloud\"&offset=0&support=cisco&type=addon&category=security_compliance&category=firewall",
     "app_viz": "",
@@ -724,14 +724,14 @@ export const PRODUCT_CATALOG = [
         "app_id": "duo_splunkapp",
         "display_name": "Duo Splunk Connector",
         "uid": "3504",
-        "addon_splunkbase_url": "https://splunkbase.splunk.com/app/3504",
+        "addon_splunkbase_url": "",
         "status": "archived"
       },
       {
         "app_id": "TA-DUOSecurity2FA",
         "display_name": "DUO Log Add-on for Splunk",
         "uid": "3194",
-        "addon_splunkbase_url": "https://splunkbase.splunk.com/app/3194",
+        "addon_splunkbase_url": "",
         "status": "archived"
       }
     ],
@@ -741,7 +741,7 @@ export const PRODUCT_CATALOG = [
         "app_id": "Splunk_TA_CCX_DUO_Connector_Support",
         "display_name": "Splunk TA CCX DUO Connector Support",
         "uid": "6544",
-        "url": "https://splunkbase.splunk.com/app/6544"
+        "url": ""
       }
     ],
     "sourcetypes": [
@@ -825,7 +825,7 @@ export const PRODUCT_CATALOG = [
     "ai_description": "",
     "cisco_retired": false,
     "coverage_gap": false,
-    "addon_splunkbase_url": "https://splunkbase.splunk.com/app/7404",
+    "addon_splunkbase_url": "",
     "addon_docs_url": "https://www.cisco.com/c/en/us/td/docs/security/cisco-secure-cloud-app/user-guide/cisco-security-cloud-user-guide/m_configure_cisco_products_in_cisco_security_cloud.html#cisco-identity-intelligence",
     "addon_install_url": "/manager/splunk-cisco-app-navigator/appsremote?order=relevance&query=\"Security+Cloud\"&offset=0&support=cisco&type=addon&category=security_compliance&category=firewall",
     "app_viz": "",
@@ -911,7 +911,7 @@ export const PRODUCT_CATALOG = [
     "ai_description": "Uses AI for endpoint security, including malware detection and response.",
     "cisco_retired": false,
     "coverage_gap": false,
-    "addon_splunkbase_url": "https://splunkbase.splunk.com/app/7404",
+    "addon_splunkbase_url": "",
     "addon_docs_url": "https://www.cisco.com/c/en/us/td/docs/security/cisco-secure-cloud-app/user-guide/cisco-security-cloud-user-guide/m_configure_cisco_products_in_cisco_security_cloud.html#cisco-secure-endpoint",
     "addon_install_url": "/manager/splunk-cisco-app-navigator/appsremote?order=relevance&query=\"Security+Cloud\"&offset=0&support=cisco&type=addon&category=security_compliance&category=firewall",
     "app_viz": "",
@@ -930,14 +930,14 @@ export const PRODUCT_CATALOG = [
         "app_id": "TA-cisco-amp4e",
         "display_name": "Cisco Secure Endpoint CIM Add-On",
         "uid": "3686",
-        "addon_splunkbase_url": "https://splunkbase.splunk.com/app/3686",
+        "addon_splunkbase_url": "",
         "status": "archived"
       },
       {
         "app_id": "amp4e_events_input",
         "display_name": "Cisco Secure Endpoint App",
         "uid": "3670",
-        "addon_splunkbase_url": "https://splunkbase.splunk.com/app/3670",
+        "addon_splunkbase_url": "",
         "status": "archived"
       }
     ],
@@ -947,7 +947,7 @@ export const PRODUCT_CATALOG = [
         "app_id": "Splunk_TA_CCX_Cisco_Secure_Endpoint",
         "display_name": "Splunk TA CCX Cisco Secure Endpoint",
         "uid": "6481",
-        "url": "https://splunkbase.splunk.com/app/6481"
+        "url": ""
       }
     ],
     "sourcetypes": [
@@ -979,7 +979,7 @@ export const PRODUCT_CATALOG = [
       {
         "label": "Cisco Secure Endpoint (FireAMP) SOAR Connector",
         "uid": "5897",
-        "url": "https://splunkbase.splunk.com/app/5897"
+        "url": ""
       }
     ],
     "itsi_content_pack": null,
@@ -1033,7 +1033,7 @@ export const PRODUCT_CATALOG = [
     "ai_description": "",
     "cisco_retired": false,
     "coverage_gap": false,
-    "addon_splunkbase_url": "https://splunkbase.splunk.com/app/7404",
+    "addon_splunkbase_url": "",
     "addon_docs_url": "https://www.cisco.com/c/en/us/td/docs/security/cisco-secure-cloud-app/user-guide/cisco-security-cloud-user-guide/m_configure_cisco_products_in_cisco_security_cloud.html#configure-an-application",
     "addon_install_url": "/manager/splunk-cisco-app-navigator/appsremote?order=relevance&query=\"Security+Cloud\"&offset=0&support=cisco&type=addon&category=security_compliance&category=firewall",
     "app_viz": "",
@@ -1052,21 +1052,21 @@ export const PRODUCT_CATALOG = [
         "app_id": "TA-Cisco-NVM",
         "display_name": "Cisco CESA Add-On for Splunk",
         "uid": "4221",
-        "addon_splunkbase_url": "https://splunkbase.splunk.com/app/4221",
+        "addon_splunkbase_url": "",
         "status": "archived"
       },
       {
         "app_id": "CiscoNVM",
         "display_name": "Cisco Endpoint Security Analytics (CESA)",
         "uid": "2992",
-        "addon_splunkbase_url": "https://splunkbase.splunk.com/app/2992",
+        "addon_splunkbase_url": "",
         "status": "archived"
       },
       {
         "app_id": "tr-splunk-relay",
         "display_name": "Cisco SecureX threat response - CESA Relay",
         "uid": "5420",
-        "addon_splunkbase_url": "https://splunkbase.splunk.com/app/5420",
+        "addon_splunkbase_url": "",
         "status": "archived"
       }
     ],
@@ -1152,7 +1152,7 @@ export const PRODUCT_CATALOG = [
     "ai_description": "",
     "cisco_retired": false,
     "coverage_gap": false,
-    "addon_splunkbase_url": "https://splunkbase.splunk.com/app/7404",
+    "addon_splunkbase_url": "",
     "addon_docs_url": "https://www.cisco.com/c/en/us/td/docs/security/cisco-secure-cloud-app/user-guide/cisco-security-cloud-user-guide/m_configure_cisco_products_in_cisco_security_cloud.html#configure-an-application",
     "addon_install_url": "/manager/splunk-cisco-app-navigator/appsremote?order=relevance&query=\"Security+Cloud\"&offset=0&support=cisco&type=addon&category=security_compliance&category=firewall",
     "app_viz": "",
@@ -1235,7 +1235,7 @@ export const PRODUCT_CATALOG = [
     "ai_description": "Employs AI to correlate security events, recommend actions, and automate incident response.",
     "cisco_retired": false,
     "coverage_gap": false,
-    "addon_splunkbase_url": "https://splunkbase.splunk.com/app/7404",
+    "addon_splunkbase_url": "",
     "addon_docs_url": "https://www.cisco.com/c/en/us/td/docs/security/cisco-secure-cloud-app/user-guide/cisco-security-cloud-user-guide/m_configure_cisco_products_in_cisco_security_cloud.html#xdr-incidents",
     "addon_install_url": "/manager/splunk-cisco-app-navigator/appsremote?order=relevance&query=\"Security+Cloud\"&offset=0&support=cisco&type=addon&category=security_compliance&category=firewall",
     "app_viz": "",
@@ -1322,7 +1322,7 @@ export const PRODUCT_CATALOG = [
     "ai_description": "",
     "cisco_retired": false,
     "coverage_gap": false,
-    "addon_splunkbase_url": "https://splunkbase.splunk.com/app/7557",
+    "addon_splunkbase_url": "",
     "addon_docs_url": "https://docs.splunk.com/Documentation/ES/latest/User/Talos",
     "addon_install_url": "/manager/splunk-cisco-app-navigator/appsremote?order=relevance&query=\"Talos\"&offset=0&support=splunk&support=cisco&type=app&type=addon",
     "app_viz": "",
@@ -1360,14 +1360,14 @@ export const PRODUCT_CATALOG = [
       {
         "label": "Cisco Talos Intelligence for Enterprise Security Cloud",
         "uid": "7557",
-        "url": "https://splunkbase.splunk.com/app/7557"
+        "url": ""
       }
     ],
     "soar_connectors": [
       {
         "label": "Cisco Talos Intelligence SOAR Connector",
         "uid": "7711",
-        "url": "https://splunkbase.splunk.com/app/7711"
+        "url": ""
       }
     ],
     "itsi_content_pack": null,
@@ -1421,7 +1421,7 @@ export const PRODUCT_CATALOG = [
     "ai_description": "",
     "cisco_retired": false,
     "coverage_gap": false,
-    "addon_splunkbase_url": "https://splunkbase.splunk.com/app/7404",
+    "addon_splunkbase_url": "",
     "addon_docs_url": "https://www.cisco.com/c/en/us/td/docs/security/cisco-secure-cloud-app/user-guide/cisco-security-cloud-user-guide/m_configure_cisco_products_in_cisco_security_cloud.html#configure-cvi",
     "addon_install_url": "/manager/splunk-cisco-app-navigator/appsremote?order=relevance&query=\"Security+Cloud\"&offset=0&support=cisco&type=addon&category=security_compliance&category=firewall",
     "app_viz": "",
@@ -1507,7 +1507,7 @@ export const PRODUCT_CATALOG = [
     "ai_description": "",
     "cisco_retired": false,
     "coverage_gap": false,
-    "addon_splunkbase_url": "https://splunkbase.splunk.com/app/7404",
+    "addon_splunkbase_url": "",
     "addon_docs_url": "https://www.cisco.com/c/en/us/td/docs/security/cisco-secure-cloud-app/user-guide/cisco-security-cloud-user-guide/m_configure_cisco_products_in_cisco_security_cloud.html#secure-malware-analytics",
     "addon_install_url": "/manager/splunk-cisco-app-navigator/appsremote?order=relevance&query=\"Security+Cloud\"&offset=0&support=cisco&type=addon&category=security_compliance&category=firewall",
     "app_viz": "",
@@ -1526,14 +1526,14 @@ export const PRODUCT_CATALOG = [
         "app_id": "TA-cisco-secure-malware-analytics",
         "display_name": "Cisco Secure Malware Analytics",
         "uid": "7219",
-        "addon_splunkbase_url": "https://splunkbase.splunk.com/app/7219",
+        "addon_splunkbase_url": "",
         "status": "archived"
       },
       {
         "app_id": "TA-cisco-threat-grid",
         "display_name": "Cisco Threat Grid Add-On",
         "uid": "4251",
-        "addon_splunkbase_url": "https://splunkbase.splunk.com/app/4251",
+        "addon_splunkbase_url": "",
         "status": "archived"
       }
     ],
@@ -1564,7 +1564,7 @@ export const PRODUCT_CATALOG = [
       {
         "label": "Cisco Secure Malware Analytics SOAR Connector",
         "uid": "6145",
-        "url": "https://splunkbase.splunk.com/app/6145"
+        "url": ""
       }
     ],
     "itsi_content_pack": null,
@@ -1618,7 +1618,7 @@ export const PRODUCT_CATALOG = [
     "ai_description": "Uses AI techniques such as natural language processing and machine learning to detect malicious intent in emails.",
     "cisco_retired": false,
     "coverage_gap": false,
-    "addon_splunkbase_url": "https://splunkbase.splunk.com/app/7404",
+    "addon_splunkbase_url": "",
     "addon_docs_url": "https://www.cisco.com/c/en/us/td/docs/security/cisco-secure-cloud-app/user-guide/cisco-security-cloud-user-guide/m_configure_cisco_products_in_cisco_security_cloud.html#secure-email-threat-defense",
     "addon_install_url": "/manager/splunk-cisco-app-navigator/appsremote?order=relevance&query=\"Security+Cloud\"&offset=0&support=cisco&type=addon&category=security_compliance&category=firewall",
     "app_viz": "",
@@ -1637,7 +1637,7 @@ export const PRODUCT_CATALOG = [
         "app_id": "TA-cisco-etd-connector",
         "display_name": "Cisco Email Threat Defense connector for Splunk",
         "uid": "7243",
-        "addon_splunkbase_url": "https://splunkbase.splunk.com/app/7243",
+        "addon_splunkbase_url": "",
         "status": "archived"
       }
     ],
@@ -1712,7 +1712,7 @@ export const PRODUCT_CATALOG = [
     "ai_description": "",
     "cisco_retired": false,
     "coverage_gap": false,
-    "addon_splunkbase_url": "https://splunkbase.splunk.com/app/1761",
+    "addon_splunkbase_url": "",
     "addon_docs_url": "https://splunk.github.io/splunk-add-on-for-cisco-esa",
     "addon_install_url": "/manager/splunk-cisco-app-navigator/appsremote?order=relevance&query=\"ESA\"&offset=0&support=splunk&support=cisco&type=app&type=addon",
     "app_viz": "",
@@ -1731,7 +1731,7 @@ export const PRODUCT_CATALOG = [
         "app_id": "Alef_TA_MIMEDecoder",
         "display_name": "MIME Decoder Add-on for Cisco ESA",
         "uid": "5116",
-        "addon_splunkbase_url": "https://splunkbase.splunk.com/app/5116",
+        "addon_splunkbase_url": "",
         "status": "archived"
       }
     ],
@@ -1773,12 +1773,12 @@ export const PRODUCT_CATALOG = [
       {
         "label": "Cisco ESA SOAR Connector",
         "uid": "5779",
-        "url": "https://splunkbase.splunk.com/app/5779"
+        "url": ""
       },
       {
         "label": "Cisco Secure Email and Web Manager SOAR Connector",
         "uid": "7770",
-        "url": "https://splunkbase.splunk.com/app/7770"
+        "url": ""
       }
     ],
     "itsi_content_pack": null,
@@ -1796,7 +1796,7 @@ export const PRODUCT_CATALOG = [
     "sc4s_supported": true,
     "sc4s_search_head_ta": "Splunk_TA_cisco-esa",
     "sc4s_search_head_ta_label": "Splunk Add-on for Cisco ESA",
-    "sc4s_search_head_ta_splunkbase_url": "https://splunkbase.splunk.com/app/1761",
+    "sc4s_search_head_ta_splunkbase_url": "",
     "sc4s_search_head_ta_splunkbase_id": "1761",
     "sc4s_search_head_ta_install_url": "/manager/splunk-cisco-app-navigator/appsremote?order=relevance&query=ESA&offset=0&support=splunk",
     "sc4s_sourcetypes": [
@@ -1845,12 +1845,12 @@ export const PRODUCT_CATALOG = [
     "ai_description": "",
     "cisco_retired": false,
     "coverage_gap": false,
-    "addon_splunkbase_url": "https://splunkbase.splunk.com/app/7569",
+    "addon_splunkbase_url": "",
     "addon_docs_url": "https://developer.cisco.com/docs/cloud-security/cisco-cloud-security-add-on-for-splunk",
     "addon_install_url": "/manager/splunk-cisco-app-navigator/appsremote?order=relevance&query=Secure+Access&offset=0&support=cisco",
     "app_viz": "cisco-cloud-security",
     "app_viz_label": "Cisco Secure Access App for Splunk",
-    "app_viz_splunkbase_url": "https://splunkbase.splunk.com/app/5558",
+    "app_viz_splunkbase_url": "",
     "app_viz_docs_url": "https://developer.cisco.com/docs/cloud-security/cisco-cloud-security-app-for-splunk/#cisco-cloud-security-app-for-splunk",
     "app_viz_install_url": "/manager/splunk-cisco-app-navigator/appsremote?order=relevance&query=Secure+Access&offset=0&support=cisco",
     "app_viz_2": "",
@@ -1943,12 +1943,12 @@ export const PRODUCT_CATALOG = [
     "ai_description": "Applies AI for cloud security and threat detection.",
     "cisco_retired": false,
     "coverage_gap": false,
-    "addon_splunkbase_url": "https://splunkbase.splunk.com/app/7569",
+    "addon_splunkbase_url": "",
     "addon_docs_url": "https://developer.cisco.com/docs/cloud-security/cisco-cloud-security-add-on-for-splunk",
     "addon_install_url": "/manager/splunk-cisco-app-navigator/appsremote?order=relevance&query=Secure+Access&offset=0&support=cisco",
     "app_viz": "cisco-cloud-security",
     "app_viz_label": "Cisco Secure Access App for Splunk",
-    "app_viz_splunkbase_url": "https://splunkbase.splunk.com/app/5558",
+    "app_viz_splunkbase_url": "",
     "app_viz_docs_url": "https://developer.cisco.com/docs/cloud-security/cisco-cloud-security-app-for-splunk/#cisco-cloud-security-app-for-splunk",
     "app_viz_install_url": "/manager/splunk-cisco-app-navigator/appsremote?order=relevance&query=Secure+Access&offset=0&support=cisco",
     "app_viz_2": "",
@@ -1962,28 +1962,28 @@ export const PRODUCT_CATALOG = [
         "app_id": "TA-Umbrella",
         "display_name": "Umbrella Add-on for Splunk Enterprise",
         "uid": "3629",
-        "addon_splunkbase_url": "https://splunkbase.splunk.com/app/3629",
+        "addon_splunkbase_url": "",
         "status": "archived"
       },
       {
         "app_id": "TA-cisco-cloud-security-umbrella-addon",
         "display_name": "Cisco Cloud Security Umbrella Add-on for Splunk",
         "uid": "5557",
-        "addon_splunkbase_url": "https://splunkbase.splunk.com/app/5557",
+        "addon_splunkbase_url": "",
         "status": "archived"
       },
       {
         "app_id": "TA-cisco_umbrella",
         "display_name": "Cisco Umbrella Add-On for Splunk",
         "uid": "3926",
-        "addon_splunkbase_url": "https://splunkbase.splunk.com/app/3926",
+        "addon_splunkbase_url": "",
         "status": "archived"
       },
       {
         "app_id": "opendns_investigate",
         "display_name": "Cisco Umbrella Investigate Add-on",
         "uid": "3324",
-        "addon_splunkbase_url": "https://splunkbase.splunk.com/app/3324",
+        "addon_splunkbase_url": "",
         "status": "archived"
       }
     ],
@@ -2036,24 +2036,24 @@ export const PRODUCT_CATALOG = [
       {
         "label": "Cisco Secure Access App for Splunk",
         "uid": "5558",
-        "url": "https://splunkbase.splunk.com/app/5558"
+        "url": ""
       }
     ],
     "soar_connectors": [
       {
         "label": "Cisco Umbrella Investigate SOAR Connector",
         "uid": "5780",
-        "url": "https://splunkbase.splunk.com/app/5780"
+        "url": ""
       },
       {
         "label": "Cisco Umbrella SOAR Connector",
         "uid": "5887",
-        "url": "https://splunkbase.splunk.com/app/5887"
+        "url": ""
       },
       {
         "label": "Cisco Umbrella v2 SOAR Connector",
         "uid": "8085",
-        "url": "https://splunkbase.splunk.com/app/8085"
+        "url": ""
       }
     ],
     "itsi_content_pack": null,
@@ -2107,12 +2107,12 @@ export const PRODUCT_CATALOG = [
     "ai_description": "",
     "cisco_retired": false,
     "coverage_gap": false,
-    "addon_splunkbase_url": "https://splunkbase.splunk.com/app/7569",
+    "addon_splunkbase_url": "",
     "addon_docs_url": "https://developer.cisco.com/docs/cloud-security/cisco-cloud-security-add-on-for-splunk",
     "addon_install_url": "/manager/splunk-cisco-app-navigator/appsremote?order=relevance&query=Secure+Access&offset=0&support=cisco",
     "app_viz": "cisco-cloud-security",
     "app_viz_label": "Cisco Secure Access App for Splunk",
-    "app_viz_splunkbase_url": "https://splunkbase.splunk.com/app/5558",
+    "app_viz_splunkbase_url": "",
     "app_viz_docs_url": "https://developer.cisco.com/docs/cloud-security/cisco-cloud-security-app-for-splunk/#cisco-cloud-security-app-for-splunk",
     "app_viz_install_url": "/manager/splunk-cisco-app-navigator/appsremote?order=relevance&query=Secure+Access&offset=0&support=cisco",
     "app_viz_2": "",
@@ -2126,7 +2126,7 @@ export const PRODUCT_CATALOG = [
         "app_id": "opendns_investigate",
         "display_name": "Cisco Umbrella Investigate Add-on",
         "uid": "3324",
-        "addon_splunkbase_url": "https://splunkbase.splunk.com/app/3324",
+        "addon_splunkbase_url": "",
         "status": "archived"
       }
     ],
@@ -2153,7 +2153,7 @@ export const PRODUCT_CATALOG = [
       {
         "label": "Cisco Umbrella Investigate SOAR Connector",
         "uid": "5780",
-        "url": "https://splunkbase.splunk.com/app/5780"
+        "url": ""
       }
     ],
     "itsi_content_pack": null,
@@ -2207,12 +2207,12 @@ export const PRODUCT_CATALOG = [
     "ai_description": "",
     "cisco_retired": false,
     "coverage_gap": false,
-    "addon_splunkbase_url": "https://splunkbase.splunk.com/app/7569",
+    "addon_splunkbase_url": "",
     "addon_docs_url": "https://developer.cisco.com/docs/cloud-security/cisco-cloud-security-add-on-for-splunk",
     "addon_install_url": "/manager/splunk-cisco-app-navigator/appsremote?order=relevance&query=Secure+Access&offset=0&support=cisco",
     "app_viz": "cisco-cloud-security",
     "app_viz_label": "Cisco Secure Access App for Splunk",
-    "app_viz_splunkbase_url": "https://splunkbase.splunk.com/app/5558",
+    "app_viz_splunkbase_url": "",
     "app_viz_docs_url": "https://developer.cisco.com/docs/cloud-security/cisco-cloud-security-app-for-splunk/#cisco-cloud-security-app-for-splunk",
     "app_viz_install_url": "/manager/splunk-cisco-app-navigator/appsremote?order=relevance&query=Secure+Access&offset=0&support=cisco",
     "app_viz_2": "",
@@ -2226,7 +2226,7 @@ export const PRODUCT_CATALOG = [
         "app_id": "cloudlock",
         "display_name": "Cisco Cloudlock for Splunk",
         "uid": "3043",
-        "addon_splunkbase_url": "https://splunkbase.splunk.com/app/3043",
+        "addon_splunkbase_url": "",
         "status": "archived"
       }
     ],
@@ -2302,7 +2302,7 @@ export const PRODUCT_CATALOG = [
     "ai_description": "",
     "cisco_retired": false,
     "coverage_gap": false,
-    "addon_splunkbase_url": "https://splunkbase.splunk.com/app/7404",
+    "addon_splunkbase_url": "",
     "addon_docs_url": "https://www.cisco.com/c/en/us/td/docs/security/cisco-secure-cloud-app/user-guide/cisco-security-cloud-user-guide/m_configure_cisco_products_in_cisco_security_cloud.html#multicloud-defense",
     "addon_install_url": "/manager/splunk-cisco-app-navigator/appsremote?order=relevance&query=\"Security+Cloud\"&offset=0&support=cisco&type=addon&category=security_compliance&category=firewall",
     "app_viz": "",
@@ -2573,7 +2573,7 @@ export const PRODUCT_CATALOG = [
     "ai_description": "",
     "cisco_retired": false,
     "coverage_gap": false,
-    "addon_splunkbase_url": "https://splunkbase.splunk.com/app/1747",
+    "addon_splunkbase_url": "",
     "addon_docs_url": "http://docs.splunk.com/Documentation/AddOns/latest/CiscoWSA/About",
     "addon_install_url": "/manager/splunk-cisco-app-navigator/appsremote?order=relevance&query=\"WSA\"&offset=0&support=splunk&support=cisco&type=app&type=addon",
     "app_viz": "",
@@ -2592,7 +2592,7 @@ export const PRODUCT_CATALOG = [
         "app_id": "Cisco_WSA_Insight",
         "display_name": "Cisco Web Security Appliance (WSA) Insight",
         "uid": "5524",
-        "addon_splunkbase_url": "https://splunkbase.splunk.com/app/5524",
+        "addon_splunkbase_url": "",
         "status": "archived"
       }
     ],
@@ -2629,7 +2629,7 @@ export const PRODUCT_CATALOG = [
       {
         "label": "Cisco Secure Email and Web Manager SOAR Connector",
         "uid": "7770",
-        "url": "https://splunkbase.splunk.com/app/7770"
+        "url": ""
       }
     ],
     "itsi_content_pack": {
@@ -2650,7 +2650,7 @@ export const PRODUCT_CATALOG = [
     "sc4s_supported": true,
     "sc4s_search_head_ta": "Splunk_TA_cisco-wsa",
     "sc4s_search_head_ta_label": "Splunk Add-on for Cisco WSA",
-    "sc4s_search_head_ta_splunkbase_url": "https://splunkbase.splunk.com/app/1747",
+    "sc4s_search_head_ta_splunkbase_url": "",
     "sc4s_search_head_ta_splunkbase_id": "1747",
     "sc4s_search_head_ta_install_url": "/manager/splunk-cisco-app-navigator/appsremote?order=relevance&query=WSA&offset=0&support=splunk",
     "sc4s_sourcetypes": [
@@ -2694,7 +2694,7 @@ export const PRODUCT_CATALOG = [
     "ai_description": "Utilizes AI for workload and application security.",
     "cisco_retired": false,
     "coverage_gap": false,
-    "addon_splunkbase_url": "https://splunkbase.splunk.com/app/7404",
+    "addon_splunkbase_url": "",
     "addon_docs_url": "https://www.cisco.com/c/en/us/td/docs/security/cisco-secure-cloud-app/user-guide/cisco-security-cloud-user-guide/m_configure_cisco_products_in_cisco_security_cloud.html#cisco-secure-workload",
     "addon_install_url": "/manager/splunk-cisco-app-navigator/appsremote?order=relevance&query=\"Security+Cloud\"&offset=0&support=cisco&type=addon&category=security_compliance&category=firewall",
     "app_viz": "",
@@ -2781,7 +2781,7 @@ export const PRODUCT_CATALOG = [
     "ai_description": "A comprehensive security solution focused on protecting AI applications and infrastructure, leveraging AI for threat detection and mitigation.",
     "cisco_retired": false,
     "coverage_gap": false,
-    "addon_splunkbase_url": "https://splunkbase.splunk.com/app/7404",
+    "addon_splunkbase_url": "",
     "addon_docs_url": "https://www.cisco.com/c/en/us/td/docs/security/cisco-secure-cloud-app/user-guide/cisco-security-cloud-user-guide/m_configure_cisco_products_in_cisco_security_cloud.html#configure-an-application",
     "addon_install_url": "/manager/splunk-cisco-app-navigator/appsremote?order=relevance&query=\"Security+Cloud\"&offset=0&support=cisco&type=addon&category=security_compliance&category=firewall",
     "app_viz": "",
@@ -2866,7 +2866,7 @@ export const PRODUCT_CATALOG = [
     "ai_description": "Utilizes AI for workload and application security with eBPF-based network security.",
     "cisco_retired": false,
     "coverage_gap": false,
-    "addon_splunkbase_url": "https://splunkbase.splunk.com/app/7404",
+    "addon_splunkbase_url": "",
     "addon_docs_url": "https://www.cisco.com/c/en/us/td/docs/security/cisco-secure-cloud-app/user-guide/cisco-security-cloud-user-guide/m_configure_cisco_products_in_cisco_security_cloud.html#configure-an-application",
     "addon_install_url": "/manager/splunk-cisco-app-navigator/appsremote?order=relevance&query=\"Security+Cloud\"&offset=0&support=cisco&type=addon&category=security_compliance&category=firewall",
     "app_viz": "",
@@ -2959,7 +2959,7 @@ export const PRODUCT_CATALOG = [
     "ai_description": "",
     "cisco_retired": false,
     "coverage_gap": false,
-    "addon_splunkbase_url": "https://splunkbase.splunk.com/app/7404",
+    "addon_splunkbase_url": "",
     "addon_docs_url": "https://www.cisco.com/c/en/us/td/docs/security/cisco-secure-cloud-app/user-guide/cisco-security-cloud-user-guide/m_configure_cisco_products_in_cisco_security_cloud.html#configure-an-application",
     "addon_install_url": "/manager/splunk-cisco-app-navigator/appsremote?order=relevance&query=\"Security+Cloud\"&offset=0&support=cisco&type=addon&category=security_compliance&category=firewall",
     "app_viz": "",
@@ -3219,12 +3219,12 @@ export const PRODUCT_CATALOG = [
     "ai_description": "Integrates AI for network management and automation.",
     "cisco_retired": false,
     "coverage_gap": false,
-    "addon_splunkbase_url": "https://splunkbase.splunk.com/app/7538",
+    "addon_splunkbase_url": "",
     "addon_docs_url": "https://splunkbase.splunk.com/app/7538",
     "addon_install_url": "/manager/launcher/appsremote?order=relevance&query=Catalyst&offset=0&category=network_security&type=addon&support=cisco",
     "app_viz": "cisco-catalyst-app",
     "app_viz_label": "Cisco Enterprise Networking for Splunk Platform",
-    "app_viz_splunkbase_url": "https://splunkbase.splunk.com/app/7539",
+    "app_viz_splunkbase_url": "",
     "app_viz_docs_url": "https://splunkbase.splunk.com/app/7539",
     "app_viz_install_url": "/manager/launcher/appsremote?order=relevance&query=Catalyst&offset=0&category=network_security&type=addon&support=cisco",
     "app_viz_2": "",
@@ -3238,28 +3238,28 @@ export const PRODUCT_CATALOG = [
         "app_id": "Splunk-TA-cisco-dnacenter",
         "display_name": "Cisco DNA Center Add-on (archived)",
         "uid": "6668",
-        "addon_splunkbase_url": "https://splunkbase.splunk.com/app/6668",
+        "addon_splunkbase_url": "",
         "status": "archived"
       },
       {
         "app_id": "Splunk_CiscoDNACenter",
         "display_name": "Cisco DNA Center App (archived)",
         "uid": "6669",
-        "addon_splunkbase_url": "https://splunkbase.splunk.com/app/6669",
+        "addon_splunkbase_url": "",
         "status": "archived"
       },
       {
         "app_id": "Splunk-TA-cisco-catalyst-center",
         "display_name": "Catalyst Center Add-on",
         "uid": "7858",
-        "addon_splunkbase_url": "https://splunkbase.splunk.com/app/7858",
+        "addon_splunkbase_url": "",
         "status": "active"
       },
       {
         "app_id": "Splunk-cisco-catalyst-center",
         "display_name": "Catalyst Center App",
         "uid": "7859",
-        "addon_splunkbase_url": "https://splunkbase.splunk.com/app/7859",
+        "addon_splunkbase_url": "",
         "status": "active"
       }
     ],
@@ -3268,19 +3268,19 @@ export const PRODUCT_CATALOG = [
         "app_id": "Splunk_TA_stream",
         "display_name": "Splunk Add-on for Stream Forwarders",
         "uid": "5238",
-        "addon_splunkbase_url": "https://splunkbase.splunk.com/app/5238"
+        "addon_splunkbase_url": ""
       },
       {
         "app_id": "splunk_app_stream",
         "display_name": "Splunk App for Stream",
         "uid": "1809",
-        "addon_splunkbase_url": "https://splunkbase.splunk.com/app/1809"
+        "addon_splunkbase_url": ""
       },
       {
         "app_id": "Splunk_TA_stream_wire_data",
         "display_name": "Splunk Add-on for Stream Wire Data",
         "uid": "5234",
-        "addon_splunkbase_url": "https://splunkbase.splunk.com/app/5234"
+        "addon_splunkbase_url": ""
       }
     ],
     "community_apps": [],
@@ -3352,7 +3352,7 @@ export const PRODUCT_CATALOG = [
     "netflow_supported": true,
     "netflow_addon": "splunk_app_stream_ipfix_cisco_hsl",
     "netflow_addon_label": "Cisco Catalyst Enhanced Netflow Add-on for Splunk",
-    "netflow_addon_splunkbase_url": "https://splunkbase.splunk.com/app/6872",
+    "netflow_addon_splunkbase_url": "",
     "netflow_addon_splunkbase_id": "6872",
     "netflow_addon_install_url": "/manager/splunk-cisco-app-navigator/appsremote?order=relevance&query=%22Enhanced+Netflow%22&offset=0&support=cisco",
     "netflow_addon_docs_url": "https://www.cisco.com/c/en/us/solutions/collateral/enterprise-networks/sd-wan/sd-wan-splunk-integration-ug.html",
@@ -3386,12 +3386,12 @@ export const PRODUCT_CATALOG = [
     "ai_description": "",
     "cisco_retired": false,
     "coverage_gap": false,
-    "addon_splunkbase_url": "https://splunkbase.splunk.com/app/7538",
+    "addon_splunkbase_url": "",
     "addon_docs_url": "https://splunkbase.splunk.com/app/7538",
     "addon_install_url": "/manager/launcher/appsremote?order=relevance&query=Catalyst&offset=0&category=network_security&type=addon&support=cisco",
     "app_viz": "cisco-catalyst-app",
     "app_viz_label": "Cisco Enterprise Networking for Splunk Platform",
-    "app_viz_splunkbase_url": "https://splunkbase.splunk.com/app/7539",
+    "app_viz_splunkbase_url": "",
     "app_viz_docs_url": "https://splunkbase.splunk.com/app/7539",
     "app_viz_install_url": "/manager/launcher/appsremote?order=relevance&query=Catalyst&offset=0&category=network_security&type=addon&support=cisco",
     "app_viz_2": "",
@@ -3405,14 +3405,14 @@ export const PRODUCT_CATALOG = [
         "app_id": "TA-cisco_ios",
         "display_name": "DEPRECATED Add-on for Cisco Network Data",
         "uid": "1467",
-        "addon_splunkbase_url": "https://splunkbase.splunk.com/app/1467",
+        "addon_splunkbase_url": "",
         "status": "active"
       },
       {
         "app_id": "cisco_ios",
         "display_name": "App for Cisco Network Data",
         "uid": "1352",
-        "addon_splunkbase_url": "https://splunkbase.splunk.com/app/1352",
+        "addon_splunkbase_url": "",
         "status": "active"
       }
     ],
@@ -3421,19 +3421,19 @@ export const PRODUCT_CATALOG = [
         "app_id": "Splunk_TA_stream",
         "display_name": "Splunk Add-on for Stream Forwarders",
         "uid": "5238",
-        "addon_splunkbase_url": "https://splunkbase.splunk.com/app/5238"
+        "addon_splunkbase_url": ""
       },
       {
         "app_id": "splunk_app_stream",
         "display_name": "Splunk App for Stream",
         "uid": "1809",
-        "addon_splunkbase_url": "https://splunkbase.splunk.com/app/1809"
+        "addon_splunkbase_url": ""
       },
       {
         "app_id": "Splunk_TA_stream_wire_data",
         "display_name": "Splunk Add-on for Stream Wire Data",
         "uid": "5234",
-        "addon_splunkbase_url": "https://splunkbase.splunk.com/app/5234"
+        "addon_splunkbase_url": ""
       }
     ],
     "community_apps": [],
@@ -3475,7 +3475,7 @@ export const PRODUCT_CATALOG = [
     "sc4s_supported": true,
     "sc4s_search_head_ta": "Splunk_TA_cisco-networks",
     "sc4s_search_head_ta_label": "Cisco Networks Add-on for Splunk",
-    "sc4s_search_head_ta_splunkbase_url": "https://splunkbase.splunk.com/app/1467",
+    "sc4s_search_head_ta_splunkbase_url": "",
     "sc4s_search_head_ta_splunkbase_id": "1467",
     "sc4s_search_head_ta_install_url": "/manager/splunk-cisco-app-navigator/appsremote?order=relevance&query=%22Cisco+Networks%22&offset=0&support=splunk",
     "sc4s_sourcetypes": [
@@ -3489,7 +3489,7 @@ export const PRODUCT_CATALOG = [
     "netflow_supported": true,
     "netflow_addon": "splunk_app_stream_ipfix_cisco_hsl",
     "netflow_addon_label": "Cisco Catalyst Enhanced Netflow Add-on for Splunk",
-    "netflow_addon_splunkbase_url": "https://splunkbase.splunk.com/app/6872",
+    "netflow_addon_splunkbase_url": "",
     "netflow_addon_splunkbase_id": "6872",
     "netflow_addon_install_url": "/manager/splunk-cisco-app-navigator/appsremote?order=relevance&query=%22Enhanced+Netflow%22&offset=0&support=cisco",
     "netflow_addon_docs_url": "https://www.cisco.com/c/en/us/solutions/collateral/enterprise-networks/sd-wan/sd-wan-splunk-integration-ug.html",
@@ -3523,12 +3523,12 @@ export const PRODUCT_CATALOG = [
     "ai_description": "",
     "cisco_retired": false,
     "coverage_gap": false,
-    "addon_splunkbase_url": "https://splunkbase.splunk.com/app/7538",
+    "addon_splunkbase_url": "",
     "addon_docs_url": "https://splunkbase.splunk.com/app/7538",
     "addon_install_url": "/manager/launcher/appsremote?order=relevance&query=Catalyst&offset=0&category=network_security&type=addon&support=cisco",
     "app_viz": "cisco-catalyst-app",
     "app_viz_label": "Cisco Enterprise Networking for Splunk Platform",
-    "app_viz_splunkbase_url": "https://splunkbase.splunk.com/app/7539",
+    "app_viz_splunkbase_url": "",
     "app_viz_docs_url": "https://splunkbase.splunk.com/app/7539",
     "app_viz_install_url": "/manager/launcher/appsremote?order=relevance&query=Catalyst&offset=0&category=network_security&type=addon&support=cisco",
     "app_viz_2": "",
@@ -3542,14 +3542,14 @@ export const PRODUCT_CATALOG = [
         "app_id": "Splunk_TA_cisco-ise",
         "display_name": "Splunk Add-on for Cisco Identity Services",
         "uid": "1915",
-        "addon_splunkbase_url": "https://splunkbase.splunk.com/app/1915",
+        "addon_splunkbase_url": "",
         "status": "active"
       },
       {
         "app_id": "Splunk_CiscoISE",
         "display_name": "Splunk for Cisco Identity Services (ISE)",
         "uid": "1589",
-        "addon_splunkbase_url": "https://splunkbase.splunk.com/app/1589",
+        "addon_splunkbase_url": "",
         "status": "active"
       }
     ],
@@ -3559,7 +3559,7 @@ export const PRODUCT_CATALOG = [
         "app_id": "Splunk_TA_CCX_Cisco_ISE",
         "display_name": "Splunk TA CCX Cisco ISE",
         "uid": "6460",
-        "url": "https://splunkbase.splunk.com/app/6460"
+        "url": ""
       }
     ],
     "sourcetypes": [
@@ -3592,14 +3592,14 @@ export const PRODUCT_CATALOG = [
       {
         "label": "Custom Alert for Cisco ISE MAC Block",
         "uid": "7548",
-        "url": "https://splunkbase.splunk.com/app/7548"
+        "url": ""
       }
     ],
     "soar_connectors": [
       {
         "label": "Cisco ISE SOAR Connector",
         "uid": "5885",
-        "url": "https://splunkbase.splunk.com/app/5885"
+        "url": ""
       }
     ],
     "itsi_content_pack": null,
@@ -3617,7 +3617,7 @@ export const PRODUCT_CATALOG = [
     "sc4s_supported": true,
     "sc4s_search_head_ta": "Splunk_TA_cisco-ise",
     "sc4s_search_head_ta_label": "Splunk Add-on for Cisco Identity Services",
-    "sc4s_search_head_ta_splunkbase_url": "https://splunkbase.splunk.com/app/1915",
+    "sc4s_search_head_ta_splunkbase_url": "",
     "sc4s_search_head_ta_splunkbase_id": "1915",
     "sc4s_search_head_ta_install_url": "/manager/splunk-cisco-app-navigator/appsremote?order=relevance&query=%22ISE%22&offset=0&support=splunk",
     "sc4s_sourcetypes": [
@@ -3659,12 +3659,12 @@ export const PRODUCT_CATALOG = [
     "ai_description": "",
     "cisco_retired": false,
     "coverage_gap": false,
-    "addon_splunkbase_url": "https://splunkbase.splunk.com/app/7538",
+    "addon_splunkbase_url": "",
     "addon_docs_url": "https://splunkbase.splunk.com/app/7538",
     "addon_install_url": "/manager/launcher/appsremote?order=relevance&query=Catalyst&offset=0&category=network_security&type=addon&support=cisco",
     "app_viz": "cisco-catalyst-app",
     "app_viz_label": "Cisco Enterprise Networking for Splunk Platform",
-    "app_viz_splunkbase_url": "https://splunkbase.splunk.com/app/7539",
+    "app_viz_splunkbase_url": "",
     "app_viz_docs_url": "https://splunkbase.splunk.com/app/7539",
     "app_viz_install_url": "/manager/launcher/appsremote?order=relevance&query=Catalyst&offset=0&category=network_security&type=addon&support=cisco",
     "app_viz_2": "",
@@ -3678,14 +3678,14 @@ export const PRODUCT_CATALOG = [
         "app_id": "TA-cisco_ios",
         "display_name": "DEPRECATED Add-on for Cisco Network Data",
         "uid": "1467",
-        "addon_splunkbase_url": "https://splunkbase.splunk.com/app/1467",
+        "addon_splunkbase_url": "",
         "status": "active"
       },
       {
         "app_id": "cisco_ios",
         "display_name": "App for Cisco Network Data",
         "uid": "1352",
-        "addon_splunkbase_url": "https://splunkbase.splunk.com/app/1352",
+        "addon_splunkbase_url": "",
         "status": "active"
       }
     ],
@@ -3763,12 +3763,12 @@ export const PRODUCT_CATALOG = [
     "ai_description": "",
     "cisco_retired": false,
     "coverage_gap": false,
-    "addon_splunkbase_url": "https://splunkbase.splunk.com/app/7538",
+    "addon_splunkbase_url": "",
     "addon_docs_url": "https://splunkbase.splunk.com/app/7538",
     "addon_install_url": "/manager/launcher/appsremote?order=relevance&query=Catalyst&offset=0&category=network_security&type=addon&support=cisco",
     "app_viz": "cisco-catalyst-app",
     "app_viz_label": "Cisco Enterprise Networking for Splunk Platform",
-    "app_viz_splunkbase_url": "https://splunkbase.splunk.com/app/7539",
+    "app_viz_splunkbase_url": "",
     "app_viz_docs_url": "https://splunkbase.splunk.com/app/7539",
     "app_viz_install_url": "/manager/launcher/appsremote?order=relevance&query=Catalyst&offset=0&category=network_security&type=addon&support=cisco",
     "app_viz_2": "",
@@ -3782,14 +3782,14 @@ export const PRODUCT_CATALOG = [
         "app_id": "TA-cisco_ios",
         "display_name": "DEPRECATED Add-on for Cisco Network Data",
         "uid": "1467",
-        "addon_splunkbase_url": "https://splunkbase.splunk.com/app/1467",
+        "addon_splunkbase_url": "",
         "status": "active"
       },
       {
         "app_id": "cisco_ios",
         "display_name": "App for Cisco Network Data",
         "uid": "1352",
-        "addon_splunkbase_url": "https://splunkbase.splunk.com/app/1352",
+        "addon_splunkbase_url": "",
         "status": "active"
       }
     ],
@@ -3798,19 +3798,19 @@ export const PRODUCT_CATALOG = [
         "app_id": "Splunk_TA_stream",
         "display_name": "Splunk Add-on for Stream Forwarders",
         "uid": "5238",
-        "addon_splunkbase_url": "https://splunkbase.splunk.com/app/5238"
+        "addon_splunkbase_url": ""
       },
       {
         "app_id": "splunk_app_stream",
         "display_name": "Splunk App for Stream",
         "uid": "1809",
-        "addon_splunkbase_url": "https://splunkbase.splunk.com/app/1809"
+        "addon_splunkbase_url": ""
       },
       {
         "app_id": "Splunk_TA_stream_wire_data",
         "display_name": "Splunk Add-on for Stream Wire Data",
         "uid": "5234",
-        "addon_splunkbase_url": "https://splunkbase.splunk.com/app/5234"
+        "addon_splunkbase_url": ""
       }
     ],
     "community_apps": [],
@@ -3858,7 +3858,7 @@ export const PRODUCT_CATALOG = [
     "netflow_supported": true,
     "netflow_addon": "splunk_app_stream_ipfix_cisco_hsl",
     "netflow_addon_label": "Cisco Catalyst Enhanced Netflow Add-on for Splunk",
-    "netflow_addon_splunkbase_url": "https://splunkbase.splunk.com/app/6872",
+    "netflow_addon_splunkbase_url": "",
     "netflow_addon_splunkbase_id": "6872",
     "netflow_addon_install_url": "/manager/splunk-cisco-app-navigator/appsremote?order=relevance&query=%22Enhanced+Netflow%22&offset=0&support=cisco",
     "netflow_addon_docs_url": "https://www.cisco.com/c/en/us/solutions/collateral/enterprise-networks/sd-wan/sd-wan-splunk-integration-ug.html",
@@ -3892,12 +3892,12 @@ export const PRODUCT_CATALOG = [
     "ai_description": "Applies AI for cloud-managed networking, security, and device control.",
     "cisco_retired": false,
     "coverage_gap": false,
-    "addon_splunkbase_url": "https://splunkbase.splunk.com/app/7538",
+    "addon_splunkbase_url": "",
     "addon_docs_url": "https://splunkbase.splunk.com/app/7538",
     "addon_install_url": "/manager/launcher/appsremote?order=relevance&query=Catalyst&offset=0&category=network_security&type=addon&support=cisco",
     "app_viz": "cisco-catalyst-app",
     "app_viz_label": "Cisco Enterprise Networking for Splunk Platform",
-    "app_viz_splunkbase_url": "https://splunkbase.splunk.com/app/7539",
+    "app_viz_splunkbase_url": "",
     "app_viz_docs_url": "https://splunkbase.splunk.com/app/7539",
     "app_viz_install_url": "/manager/launcher/appsremote?order=relevance&query=Catalyst&offset=0&category=network_security&type=addon&support=cisco",
     "app_viz_2": "",
@@ -3911,28 +3911,28 @@ export const PRODUCT_CATALOG = [
         "app_id": "Splunk_TA_cisco_meraki",
         "display_name": "Cisco Meraki Add-on for Splunk",
         "uid": "5580",
-        "addon_splunkbase_url": "https://splunkbase.splunk.com/app/5580",
+        "addon_splunkbase_url": "",
         "status": "active"
       },
       {
         "app_id": "TA-cisco_meraki_operations",
         "display_name": "Add On for Cisco Meraki Operations",
         "uid": "6201",
-        "addon_splunkbase_url": "https://splunkbase.splunk.com/app/6201",
+        "addon_splunkbase_url": "",
         "status": "archived"
       },
       {
         "app_id": "TA-meraki",
         "display_name": "TA-meraki",
         "uid": "3018",
-        "addon_splunkbase_url": "https://splunkbase.splunk.com/app/3018",
+        "addon_splunkbase_url": "",
         "status": "archived"
       },
       {
         "app_id": "TA_Meraki_SNMP_trap",
         "display_name": "Meraki SNMP trap Add-on for Splunk",
         "uid": "4838",
-        "addon_splunkbase_url": "https://splunkbase.splunk.com/app/4838",
+        "addon_splunkbase_url": "",
         "status": "archived"
       }
     ],
@@ -3941,19 +3941,19 @@ export const PRODUCT_CATALOG = [
         "app_id": "Splunk_TA_stream",
         "display_name": "Splunk Add-on for Stream Forwarders",
         "uid": "5238",
-        "addon_splunkbase_url": "https://splunkbase.splunk.com/app/5238"
+        "addon_splunkbase_url": ""
       },
       {
         "app_id": "splunk_app_stream",
         "display_name": "Splunk App for Stream",
         "uid": "1809",
-        "addon_splunkbase_url": "https://splunkbase.splunk.com/app/1809"
+        "addon_splunkbase_url": ""
       },
       {
         "app_id": "Splunk_TA_stream_wire_data",
         "display_name": "Splunk Add-on for Stream Wire Data",
         "uid": "5234",
-        "addon_splunkbase_url": "https://splunkbase.splunk.com/app/5234"
+        "addon_splunkbase_url": ""
       }
     ],
     "community_apps": [
@@ -3961,7 +3961,7 @@ export const PRODUCT_CATALOG = [
         "app_id": "Splunk_TA_CCX_Cisco_Meraki",
         "display_name": "Splunk TA CCX Cisco Meraki",
         "uid": "7365",
-        "url": "https://splunkbase.splunk.com/app/7365"
+        "url": ""
       }
     ],
     "sourcetypes": [
@@ -4031,7 +4031,7 @@ export const PRODUCT_CATALOG = [
       {
         "label": "Cisco Meraki SOAR Connector",
         "uid": "7960",
-        "url": "https://splunkbase.splunk.com/app/7960"
+        "url": ""
       }
     ],
     "itsi_content_pack": {
@@ -4052,7 +4052,7 @@ export const PRODUCT_CATALOG = [
     "sc4s_supported": true,
     "sc4s_search_head_ta": "TA-meraki",
     "sc4s_search_head_ta_label": "Cisco Meraki Add-on for Splunk",
-    "sc4s_search_head_ta_splunkbase_url": "https://splunkbase.splunk.com/app/3018",
+    "sc4s_search_head_ta_splunkbase_url": "",
     "sc4s_search_head_ta_splunkbase_id": "3018",
     "sc4s_search_head_ta_install_url": "/manager/splunk-cisco-app-navigator/appsremote?order=relevance&query=%22Cisco+Meraki%22&offset=0&support=splunk",
     "sc4s_sourcetypes": [
@@ -4068,7 +4068,7 @@ export const PRODUCT_CATALOG = [
     "netflow_supported": true,
     "netflow_addon": "splunk_app_stream_ipfix_cisco_hsl",
     "netflow_addon_label": "Cisco Catalyst Enhanced Netflow Add-on for Splunk",
-    "netflow_addon_splunkbase_url": "https://splunkbase.splunk.com/app/6872",
+    "netflow_addon_splunkbase_url": "",
     "netflow_addon_splunkbase_id": "6872",
     "netflow_addon_install_url": "/manager/splunk-cisco-app-navigator/appsremote?order=relevance&query=%22Enhanced+Netflow%22&offset=0&support=cisco",
     "netflow_addon_docs_url": "https://www.cisco.com/c/en/us/solutions/collateral/enterprise-networks/sd-wan/sd-wan-splunk-integration-ug.html",
@@ -4102,7 +4102,7 @@ export const PRODUCT_CATALOG = [
     "ai_description": "",
     "cisco_retired": false,
     "coverage_gap": false,
-    "addon_splunkbase_url": "https://splunkbase.splunk.com/app/8485",
+    "addon_splunkbase_url": "",
     "addon_docs_url": "https://splunkbase.splunk.com/app/8485",
     "addon_install_url": "",
     "app_viz": "",
@@ -4187,12 +4187,12 @@ export const PRODUCT_CATALOG = [
     "ai_description": "",
     "cisco_retired": false,
     "coverage_gap": false,
-    "addon_splunkbase_url": "https://splunkbase.splunk.com/app/7538",
+    "addon_splunkbase_url": "",
     "addon_docs_url": "https://splunkbase.splunk.com/app/7538",
     "addon_install_url": "/manager/launcher/appsremote?order=relevance&query=Catalyst&offset=0&category=network_security&type=addon&support=cisco",
     "app_viz": "cisco-catalyst-app",
     "app_viz_label": "Cisco Enterprise Networking for Splunk Platform",
-    "app_viz_splunkbase_url": "https://splunkbase.splunk.com/app/7539",
+    "app_viz_splunkbase_url": "",
     "app_viz_docs_url": "https://splunkbase.splunk.com/app/7539",
     "app_viz_install_url": "/manager/launcher/appsremote?order=relevance&query=Catalyst&offset=0&category=network_security&type=addon&support=cisco",
     "app_viz_2": "",
@@ -4206,14 +4206,14 @@ export const PRODUCT_CATALOG = [
         "app_id": "ta-cisco-sdwan",
         "display_name": "Cisco Catalyst SD-WAN Add-on for Splunk (Deprecated)",
         "uid": "6656",
-        "addon_splunkbase_url": "https://splunkbase.splunk.com/app/6656",
+        "addon_splunkbase_url": "",
         "status": "active"
       },
       {
         "app_id": "cisco-sdwan-app",
         "display_name": "Cisco Catalyst SD-WAN App for Splunk (Deprecated)",
         "uid": "6657",
-        "addon_splunkbase_url": "https://splunkbase.splunk.com/app/6657",
+        "addon_splunkbase_url": "",
         "status": "active"
       }
     ],
@@ -4222,19 +4222,19 @@ export const PRODUCT_CATALOG = [
         "app_id": "Splunk_TA_stream",
         "display_name": "Splunk Add-on for Stream Forwarders",
         "uid": "5238",
-        "addon_splunkbase_url": "https://splunkbase.splunk.com/app/5238"
+        "addon_splunkbase_url": ""
       },
       {
         "app_id": "splunk_app_stream",
         "display_name": "Splunk App for Stream",
         "uid": "1809",
-        "addon_splunkbase_url": "https://splunkbase.splunk.com/app/1809"
+        "addon_splunkbase_url": ""
       },
       {
         "app_id": "Splunk_TA_stream_wire_data",
         "display_name": "Splunk Add-on for Stream Wire Data",
         "uid": "5234",
-        "addon_splunkbase_url": "https://splunkbase.splunk.com/app/5234"
+        "addon_splunkbase_url": ""
       }
     ],
     "community_apps": [],
@@ -4298,7 +4298,7 @@ export const PRODUCT_CATALOG = [
     "sc4s_supported": true,
     "sc4s_search_head_ta": "TA-cisco_sdwan",
     "sc4s_search_head_ta_label": "DEPRECATED - Cisco Catalyst SD-WAN Add-on for Splunk",
-    "sc4s_search_head_ta_splunkbase_url": "https://splunkbase.splunk.com/app/6656",
+    "sc4s_search_head_ta_splunkbase_url": "",
     "sc4s_search_head_ta_splunkbase_id": "6656",
     "sc4s_search_head_ta_install_url": "/manager/splunk-cisco-app-navigator/appsremote?order=relevance&query=%22Cisco+SD-WAN%22&offset=0&support=splunk",
     "sc4s_sourcetypes": [
@@ -4311,7 +4311,7 @@ export const PRODUCT_CATALOG = [
     "netflow_supported": true,
     "netflow_addon": "splunk_app_stream_ipfix_cisco_hsl",
     "netflow_addon_label": "Cisco Catalyst Enhanced Netflow Add-on for Splunk",
-    "netflow_addon_splunkbase_url": "https://splunkbase.splunk.com/app/6872",
+    "netflow_addon_splunkbase_url": "",
     "netflow_addon_splunkbase_id": "6872",
     "netflow_addon_install_url": "/manager/splunk-cisco-app-navigator/appsremote?order=relevance&query=%22Enhanced+Netflow%22&offset=0&support=cisco",
     "netflow_addon_docs_url": "https://www.cisco.com/c/en/us/solutions/collateral/enterprise-networks/sd-wan/sd-wan-splunk-integration-ug.html",
@@ -4345,12 +4345,12 @@ export const PRODUCT_CATALOG = [
     "ai_description": "",
     "cisco_retired": false,
     "coverage_gap": false,
-    "addon_splunkbase_url": "https://splunkbase.splunk.com/app/7538",
+    "addon_splunkbase_url": "",
     "addon_docs_url": "https://splunkbase.splunk.com/app/7538",
     "addon_install_url": "/manager/launcher/appsremote?order=relevance&query=Catalyst&offset=0&category=network_security&type=addon&support=cisco",
     "app_viz": "cisco-catalyst-app",
     "app_viz_label": "Cisco Enterprise Networking for Splunk Platform",
-    "app_viz_splunkbase_url": "https://splunkbase.splunk.com/app/7539",
+    "app_viz_splunkbase_url": "",
     "app_viz_docs_url": "https://splunkbase.splunk.com/app/7539",
     "app_viz_install_url": "/manager/launcher/appsremote?order=relevance&query=Catalyst&offset=0&category=network_security&type=addon&support=cisco",
     "app_viz_2": "",
@@ -4364,14 +4364,14 @@ export const PRODUCT_CATALOG = [
         "app_id": "TA-cisco_ios",
         "display_name": "DEPRECATED Add-on for Cisco Network Data",
         "uid": "1467",
-        "addon_splunkbase_url": "https://splunkbase.splunk.com/app/1467",
+        "addon_splunkbase_url": "",
         "status": "active"
       },
       {
         "app_id": "cisco_ios",
         "display_name": "App for Cisco Network Data",
         "uid": "1352",
-        "addon_splunkbase_url": "https://splunkbase.splunk.com/app/1352",
+        "addon_splunkbase_url": "",
         "status": "active"
       }
     ],
@@ -4380,19 +4380,19 @@ export const PRODUCT_CATALOG = [
         "app_id": "Splunk_TA_stream",
         "display_name": "Splunk Add-on for Stream Forwarders",
         "uid": "5238",
-        "addon_splunkbase_url": "https://splunkbase.splunk.com/app/5238"
+        "addon_splunkbase_url": ""
       },
       {
         "app_id": "splunk_app_stream",
         "display_name": "Splunk App for Stream",
         "uid": "1809",
-        "addon_splunkbase_url": "https://splunkbase.splunk.com/app/1809"
+        "addon_splunkbase_url": ""
       },
       {
         "app_id": "Splunk_TA_stream_wire_data",
         "display_name": "Splunk Add-on for Stream Wire Data",
         "uid": "5234",
-        "addon_splunkbase_url": "https://splunkbase.splunk.com/app/5234"
+        "addon_splunkbase_url": ""
       }
     ],
     "community_apps": [],
@@ -4440,7 +4440,7 @@ export const PRODUCT_CATALOG = [
     "netflow_supported": true,
     "netflow_addon": "splunk_app_stream_ipfix_cisco_hsl",
     "netflow_addon_label": "Cisco Catalyst Enhanced Netflow Add-on for Splunk",
-    "netflow_addon_splunkbase_url": "https://splunkbase.splunk.com/app/6872",
+    "netflow_addon_splunkbase_url": "",
     "netflow_addon_splunkbase_id": "6872",
     "netflow_addon_install_url": "/manager/splunk-cisco-app-navigator/appsremote?order=relevance&query=%22Enhanced+Netflow%22&offset=0&support=cisco",
     "netflow_addon_docs_url": "https://www.cisco.com/c/en/us/solutions/collateral/enterprise-networks/sd-wan/sd-wan-splunk-integration-ug.html",
@@ -4474,12 +4474,12 @@ export const PRODUCT_CATALOG = [
     "ai_description": "",
     "cisco_retired": false,
     "coverage_gap": false,
-    "addon_splunkbase_url": "https://splunkbase.splunk.com/app/7538",
+    "addon_splunkbase_url": "",
     "addon_docs_url": "https://splunkbase.splunk.com/app/7538",
     "addon_install_url": "/manager/launcher/appsremote?order=relevance&query=Catalyst&offset=0&category=network_security&type=addon&support=cisco",
     "app_viz": "cisco-catalyst-app",
     "app_viz_label": "Cisco Enterprise Networking for Splunk Platform",
-    "app_viz_splunkbase_url": "https://splunkbase.splunk.com/app/7539",
+    "app_viz_splunkbase_url": "",
     "app_viz_docs_url": "https://splunkbase.splunk.com/app/7539",
     "app_viz_install_url": "/manager/launcher/appsremote?order=relevance&query=Catalyst&offset=0&category=network_security&type=addon&support=cisco",
     "app_viz_2": "",
@@ -4493,14 +4493,14 @@ export const PRODUCT_CATALOG = [
         "app_id": "TA-cisco_ios",
         "display_name": "DEPRECATED Add-on for Cisco Network Data",
         "uid": "1467",
-        "addon_splunkbase_url": "https://splunkbase.splunk.com/app/1467",
+        "addon_splunkbase_url": "",
         "status": "active"
       },
       {
         "app_id": "cisco_ios",
         "display_name": "App for Cisco Network Data",
         "uid": "1352",
-        "addon_splunkbase_url": "https://splunkbase.splunk.com/app/1352",
+        "addon_splunkbase_url": "",
         "status": "active"
       }
     ],
@@ -4509,19 +4509,19 @@ export const PRODUCT_CATALOG = [
         "app_id": "Splunk_TA_stream",
         "display_name": "Splunk Add-on for Stream Forwarders",
         "uid": "5238",
-        "addon_splunkbase_url": "https://splunkbase.splunk.com/app/5238"
+        "addon_splunkbase_url": ""
       },
       {
         "app_id": "splunk_app_stream",
         "display_name": "Splunk App for Stream",
         "uid": "1809",
-        "addon_splunkbase_url": "https://splunkbase.splunk.com/app/1809"
+        "addon_splunkbase_url": ""
       },
       {
         "app_id": "Splunk_TA_stream_wire_data",
         "display_name": "Splunk Add-on for Stream Wire Data",
         "uid": "5234",
-        "addon_splunkbase_url": "https://splunkbase.splunk.com/app/5234"
+        "addon_splunkbase_url": ""
       }
     ],
     "community_apps": [],
@@ -4568,7 +4568,7 @@ export const PRODUCT_CATALOG = [
     "netflow_supported": true,
     "netflow_addon": "splunk_app_stream_ipfix_cisco_hsl",
     "netflow_addon_label": "Cisco Catalyst Enhanced Netflow Add-on for Splunk",
-    "netflow_addon_splunkbase_url": "https://splunkbase.splunk.com/app/6872",
+    "netflow_addon_splunkbase_url": "",
     "netflow_addon_splunkbase_id": "6872",
     "netflow_addon_install_url": "/manager/splunk-cisco-app-navigator/appsremote?order=relevance&query=%22Enhanced+Netflow%22&offset=0&support=cisco",
     "netflow_addon_docs_url": "https://www.cisco.com/c/en/us/solutions/collateral/enterprise-networks/sd-wan/sd-wan-splunk-integration-ug.html",
@@ -4602,12 +4602,12 @@ export const PRODUCT_CATALOG = [
     "ai_description": "",
     "cisco_retired": false,
     "coverage_gap": false,
-    "addon_splunkbase_url": "https://splunkbase.splunk.com/app/7538",
+    "addon_splunkbase_url": "",
     "addon_docs_url": "https://splunkbase.splunk.com/app/7538",
     "addon_install_url": "/manager/launcher/appsremote?order=relevance&query=Catalyst&offset=0&category=network_security&type=addon&support=cisco",
     "app_viz": "cisco-catalyst-app",
     "app_viz_label": "Cisco Enterprise Networking for Splunk Platform",
-    "app_viz_splunkbase_url": "https://splunkbase.splunk.com/app/7539",
+    "app_viz_splunkbase_url": "",
     "app_viz_docs_url": "https://splunkbase.splunk.com/app/7539",
     "app_viz_install_url": "/manager/launcher/appsremote?order=relevance&query=Catalyst&offset=0&category=network_security&type=addon&support=cisco",
     "app_viz_2": "",
@@ -4621,14 +4621,14 @@ export const PRODUCT_CATALOG = [
         "app_id": "TA-cisco_ios",
         "display_name": "DEPRECATED Add-on for Cisco Network Data",
         "uid": "1467",
-        "addon_splunkbase_url": "https://splunkbase.splunk.com/app/1467",
+        "addon_splunkbase_url": "",
         "status": "active"
       },
       {
         "app_id": "cisco_ios",
         "display_name": "App for Cisco Network Data",
         "uid": "1352",
-        "addon_splunkbase_url": "https://splunkbase.splunk.com/app/1352",
+        "addon_splunkbase_url": "",
         "status": "active"
       }
     ],
@@ -4637,19 +4637,19 @@ export const PRODUCT_CATALOG = [
         "app_id": "Splunk_TA_stream",
         "display_name": "Splunk Add-on for Stream Forwarders",
         "uid": "5238",
-        "addon_splunkbase_url": "https://splunkbase.splunk.com/app/5238"
+        "addon_splunkbase_url": ""
       },
       {
         "app_id": "splunk_app_stream",
         "display_name": "Splunk App for Stream",
         "uid": "1809",
-        "addon_splunkbase_url": "https://splunkbase.splunk.com/app/1809"
+        "addon_splunkbase_url": ""
       },
       {
         "app_id": "Splunk_TA_stream_wire_data",
         "display_name": "Splunk Add-on for Stream Wire Data",
         "uid": "5234",
-        "addon_splunkbase_url": "https://splunkbase.splunk.com/app/5234"
+        "addon_splunkbase_url": ""
       }
     ],
     "community_apps": [],
@@ -4696,7 +4696,7 @@ export const PRODUCT_CATALOG = [
     "netflow_supported": true,
     "netflow_addon": "splunk_app_stream_ipfix_cisco_hsl",
     "netflow_addon_label": "Cisco Catalyst Enhanced Netflow Add-on for Splunk",
-    "netflow_addon_splunkbase_url": "https://splunkbase.splunk.com/app/6872",
+    "netflow_addon_splunkbase_url": "",
     "netflow_addon_splunkbase_id": "6872",
     "netflow_addon_install_url": "/manager/splunk-cisco-app-navigator/appsremote?order=relevance&query=%22Enhanced+Netflow%22&offset=0&support=cisco",
     "netflow_addon_docs_url": "https://www.cisco.com/c/en/us/solutions/collateral/enterprise-networks/sd-wan/sd-wan-splunk-integration-ug.html",
@@ -4912,7 +4912,7 @@ export const PRODUCT_CATALOG = [
     "ai_description": "",
     "cisco_retired": false,
     "coverage_gap": false,
-    "addon_splunkbase_url": "https://splunkbase.splunk.com/app/7777",
+    "addon_splunkbase_url": "",
     "addon_docs_url": "https://splunkbase.splunk.com/app/7777",
     "addon_install_url": "/manager/splunk-cisco-app-navigator/appsremote?order=relevance&query=\"DC+Networking\"&offset=0&count=20&support=splunk&support=cisco&type=app&type=addon",
     "app_viz": "",
@@ -4931,14 +4931,14 @@ export const PRODUCT_CATALOG = [
         "app_id": "TA_cisco-ACI",
         "display_name": "Cisco ACI Add-on for Splunk Enterprise (deprecated)",
         "uid": "1897",
-        "addon_splunkbase_url": "https://splunkbase.splunk.com/app/1897",
+        "addon_splunkbase_url": "",
         "status": "active"
       },
       {
         "app_id": "cisco-app-ACI",
         "display_name": "Cisco ACI App for Splunk Enterprise (deprecated)",
         "uid": "1896",
-        "addon_splunkbase_url": "https://splunkbase.splunk.com/app/1896",
+        "addon_splunkbase_url": "",
         "status": "active"
       }
     ],
@@ -4947,19 +4947,19 @@ export const PRODUCT_CATALOG = [
         "app_id": "Splunk_TA_stream",
         "display_name": "Splunk Add-on for Stream Forwarders",
         "uid": "5238",
-        "addon_splunkbase_url": "https://splunkbase.splunk.com/app/5238"
+        "addon_splunkbase_url": ""
       },
       {
         "app_id": "splunk_app_stream",
         "display_name": "Splunk App for Stream",
         "uid": "1809",
-        "addon_splunkbase_url": "https://splunkbase.splunk.com/app/1809"
+        "addon_splunkbase_url": ""
       },
       {
         "app_id": "Splunk_TA_stream_wire_data",
         "display_name": "Splunk Add-on for Stream Wire Data",
         "uid": "5234",
-        "addon_splunkbase_url": "https://splunkbase.splunk.com/app/5234"
+        "addon_splunkbase_url": ""
       }
     ],
     "community_apps": [],
@@ -5051,7 +5051,7 @@ export const PRODUCT_CATALOG = [
     "ai_description": "",
     "cisco_retired": false,
     "coverage_gap": false,
-    "addon_splunkbase_url": "https://splunkbase.splunk.com/app/7777",
+    "addon_splunkbase_url": "",
     "addon_docs_url": "https://splunkbase.splunk.com/app/7777",
     "addon_install_url": "/manager/splunk-cisco-app-navigator/appsremote?order=relevance&query=\"DC+Networking\"&offset=0&count=20&support=splunk&support=cisco&type=app&type=addon",
     "app_viz": "",
@@ -5070,28 +5070,28 @@ export const PRODUCT_CATALOG = [
         "app_id": "TA_cisco-Nexus-9k",
         "display_name": "Cisco Nexus 9k Add-on for Splunk Enterprise (deprecated)",
         "uid": "1917",
-        "addon_splunkbase_url": "https://splunkbase.splunk.com/app/1917",
+        "addon_splunkbase_url": "",
         "status": "active"
       },
       {
         "app_id": "TA_cisco-NI",
         "display_name": "Cisco Nexus Dashboard Insights Add-On for Splunk (deprecated)",
         "uid": "6118",
-        "addon_splunkbase_url": "https://splunkbase.splunk.com/app/6118",
+        "addon_splunkbase_url": "",
         "status": "active"
       },
       {
         "app_id": "cisco-app-Nexus-9k",
         "display_name": "Cisco Nexus 9k App for Splunk Enterprise (deprecated)",
         "uid": "1916",
-        "addon_splunkbase_url": "https://splunkbase.splunk.com/app/1916",
+        "addon_splunkbase_url": "",
         "status": "active"
       },
       {
         "app_id": "cisco-app-NI",
         "display_name": "Cisco Nexus Dashboard Insights App for Splunk (deprecated)",
         "uid": "6117",
-        "addon_splunkbase_url": "https://splunkbase.splunk.com/app/6117",
+        "addon_splunkbase_url": "",
         "status": "active"
       }
     ],
@@ -5100,19 +5100,19 @@ export const PRODUCT_CATALOG = [
         "app_id": "Splunk_TA_stream",
         "display_name": "Splunk Add-on for Stream Forwarders",
         "uid": "5238",
-        "addon_splunkbase_url": "https://splunkbase.splunk.com/app/5238"
+        "addon_splunkbase_url": ""
       },
       {
         "app_id": "splunk_app_stream",
         "display_name": "Splunk App for Stream",
         "uid": "1809",
-        "addon_splunkbase_url": "https://splunkbase.splunk.com/app/1809"
+        "addon_splunkbase_url": ""
       },
       {
         "app_id": "Splunk_TA_stream_wire_data",
         "display_name": "Splunk Add-on for Stream Wire Data",
         "uid": "5234",
-        "addon_splunkbase_url": "https://splunkbase.splunk.com/app/5234"
+        "addon_splunkbase_url": ""
       }
     ],
     "community_apps": [],
@@ -5198,7 +5198,7 @@ export const PRODUCT_CATALOG = [
     "ai_description": "",
     "cisco_retired": false,
     "coverage_gap": false,
-    "addon_splunkbase_url": "https://splunkbase.splunk.com/app/7777",
+    "addon_splunkbase_url": "",
     "addon_docs_url": "https://splunkbase.splunk.com/app/7777",
     "addon_install_url": "/manager/splunk-cisco-app-navigator/appsremote?order=relevance&query=\"DC+Networking\"&offset=0&count=20&support=splunk&support=cisco&type=app&type=addon",
     "app_viz": "",
@@ -5550,7 +5550,7 @@ export const PRODUCT_CATALOG = [
     "ai_description": "",
     "cisco_retired": false,
     "coverage_gap": false,
-    "addon_splunkbase_url": "https://splunkbase.splunk.com/app/2731",
+    "addon_splunkbase_url": "",
     "addon_docs_url": "https://splunk.github.io/splunk-add-on-for-cisco-ucs",
     "addon_install_url": "/manager/splunk-cisco-app-navigator/appsremote?order=relevance&query=UCS&offset=0",
     "app_viz": "",
@@ -5643,7 +5643,7 @@ export const PRODUCT_CATALOG = [
     "ai_description": "Uses AI to simplify server fleet management and optimize data center operations.",
     "cisco_retired": false,
     "coverage_gap": false,
-    "addon_splunkbase_url": "https://splunkbase.splunk.com/app/7828",
+    "addon_splunkbase_url": "",
     "addon_docs_url": "https://splunkbase.splunk.com/app/7828",
     "addon_install_url": "/manager/launcher/appsremote?order=relevance&query=Intersight+Add-on+for+Splunk&offset=0&category=it_operations_management&support=cisco&type=addon",
     "app_viz": "",
@@ -5662,7 +5662,7 @@ export const PRODUCT_CATALOG = [
         "app_id": "TA-intersight-addon",
         "display_name": "Cisco Intersight Add-on for Splunk (Deprecated)",
         "uid": "6482",
-        "addon_splunkbase_url": "https://splunkbase.splunk.com/app/6482",
+        "addon_splunkbase_url": "",
         "status": "archived"
       }
     ],
@@ -5953,12 +5953,12 @@ export const PRODUCT_CATALOG = [
     "ai_description": "",
     "cisco_retired": false,
     "coverage_gap": false,
-    "addon_splunkbase_url": "https://splunkbase.splunk.com/app/7538",
+    "addon_splunkbase_url": "",
     "addon_docs_url": "https://splunkbase.splunk.com/app/7538",
     "addon_install_url": "/manager/launcher/appsremote?order=relevance&query=Catalyst&offset=0&category=network_security&type=addon&support=cisco",
     "app_viz": "cisco-catalyst-app",
     "app_viz_label": "Cisco Enterprise Networking for Splunk Platform",
-    "app_viz_splunkbase_url": "https://splunkbase.splunk.com/app/7539",
+    "app_viz_splunkbase_url": "",
     "app_viz_docs_url": "https://splunkbase.splunk.com/app/7539",
     "app_viz_install_url": "/manager/launcher/appsremote?order=relevance&query=Catalyst&offset=0&category=network_security&type=addon&support=cisco",
     "app_viz_2": "",
@@ -5972,14 +5972,14 @@ export const PRODUCT_CATALOG = [
         "app_id": "TA-cisco_cybervision",
         "display_name": "Cisco Cyber Vision Splunk Add On",
         "uid": "5748",
-        "addon_splunkbase_url": "https://splunkbase.splunk.com/app/5748",
+        "addon_splunkbase_url": "",
         "status": "active"
       },
       {
         "app_id": "cisco_cybervision_app_for_splunk",
         "display_name": "Cisco Cyber Vision Splunk App",
         "uid": "5747",
-        "addon_splunkbase_url": "https://splunkbase.splunk.com/app/5747",
+        "addon_splunkbase_url": "",
         "status": "active"
       }
     ],
@@ -6061,7 +6061,7 @@ export const PRODUCT_CATALOG = [
     "ai_description": "Uses AI for network and digital experience monitoring.",
     "cisco_retired": false,
     "coverage_gap": false,
-    "addon_splunkbase_url": "https://splunkbase.splunk.com/app/7719",
+    "addon_splunkbase_url": "",
     "addon_docs_url": "https://docs.thousandeyes.com/product-documentation/integration-guides/custom-built-integrations/splunk-app",
     "addon_install_url": "/manager/splunk-cisco-app-navigator/appsremote?order=relevance&query=ThousandEyes&offset=0&support=cisco&type=app&category=it_operations_management",
     "app_viz": "",
@@ -6080,14 +6080,14 @@ export const PRODUCT_CATALOG = [
         "app_id": "ta_cisco_thousandeyes",
         "display_name": "Cisco ThousandEyes Add-on for Splunk",
         "uid": "7719",
-        "addon_splunkbase_url": "https://splunkbase.splunk.com/app/7719",
+        "addon_splunkbase_url": "",
         "status": "archived"
       },
       {
         "app_id": "cisco_thousandeyes_alerting_app_for_splunk",
         "display_name": "cisco_thousandeyes_alerting_app_for_splunk",
         "uid": "5737",
-        "addon_splunkbase_url": "https://splunkbase.splunk.com/app/5737",
+        "addon_splunkbase_url": "",
         "status": "archived"
       }
     ],
@@ -6178,7 +6178,7 @@ export const PRODUCT_CATALOG = [
     "ai_description": "Employs AI for application performance monitoring and anomaly detection.",
     "cisco_retired": false,
     "coverage_gap": false,
-    "addon_splunkbase_url": "https://splunkbase.splunk.com/app/3471",
+    "addon_splunkbase_url": "",
     "addon_docs_url": "https://docs.splunk.com/Documentation/AppD/latest/AddOn",
     "addon_install_url": "/manager/splunk-cisco-app-navigator/appsremote?order=relevance&query=\"AppDynamics\"&offset=0&support=splunk&support=cisco&type=addon",
     "app_viz": "",
@@ -6197,14 +6197,14 @@ export const PRODUCT_CATALOG = [
         "app_id": "appdynamics",
         "display_name": "AppDynamics (Archived)",
         "uid": "1297",
-        "addon_splunkbase_url": "https://splunkbase.splunk.com/app/1297",
+        "addon_splunkbase_url": "",
         "status": "archived"
       },
       {
         "app_id": "splunk_app_AppDynamics",
         "display_name": "Splunk App for AppDynamics (Archived)",
         "uid": "3472",
-        "addon_splunkbase_url": "https://splunkbase.splunk.com/app/3472",
+        "addon_splunkbase_url": "",
         "status": "archived"
       }
     ],
@@ -6293,17 +6293,17 @@ export const PRODUCT_CATALOG = [
     "ai_description": "",
     "cisco_retired": false,
     "coverage_gap": false,
-    "addon_splunkbase_url": "https://splunkbase.splunk.com/app/4434",
+    "addon_splunkbase_url": "",
     "addon_docs_url": "https://sideviewapps.com/documentation/cisco-cdr-reporting-analytics-installation-step-3-data-collection",
     "addon_install_url": "/manager/splunk-cisco-app-navigator/appsremote?order=relevance&query=\"CallManager\"",
     "app_viz": "cisco_cdr",
     "app_viz_label": "Cisco CDR Reporting and Analytics",
-    "app_viz_splunkbase_url": "https://splunkbase.splunk.com/app/669",
+    "app_viz_splunkbase_url": "",
     "app_viz_docs_url": "https://sideviewapps.com/documentation/cisco-cdr-reporting-analytics-installation",
     "app_viz_install_url": "/manager/splunk-cisco-app-navigator/appsremote?order=relevance&query=\"CDR+Reporting\"",
     "app_viz_2": "ta_cisco_webex_add_on_for_splunk",
     "app_viz_2_label": "Webex Add-on for Splunk",
-    "app_viz_2_splunkbase_url": "https://splunkbase.splunk.com/app/8365",
+    "app_viz_2_splunkbase_url": "",
     "app_viz_2_docs_url": "https://splunkbase.splunk.com/app/8365",
     "app_viz_2_install_url": "/manager/splunk-cisco-app-navigator/appsremote?order=relevance&query=\"Webex+Add-on+for+Splunk\"",
     "learn_more_url": "https://www.webex.com/",
@@ -6312,49 +6312,49 @@ export const PRODUCT_CATALOG = [
         "app_id": "TA-DP-webex-teams",
         "display_name": "Technology Add-on for Webex Teams",
         "uid": "5152",
-        "addon_splunkbase_url": "https://splunkbase.splunk.com/app/5152",
+        "addon_splunkbase_url": "",
         "status": "archived"
       },
       {
         "app_id": "ta-cisco-webex-meetings-add-on-for-splunk",
         "display_name": "Cisco WebEx Meetings Add-on for Splunk",
         "uid": "4991",
-        "addon_splunkbase_url": "https://splunkbase.splunk.com/app/4991",
+        "addon_splunkbase_url": "",
         "status": "archived"
       },
       {
         "app_id": "SA_sideview_webex",
         "display_name": "Sideview Supporting App for Webex",
         "uid": "8429",
-        "addon_splunkbase_url": "https://splunkbase.splunk.com/app/8429",
+        "addon_splunkbase_url": "",
         "status": "archived"
       },
       {
         "app_id": "cisco_webex_meetings_app_for_splunk",
         "display_name": "Cisco WebEx Meetings App for Splunk",
         "uid": "4992",
-        "addon_splunkbase_url": "https://splunkbase.splunk.com/app/4992",
+        "addon_splunkbase_url": "",
         "status": "archived"
       },
       {
         "app_id": "splunk_app_spark_room",
         "display_name": "Cisco Spark Add-on for Splunk",
         "uid": "3384",
-        "addon_splunkbase_url": "https://splunkbase.splunk.com/app/3384",
+        "addon_splunkbase_url": "",
         "status": "archived"
       },
       {
         "app_id": "splunk_spark_app",
         "display_name": "Cisco Spark App for Splunk",
         "uid": "3385",
-        "addon_splunkbase_url": "https://splunkbase.splunk.com/app/3385",
+        "addon_splunkbase_url": "",
         "status": "archived"
       },
       {
         "app_id": "WebexTeams_AlertAction",
         "display_name": "Cisco Webex Teams Alert Action (Archived)",
         "uid": "4870",
-        "addon_splunkbase_url": "https://splunkbase.splunk.com/app/4870",
+        "addon_splunkbase_url": "",
         "status": "archived"
       }
     ],
@@ -6363,7 +6363,7 @@ export const PRODUCT_CATALOG = [
         "app_id": "canary",
         "display_name": "Canary",
         "uid": "4697",
-        "addon_splunkbase_url": "https://splunkbase.splunk.com/app/4697"
+        "addon_splunkbase_url": ""
       }
     ],
     "community_apps": [],
@@ -6407,14 +6407,14 @@ export const PRODUCT_CATALOG = [
       {
         "label": "Webex Alert Action",
         "uid": "8358",
-        "url": "https://splunkbase.splunk.com/app/8358"
+        "url": ""
       }
     ],
     "soar_connectors": [
       {
         "label": "Cisco Webex SOAR Connector",
         "uid": "5781",
-        "url": "https://splunkbase.splunk.com/app/5781"
+        "url": ""
       }
     ],
     "itsi_content_pack": null,
@@ -6468,12 +6468,12 @@ export const PRODUCT_CATALOG = [
     "ai_description": "",
     "cisco_retired": false,
     "coverage_gap": false,
-    "addon_splunkbase_url": "https://splunkbase.splunk.com/app/4434",
+    "addon_splunkbase_url": "",
     "addon_docs_url": "https://sideviewapps.com/documentation/cisco-cdr-reporting-analytics-installation-step-3-data-collection",
     "addon_install_url": "/manager/splunk-cisco-app-navigator/appsremote?order=relevance&query=\"CallManager\"",
     "app_viz": "cisco_cdr",
     "app_viz_label": "Cisco CDR Reporting and Analytics",
-    "app_viz_splunkbase_url": "https://splunkbase.splunk.com/app/669",
+    "app_viz_splunkbase_url": "",
     "app_viz_docs_url": "https://sideviewapps.com/documentation/cisco-cdr-reporting-analytics-installation",
     "app_viz_install_url": "/manager/splunk-cisco-app-navigator/appsremote?order=relevance&query=\"CDR+Reporting\"",
     "app_viz_2": "",
@@ -6487,14 +6487,14 @@ export const PRODUCT_CATALOG = [
         "app_id": "SA_cisco_cdr_axl",
         "display_name": "Supporting App for AXL",
         "uid": "4640",
-        "addon_splunkbase_url": "https://splunkbase.splunk.com/app/4640",
+        "addon_splunkbase_url": "",
         "status": "active"
       },
       {
         "app_id": "TA-ciscoaxl",
         "display_name": "Cisco CallManager API - TA-ciscoaxl",
         "uid": "2997",
-        "addon_splunkbase_url": "https://splunkbase.splunk.com/app/2997",
+        "addon_splunkbase_url": "",
         "status": "archived"
       }
     ],
@@ -6503,7 +6503,7 @@ export const PRODUCT_CATALOG = [
         "app_id": "canary",
         "display_name": "Canary",
         "uid": "4697",
-        "addon_splunkbase_url": "https://splunkbase.splunk.com/app/4697"
+        "addon_splunkbase_url": ""
       }
     ],
     "community_apps": [],
@@ -6590,7 +6590,7 @@ export const PRODUCT_CATALOG = [
     "ai_description": "",
     "cisco_retired": false,
     "coverage_gap": false,
-    "addon_splunkbase_url": "https://splunkbase.splunk.com/app/8413",
+    "addon_splunkbase_url": "",
     "addon_docs_url": "https://splunkbase.splunk.com/app/8413",
     "addon_install_url": "/manager/splunk-cisco-app-navigator/appsremote?order=relevance&query=cms&offset=0",
     "app_viz": "",
@@ -6610,7 +6610,7 @@ export const PRODUCT_CATALOG = [
         "app_id": "canary",
         "display_name": "Canary",
         "uid": "4697",
-        "addon_splunkbase_url": "https://splunkbase.splunk.com/app/4697"
+        "addon_splunkbase_url": ""
       }
     ],
     "community_apps": [],
@@ -7049,7 +7049,7 @@ export const PRODUCT_CATALOG = [
     "ai_description": "",
     "cisco_retired": true,
     "coverage_gap": false,
-    "addon_splunkbase_url": "https://splunkbase.splunk.com/app/2791",
+    "addon_splunkbase_url": "",
     "addon_docs_url": "https://splunkbase.splunk.com/app/2791",
     "addon_install_url": "/manager/splunk-cisco-app-navigator/appsremote?order=relevance&query=CWS&offset=0&category=network_security&type=addon&support=cisco",
     "app_viz": "",
@@ -7134,12 +7134,12 @@ export const PRODUCT_CATALOG = [
     "ai_description": "",
     "cisco_retired": true,
     "coverage_gap": false,
-    "addon_splunkbase_url": "https://splunkbase.splunk.com/app/5470",
+    "addon_splunkbase_url": "",
     "addon_docs_url": "https://splunkbase.splunk.com/app/5470",
     "addon_install_url": "/manager/splunk-cisco-app-navigator/appsremote?order=relevance&query=%22Cisco+DMP%22&offset=0&support=cisco",
     "app_viz": "Cisco_DP_PD",
     "app_viz_label": "Cisco DMP/APP App for Splunk",
-    "app_viz_splunkbase_url": "https://splunkbase.splunk.com/app/5471",
+    "app_viz_splunkbase_url": "",
     "app_viz_docs_url": "https://splunkbase.splunk.com/app/5471",
     "app_viz_install_url": "/manager/splunk-cisco-app-navigator/appsremote?order=relevance&query=%22Cisco+DMP%22&offset=0&support=cisco",
     "app_viz_2": "",
@@ -7228,12 +7228,12 @@ export const PRODUCT_CATALOG = [
     "ai_description": "",
     "cisco_retired": true,
     "coverage_gap": false,
-    "addon_splunkbase_url": "https://splunkbase.splunk.com/app/3820",
+    "addon_splunkbase_url": "",
     "addon_docs_url": "https://splunkbase.splunk.com/app/3820",
     "addon_install_url": "/manager/splunk-cisco-app-navigator/appsremote?order=relevance&query=%22Network+Assurance+Engine%22&offset=0&support=cisco",
     "app_viz": "cisco-app-candid",
     "app_viz_label": "Cisco Network Assurance Engine App for Splunk Enterprise (Cisco NAE)",
-    "app_viz_splunkbase_url": "https://splunkbase.splunk.com/app/3821",
+    "app_viz_splunkbase_url": "",
     "app_viz_docs_url": "https://splunkbase.splunk.com/app/3821",
     "app_viz_install_url": "/manager/splunk-cisco-app-navigator/appsremote?order=relevance&query=%22Network+Assurance+Engine%22&offset=0&support=cisco",
     "app_viz_2": "",
@@ -7313,7 +7313,7 @@ export const PRODUCT_CATALOG = [
     "ai_description": "",
     "cisco_retired": true,
     "coverage_gap": false,
-    "addon_splunkbase_url": "https://splunkbase.splunk.com/app/5020",
+    "addon_splunkbase_url": "",
     "addon_docs_url": "https://splunkbase.splunk.com/app/5020",
     "addon_install_url": "/manager/splunk-cisco-app-navigator/appsremote?order=relevance&query=%22Prime+Infrastructure%22&offset=0&support=cisco",
     "app_viz": "",
@@ -7404,7 +7404,7 @@ export const PRODUCT_CATALOG = [
     "ai_description": "",
     "cisco_retired": false,
     "coverage_gap": false,
-    "addon_splunkbase_url": "https://splunkbase.splunk.com/app/5183",
+    "addon_splunkbase_url": "",
     "addon_docs_url": "https://splunkbase.splunk.com/app/5183",
     "addon_install_url": "/manager/splunk-cisco-app-navigator/appsremote?order=relevance&query=%22Cisco+PSIRT%22&offset=0&support=cisco",
     "app_viz": "",
@@ -7494,7 +7494,7 @@ export const PRODUCT_CATALOG = [
     "ai_description": "",
     "cisco_retired": true,
     "coverage_gap": false,
-    "addon_splunkbase_url": "https://splunkbase.splunk.com/app/1811",
+    "addon_splunkbase_url": "",
     "addon_docs_url": "https://splunkbase.splunk.com/app/1811",
     "addon_install_url": "/manager/splunk-cisco-app-navigator/appsremote?order=relevance&query=%22Cisco+ACS%22&offset=0&support=cisco",
     "app_viz": "",
@@ -7546,7 +7546,7 @@ export const PRODUCT_CATALOG = [
     "sc4s_supported": true,
     "sc4s_search_head_ta": "TA-cisco_acs",
     "sc4s_search_head_ta_label": "Technology Add-on for Cisco Secure Access Control Server (ACS)",
-    "sc4s_search_head_ta_splunkbase_url": "https://splunkbase.splunk.com/app/1811",
+    "sc4s_search_head_ta_splunkbase_url": "",
     "sc4s_search_head_ta_splunkbase_id": "1811",
     "sc4s_search_head_ta_install_url": "/manager/splunk-cisco-app-navigator/appsremote?order=relevance&query=%22Cisco+ACS%22&offset=0&support=splunk",
     "sc4s_sourcetypes": [
@@ -7587,12 +7587,12 @@ export const PRODUCT_CATALOG = [
     "ai_description": "",
     "cisco_retired": true,
     "coverage_gap": false,
-    "addon_splunkbase_url": "https://splunkbase.splunk.com/app/4761",
+    "addon_splunkbase_url": "",
     "addon_docs_url": "https://splunkbase.splunk.com/app/4761",
     "addon_install_url": "/manager/splunk-cisco-app-navigator/appsremote?order=relevance&query=%22Cisco+SecureX%22&offset=0&support=cisco",
     "app_viz": "relay-module",
     "app_viz_label": "Cisco SecureX threat response - Relay module",
-    "app_viz_splunkbase_url": "https://splunkbase.splunk.com/app/5605",
+    "app_viz_splunkbase_url": "",
     "app_viz_docs_url": "https://splunkbase.splunk.com/app/5605",
     "app_viz_install_url": "/manager/splunk-cisco-app-navigator/appsremote?order=relevance&query=%22SecureX+Relay%22&offset=0&support=cisco",
     "app_viz_2": "",
@@ -7672,7 +7672,7 @@ export const PRODUCT_CATALOG = [
     "ai_description": "",
     "cisco_retired": true,
     "coverage_gap": false,
-    "addon_splunkbase_url": "https://splunkbase.splunk.com/app/1903",
+    "addon_splunkbase_url": "",
     "addon_docs_url": "https://splunkbase.splunk.com/app/1903",
     "addon_install_url": "/manager/splunk-cisco-app-navigator/appsremote?order=relevance&query=%22Cisco+IPS%22&offset=0&support=cisco",
     "app_viz": "",
@@ -7762,7 +7762,7 @@ export const PRODUCT_CATALOG = [
     "ai_description": "",
     "cisco_retired": true,
     "coverage_gap": false,
-    "addon_splunkbase_url": "https://splunkbase.splunk.com/app/3496",
+    "addon_splunkbase_url": "",
     "addon_docs_url": "https://splunkbase.splunk.com/app/3496",
     "addon_install_url": "/manager/splunk-cisco-app-navigator/appsremote?order=relevance&query=%22Cisco+CMX%22&offset=0&support=cisco",
     "app_viz": "",
@@ -7781,7 +7781,7 @@ export const PRODUCT_CATALOG = [
         "app_id": "CMX",
         "display_name": "Cisco CMX App for Splunk",
         "uid": "3497",
-        "addon_splunkbase_url": "https://splunkbase.splunk.com/app/3497",
+        "addon_splunkbase_url": "",
         "status": "archived"
       }
     ],
@@ -7860,7 +7860,7 @@ export const PRODUCT_CATALOG = [
     "ai_description": "",
     "cisco_retired": false,
     "coverage_gap": false,
-    "addon_splunkbase_url": "https://splunkbase.splunk.com/app/4817",
+    "addon_splunkbase_url": "",
     "addon_docs_url": "https://splunkbase.splunk.com/app/4817",
     "addon_install_url": "/manager/splunk-cisco-app-navigator/appsremote?order=relevance&query=%22Cisco+Bug+Search%22&offset=0&support=cisco",
     "app_viz": "",
@@ -7945,7 +7945,7 @@ export const PRODUCT_CATALOG = [
     "ai_description": "",
     "cisco_retired": false,
     "coverage_gap": false,
-    "addon_splunkbase_url": "https://splunkbase.splunk.com/app/5409",
+    "addon_splunkbase_url": "",
     "addon_docs_url": "https://splunkbase.splunk.com/app/5409",
     "addon_install_url": "/manager/splunk-cisco-app-navigator/appsremote?order=relevance&query=%22Accedian+Skylight%22&offset=0",
     "app_viz": "",
@@ -7964,14 +7964,14 @@ export const PRODUCT_CATALOG = [
         "app_id": "skylight_security_for_splunk",
         "display_name": "Accedian Skylight powered Security",
         "uid": "4691",
-        "addon_splunkbase_url": "https://splunkbase.splunk.com/app/4691",
+        "addon_splunkbase_url": "",
         "status": "archived"
       },
       {
         "app_id": "sa_sse_accedian",
         "display_name": "SA SSE Accedian Skylight",
         "uid": "4851",
-        "addon_splunkbase_url": "https://splunkbase.splunk.com/app/4851",
+        "addon_splunkbase_url": "",
         "status": "archived"
       }
     ],

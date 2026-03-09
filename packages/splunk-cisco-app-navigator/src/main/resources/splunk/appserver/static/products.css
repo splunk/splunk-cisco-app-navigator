@@ -79,10 +79,10 @@
     --faint-color: #888888;
     --dimmed-color: #999999;
     --card-bg: #ffffff;
-    --card-border: #dce0e4;
+    --card-border: #E5E7EB;
     --pill-divider: #b0b0b0;
-    --card-shadow: rgba(0, 0, 0, 0.08);
-    --card-shadow-hover: rgba(0, 0, 0, 0.12);
+    --card-shadow: none;
+    --card-shadow-hover: none;
     --card-header-bg: #ffffff;
     --card-body-bg: #ffffff;
     --card-footer-bg: #f7f8fa;
@@ -151,8 +151,8 @@
     --card-bg: #1e262c;
     --card-border: #333d44;
     --pill-divider: #5a6570;
-    --card-shadow: rgba(0, 0, 0, 0.3);
-    --card-shadow-hover: rgba(0, 0, 0, 0.45);
+    --card-shadow: none;
+    --card-shadow-hover: none;
     --card-header-bg: #1e262c;
     --card-body-bg: #1e262c;
     --card-footer-bg: #232d34;
@@ -871,11 +871,12 @@ html.dce-dark [data-view="views/shared/Page"] {
 #unsupported_products,
 #deprecated_products {
     margin-bottom: 24px;
-    border-top: 1px solid var(--section-border);
-    border-bottom: 1px solid var(--section-border);
+    border: 1px solid #E5E7EB !important;
+    border-left: none !important;
+    box-shadow: none !important;
     min-height: 42px !important;
-    background: var(--section-bg) !important;
-    border-radius: 8px;
+    background: #FFFFFF !important;
+    border-radius: 8px !important;
     overflow: hidden;
 }
 
@@ -1033,16 +1034,16 @@ html.dce-dark [data-view="views/shared/Page"] {
     position: relative;
     overflow: visible;
     background: var(--card-bg);
-    border: 1px solid var(--card-border);
-    border-radius: 10px;
+    border: 1px solid #E5E7EB !important;
+    border-radius: 12px !important;
     display: flex;
     flex-direction: column;
-    box-shadow: rgba(0,0,0,0.15) 0px 2px 8px, rgba(0,0,0,0.12) 0px 0px 1px;
+    box-shadow: none !important;
     transition: box-shadow 0.25s ease, transform 0.25s ease;
 }
 
 .csc-card:hover {
-    box-shadow: rgba(0,0,0,0.22) 0px 6px 20px, rgba(0,0,0,0.15) 0px 0px 2px;
+    box-shadow: none;
     transform: translateY(-2px);
     z-index: 50;
 }
@@ -1272,6 +1273,73 @@ html.dce-dark [data-view="views/shared/Page"] {
     flex-direction: column;
     min-width: 0;
     flex: 1;
+}
+
+/* ── New Header Layout for Title Row (for SC4S/NetFlow badges) ── */
+.csc-title-row {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 8px;
+    width: 100%;
+}
+.csc-title-content {
+    flex: 1;
+    min-width: 0;
+}
+.csc-header-badges {
+    flex-shrink: 0;
+    display: flex;
+    gap: 4px;
+    margin-top: 2px;
+}
+.csc-badge-btn {
+    display: inline-block;
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-size: 10px;
+    font-weight: 700;
+    text-transform: uppercase;
+    line-height: 1.3;
+    white-space: nowrap;
+    border: 1px solid var(--border-color);
+    background: var(--bg-color);
+    color: var(--text-color);
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+.csc-badge-btn:hover {
+    filter: brightness(0.95);
+    transform: translateY(-1px);
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+}
+:root.dce-dark .csc-badge-btn:hover {
+    filter: brightness(1.2);
+    box-shadow: 0 1px 3px rgba(0,0,0,0.4);
+}
+
+/* SC4S Badge */
+.csc-badge-sc4s {
+    --bg-color: #e3f2fd;
+    --text-color: #0277bd;
+    --border-color: #bbdefb;
+}
+:root.dce-dark .csc-badge-sc4s {
+    --bg-color: rgba(2, 119, 189, 0.15);
+    --text-color: #4fc3f7;
+    --border-color: rgba(2, 119, 189, 0.3);
+}
+
+/* NetFlow Badge */
+.csc-badge-netflow {
+    --bg-color: #e0f2f1;
+    --text-color: #00695c;
+    --border-color: #b2dfdb;
+}
+:root.dce-dark .csc-badge-netflow {
+    --bg-color: rgba(0, 105, 92, 0.15);
+    --text-color: #4db6ac;
+    --border-color: rgba(0, 105, 92, 0.3);
 }
 
 .csc-card-name {
@@ -3260,6 +3328,10 @@ a.csc-dep-name-link:hover {
     transition: background .2s, box-shadow .2s;
     font-family: 'CiscoSans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
 }
+/* Push feedback tab out of the way when drawer is open */
+body:has(.scan-drawer-open) .scan-feedback-tab {
+    transform: translate(-340px, -50%);
+}
 .scan-feedback-tab:hover {
     background: linear-gradient(180deg, #d40f47 0%, #b80838 100%);
     box-shadow: -3px 3px 12px rgba(0,0,0,0.35);
@@ -4325,14 +4397,10 @@ a.csc-dep-name-link:hover {
 
 /* ─── Dark mode card enhancements ─── */
 :root.dce-dark .csc-card {
-    box-shadow:
-        rgba(0,0,0,0.3) 0px 2px 8px,
-        rgba(0,0,0,0.2) 0px 0px 1px;
+    box-shadow: none;
 }
 :root.dce-dark .csc-card:hover {
-    box-shadow:
-        rgba(0,0,0,0.4) 0px 6px 20px,
-        rgba(0,0,0,0.25) 0px 0px 2px;
+    box-shadow: none;
 }
 :root.dce-dark .csc-card::before {
     background: var(--card-border);
@@ -4657,21 +4725,21 @@ tr.scan-ts-ahead .scan-ts-name {
 }
 @keyframes scanFadeIn { from { opacity: 0; } to { opacity: 1; } }
 
-/* The drawer panel — slides in from left */
+/* The drawer panel — slides in from RIGHT */
 .scan-drawer {
     position: fixed;
     top: 0;
-    left: 0;
+    right: 0; /* Changed from left: 0 */
     width: 340px;
     max-width: 92vw;
     height: 100vh;
     background: var(--card-bg, #fff);
-    border-right: 1px solid var(--card-border, #ddd);
-    box-shadow: 8px 0 32px rgba(0, 0, 0, 0.15);
+    border-left: 1px solid var(--card-border, #ddd); /* Changed from border-right */
+    box-shadow: -8px 0 32px rgba(0, 0, 0, 0.15); /* Flipped shadow direction */
     z-index: 9999;
     display: flex;
     flex-direction: column;
-    transform: translateX(-100%);
+    transform: translateX(100%); /* Changed from -100% to slide from right */
     transition: transform 0.28s cubic-bezier(0.4, 0, 0.2, 1);
     overflow: hidden;
 }
@@ -5339,3 +5407,103 @@ tr.scan-ts-ahead .scan-ts-name {
 :root.dce-dark .scan-drawer-pill-unsupported-active { border-color: #666; background: rgba(100,100,100,0.2); color: #aaa; }
 :root.dce-dark .scan-drawer-pill-sc4s-active { border-color: #26a69a; background: rgba(38,166,154,0.18); color: #80cbc4; }
 :root.dce-dark .scan-drawer-pill-stream-active { border-color: #42a5f5; background: rgba(66,165,245,0.15); color: #90caf9; }
+
+/* =========================================
+   CISCO CLEAN UI OVERRIDES (TARGETED)
+   ========================================= */
+
+/* 1. Flatten the Product Cards */
+.csc-card {
+    box-shadow: none !important;
+    border: 1px solid #E5E7EB !important;
+    border-radius: 12px !important;
+    background: #FFFFFF !important;
+}
+
+.csc-card:hover {
+    border-color: #93C5FD !important; 
+    box-shadow: none !important;
+    transform: none !important;
+}
+
+/* Remove the colored bottom border from cards */
+.csc-card-bottom-border {
+    display: none !important;
+}
+
+/* 2. Round the Filter Pills & Hide Icons (Top Bar) */
+.csc-subcategory-pill {
+    border-radius: 9999px !important;
+    box-shadow: none !important;
+    border: 1px solid #E5E7EB !important;
+    background: #FFFFFF !important;
+}
+
+.csc-subcategory-pill-active {
+    background: #049fd9 !important;
+    border-color: #049fd9 !important;
+    color: #ffffff !important;
+}
+
+/* Hide the icons inside the top pills */
+.csc-subcategory-pill svg,
+.csc-subcategory-pill img,
+.csc-subcategory-pill i {
+    display: none !important;
+}
+
+/* 3. Clean up the Sidebar Drawer & Hide Icons */
+.scan-drawer {
+    box-shadow: none !important;
+    border-right: 1px solid #E5E7EB !important;
+}
+
+/* Round the pills inside the drawer */
+.scan-drawer-pill {
+    border-radius: 9999px !important;
+}
+
+/* Hide ALL icons, emojis, and SVGs inside the drawer pills */
+.scan-drawer-pill svg,
+.scan-drawer-pill img,
+.scan-drawer-pill i {
+    display: none !important;
+}
+
+/* Hide the colored dots in the Support Level pills */
+.scan-drawer-pill-cisco-active::before,
+.scan-drawer-pill-splunk-active::before,
+.scan-drawer-pill-dev-active::before,
+.scan-drawer-pill-unsupported-active::before {
+    display: none !important;
+}
+
+/* 5. Clean up the Dependency Tabs (SC4S, NetFlow) */
+/* Hide the icons inside the tabs, but KEEP the text */
+.csc-dep-tab svg,
+.csc-dep-tab img,
+.csc-dep-tab i {
+    display: none !important;
+}
+
+/* Ensure the info trigger button stays visible! */
+.csc-sc4s-info-trigger svg,
+.csc-sc4s-info-trigger i {
+    display: block !important; 
+}
+
+/* 6. Ultimate Clean Look: Hide tiny decorative icons in the card body */
+.csc-dep-summary-icons svg,
+.csc-dep-summary-icons img,
+.csc-st-summary svg,
+.csc-st-summary img,
+.csc-dep-details-summary svg,
+.csc-dep-details-summary img {
+    display: none !important;
+}
+
+/* Hide the green/blue dots next to the tab text */
+.csc-dep-tab::before {
+    display: none !important;
+}
+

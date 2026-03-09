@@ -478,6 +478,63 @@
 			},
 			"title": "Cisco Validation & Compliance Status",
 			"type": "splunk.table"
+		},
+		"viz_header_product_version": {
+			"options": {
+				"markdown": "## 📋 Product Version Support Analysis\n**Customer Perspective:** For your Splunk version, which Cisco products are supported? Immediately identify compatibility gaps before upgrading — see which products require updates, which have workarounds, and which have full support across versions."
+			},
+			"type": "splunk.markdown"
+		},
+		"viz_kpi_products_supported": {
+			"dataSources": {
+				"primary": "ds_product_version_support"
+			},
+			"options": {
+				"backgroundColor": "#f0fdf4",
+				"majorColor": "#16a34a",
+				"sparklineDisplay": "off",
+				"trendDisplay": "off",
+				"unit": "products",
+				"unitPosition": "after"
+			},
+			"title": "Products Supporting All Versions",
+			"type": "splunk.singlevalue"
+		},
+		"viz_table_product_version": {
+			"dataSources": {
+				"primary": "ds_product_version_support"
+			},
+			"options": {
+				"count": 50,
+				"dataOverlayMode": "none",
+				"drilldown": "none",
+				"showRowNumbers": true,
+				"tableFormat": {
+					"headerBackgroundColor": "#0891b2",
+					"headerFontColor": "#ffffff",
+					"rowBackgroundColors": "> table | seriesByIndex(0) | pick(#ecfeff,#ffffff)"
+				}
+			},
+			"title": "Cisco Products — Splunk Version Support Matrix",
+			"type": "splunk.table"
+		},
+		"viz_table_product_version_gap": {
+			"dataSources": {
+				"primary": "ds_product_version_gap"
+			},
+			"options": {
+				"count": 50,
+				"dataOverlayMode": "none",
+				"drilldown": "none",
+				"showRowNumbers": true,
+				"tableFormat": {
+					"headerBackgroundColor": "#dc2626",
+					"headerFontColor": "#ffffff",
+					"rowBackgroundColors": "> table | seriesByIndex(0) | pick(#fef2f2,#ffffff)"
+				}
+			},
+			"title": "Product Version Coverage Gaps (Active Products Without Support)",
+			"type": "splunk.table"
 		}
 	},
 	"dataSources": {
@@ -695,6 +752,20 @@
 				"query": "| search is_archived=false type IN (\"app\",\"addon\") | eval validation_status=case(passed_validation==\"true\" AND appinspect_passed==\"true\",\"✅ Fully Validated\",passed_validation==\"true\",\"✅ Passed Validation\",appinspect_passed==\"true\",\"⚠️ AppInspect Only\",1==1,\"❌ Not Validated\") | eval compliance=mvappend(if(fedramp_validation==\"yes\",\"FedRAMP\",null()),if(fips_compatibility==\"yes\",\"FIPS\",null())) | table title type support validation_status compliance app_version | sort 0 validation_status title"
 			},
 			"type": "ds.chain"
+		},
+		"ds_product_version_support": {
+			"name": "Product Version Support Matrix",
+			"options": {
+				"query": "| savedsearch \"SCAN - Product Version Support Matrix\""
+			},
+			"type": "ds.search"
+		},
+		"ds_product_version_gap": {
+			"name": "Products WITHOUT Version Support",
+			"options": {
+				"query": "| savedsearch \"SCAN - Products WITHOUT Version Support\""
+			},
+			"type": "ds.search"
 		}
 	},
 	"layout": {
@@ -1071,6 +1142,56 @@
 				"type": "absolute"
 			}
 		},
+		"layout_tab3": {
+			"options": {
+				"display": "auto-scale",
+				"height": 1400,
+				"width": 1440
+			},
+			"structure": [
+				{
+					"item": "viz_header_product_version",
+					"position": {
+						"h": 110,
+						"w": 1400,
+						"x": 20,
+						"y": 10
+					},
+					"type": "block"
+				},
+				{
+					"item": "viz_kpi_products_supported",
+					"position": {
+						"h": 110,
+						"w": 1400,
+						"x": 20,
+						"y": 130
+					},
+					"type": "block"
+				},
+				{
+					"item": "viz_table_product_version",
+					"position": {
+						"h": 450,
+						"w": 1400,
+						"x": 20,
+						"y": 250
+					},
+					"type": "block"
+				},
+				{
+					"item": "viz_table_product_version_gap",
+					"position": {
+						"h": 450,
+						"w": 1400,
+						"x": 20,
+						"y": 710
+					},
+					"type": "block"
+				}
+			],
+			"type": "absolute"
+		},
 		"tabs": {
 			"items": [
 				{
@@ -1080,6 +1201,10 @@
 				{
 					"label": "Splunkbase & Operations",
 					"layoutId": "layout_tab2"
+				},
+				{
+					"label": "Version Support Analysis",
+					"layoutId": "layout_tab3"
 				}
 			]
 		}

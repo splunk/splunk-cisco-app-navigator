@@ -4,7 +4,7 @@
   "license": "UNLICENSED",
   "scripts": {
     "build": "node bin/build.js build",
-    "clean:build": "bash bin/clean_build.sh && node bin/build.js build",
+    "clean:build": "bash bin/clean_build.sh --wipe-local && node bin/build.js build",
     "package:app": "bash bin/package_app.sh",
     "eslint": "eslint src --ext \".js,.jsx\"",
     "eslint:ci": "yarn run eslint -f junit -o test-reports/lint-results.xml",
@@ -23,6 +23,7 @@
     "@splunk/eslint-config": "^5.0.0",
     "@splunk/react-page": "^8.2.1",
     "@splunk/react-ui": "^5.8.0",
+    "@splunk/react-icons": "^4.0.0",
     "@splunk/splunk-utils": "^3.4.0",
     "@splunk/stylelint-config": "^5.0.0",
     "@splunk/themes": "^1.5.0",
