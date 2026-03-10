@@ -6,7 +6,26 @@
 {
 	"title": "Cisco Ecosystem Intelligence",
 	"description": "Comprehensive Cisco ecosystem analytics — product catalog health, Splunkbase intelligence, deployment readiness, and compliance",
-	"inputs": {},
+	"inputs": {
+		"input_min_version": {
+			"type": "input.dropdown",
+			"options": {
+				"items": [
+					{"label": "Splunk 10.4", "value": "10_4"},
+					{"label": "Splunk 10.3", "value": "10_3"},
+					{"label": "Splunk 10.2", "value": "10_2"},
+					{"label": "Splunk 10.1", "value": "10_1"},
+					{"label": "Splunk 10.0", "value": "10_0"},
+					{"label": "Splunk 9.4", "value": "9_4"},
+					{"label": "Splunk 9.3", "value": "9_3"},
+					{"label": "Splunk 9.2", "value": "9_2"}
+				],
+				"defaultValue": "10_2",
+				"token": "min_splunk_ver"
+			},
+			"title": "Minimum Splunk Version"
+		}
+	},
 	"defaults": {
 		"dataSources": {
 			"ds.search": {
@@ -22,7 +41,7 @@
 	"visualizations": {
 		"viz_header_health": {
 			"options": {
-				"markdown": "## 📊 Ecosystem Health\nCisco product catalog rollup — 79 products across Security, Networking, Observability, and Collaboration"
+				"markdown": "### Ecosystem Health\nCisco product catalog rollup — 79 products across Security, Networking, Observability, and Collaboration"
 			},
 			"type": "splunk.markdown"
 		},
@@ -163,7 +182,7 @@
 		},
 		"viz_header_portfolio": {
 			"options": {
-				"markdown": "## 🏢 Portfolio Analysis\nCategory distribution, lifecycle status, and support level across the Cisco product catalog"
+				"markdown": "### Portfolio Analysis\nCategory distribution, lifecycle status, and support level across the Cisco product catalog"
 			},
 			"type": "splunk.markdown"
 		},
@@ -215,7 +234,7 @@
 		},
 		"viz_header_soar": {
 			"options": {
-				"markdown": "## 🤖 SOAR Connector Inventory\nCisco products with Splunk SOAR automation connectors — identify automation opportunities across your Cisco estate"
+				"markdown": "### SOAR Connector Inventory\nCisco products with Splunk SOAR automation connectors — identify automation opportunities across your Cisco estate"
 			},
 			"type": "splunk.markdown"
 		},
@@ -229,9 +248,9 @@
 				"drilldown": "none",
 				"showRowNumbers": true,
 				"tableFormat": {
-					"headerBackgroundColor": "#0A60FF",
-					"headerFontColor": "#ffffff",
-					"rowBackgroundColors": "> table | seriesByIndex(0) | pick(#e0eeff,#ffffff)"
+					"headerBackgroundColor": "#E8EDF2",
+					"headerFontColor": "#314257",
+					"rowBackgroundColors": "> table | seriesByIndex(0) | pick(#f9fafb,#ffffff)"
 				}
 			},
 			"title": "Products with SOAR Connectors",
@@ -239,7 +258,7 @@
 		},
 		"viz_header_addon_family": {
 			"options": {
-				"markdown": "## 📦 Add-on Family Overview\nProducts grouped by shared Splunk add-on — multiple Cisco products often share a single TA for data collection"
+				"markdown": "### Add-on Family Overview\nProducts grouped by shared Splunk add-on — multiple Cisco products often share a single TA for data collection"
 			},
 			"type": "splunk.markdown"
 		},
@@ -253,9 +272,9 @@
 				"drilldown": "none",
 				"showRowNumbers": true,
 				"tableFormat": {
-					"headerBackgroundColor": "#027494",
-					"headerFontColor": "#ffffff",
-					"rowBackgroundColors": "> table | seriesByIndex(0) | pick(#ebfbff,#ffffff)"
+					"headerBackgroundColor": "#E8EDF2",
+					"headerFontColor": "#314257",
+					"rowBackgroundColors": "> table | seriesByIndex(0) | pick(#f9fafb,#ffffff)"
 				}
 			},
 			"title": "Add-on Families & Shared Products",
@@ -263,7 +282,7 @@
 		},
 		"viz_header_quality": {
 			"options": {
-				"markdown": "## 🔍 Data Quality Audit\nProducts with missing critical fields in the SCAN catalog — run after catalog edits to catch data quality issues"
+				"markdown": "### Data Quality Audit\nProducts with missing critical fields in the SCAN catalog — run after catalog edits to catch data quality issues"
 			},
 			"type": "splunk.markdown"
 		},
@@ -277,9 +296,9 @@
 				"drilldown": "none",
 				"showRowNumbers": true,
 				"tableFormat": {
-					"headerBackgroundColor": "#FF9000",
-					"headerFontColor": "#ffffff",
-					"rowBackgroundColors": "> table | seriesByIndex(0) | pick(#fff8f0,#ffffff)"
+					"headerBackgroundColor": "#E8EDF2",
+					"headerFontColor": "#314257",
+					"rowBackgroundColors": "> table | seriesByIndex(0) | pick(#f9fafb,#ffffff)"
 				}
 			},
 			"title": "Missing Fields Audit",
@@ -287,7 +306,7 @@
 		},
 		"viz_header_splunkbase": {
 			"options": {
-				"markdown": "## 🌐 Cisco Splunkbase Intelligence\nApp freshness, platform compatibility, and download analytics for the Cisco ecosystem apps on Splunkbase — filtered exclusively to apps referenced in the SCAN product catalog"
+				"markdown": "### Cisco Splunkbase Intelligence\nApp freshness, platform compatibility, and download analytics for the Cisco ecosystem apps on Splunkbase — filtered exclusively to apps referenced in the SCAN product catalog"
 			},
 			"type": "splunk.markdown"
 		},
@@ -385,7 +404,7 @@
 		},
 		"viz_header_installed": {
 			"options": {
-				"markdown": "## 📋 Installed Cisco Estate\nLocally installed Splunk apps cross-referenced against the Cisco product catalog — shows add-on deployment status and legacy TA presence"
+				"markdown": "### Installed Cisco Estate\nLocally installed Splunk apps cross-referenced against the Cisco product catalog — shows add-on deployment status and legacy TA presence"
 			},
 			"type": "splunk.markdown"
 		},
@@ -399,9 +418,9 @@
 				"drilldown": "none",
 				"showRowNumbers": true,
 				"tableFormat": {
-					"headerBackgroundColor": "#027494",
-					"headerFontColor": "#ffffff",
-					"rowBackgroundColors": "> table | seriesByIndex(0) | pick(#f2f5f7,#ffffff)"
+					"headerBackgroundColor": "#E8EDF2",
+					"headerFontColor": "#314257",
+					"rowBackgroundColors": "> table | seriesByIndex(0) | pick(#f9fafb,#ffffff)"
 				}
 			},
 			"title": "Cisco Add-on Deployment Status",
@@ -409,7 +428,7 @@
 		},
 		"viz_header_version": {
 			"options": {
-				"markdown": "## 🔄 Version & Update Health\nCisco ecosystem apps sorted by days since last Splunkbase update — identify stale integrations requiring attention"
+				"markdown": "### Version & Update Health\nCisco ecosystem apps sorted by days since last Splunkbase update — identify stale integrations requiring attention"
 			},
 			"type": "splunk.markdown"
 		},
@@ -423,9 +442,9 @@
 				"drilldown": "none",
 				"showRowNumbers": true,
 				"tableFormat": {
-					"headerBackgroundColor": "#d97a00",
-					"headerFontColor": "#ffffff",
-					"rowBackgroundColors": "> table | seriesByIndex(0) | pick(#fff8f0,#ffffff)"
+					"headerBackgroundColor": "#E8EDF2",
+					"headerFontColor": "#314257",
+					"rowBackgroundColors": "> table | seriesByIndex(0) | pick(#f9fafb,#ffffff)"
 				}
 			},
 			"title": "Cisco Apps — Staleness Tracker",
@@ -433,7 +452,7 @@
 		},
 		"viz_header_migration": {
 			"options": {
-				"markdown": "## 📦 Migration Planning\nDeprecated and archived Cisco apps mapped to their modern replacements — essential for planning TA migrations"
+				"markdown": "### Migration Planning\nDeprecated and archived Cisco apps mapped to their modern replacements — essential for planning TA migrations"
 			},
 			"type": "splunk.markdown"
 		},
@@ -447,9 +466,9 @@
 				"drilldown": "none",
 				"showRowNumbers": true,
 				"tableFormat": {
-					"headerBackgroundColor": "#d91821",
-					"headerFontColor": "#ffffff",
-					"rowBackgroundColors": "> table | seriesByIndex(0) | pick(#ffe8ea,#ffffff)"
+					"headerBackgroundColor": "#E8EDF2",
+					"headerFontColor": "#314257",
+					"rowBackgroundColors": "> table | seriesByIndex(0) | pick(#f9fafb,#ffffff)"
 				}
 			},
 			"title": "Deprecated App Migration Paths",
@@ -457,7 +476,7 @@
 		},
 		"viz_header_compliance": {
 			"options": {
-				"markdown": "## ✅ Compliance & Validation\nAppInspect, FedRAMP, and FIPS validation status for Cisco ecosystem apps on Splunkbase"
+				"markdown": "### Compliance & Validation\nAppInspect, FedRAMP, and FIPS validation status for Cisco ecosystem apps on Splunkbase"
 			},
 			"type": "splunk.markdown"
 		},
@@ -471,9 +490,9 @@
 				"drilldown": "none",
 				"showRowNumbers": true,
 				"tableFormat": {
-					"headerBackgroundColor": "#3D851C",
-					"headerFontColor": "#ffffff",
-					"rowBackgroundColors": "> table | seriesByIndex(0) | pick(#e3f7da,#ffffff)"
+					"headerBackgroundColor": "#E8EDF2",
+					"headerFontColor": "#314257",
+					"rowBackgroundColors": "> table | seriesByIndex(0) | pick(#f9fafb,#ffffff)"
 				}
 			},
 			"title": "Cisco Validation & Compliance Status",
@@ -481,23 +500,23 @@
 		},
 		"viz_header_product_version": {
 			"options": {
-				"markdown": "## 📋 Product Version Support Analysis\n**Customer Perspective:** For your Splunk version, which Cisco products are supported? Immediately identify compatibility gaps before upgrading — see which products require updates, which have workarounds, and which have full support across versions."
+				"markdown": "### Add-on Version Support Analysis\nFor each Cisco/Splunk-supported add-on, which Splunk versions are supported? Select a minimum version to check compatibility. The KPI counts add-ons that declare support for the selected Splunk version."
 			},
 			"type": "splunk.markdown"
 		},
 		"viz_kpi_products_supported": {
 			"dataSources": {
-				"primary": "ds_product_version_support"
+				"primary": "ds_product_version_kpi"
 			},
 			"options": {
 				"backgroundColor": "#e3f7da",
 				"majorColor": "#3D851C",
 				"sparklineDisplay": "off",
 				"trendDisplay": "off",
-				"unit": "products",
+				"unit": "add-ons",
 				"unitPosition": "after"
 			},
-			"title": "Products Supporting All Versions",
+			"title": "Compatible Add-ons",
 			"type": "splunk.singlevalue"
 		},
 		"viz_table_product_version": {
@@ -510,12 +529,12 @@
 				"drilldown": "none",
 				"showRowNumbers": true,
 				"tableFormat": {
-					"headerBackgroundColor": "#027494",
-					"headerFontColor": "#ffffff",
-					"rowBackgroundColors": "> table | seriesByIndex(0) | pick(#ebfbff,#ffffff)"
+					"headerBackgroundColor": "#E8EDF2",
+					"headerFontColor": "#314257",
+					"rowBackgroundColors": "> table | seriesByIndex(0) | pick(#f9fafb,#ffffff)"
 				}
 			},
-			"title": "Cisco Products — Splunk Version Support Matrix",
+			"title": "Cisco Add-ons — Splunk Version Support Matrix",
 			"type": "splunk.table"
 		},
 		"viz_table_product_version_gap": {
@@ -528,17 +547,17 @@
 				"drilldown": "none",
 				"showRowNumbers": true,
 				"tableFormat": {
-					"headerBackgroundColor": "#d91821",
-					"headerFontColor": "#ffffff",
-					"rowBackgroundColors": "> table | seriesByIndex(0) | pick(#ffe8ea,#ffffff)"
+					"headerBackgroundColor": "#E8EDF2",
+					"headerFontColor": "#314257",
+					"rowBackgroundColors": "> table | seriesByIndex(0) | pick(#f9fafb,#ffffff)"
 				}
 			},
-			"title": "Product Version Coverage Gaps (Active Products Without Support)",
+			"title": "Add-on Version Coverage Gaps (Missing Splunk Version Support)",
 			"type": "splunk.table"
 		},
 		"viz_header_magic6": {
 			"options": {
-				"markdown": "## 🔮 Magic Six Audit\n**Props.conf Best Practices:** Audits every Cisco product sourcetype against the Magic Six props.conf settings — SHOULD_LINEMERGE, LINE_BREAKER, TRUNCATE, TIME_FORMAT, TIME_PREFIX, MAX_TIMESTAMP_LOOKAHEAD. Identifies configuration gaps that can cause parsing failures, timestamp issues, and data quality problems."
+				"markdown": "### Magic Six Audit\nAudits every Cisco product sourcetype against the Magic Six props.conf settings — SHOULD_LINEMERGE, LINE_BREAKER, TRUNCATE, TIME_FORMAT, TIME_PREFIX, MAX_TIMESTAMP_LOOKAHEAD. Identifies gaps that can cause parsing failures, timestamp issues, and data quality problems."
 			},
 			"type": "splunk.markdown"
 		},
@@ -618,9 +637,9 @@
 				"drilldown": "none",
 				"showRowNumbers": true,
 				"tableFormat": {
-					"headerBackgroundColor": "#0A60FF",
-					"headerFontColor": "#ffffff",
-					"rowBackgroundColors": "> table | seriesByIndex(0) | pick(#e0eeff,#ffffff)"
+					"headerBackgroundColor": "#E8EDF2",
+					"headerFontColor": "#314257",
+					"rowBackgroundColors": "> table | seriesByIndex(0) | pick(#f9fafb,#ffffff)"
 				}
 			},
 			"title": "Magic Six Compliance — All Cisco Product Sourcetypes",
@@ -844,14 +863,22 @@
 			"type": "ds.chain"
 		},
 		"ds_product_version_support": {
-			"name": "Product Version Support Matrix",
+			"name": "Add-on Version Support Matrix",
 			"options": {
 				"query": "| savedsearch \"SCAN - Product Version Support Matrix\""
 			},
 			"type": "ds.search"
 		},
+		"ds_product_version_kpi": {
+			"name": "KPI Compatible Add-ons",
+			"options": {
+				"extend": "ds_product_version_support",
+				"query": "| where supports_$min_splunk_ver$=\"✅ YES\" | stats count as total"
+			},
+			"type": "ds.chain"
+		},
 		"ds_product_version_gap": {
-			"name": "Products WITHOUT Version Support",
+			"name": "Add-ons WITHOUT Version Support",
 			"options": {
 				"query": "| savedsearch \"SCAN - Products WITHOUT Version Support\""
 			},
@@ -900,7 +927,7 @@
 			"name": "Chart Magic Six by Category",
 			"options": {
 				"extend": "ds_magic6_audit",
-				"query": "| stats avg(tonumber(mvindex(split(score,\"/\"),0))) as avg_score by Category | eval avg_score=round(avg_score,1) | rename avg_score as \"Avg Settings\" | sort - \"Avg Settings\""
+				"query": "| stats avg(magic_six_count) as avg_score by Category | eval avg_score=round(avg_score,1) | rename avg_score as \"Avg Settings\" | sort - \"Avg Settings\""
 			},
 			"type": "ds.chain"
 		}

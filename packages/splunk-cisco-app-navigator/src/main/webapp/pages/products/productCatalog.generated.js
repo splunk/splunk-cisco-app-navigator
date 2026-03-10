@@ -2,7 +2,7 @@
 /**
  * AUTO-GENERATED from products.conf — DO NOT EDIT BY HAND.
  * Regenerate:  node bin/generate-catalog.js
- * Generated:   2026-03-09T15:46:13.653Z
+ * Generated:   2026-03-10T23:05:31.105Z
  * Products:    75
  */
 
@@ -62,23 +62,13 @@ export const PRODUCT_CATALOG = [
     ],
     "sourcetypes": [
       "cisco:asa",
-      "cisco:estreamer:clean",
-      "cisco:estreamer:data",
-      "cisco:estreamer:log",
-      "cisco:estreamer:status",
-      "cisco:firepower:syslog",
-      "cisco:ftd",
       "cisco:ftd:syslog",
-      "cisco:fwsm",
-      "cisco:pix",
-      "cisco:sfw:estreamer",
-      "cisco:sourcefire",
-      "cisco:sourcefire:appliance:syslog",
-      "cisco:sourcefire:defencecenter:syslog",
-      "estreamer",
-      "snort"
+      "cisco:sfw:estreamer"
     ],
-    "dashboard": "secure_firewall_dashboard",
+    "dashboards": [
+      "secure_firewall_dashboard",
+      "asa_dashboard"
+    ],
     "custom_dashboard": "",
     "icon_emoji": "fire",
     "icon_svg": "firewall",
@@ -261,11 +251,11 @@ export const PRODUCT_CATALOG = [
     "sourcetypes": [
       "cisco:sna",
       "cisco:sna:notable",
-      "cisco:sna:risk",
-      "cisco:stealthwatch:alert",
-      "stealthwatch:fc:flow"
+      "cisco:sna:risk"
     ],
-    "dashboard": "sna_dashboard",
+    "dashboards": [
+      "sna_dashboard"
+    ],
     "custom_dashboard": "",
     "icon_emoji": "chart",
     "icon_svg": "network_analytics",
@@ -358,7 +348,7 @@ export const PRODUCT_CATALOG = [
     "legacy_uids": [],
     "community_uids": [],
     "sourcetypes": [],
-    "dashboard": "",
+    "dashboards": [],
     "custom_dashboard": "",
     "icon_emoji": "control",
     "icon_svg": "firewall",
@@ -443,7 +433,7 @@ export const PRODUCT_CATALOG = [
     "legacy_uids": [],
     "community_uids": [],
     "sourcetypes": [],
-    "dashboard": "",
+    "dashboards": [],
     "custom_dashboard": "",
     "icon_emoji": "shield",
     "icon_svg": "cloud_protection",
@@ -526,7 +516,7 @@ export const PRODUCT_CATALOG = [
     "legacy_uids": [],
     "community_uids": [],
     "sourcetypes": [],
-    "dashboard": "",
+    "dashboards": [],
     "custom_dashboard": "",
     "icon_emoji": "lock",
     "icon_svg": "breach_protection",
@@ -611,7 +601,7 @@ export const PRODUCT_CATALOG = [
     "legacy_uids": [],
     "community_uids": [],
     "sourcetypes": [],
-    "dashboard": "",
+    "dashboards": [],
     "custom_dashboard": "",
     "icon_emoji": "eye",
     "icon_svg": "breach_protection",
@@ -699,17 +689,12 @@ export const PRODUCT_CATALOG = [
       "6544"
     ],
     "sourcetypes": [
-      "cisco:duo:account",
-      "cisco:duo:activity",
-      "cisco:duo:administrator",
       "cisco:duo:authentication",
-      "cisco:duo:authentication_v2",
-      "cisco:duo:endpoint",
-      "cisco:duo:user",
-      "duo",
-      "duo:authentication"
+      "cisco:duo:authentication_v2"
     ],
-    "dashboard": "duo_overview",
+    "dashboards": [
+      "duo_overview"
+    ],
     "custom_dashboard": "",
     "icon_emoji": "lock",
     "icon_svg": "duo",
@@ -819,7 +804,9 @@ export const PRODUCT_CATALOG = [
     "sourcetypes": [
       "cisco:cii"
     ],
-    "dashboard": "cii_dashboard",
+    "dashboards": [
+      "cii_dashboard"
+    ],
     "custom_dashboard": "",
     "icon_emoji": "badge",
     "icon_svg": "ise",
@@ -912,15 +899,11 @@ export const PRODUCT_CATALOG = [
       "6481"
     ],
     "sourcetypes": [
-      "cisco:amp:event",
-      "cisco:se",
-      "cisco:secureendpoint",
-      "cisco:secureendpoint:alerts",
-      "cisco:secureendpoint:audit",
-      "cisco:secureendpoint:threat",
-      "cisco:secureendpoint:vuln"
+      "cisco:se"
     ],
-    "dashboard": "cse_dashboard",
+    "dashboards": [
+      "cse_dashboard"
+    ],
     "custom_dashboard": "",
     "icon_emoji": "shield",
     "icon_svg": "endpoint",
@@ -1021,20 +1004,16 @@ export const PRODUCT_CATALOG = [
     ],
     "community_uids": [],
     "sourcetypes": [
-      "cisco:nvm:eve",
       "cisco:nvm:eve:v2",
-      "cisco:nvm:flowdata",
       "cisco:nvm:flowdata:v2",
-      "cisco:nvm:ifdata",
       "cisco:nvm:ifdata:v2",
-      "cisco:nvm:osquery",
       "cisco:nvm:osquery:v2",
-      "cisco:nvm:processinfodata",
       "cisco:nvm:processinfodata:v2",
-      "cisco:nvm:sysdata",
       "cisco:nvm:sysdata:v2"
     ],
-    "dashboard": "nvm_dashboard",
+    "dashboards": [
+      "nvm_dashboard"
+    ],
     "custom_dashboard": "",
     "icon_emoji": "satellite",
     "icon_svg": "client",
@@ -1160,7 +1139,9 @@ export const PRODUCT_CATALOG = [
       "cisco:evm:registry_value_activity",
       "cisco:evm:windows_service_activity"
     ],
-    "dashboard": "cse_dashboard",
+    "dashboards": [
+      "cse_dashboard"
+    ],
     "custom_dashboard": "",
     "icon_emoji": "mag",
     "icon_svg": "vulnerability_mgmt",
@@ -1250,7 +1231,9 @@ export const PRODUCT_CATALOG = [
       "cisco:xdr:incidents-summary",
       "cisco:xdr:incidents-summary:notable"
     ],
-    "dashboard": "xdr_dashboard",
+    "dashboards": [
+      "xdr_dashboard"
+    ],
     "custom_dashboard": "",
     "icon_emoji": "search",
     "icon_svg": "xdr",
@@ -1338,7 +1321,9 @@ export const PRODUCT_CATALOG = [
     "sourcetypes": [
       "cisco:talos"
     ],
-    "dashboard": "",
+    "dashboards": [
+      "talos_logs"
+    ],
     "custom_dashboard": "",
     "icon_emoji": "skull",
     "icon_svg": "security_cloud",
@@ -1432,7 +1417,9 @@ export const PRODUCT_CATALOG = [
     "sourcetypes": [
       "cisco:cvi"
     ],
-    "dashboard": "cvi_dashboard",
+    "dashboards": [
+      "cvi_dashboard"
+    ],
     "custom_dashboard": "",
     "icon_emoji": "eye",
     "icon_svg": "vulnerability_intel",
@@ -1522,11 +1509,11 @@ export const PRODUCT_CATALOG = [
     ],
     "community_uids": [],
     "sourcetypes": [
-      "cisco:sma:data",
-      "cisco:sma:submissions",
-      "cisco:tg:data"
+      "cisco:sma:submissions"
     ],
-    "dashboard": "sma_dashboard",
+    "dashboards": [
+      "sma_dashboard"
+    ],
     "custom_dashboard": "",
     "icon_emoji": "microscope",
     "icon_svg": "malware_analytics",
@@ -1622,7 +1609,9 @@ export const PRODUCT_CATALOG = [
     "sourcetypes": [
       "cisco:etd"
     ],
-    "dashboard": "etd_dashboard",
+    "dashboards": [
+      "etd_dashboard"
+    ],
     "custom_dashboard": "",
     "icon_emoji": "email",
     "icon_svg": "mail",
@@ -1725,7 +1714,9 @@ export const PRODUCT_CATALOG = [
       "cisco:esa:system_logs",
       "cisco:esa:textmail"
     ],
-    "dashboard": "",
+    "dashboards": [
+      "cisco_esa_dashboard"
+    ],
     "custom_dashboard": "",
     "icon_emoji": "email",
     "icon_svg": "mail",
@@ -1842,17 +1833,19 @@ export const PRODUCT_CATALOG = [
     "sourcetypes": [
       "cisco:cloud_security:audit",
       "cisco:cloud_security:dlp",
-      "cisco:cloud_security:dns",
       "cisco:cloud_security:fileevent",
       "cisco:cloud_security:firewall",
       "cisco:cloud_security:intrusion",
+      "cisco:cloud_security:privateapps",
       "cisco:cloud_security:proxy",
       "cisco:cloud_security:ravpn",
       "cisco:cloud_security:ztna",
       "cisco:cloud_security:ztnaenrollment",
       "cisco:cloud_security:ztnaflow"
     ],
-    "dashboard": "",
+    "dashboards": [
+      "access"
+    ],
     "custom_dashboard": "",
     "icon_emoji": "lock_globe",
     "icon_svg": "secure_access",
@@ -1953,33 +1946,14 @@ export const PRODUCT_CATALOG = [
     ],
     "community_uids": [],
     "sourcetypes": [
+      "cisco:cloud_security:appdiscovery",
       "cisco:cloud_security:audit",
-      "cisco:cloud_security:dlp",
       "cisco:cloud_security:dns",
-      "cisco:cloud_security:fileevent",
-      "cisco:cloud_security:firewall",
-      "cisco:cloud_security:intrusion",
-      "cisco:cloud_security:proxy",
-      "cisco:cloud_security:ravpn",
-      "cisco:cloud_security:ztna",
-      "cisco:cloud_security:ztnaenrollment",
-      "cisco:cloud_security:ztnaflow",
-      "cisco:umbrella:audit",
-      "cisco:umbrella:dlp",
-      "cisco:umbrella:dns",
-      "cisco:umbrella:firewall",
-      "cisco:umbrella:ip",
-      "cisco:umbrella:proxy",
-      "opendns:auditlogs",
-      "opendns:dnslog",
-      "opendns:dnslogs",
-      "opendns:firewalllogs",
-      "opendns:iplogs",
-      "opendns:proxylogs",
-      "opendns:s3",
-      "opendns_investigate"
+      "cisco:cloud_security:ip"
     ],
-    "dashboard": "overview",
+    "dashboards": [
+      "dns"
+    ],
     "custom_dashboard": "",
     "icon_emoji": "umbrella",
     "icon_svg": "umbrella",
@@ -2084,9 +2058,11 @@ export const PRODUCT_CATALOG = [
     ],
     "community_uids": [],
     "sourcetypes": [
-      "opendns_investigate"
+      "cisco:cloud_security:investigated"
     ],
-    "dashboard": "",
+    "dashboards": [
+      "investigate"
+    ],
     "custom_dashboard": "",
     "icon_emoji": "detective",
     "icon_svg": "vulnerability_intel",
@@ -2175,10 +2151,11 @@ export const PRODUCT_CATALOG = [
     ],
     "community_uids": [],
     "sourcetypes": [
-      "cisco:cloud_security:cloudlock",
-      "incident"
+      "cisco:cloud_security:cloudlock"
     ],
-    "dashboard": "cloudlock_incidents_overview",
+    "dashboards": [
+      "cloudlock"
+    ],
     "custom_dashboard": "",
     "icon_emoji": "cloud_lock",
     "icon_svg": "cloudlock",
@@ -2287,7 +2264,9 @@ export const PRODUCT_CATALOG = [
       "cisco:multicloud:defense:waf",
       "gateway"
     ],
-    "dashboard": "mcd_dashboard",
+    "dashboards": [
+      "mcd_dashboard"
+    ],
     "custom_dashboard": "",
     "icon_emoji": "cloud",
     "icon_svg": "multicloud_defense",
@@ -2381,7 +2360,7 @@ export const PRODUCT_CATALOG = [
     "legacy_uids": [],
     "community_uids": [],
     "sourcetypes": [],
-    "dashboard": "",
+    "dashboards": [],
     "custom_dashboard": "",
     "icon_emoji": "cloud",
     "icon_svg": "cloud_protection",
@@ -2467,7 +2446,7 @@ export const PRODUCT_CATALOG = [
     "legacy_uids": [],
     "community_uids": [],
     "sourcetypes": [],
-    "dashboard": "",
+    "dashboards": [],
     "custom_dashboard": "",
     "icon_emoji": "cloud_lock",
     "icon_svg": "cloud_analytics",
@@ -2555,15 +2534,14 @@ export const PRODUCT_CATALOG = [
     "community_uids": [],
     "sourcetypes": [
       "cisco:wsa:l4tm",
-      "cisco:wsa:prox_track",
-      "cisco:wsa:shd",
       "cisco:wsa:squid",
       "cisco:wsa:syslog",
-      "cisco:wsa:systemlogs",
       "cisco:wsa:w3c",
       "cisco:wsa:w3c:recommended"
     ],
-    "dashboard": "",
+    "dashboards": [
+      "cisco_wsa_dashboard"
+    ],
     "custom_dashboard": "",
     "icon_emoji": "web",
     "icon_svg": "web_appliance",
@@ -2670,7 +2648,9 @@ export const PRODUCT_CATALOG = [
     "sourcetypes": [
       "cisco:secure:workload"
     ],
-    "dashboard": "csw_dashboard",
+    "dashboards": [
+      "csw_dashboard"
+    ],
     "custom_dashboard": "",
     "icon_emoji": "building",
     "icon_svg": "workload",
@@ -2761,7 +2741,9 @@ export const PRODUCT_CATALOG = [
       "cisco:ai:defense",
       "cisco:ai:defense:notable"
     ],
-    "dashboard": "aid_dashboard",
+    "dashboards": [
+      "aid_dashboard"
+    ],
     "custom_dashboard": "",
     "icon_emoji": "robot",
     "icon_svg": "app_security",
@@ -2855,7 +2837,9 @@ export const PRODUCT_CATALOG = [
       "cisco:isovalent:telemetry:network",
       "cisco:isovalent:telemetry:process"
     ],
-    "dashboard": "irs_dashboard",
+    "dashboards": [
+      "irs_dashboard"
+    ],
     "custom_dashboard": "",
     "icon_emoji": "bee",
     "icon_svg": "cloud_protection",
@@ -2970,7 +2954,9 @@ export const PRODUCT_CATALOG = [
       "cisco:isovalent:edge_processor:telemetry:network",
       "cisco:isovalent:edge_processor:telemetry:process"
     ],
-    "dashboard": "irs_dashboard",
+    "dashboards": [
+      "irs_dashboard"
+    ],
     "custom_dashboard": "",
     "icon_emoji": "zap",
     "icon_svg": "sse",
@@ -3054,7 +3040,7 @@ export const PRODUCT_CATALOG = [
     "legacy_uids": [],
     "community_uids": [],
     "sourcetypes": [],
-    "dashboard": "",
+    "dashboards": [],
     "custom_dashboard": "",
     "icon_emoji": "stop_sign",
     "icon_svg": "ddos",
@@ -3142,7 +3128,7 @@ export const PRODUCT_CATALOG = [
     "legacy_uids": [],
     "community_uids": [],
     "sourcetypes": [],
-    "dashboard": "",
+    "dashboards": [],
     "custom_dashboard": "",
     "icon_emoji": "factory",
     "icon_svg": "workload",
@@ -3215,7 +3201,7 @@ export const PRODUCT_CATALOG = [
     "app_viz_splunkbase_uid": "",
     "app_viz_docs_url": "https://splunkbase.splunk.com/app/7539",
     "app_viz_troubleshoot_url": "",
-    "app_viz_install_url": "/manager/launcher/appsremote?order=relevance&query=Catalyst&offset=0&category=network_security&type=addon&support=cisco",
+    "app_viz_install_url": "/manager/launcher/appsremote?order=relevance&query=Cisco+Enterprise+Networking+for+Splunk+Platform&offset=0&category=firewall&category=network_access_control&type=app&support=cisco",
     "app_viz_2": "",
     "app_viz_2_label": "",
     "app_viz_2_splunkbase_uid": "",
@@ -3231,13 +3217,8 @@ export const PRODUCT_CATALOG = [
     ],
     "community_uids": [],
     "sourcetypes": [
-      "cisco:catalyst:client",
-      "cisco:catalyst:clienthealth",
-      "cisco:catalyst:compliance",
-      "cisco:catalyst:devicehealth",
-      "cisco:catalyst:issue",
-      "cisco:catalyst:networkhealth",
-      "cisco:catalyst:securityadvisory",
+      "cisco:catalyst:center:compliance:report",
+      "cisco:catalyst:center:inventory:report",
       "cisco:catalyst:syslog",
       "cisco:dnac:audit:logs",
       "cisco:dnac:client",
@@ -3249,7 +3230,10 @@ export const PRODUCT_CATALOG = [
       "cisco:dnac:securityadvisory",
       "cisco:dnac:site:topology"
     ],
-    "dashboard": "",
+    "dashboards": [
+      "overview",
+      "events_and_incident_viewer"
+    ],
     "custom_dashboard": "",
     "icon_emoji": "globe",
     "icon_svg": "network_analytics",
@@ -3358,7 +3342,9 @@ export const PRODUCT_CATALOG = [
       "cisco:ios:traceback",
       "cisco:telemetry"
     ],
-    "dashboard": "",
+    "dashboards": [
+      "network_insights"
+    ],
     "custom_dashboard": "",
     "icon_emoji": "switch",
     "icon_svg": "cisco_switch",
@@ -3484,6 +3470,11 @@ export const PRODUCT_CATALOG = [
       "6460"
     ],
     "sourcetypes": [
+      "cisco:ise:analytics",
+      "cisco:ise:analytics:applications",
+      "cisco:ise:analytics:fullreport",
+      "cisco:ise:analytics:hardware",
+      "cisco:ise:analytics:registry",
       "cisco:ise:radius:authz:policy",
       "cisco:ise:radius:policyset",
       "cisco:ise:securitygroups",
@@ -3492,7 +3483,9 @@ export const PRODUCT_CATALOG = [
       "cisco:ise:tacacs:authz:policy",
       "cisco:ise:tacacs:policyset"
     ],
-    "dashboard": "",
+    "dashboards": [
+      "security_insights"
+    ],
     "custom_dashboard": "",
     "icon_emoji": "key",
     "icon_svg": "ise",
@@ -3603,7 +3596,9 @@ export const PRODUCT_CATALOG = [
       "cisco:ios:traceback",
       "cisco:telemetry"
     ],
-    "dashboard": "",
+    "dashboards": [
+      "endpoint"
+    ],
     "custom_dashboard": "",
     "icon_emoji": "satellite",
     "icon_svg": "cisco_wifi",
@@ -3696,7 +3691,9 @@ export const PRODUCT_CATALOG = [
       "cisco:ios:traceback",
       "cisco:telemetry"
     ],
-    "dashboard": "",
+    "dashboards": [
+      "network_insights"
+    ],
     "custom_dashboard": "",
     "icon_emoji": "wifi",
     "icon_svg": "cisco_wifi",
@@ -3814,7 +3811,6 @@ export const PRODUCT_CATALOG = [
       "meraki:licensesoverview",
       "meraki:licensessubscriptionentitlements",
       "meraki:licensessubscriptions",
-      "meraki:networkdevices",
       "meraki:organizations",
       "meraki:organizationsecurity",
       "meraki:organizationsnetworks",
@@ -3830,9 +3826,6 @@ export const PRODUCT_CATALOG = [
       "meraki:switches",
       "meraki:switchportsbyswitch",
       "meraki:switchportsoverview",
-      "meraki:syslog",
-      "meraki:uplinks",
-      "meraki:uplinkslossandlatency",
       "meraki:webhook",
       "meraki:webhooklogs:api",
       "meraki:wirelesscontrolleravailabilitieschangehistory",
@@ -3842,7 +3835,10 @@ export const PRODUCT_CATALOG = [
       "meraki:wirelessdevicespacketlossbydevice",
       "meraki:wirelessdeviceswirelesscontrollersbydevice"
     ],
-    "dashboard": "",
+    "dashboards": [
+      "sensors",
+      "network_insights"
+    ],
     "custom_dashboard": "",
     "icon_emoji": "cloud_network",
     "icon_svg": "cisco_cloud_networking",
@@ -3954,7 +3950,7 @@ export const PRODUCT_CATALOG = [
     "legacy_uids": [],
     "community_uids": [],
     "sourcetypes": [],
-    "dashboard": "",
+    "dashboards": [],
     "custom_dashboard": "",
     "icon_emoji": "globe",
     "icon_svg": "cisco_wifi",
@@ -4058,6 +4054,7 @@ export const PRODUCT_CATALOG = [
       "cisco:sdwan:session:audit:trail",
       "cisco:sdwan:session:audit:trail:start",
       "cisco:sdwan:sessions:maximum",
+      "cisco:sdwan:sgacl:logs",
       "cisco:sdwan:sitehealth",
       "cisco:sdwan:smart:lic:platform:error",
       "cisco:sdwan:ssetunnels",
@@ -4069,7 +4066,9 @@ export const PRODUCT_CATALOG = [
       "cisco:sgacl:logs",
       "stream:netflow"
     ],
-    "dashboard": "",
+    "dashboards": [
+      "performance"
+    ],
     "custom_dashboard": "",
     "icon_emoji": "highway",
     "icon_svg": "cisco_sdwan",
@@ -4182,7 +4181,9 @@ export const PRODUCT_CATALOG = [
       "cisco:ios:traceback",
       "cisco:telemetry"
     ],
-    "dashboard": "",
+    "dashboards": [
+      "network_insights"
+    ],
     "custom_dashboard": "",
     "icon_emoji": "router",
     "icon_svg": "cisco_router",
@@ -4281,7 +4282,9 @@ export const PRODUCT_CATALOG = [
       "cisco:ios:traceback",
       "cisco:telemetry"
     ],
-    "dashboard": "",
+    "dashboards": [
+      "network_insights"
+    ],
     "custom_dashboard": "",
     "icon_emoji": "router",
     "icon_svg": "cisco_router",
@@ -4379,7 +4382,9 @@ export const PRODUCT_CATALOG = [
       "cisco:ios:traceback",
       "cisco:telemetry"
     ],
-    "dashboard": "",
+    "dashboards": [
+      "network_insights"
+    ],
     "custom_dashboard": "",
     "icon_emoji": "globe",
     "icon_svg": "cisco_router",
@@ -4470,7 +4475,7 @@ export const PRODUCT_CATALOG = [
     "legacy_uids": [],
     "community_uids": [],
     "sourcetypes": [],
-    "dashboard": "",
+    "dashboards": [],
     "custom_dashboard": "",
     "icon_emoji": "satellite_antenna",
     "icon_svg": "cisco_router",
@@ -4568,7 +4573,7 @@ export const PRODUCT_CATALOG = [
     "legacy_uids": [],
     "community_uids": [],
     "sourcetypes": [],
-    "dashboard": "",
+    "dashboards": [],
     "custom_dashboard": "",
     "icon_emoji": "chart",
     "icon_svg": "analytics_logging",
@@ -4663,7 +4668,10 @@ export const PRODUCT_CATALOG = [
       "cisco:dc:aci:stats",
       "cisco:dc:aci:syslog"
     ],
-    "dashboard": "",
+    "dashboards": [
+      "fabric_dashboard",
+      "tenant_dashboard"
+    ],
     "custom_dashboard": "",
     "icon_emoji": "jigsaw",
     "icon_svg": "cisco_nexus_aci",
@@ -4705,10 +4713,10 @@ export const PRODUCT_CATALOG = [
       "stream:netflow"
     ],
     "netflow_config_notes": [
-      "ACI supports SPAN and ERSPAN for packet capture and traffic mirroring to Splunk Stream.",
-      "Configure ERSPAN sessions on the ACI fabric to send mirrored traffic to the Stream Forwarder.",
+      "ACI leaf switches support native NetFlow v9 export (ACI 4.1+). Configure NetFlow export policies via APIC (Fabric > Access Policies > NetFlow).",
+      "ACI also supports SPAN/ERSPAN for packet-level mirroring — complementary to NetFlow.",
       "Requires all 3 Stream packages: App for Stream (1809) on search heads, Add-on for Stream Forwarders (5238) on forwarders, and Add-on for Stream Wire Data (5234) on search heads and indexers.",
-      "No Cisco Enhanced Netflow Add-on (6872) is required — ACI uses SPAN/ERSPAN, not IPFIX."
+      "NX-OS and ACI both export standard NetFlow v9 — no Cisco Enhanced Netflow Add-on (6872) is required."
     ],
     "best_practices": [],
     "sort_order": 120,
@@ -4764,7 +4772,10 @@ export const PRODUCT_CATALOG = [
       "cisco:dc:nexus9k",
       "cisco:dc:nexus9k:syslog"
     ],
-    "dashboard": "",
+    "dashboards": [
+      "n9k_syslog",
+      "dashboard"
+    ],
     "custom_dashboard": "",
     "icon_emoji": "switch",
     "icon_svg": "cisco_nexus_switch",
@@ -4870,7 +4881,10 @@ export const PRODUCT_CATALOG = [
       "cisco:dc:nd:switches",
       "cisco:dc:nd:syslog"
     ],
-    "dashboard": "",
+    "dashboards": [
+      "nd_flow_overview",
+      "anomalies"
+    ],
     "custom_dashboard": "",
     "icon_emoji": "dashboard",
     "icon_svg": "cisco_nexus_dashboard",
@@ -4954,10 +4968,8 @@ export const PRODUCT_CATALOG = [
     "learn_more_url": "https://www.cisco.com/c/en/us/support/data-center-networking/nexus-hyperfabric/series.html",
     "legacy_uids": [],
     "community_uids": [],
-    "sourcetypes": [
-      "cisco:dc:hyperfabric"
-    ],
-    "dashboard": "",
+    "sourcetypes": [],
+    "dashboards": [],
     "custom_dashboard": "",
     "icon_emoji": "cloud",
     "icon_svg": "cloud_insights",
@@ -5040,7 +5052,7 @@ export const PRODUCT_CATALOG = [
     "legacy_uids": [],
     "community_uids": [],
     "sourcetypes": [],
-    "dashboard": "",
+    "dashboards": [],
     "custom_dashboard": "",
     "icon_emoji": "server",
     "icon_svg": "cisco_mds",
@@ -5126,7 +5138,7 @@ export const PRODUCT_CATALOG = [
     "legacy_uids": [],
     "community_uids": [],
     "sourcetypes": [],
-    "dashboard": "",
+    "dashboards": [],
     "custom_dashboard": "",
     "icon_emoji": "flashlight",
     "icon_svg": "cloud_insights",
@@ -5216,7 +5228,9 @@ export const PRODUCT_CATALOG = [
     "sourcetypes": [
       "cisco:ucs"
     ],
-    "dashboard": "dashboard",
+    "dashboards": [
+      "dashboard"
+    ],
     "custom_dashboard": "",
     "icon_emoji": "server",
     "icon_svg": "cisco_rack_server",
@@ -5310,49 +5324,24 @@ export const PRODUCT_CATALOG = [
     ],
     "community_uids": [],
     "sourcetypes": [
-      "cisco:intersight:aaaauditrecords",
       "cisco:intersight:advisories",
       "cisco:intersight:alarms",
-      "cisco:intersight:assetdevicecontractinformations",
-      "cisco:intersight:assettargets",
       "cisco:intersight:auditrecords",
       "cisco:intersight:compute",
-      "cisco:intersight:computephysicalsummaries",
-      "cisco:intersight:condalarms",
-      "cisco:intersight:condhclstatuses",
       "cisco:intersight:contracts",
-      "cisco:intersight:convergedinfrapods",
       "cisco:intersight:custom:inventory",
       "cisco:intersight:custom:metrics",
-      "cisco:intersight:default",
-      "cisco:intersight:equipmentchassis",
-      "cisco:intersight:hyperflexclusters",
-      "cisco:intersight:hyperflexlicenses",
-      "cisco:intersight:hyperflexnodes",
-      "cisco:intersight:hyperflexstoragecontainers",
-      "cisco:intersight:licenseaccountlicensedata",
-      "cisco:intersight:licenselicenseinfos",
       "cisco:intersight:licenses",
       "cisco:intersight:metrics",
       "cisco:intersight:networkelements",
-      "cisco:intersight:networkelementsummaries",
       "cisco:intersight:networkobjects",
       "cisco:intersight:pools",
       "cisco:intersight:profiles",
-      "cisco:intersight:storagehitachiarrays",
-      "cisco:intersight:storagehitachicontrollers",
-      "cisco:intersight:storagehitachivolumes",
-      "cisco:intersight:storagenetappclusters",
-      "cisco:intersight:storagenetappnodes",
-      "cisco:intersight:storagenetappstoragevms",
-      "cisco:intersight:storagenetappvolumes",
-      "cisco:intersight:storagepurearrays",
-      "cisco:intersight:storagepurecontrollers",
-      "cisco:intersight:storagepurevolumes",
-      "cisco:intersight:tamadvisoryinstances",
       "cisco:intersight:targets"
     ],
-    "dashboard": "activity_monitor",
+    "dashboards": [
+      "activity_monitor"
+    ],
     "custom_dashboard": "",
     "icon_emoji": "satellite",
     "icon_svg": "cisco_intersight_product",
@@ -5436,7 +5425,7 @@ export const PRODUCT_CATALOG = [
     "legacy_uids": [],
     "community_uids": [],
     "sourcetypes": [],
-    "dashboard": "",
+    "dashboards": [],
     "custom_dashboard": "",
     "icon_emoji": "wrench",
     "icon_svg": "cisco_server",
@@ -5527,7 +5516,7 @@ export const PRODUCT_CATALOG = [
     "legacy_uids": [],
     "community_uids": [],
     "sourcetypes": [],
-    "dashboard": "",
+    "dashboards": [],
     "custom_dashboard": "",
     "icon_emoji": "factory",
     "icon_svg": "cisco_iot",
@@ -5626,7 +5615,9 @@ export const PRODUCT_CATALOG = [
       "cisco:cybervision:syslog",
       "cisco:cybervision:vulnerabilities"
     ],
-    "dashboard": "cvi_dashboard",
+    "dashboards": [
+      "cyber_vision_syslog_vulnerability_overview"
+    ],
     "custom_dashboard": "",
     "icon_emoji": "factory",
     "icon_svg": "cisco_cyber_vision",
@@ -5720,15 +5711,12 @@ export const PRODUCT_CATALOG = [
       "cisco:thousandeyes:event",
       "cisco:thousandeyes:metric",
       "cisco:thousandeyes:path-vis",
-      "cisco:thousandeyes:refresh-tokens",
-      "cisco:thousandeyes:trace",
-      "ciscothousandeyes:log",
-      "snmptrap",
-      "snow:incident",
-      "thousandeyes:alerts",
-      "thousandeyes:enriched_alerts"
+      "cisco:thousandeyes:trace"
     ],
-    "dashboard": "",
+    "dashboards": [
+      "network",
+      "alerts"
+    ],
     "custom_dashboard": "",
     "icon_emoji": "eye",
     "icon_svg": "cloud_insights",
@@ -5832,7 +5820,9 @@ export const PRODUCT_CATALOG = [
       "appdynamics_snapshots",
       "appdynamics_status"
     ],
-    "dashboard": "dashboard",
+    "dashboards": [
+      "dashboard"
+    ],
     "custom_dashboard": "",
     "icon_emoji": "chart",
     "icon_svg": "cloud_analytics",
@@ -5936,21 +5926,9 @@ export const PRODUCT_CATALOG = [
       "cisco:webex:meeting:qualities",
       "cisco:webex:meeting:usage:reports",
       "cisco:webex:meetings",
-      "cisco:webex:meetings:general:summarysession",
-      "cisco:webex:meetings:history:eventattendeehistory",
-      "cisco:webex:meetings:history:eventsessionhistory",
-      "cisco:webex:meetings:history:meetingattendeehistory",
-      "cisco:webex:meetings:history:meetingusagehistory",
-      "cisco:webex:meetings:history:recordaccesshistory",
-      "cisco:webex:meetings:history:supportattendeehistory",
-      "cisco:webex:meetings:history:supportsessionhistory",
-      "cisco:webex:meetings:history:trainingattendeehistory",
-      "cisco:webex:meetings:history:trainingsessionhistory",
-      "cisco:webex:security:audit:events",
-      "webex:teams:adminaudit:events",
-      "webex:teams:events"
+      "cisco:webex:security:audit:events"
     ],
-    "dashboard": "",
+    "dashboards": [],
     "custom_dashboard": "",
     "icon_emoji": "video",
     "icon_svg": "cisco_video",
@@ -6051,7 +6029,7 @@ export const PRODUCT_CATALOG = [
       "cucm_cdr",
       "cucm_cmr"
     ],
-    "dashboard": "",
+    "dashboards": [],
     "custom_dashboard": "",
     "icon_emoji": "phone",
     "icon_svg": "cisco_call_manager",
@@ -6147,7 +6125,7 @@ export const PRODUCT_CATALOG = [
     "sourcetypes": [
       "cms_cdr"
     ],
-    "dashboard": "",
+    "dashboards": [],
     "custom_dashboard": "",
     "icon_emoji": "video",
     "icon_svg": "cisco_conference",
@@ -6240,7 +6218,7 @@ export const PRODUCT_CATALOG = [
     "sourcetypes": [
       "cisco:meetingmgmt"
     ],
-    "dashboard": "",
+    "dashboards": [],
     "custom_dashboard": "",
     "icon_emoji": "clipboard",
     "icon_svg": "cisco_conference",
@@ -6332,7 +6310,7 @@ export const PRODUCT_CATALOG = [
     "sourcetypes": [
       "cisco:tvcs"
     ],
-    "dashboard": "",
+    "dashboards": [],
     "custom_dashboard": "",
     "icon_emoji": "tv",
     "icon_svg": "cisco_telepresence",
@@ -6424,7 +6402,7 @@ export const PRODUCT_CATALOG = [
     "legacy_uids": [],
     "community_uids": [],
     "sourcetypes": [],
-    "dashboard": "",
+    "dashboards": [],
     "custom_dashboard": "",
     "icon_emoji": "desktop_computer",
     "icon_svg": "cisco_desk_phone",
@@ -6513,7 +6491,7 @@ export const PRODUCT_CATALOG = [
     "sourcetypes": [
       "cisco:ace"
     ],
-    "dashboard": "",
+    "dashboards": [],
     "custom_dashboard": "",
     "icon_emoji": "balance_scale",
     "icon_svg": "app_delivery",
@@ -6604,7 +6582,7 @@ export const PRODUCT_CATALOG = [
     "sourcetypes": [
       "ciscocws"
     ],
-    "dashboard": "",
+    "dashboards": [],
     "custom_dashboard": "",
     "icon_emoji": "umbrella",
     "icon_svg": "umbrella",
@@ -6697,7 +6675,7 @@ export const PRODUCT_CATALOG = [
       "cisco:dp:status",
       "cisco:dp:threatfeeds"
     ],
-    "dashboard": "",
+    "dashboards": [],
     "custom_dashboard": "",
     "icon_emoji": "email",
     "icon_svg": "mail",
@@ -6785,7 +6763,7 @@ export const PRODUCT_CATALOG = [
     "sourcetypes": [
       "cisco:candid:events"
     ],
-    "dashboard": "",
+    "dashboards": [],
     "custom_dashboard": "",
     "icon_emoji": "chart",
     "icon_svg": "network_analytics",
@@ -6877,7 +6855,7 @@ export const PRODUCT_CATALOG = [
       "cisco:pi:data:events",
       "cisco:pi:data:inventorydetails"
     ],
-    "dashboard": "",
+    "dashboards": [],
     "custom_dashboard": "",
     "icon_emoji": "dashboard",
     "icon_svg": "network_analytics",
@@ -6967,7 +6945,7 @@ export const PRODUCT_CATALOG = [
       "cisco:vuln:advisories:cvrf:summary",
       "cisco:vuln:advisories:cvrf:vuln"
     ],
-    "dashboard": "",
+    "dashboards": [],
     "custom_dashboard": "",
     "icon_emoji": "eye",
     "icon_svg": "vulnerability_intel",
@@ -7054,7 +7032,7 @@ export const PRODUCT_CATALOG = [
     "sourcetypes": [
       "cisco:acs"
     ],
-    "dashboard": "",
+    "dashboards": [],
     "custom_dashboard": "",
     "icon_emoji": "key",
     "icon_svg": "ise",
@@ -7148,7 +7126,7 @@ export const PRODUCT_CATALOG = [
     "sourcetypes": [
       "cisco:tr:data"
     ],
-    "dashboard": "",
+    "dashboards": [],
     "custom_dashboard": "",
     "icon_emoji": "search",
     "icon_svg": "xdr",
@@ -7236,7 +7214,7 @@ export const PRODUCT_CATALOG = [
       "cisco:ips:syslog",
       "sdee_connection"
     ],
-    "dashboard": "",
+    "dashboards": [],
     "custom_dashboard": "",
     "icon_emoji": "shield",
     "icon_svg": "firewall",
@@ -7331,7 +7309,7 @@ export const PRODUCT_CATALOG = [
       "cmxhttp",
       "cmxmap"
     ],
-    "dashboard": "",
+    "dashboards": [],
     "custom_dashboard": "",
     "icon_emoji": "globe",
     "icon_svg": "cisco_wifi",
@@ -7419,7 +7397,7 @@ export const PRODUCT_CATALOG = [
       "cisco:bugs:csv",
       "cisco:bugs:json"
     ],
-    "dashboard": "",
+    "dashboards": [],
     "custom_dashboard": "",
     "icon_emoji": "detective",
     "icon_svg": "vulnerability_intel",
@@ -7505,7 +7483,7 @@ export const PRODUCT_CATALOG = [
     ],
     "community_uids": [],
     "sourcetypes": [],
-    "dashboard": "",
+    "dashboards": [],
     "custom_dashboard": "",
     "icon_emoji": "chart",
     "icon_svg": "analytics_logging",

@@ -69,7 +69,7 @@ const SHOW_VALUE_PROP_ON_CARD = false;
 const PERSONA_PRESETS = [
     {
         id: 'security',
-        icon: '',
+        icon: 'cat-security',
         title: 'Security Analyst',
         description: 'Firewalls, threat detection, identity, XDR, and endpoint protection',
         category: 'security',
@@ -82,7 +82,7 @@ const PERSONA_PRESETS = [
     },
     {
         id: 'networking',
-        icon: '',
+        icon: 'cat-networking',
         title: 'Network Engineer',
         description: 'Campus, SD-WAN, switches, routers, Meraki, and data center networking',
         category: 'networking',
@@ -95,11 +95,11 @@ const PERSONA_PRESETS = [
     },
     {
         id: 'collaboration',
-        icon: '',
+        icon: 'cat-collaboration',
         title: 'Collaboration Admin',
         description: 'Webex, CUCM, video conferencing, and meeting infrastructure',
         category: 'collaboration',
-        color: '#FF9000',
+        color: '#0A60FF',
         suggested: [
             'cisco_webex', 'cisco_cucm', 'cisco_meeting_server',
             'cisco_meeting_management', 'cisco_tvcs',
@@ -107,7 +107,7 @@ const PERSONA_PRESETS = [
     },
     {
         id: 'observability',
-        icon: '',
+        icon: 'cat-observability',
         title: 'Observability Engineer',
         description: 'APM, monitoring, ThousandEyes, and full-stack telemetry',
         category: 'observability',
@@ -118,11 +118,11 @@ const PERSONA_PRESETS = [
     },
     {
         id: 'explorer',
-        icon: '',
+        icon: null,
         title: 'Explorer',
         description: 'Browse the full Cisco portfolio — all categories, all products',
         category: null,
-        color: '#02C8FF',
+        color: '#0A60FF',
         suggested: [],
     },
 ];
@@ -267,6 +267,32 @@ function getAllProductUids(product, appidToUidMap) {
 }
 
 /**
+ * Check if a product's apps support the given Splunk version(s).
+ *
+ * Addon-first rule: if a product has an add-on, the ADD-ON must support the
+ * version for the product to pass. A viz-app-only match is not enough because
+ * without the add-on you can't ingest data, extract fields, or map to CIM.
+ * Products without add-ons (SC4S-only, standalone dashboards) pass if ANY
+ * of their apps support the version.
+ */
+function productSupportsVersions(product, versions, splunkbaseData, appidToUidMap) {
+    const uidSupports = (uid) => {
+        const entry = splunkbaseData[uid];
+        if (!entry || !entry.version_compatibility) return false;
+        const supported = entry.version_compatibility.split(/[|,]/).map(v => v.trim());
+        return versions.some(vf => supported.includes(vf));
+    };
+    // If product has an addon, the addon MUST support the version
+    const addonUid = product.addon_splunkbase_uid ? String(product.addon_splunkbase_uid)
+        : (appidToUidMap && product.addon ? appidToUidMap[product.addon] : null);
+    if (addonUid) return uidSupports(addonUid);
+    // No addon — check all other UIDs (viz apps, community apps, etc.)
+    const uids = getAllProductUids(product, appidToUidMap);
+    if (uids.length === 0) return true; // no Splunkbase apps = pass through (e.g. SC4S-only)
+    return uids.some(uid => uidSupports(uid));
+}
+
+/**
  * Sort version strings in descending order (latest first).
  * Handles formats like "10.1", "9.4", "8.2" etc.
  */
@@ -334,7 +360,7 @@ async function loadProductsFromConf() {
             legacy_uids: laUids.filter(Boolean),
             community_uids: caUids.filter(Boolean),
             sourcetypes: csvToArray(c.sourcetypes),
-            dashboard: (c.dashboards || '').trim(),
+            dashboards: csvToArray(c.dashboards),
             custom_dashboard: c.custom_dashboard || '',
             icon_emoji: c.icon_emoji || '',
             icon_svg: c.icon_svg || '',
@@ -413,32 +439,9 @@ function formatCount(n) {
  * Shared by detectAllSourcetypeData and buildSourcetypeSearchUrl.
  */
 function buildSourcetypePatterns(sourcetypes) {
-    // Use exact sourcetype names. Only roll up to a prefix when 3+
-    // sourcetypes share the same two-segment prefix (e.g. cisco:esa:*).
-    const prefixGroups = new Map();
-    const exact = new Set();
-    sourcetypes.forEach(st => {
-        const parts = st.split(':');
-        if (parts.length <= 2) {
-            exact.add(st);
-        } else {
-            const prefix = parts.slice(0, 2).join(':') + ':';
-            if (!prefixGroups.has(prefix)) prefixGroups.set(prefix, []);
-            prefixGroups.get(prefix).push(st);
-        }
-    });
-    // Only collapse to prefix if 3+ sourcetypes share it; otherwise keep exact
-    prefixGroups.forEach((members, prefix) => {
-        if (members.length >= 3) {
-            exact.add(prefix);
-        } else {
-            members.forEach(st => exact.add(st));
-        }
-    });
-    const sorted = [...exact].sort((a, b) => a.length - b.length);
-    return sorted.filter((p, i) => !sorted.slice(0, i).some(shorter =>
-        shorter.endsWith(':') ? p.startsWith(shorter) : p === shorter
-    ));
+    // Strict exact-match only — no prefix collapsing or wildcard rollup.
+    // Each sourcetype listed in products.conf is matched individually.
+    return [...new Set(sourcetypes)];
 }
 
 /**
@@ -466,7 +469,7 @@ async function detectAllSourcetypeData(products) {
     }
     // console.log(`[SCAN] Starting sourcetype detection for ${withST.length} products with sourcetypes...`);
     try {
-        const searchStr = '| metadata type=sourcetypes | where lastTime > relative_time(now(), "-7d") | table sourcetype totalCount';
+        const searchStr = '| metadata type=sourcetypes index=* | where lastTime > relative_time(now(), "-7d") | table sourcetype totalCount';
         // console.log(`[SCAN] Search: ${searchStr}`);
         const res = await splunkFetch(SEARCH_ENDPOINT, {
             method: 'POST',
@@ -508,7 +511,7 @@ async function detectAllSourcetypeData(products) {
             let eventCount = 0;
             const matchedSTs = [];
             stMap.forEach((count, st) => {
-                if (patterns.some(pat => pat.endsWith(':') ? st.startsWith(pat) : st === pat || st.startsWith(pat + ':'))) {
+                if (patterns.some(pat => st === pat)) {
                     stCount++;
                     eventCount += count;
                     matchedSTs.push(st);
@@ -593,8 +596,10 @@ async function detectIndexerTierApps() {
 function buildSourcetypeSearchUrl(sourcetypes) {
     if (!sourcetypes || sourcetypes.length === 0) return null;
     const filtered = buildSourcetypePatterns(sourcetypes);
-    const pattern = filtered.join('|');
-    const spl = `| metadata type=sourcetypes | where match(sourcetype, "${pattern}")`;
+    // Anchor regex to exact-match each sourcetype (no substring/prefix matching)
+    const escaped = filtered.map(s => s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'));
+    const pattern = '^(' + escaped.join('|') + ')$';
+    const spl = `| metadata type=sourcetypes index=* | where match(sourcetype, "${pattern}")`;
     return createURL(`/app/search/search?q=${encodeURIComponent(spl)}`);
 }
 
@@ -709,14 +714,14 @@ function getBestPractices(product, platformType, splunkbaseData) {
                 text: `Since you are running Splunk Cloud, we highly recommend using SC4S (Splunk Connect for Syslog) for data collection. While the TA can be installed on an on-prem Heavy Forwarder to listen on a UDP port, this approach is only advisable for very small environments or single-integration use cases.`,
                 linkLabel: sc4sLabel,
                 linkUrl: product.sc4s_url,
-                icon: '🔗',
+                icon: '',
             });
         } else {
             tips.push({
                 text: `For data collection, we highly recommend using SC4S (Splunk Connect for Syslog) to reliably ingest data for ${pn}. While the TA can be installed on a Heavy Forwarder to listen directly on a UDP port, this approach is only advisable for very small environments or single-integration use cases.`,
                 linkLabel: sc4sLabel,
                 linkUrl: product.sc4s_url,
-                icon: '🔗',
+                icon: '',
             });
         }
     } else if (isCloud) {
@@ -740,13 +745,13 @@ function getBestPractices(product, platformType, splunkbaseData) {
             const sb = splunkbaseData && splunkbaseData[uid];
             return sb ? (sb.title || sb.appid || `App #${uid}`) : `App #${uid}`;
         }).join(', ');
-        tips.push({ text: `⚠ Disable and remove these deprecated apps before using the recommended add-on: ${names}`, icon: '⚠' });
+        tips.push({ text: `Disable and remove these deprecated apps before using the recommended add-on: ${names}`, icon: '' });
     }
 
     // ── Custom per-product tips ────────────────────────────────────────
     if (product.best_practices && product.best_practices.length > 0) {
         product.best_practices.forEach(tip => {
-            tips.push({ text: tip, icon: '💡', custom: true });
+            tips.push({ text: tip, icon: '', custom: true });
         });
     }
 
@@ -841,7 +846,7 @@ function SC4SInfoModal({ open, onClose }) {
         <Modal open returnFocus={returnFocusRef} onRequestClose={onClose} style={{ maxWidth: '820px', width: '92vw' }}>
             <Modal.Header title="Splunk Connect for Syslog (SC4S)" />
             <Modal.Body>
-                <div className="csc-sc4s-info">
+                <div className="csc-sc4s-info" style={{ '--info-accent': '#00897b' }}>
                     <div className="csc-sc4s-info-hero">
                         <div className="csc-sc4s-info-hero-icon"></div>
                         <div className="csc-sc4s-info-hero-text">
@@ -851,7 +856,7 @@ function SC4SInfoModal({ open, onClose }) {
                     </div>
 
                     <div className="csc-sc4s-info-section">
-                        <h4>🔧 What is SC4S?</h4>
+                        <h4>What is SC4S?</h4>
                         <p>SC4S is a "turnkey" solution that replaces the traditional method of using a Universal Forwarder (UF) to monitor flat files written by a syslog daemon. Instead, SC4S receives syslog traffic directly, parses it in memory using pre-defined vendor filters, and transmits the events to Splunk via the <strong>HTTP Event Collector (HEC)</strong>.</p>
                     </div>
 
@@ -982,14 +987,22 @@ function SC4SInfoModal({ open, onClose }) {
 
 // ────────────────────  NETFLOW / STREAM INFO MODAL  ───────────────────────
 
-function NetFlowInfoModal({ open, onClose }) {
+function NetFlowInfoModal({ open, onClose, installedApps }) {
     const returnFocusRef = useRef(null);
     if (!open) return null;
+
+    // 3 TAs checkable on Search Head (2 Splunk + 1 Cisco)
+    const streamTAs = [
+        { id: 'splunk_app_stream', label: 'Splunk App for Stream', uid: '1809', vendor: 'Splunk' },
+        { id: 'Splunk_TA_stream_wire_data', label: 'Splunk Add-on for Stream Wire Data', uid: '5234', vendor: 'Splunk' },
+        { id: 'splunk_app_stream_ipfix_cisco_hsl', label: 'Cisco Catalyst Enhanced Netflow Add-on', uid: '6872', vendor: 'Cisco' },
+    ];
+
     return (
         <Modal open returnFocus={returnFocusRef} onRequestClose={onClose} style={{ maxWidth: '860px', width: '92vw' }}>
             <Modal.Header title="NetFlow / Splunk Stream" />
             <Modal.Body>
-                <div className="csc-sc4s-info">
+                <div className="csc-sc4s-info" style={{ '--info-accent': '#1565c0' }}>
                     <div className="csc-sc4s-info-hero">
                         <div className="csc-sc4s-info-hero-icon"></div>
                         <div className="csc-sc4s-info-hero-text">
@@ -1001,6 +1014,28 @@ function NetFlowInfoModal({ open, onClose }) {
                     <div className="csc-sc4s-info-section">
                         <h4>The 4-Package Ecosystem</h4>
                         <p style={{ marginBottom: '12px', fontSize: '13px' }}>All 4 packages work together. The 3 Splunk packages form the core Stream platform; the Cisco package adds IOS-XE-specific enhancements.</p>
+
+                        {/* TA Install Status — 3 checkable on this Search Head */}
+                        {installedApps && (
+                            <div style={{ marginBottom: '14px', padding: '10px 14px', background: 'var(--bg-primary, #f2f5f7)', borderRadius: '8px', border: '1px solid var(--border-light, #E1E6EB)' }}>
+                                <div style={{ fontSize: '11px', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.3px', marginBottom: '6px', color: 'var(--faint-color, #888)' }}>Search Head Install Status</div>
+                                <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                                    {streamTAs.map(ta => {
+                                        const info = installedApps[ta.id];
+                                        return (
+                                            <div key={ta.id} style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '12px' }}>
+                                                <span style={{ color: info ? '#2e7d32' : '#9e9e9e', fontWeight: 700, width: '14px' }}>{info ? '✓' : '—'}</span>
+                                                <span style={{ flex: 1 }}>{ta.label} <span style={{ fontSize: '10px', color: '#9e9e9e' }}>({ta.vendor})</span></span>
+                                                {info && <span style={{ fontSize: '10px', color: '#6b7280' }}>v{info.version}</span>}
+                                                {!info && <span style={{ fontSize: '10px', color: '#9e9e9e', fontStyle: 'italic' }}>not on this SH</span>}
+                                            </div>
+                                        );
+                                    })}
+                                </div>
+                                <div style={{ fontSize: '10px', color: '#9e9e9e', marginTop: '6px', fontStyle: 'italic' }}>Stream Forwarder TA (5238) is installed on forwarders — not checkable from the Search Head.</div>
+                            </div>
+                        )}
+
                         <div className="csc-sc4s-info-grid">
                             <div className="csc-sc4s-info-card">
                                 <span className="csc-sc4s-info-card-icon"></span>
@@ -1024,63 +1059,63 @@ function NetFlowInfoModal({ open, onClose }) {
                                 <span className="csc-sc4s-info-card-icon"></span>
                                 <strong>Cisco Catalyst Enhanced Netflow Add-on</strong>
                                 <span style={{ fontSize: '11px', fontStyle: 'italic' }}><a href="https://splunkbase.splunk.com/app/6872" target="_blank" rel="noopener noreferrer">Splunkbase 6872</a> &middot; Cisco</span>
-                                <span>Extends Stream with <strong>Cisco-specific IPFIX templates</strong> and field extractions for IOS-XE devices. Decodes proprietary information elements for Application Visibility, Performance Routing, and SD-WAN metrics. Install on <strong>Search Heads</strong>.</span>
+                                <span>Extends Stream with <strong>Cisco-specific IPFIX templates</strong> and field extractions for Cisco Catalyst SD-WAN devices. Provides Netflow element mapping for Cisco Netflow v9 and IPFIX data. Install on <strong>Search Heads</strong>.</span>
                             </div>
                         </div>
                     </div>
 
                     <div className="csc-sc4s-info-section">
-                        <h4>🎯 When Do You Need Each Package?</h4>
+                        <h4>When Do You Need Each Package?</h4>
                         <table className="csc-sc4s-info-table">
                             <thead>
                                 <tr>
-                                    <th className="csc-sc4s-info-table-label" style={{ width: '28%' }}>Cisco Platform</th>
-                                    <th className="csc-sc4s-info-table-label" style={{ width: '42%' }}>3 Splunk Stream Packages</th>
-                                    <th className="csc-sc4s-info-table-label" style={{ width: '30%' }}>Cisco Enhanced Netflow</th>
+                                    <th className="csc-sc4s-info-table-label" style={{ width: '28%', background: '#e0f2f1', color: '#00695c' }}>Cisco Platform</th>
+                                    <th className="csc-sc4s-info-table-label" style={{ width: '42%', background: '#e0f2f1', color: '#00695c' }}>3 Splunk Stream Packages</th>
+                                    <th className="csc-sc4s-info-table-label" style={{ width: '30%', background: '#e0f2f1', color: '#00695c' }}>Cisco Enhanced Netflow</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 <tr>
-                                    <td className="csc-sc4s-info-table-label">IOS-XE Devices</td>
-                                    <td>✅ Required — core Stream platform</td>
-                                    <td><strong>✅ Required</strong> — decodes Cisco IPFIX templates</td>
+                                    <td className="csc-sc4s-info-table-label" style={{ borderLeft: '3px solid #00897b' }}>IOS-XE Devices</td>
+                                    <td><span style={{ display: 'inline-block', padding: '1px 8px', borderRadius: '4px', fontSize: '11px', fontWeight: 700, background: '#e0f2f1', color: '#00695c', marginRight: '6px' }}>Required</span> core Stream platform</td>
+                                    <td><span style={{ display: 'inline-block', padding: '1px 8px', borderRadius: '4px', fontSize: '11px', fontWeight: 700, background: '#e0f2f1', color: '#00695c', marginRight: '6px' }}>Required</span> decodes Cisco IPFIX templates</td>
                                 </tr>
                                 <tr style={{ fontSize: '12px' }}>
-                                    <td style={{ paddingLeft: '20px', border: 'none', paddingTop: 0 }}></td>
-                                    <td colSpan="2" style={{ border: 'none', paddingTop: 0 }}><em>Catalyst Center, Catalyst SD-WAN, ISR, ASR, WLC, Catalyst Switches, Meraki</em></td>
+                                    <td style={{ paddingLeft: '20px', border: 'none', paddingTop: 0, borderLeft: '3px solid transparent' }}></td>
+                                    <td colSpan="2" style={{ border: 'none', paddingTop: 0 }}><em>Catalyst SD-WAN, ISR, ASR, WLC, Catalyst Switches</em></td>
                                 </tr>
                                 <tr>
-                                    <td className="csc-sc4s-info-table-label">NX-OS Devices</td>
-                                    <td>✅ Required — core Stream platform</td>
-                                    <td>⬜ Not needed — NX-OS uses standard NetFlow v9</td>
+                                    <td className="csc-sc4s-info-table-label" style={{ borderLeft: '3px solid #00897b' }}>NX-OS &amp; ACI Fabric</td>
+                                    <td><span style={{ display: 'inline-block', padding: '1px 8px', borderRadius: '4px', fontSize: '11px', fontWeight: 700, background: '#e0f2f1', color: '#00695c', marginRight: '6px' }}>Required</span> core Stream platform</td>
+                                    <td><span style={{ display: 'inline-block', padding: '1px 8px', borderRadius: '4px', fontSize: '11px', fontWeight: 700, background: '#eceff1', color: '#607d8b', marginRight: '6px' }}>Not needed</span> standard NetFlow v9</td>
                                 </tr>
                                 <tr style={{ fontSize: '12px' }}>
-                                    <td style={{ paddingLeft: '20px', border: 'none', paddingTop: 0 }}></td>
-                                    <td colSpan="2" style={{ border: 'none', paddingTop: 0 }}><em>Nexus switches (standard NetFlow v9 templates)</em></td>
+                                    <td style={{ paddingLeft: '20px', border: 'none', paddingTop: 0, borderLeft: '3px solid transparent' }}></td>
+                                    <td colSpan="2" style={{ border: 'none', paddingTop: 0 }}><em>Nexus switches (standalone NX-OS) and ACI leaf/spine fabric (NetFlow v9 via APIC policy, ACI 4.1+)</em></td>
                                 </tr>
                                 <tr>
-                                    <td className="csc-sc4s-info-table-label">ACI Fabric</td>
-                                    <td>✅ Required — captures SPAN/ERSPAN traffic</td>
-                                    <td>⬜ Not needed — ACI uses SPAN/ERSPAN, not NetFlow</td>
+                                    <td className="csc-sc4s-info-table-label" style={{ borderLeft: '3px solid #1565c0' }}>IOS-XR Devices</td>
+                                    <td><span style={{ display: 'inline-block', padding: '1px 8px', borderRadius: '4px', fontSize: '11px', fontWeight: 700, background: '#e0f2f1', color: '#00695c', marginRight: '6px' }}>Required</span> core Stream platform</td>
+                                    <td><span style={{ display: 'inline-block', padding: '1px 8px', borderRadius: '4px', fontSize: '11px', fontWeight: 700, background: '#e3f2fd', color: '#1565c0', marginRight: '6px' }}>Optional</span> may enhance IPFIX decoding</td>
                                 </tr>
                                 <tr style={{ fontSize: '12px' }}>
-                                    <td style={{ paddingLeft: '20px', border: 'none', paddingTop: 0 }}></td>
-                                    <td colSpan="2" style={{ border: 'none', paddingTop: 0 }}><em>ACI leaf/spine switches (mirrored traffic via ERSPAN)</em></td>
+                                    <td style={{ paddingLeft: '20px', border: 'none', paddingTop: 0, borderLeft: '3px solid transparent' }}></td>
+                                    <td colSpan="2" style={{ border: 'none', paddingTop: 0 }}><em>CRS carrier routers, ASR 9000 (IPFIX-capable)</em></td>
                                 </tr>
                                 <tr>
-                                    <td className="csc-sc4s-info-table-label">IOS-XR Devices</td>
-                                    <td>✅ Required — core Stream platform</td>
-                                    <td><strong>✅ Recommended</strong> — enhances IPFIX decoding</td>
+                                    <td className="csc-sc4s-info-table-label" style={{ borderLeft: '3px solid #546e7a' }}>Meraki</td>
+                                    <td><span style={{ display: 'inline-block', padding: '1px 8px', borderRadius: '4px', fontSize: '11px', fontWeight: 700, background: '#e0f2f1', color: '#00695c', marginRight: '6px' }}>Required</span> core Stream platform</td>
+                                    <td><span style={{ display: 'inline-block', padding: '1px 8px', borderRadius: '4px', fontSize: '11px', fontWeight: 700, background: '#eceff1', color: '#607d8b', marginRight: '6px' }}>Not needed</span> standard NetFlow v9</td>
                                 </tr>
                                 <tr style={{ fontSize: '12px' }}>
-                                    <td style={{ paddingLeft: '20px', border: 'none', paddingTop: 0 }}></td>
-                                    <td colSpan="2" style={{ border: 'none', paddingTop: 0 }}><em>CRS carrier routers (IPFIX-capable)</em></td>
+                                    <td style={{ paddingLeft: '20px', border: 'none', paddingTop: 0, borderLeft: '3px solid transparent' }}></td>
+                                    <td colSpan="2" style={{ border: 'none', paddingTop: 0 }}><em>Cloud-managed — exports standard NetFlow v9 (not Cisco IPFIX)</em></td>
                                 </tr>
                             </tbody>
                         </table>
 
                         <div style={{ marginTop: '14px', padding: '12px 16px', background: 'var(--bg-primary, #f2f5f7)', borderRadius: '8px', border: '1px solid var(--border-light, #E1E6EB)', borderLeft: '3px solid var(--border-medium, #CED4DB)' }}>
-                            <strong style={{ fontSize: '13px' }}>💡 Nexus Dashboard — Proprietary Flow Monitoring</strong>
+                            <strong style={{ fontSize: '13px' }}>Nexus Dashboard — Proprietary Flow Monitoring</strong>
                             <p style={{ margin: '6px 0 0', fontSize: '12.5px', lineHeight: 1.5 }}>
                                 For <strong>ACI and Nexus switches</strong>, Cisco also offers <strong>Nexus Dashboard Insights (NDI)</strong> — a proprietary flow monitoring and analytics technology built into the fabric itself.
                                 NDI provides deep fabric-level flow telemetry, anomaly detection, and advisory intelligence <em>without</em> requiring Splunk Stream.
@@ -1093,7 +1128,7 @@ function NetFlowInfoModal({ open, onClose }) {
                     </div>
 
                     <div className="csc-sc4s-info-section">
-                        <h4>🏗️ Deployment Architecture</h4>
+                        <h4>Deployment Architecture</h4>
                         <table className="csc-sc4s-info-table">
                             <thead>
                                 <tr>
@@ -1112,7 +1147,7 @@ function NetFlowInfoModal({ open, onClose }) {
                                 </tr>
                                 <tr>
                                     <td className="csc-sc4s-info-table-label">Search Heads</td>
-                                    <td><strong>App for Stream</strong> (1809) + <strong>Add-on for Stream Wire Data</strong> (5234) + <strong>Cisco Enhanced Netflow Add-on</strong> (6872, IOS-XE only)</td>
+                                    <td><strong>App for Stream</strong> (1809) + <strong>Add-on for Stream Wire Data</strong> (5234) + <strong>Cisco Enhanced Netflow Add-on</strong> (6872, for Catalyst SD-WAN / IOS-XE)</td>
                                 </tr>
                             </tbody>
                         </table>
@@ -1124,7 +1159,7 @@ function NetFlowInfoModal({ open, onClose }) {
                             <div className="csc-sc4s-info-card">
                                 <span className="csc-sc4s-info-card-icon"></span>
                                 <strong>Deep Cisco Visibility</strong>
-                                <span>The Cisco Enhanced Netflow Add-on decodes proprietary IPFIX information elements for Application Visibility, Performance Routing, SD-WAN, and media metrics from IOS-XE devices.</span>
+                                <span>The Cisco Enhanced Netflow Add-on decodes proprietary IPFIX information elements for Application Visibility, Performance Routing, SD-WAN, and media metrics from Cisco Catalyst devices.</span>
                             </div>
                             <div className="csc-sc4s-info-card">
                                 <span className="csc-sc4s-info-card-icon"></span>
@@ -1145,10 +1180,10 @@ function NetFlowInfoModal({ open, onClose }) {
                     </div>
 
                     <div className="csc-sc4s-info-section">
-                        <h4>✅ Best Practices</h4>
+                        <h4>Best Practices</h4>
                         <div className="csc-sc4s-info-bp">
                             <div className="csc-sc4s-info-bp-item csc-sc4s-info-bp-good">
-                                <span className="csc-sc4s-info-bp-marker">📊</span>
+                                <span className="csc-sc4s-info-bp-marker"></span>
                                 <div>
                                     <strong>Install All 3 Stream Packages</strong>
                                     <p>All three Splunk Stream packages are required: the Forwarder TA on forwarders, the App on search heads, and the Wire Data TA on both search heads and indexers. Missing any one will result in incomplete data parsing.</p>
@@ -1158,7 +1193,7 @@ function NetFlowInfoModal({ open, onClose }) {
                                 <span className="csc-sc4s-info-bp-marker"></span>
                                 <div>
                                     <strong>Add Cisco Enhanced Netflow for IOS-XE</strong>
-                                    <p>If your Cisco devices run IOS-XE (Catalyst, SD-WAN/cEdge, ISR, ASR, WLC), install the Cisco Enhanced Netflow Add-on on search heads. It is <em>not</em> needed for NX-OS (Nexus) or ACI.</p>
+                                    <p>If your Cisco devices run IOS-XE (Catalyst SD-WAN, ISR, ASR, WLC), install the Cisco Enhanced Netflow Add-on on search heads. It is <em>not</em> needed for NX-OS (Nexus), ACI, or Meraki.</p>
                                 </div>
                             </div>
                             <div className="csc-sc4s-info-bp-item csc-sc4s-info-bp-good">
@@ -1207,7 +1242,7 @@ function HFInfoModal({ open, onClose, isCloud }) {
         <Modal open returnFocus={returnFocusRef} onRequestClose={onClose} style={{ maxWidth: '720px', width: '92vw' }}>
             <Modal.Header title="Heavy Forwarder Deployment" />
             <Modal.Body>
-                <div className="csc-sc4s-info">
+                <div className="csc-sc4s-info" style={{ '--info-accent': '#0A60FF' }}>
                     <div className="csc-sc4s-info-hero">
                         <div className="csc-sc4s-info-hero-icon"></div>
                         <div className="csc-sc4s-info-hero-text">
@@ -1244,7 +1279,7 @@ function HFInfoModal({ open, onClose, isCloud }) {
 
                     {isCloud && (
                         <div className="csc-sc4s-info-section">
-                            <h4>☁️ Splunk Cloud Note</h4>
+                            <h4>Splunk Cloud Note</h4>
                             <div className="csc-sc4s-info-bp">
                                 <div className="csc-sc4s-info-bp-item csc-sc4s-info-bp-warn">
                                     <span className="csc-sc4s-info-bp-marker"></span>
@@ -1384,12 +1419,97 @@ const MAGIC_SIX = [
     },
 ];
 
-function MagicSixModal({ open, onClose, sourcetypes, productName, addonApp }) {
+function MagicSixModal({ open, onClose, sourcetypes, productName, addonApp, addonLabel, appViz, appViz2, installedApps, indexerApps }) {
     const returnFocusRef = useRef(null);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
     const [results, setResults] = useState(null); // { sourcetype: { setting: value } }
     const [searchSpl, setSearchSpl] = useState(null);
+    const [sortColumn, setSortColumn] = useState('sourcetype');
+    const [sortDirection, setSortDirection] = useState('asc');
+    const [modalWidth, setModalWidth] = useState(960);
+    const [modalHeight, setModalHeight] = useState(null); // null = auto
+    const resizingRef = useRef(false);
+    const startRef = useRef({ x: 0, y: 0, w: 0, h: 0 });
+    const modalRef = useRef(null);
+
+    const MIN_W = 600;
+    const MAX_W = Math.round(window.innerWidth * 0.96);
+    const MIN_H = 400;
+    const MAX_H = Math.round(window.innerHeight * 0.92);
+
+    // Mouse-based resize handlers
+    const onResizeStart = useCallback((e) => {
+        e.preventDefault();
+        resizingRef.current = true;
+        const el = modalRef.current;
+        const rect = el ? el.closest('[data-test="modal"]')?.getBoundingClientRect() : null;
+        startRef.current = {
+            x: e.clientX,
+            y: e.clientY,
+            w: rect ? rect.width : modalWidth,
+            h: rect ? rect.height : (modalHeight || 600),
+        };
+        document.body.style.cursor = 'nwse-resize';
+        document.body.style.userSelect = 'none';
+
+        const onMove = (ev) => {
+            if (!resizingRef.current) return;
+            const dx = ev.clientX - startRef.current.x;
+            const dy = ev.clientY - startRef.current.y;
+            setModalWidth(Math.min(MAX_W, Math.max(MIN_W, startRef.current.w + dx)));
+            setModalHeight(Math.min(MAX_H, Math.max(MIN_H, startRef.current.h + dy)));
+        };
+        const onUp = () => {
+            resizingRef.current = false;
+            document.body.style.cursor = '';
+            document.body.style.userSelect = '';
+            document.removeEventListener('mousemove', onMove);
+            document.removeEventListener('mouseup', onUp);
+        };
+        document.addEventListener('mousemove', onMove);
+        document.addEventListener('mouseup', onUp);
+    }, [modalWidth, modalHeight]);
+
+    const WIDTH_PRESETS = [
+        { label: 'Normal', w: 960 },
+        { label: 'Wide', w: 1280 },
+        { label: 'Full', w: MAX_W },
+    ];
+    const activePreset = WIDTH_PRESETS.findIndex(p => Math.abs(p.w - modalWidth) < 20);
+
+    // Build tier version rows for addon + app_viz + app_viz_2
+    const tierRows = useMemo(() => {
+        if (!installedApps) return [];
+        const apps = [];
+        if (addonApp) apps.push({ id: addonApp, label: addonLabel || addonApp, role: 'Add-on' });
+        if (appViz) apps.push({ id: appViz, label: appViz, role: 'App' });
+        if (appViz2) apps.push({ id: appViz2, label: appViz2, role: 'App' });
+        return apps.map(a => {
+            const sh = installedApps[a.id];
+            const idx = indexerApps ? indexerApps[a.id] : undefined;
+            const shVer = sh ? sh.version : null;
+            const idxVer = idx ? idx.version : null;
+            const idxDisabled = idx ? idx.disabled : false;
+            let state = 'na'; // na | ok | mismatch | missing | disabled | not_installed
+            if (!sh) {
+                state = 'not_installed';
+            } else if (!indexerApps) {
+                state = 'loading';
+            } else if (Object.keys(indexerApps).length === 0) {
+                state = 'standalone';
+            } else if (!idx) {
+                state = 'missing';
+            } else if (idxDisabled) {
+                state = 'disabled';
+            } else if (shVer && idxVer && shVer !== idxVer) {
+                state = 'mismatch';
+            } else {
+                state = 'ok';
+            }
+            return { ...a, shVer, idxVer, idxDisabled, state, idxCount: idx ? idx.indexerCount : 0 };
+        }).filter(r => r.state !== 'not_installed');
+    }, [addonApp, addonLabel, appViz, appViz2, installedApps, indexerApps]);
 
     useEffect(() => {
         if (!open || !sourcetypes || sourcetypes.length === 0) return;
@@ -1421,17 +1541,22 @@ function MagicSixModal({ open, onClose, sourcetypes, productName, addonApp }) {
                 // REST best practices:
                 //   1. f= limits returned fields (bandwidth + performance)
                 //   2. | search filters by sourcetypes immediately
-                //   3. Exclude local SH — we want indexer-tier props.conf
+                //   3. Distributed: Exclude local SH — we want indexer-tier props.conf
+                //      Standalone: Query local only (same host is SH + indexer)
                 //   4. | stats values(*) as * by title — dedup across cluster AND apps
                 //   5. values(eai:acl.app) tracks which app(s) define each setting
                 const m6Fields = MAGIC_SIX.map(m => `f=${m.key}`).join(' ');
-                const spl = [
-                    `| rest splunk_server=* /servicesNS/-/-/configs/conf-props f=eai:* ${m6Fields} count=0`,
+                const isStandalone = indexerApps !== null && Object.keys(indexerApps).length === 0;
+                const splParts = [
+                    `| rest splunk_server=${isStandalone ? 'local' : '*'} /servicesNS/-/-/configs/conf-props f=eai:* ${m6Fields} count=0`,
                     `| search (${titleFilter})`,
                     `| fields splunk_server eai:acl.app title ${MAGIC_SIX.map(m => m.key).join(' ')}`,
-                    '| search NOT [| rest splunk_server=local /services/server/info f=splunk_server | fields splunk_server]',
-                    '| stats values(*) as * values(eai:acl.app) as defining_apps by title',
-                ].join(' ');
+                ];
+                if (!isStandalone) {
+                    splParts.push('| search NOT [| rest splunk_server=local /services/server/info f=splunk_server | fields splunk_server]');
+                }
+                splParts.push('| stats values(*) as * values(eai:acl.app) as defining_apps by title');
+                const spl = splParts.join(' ');
                 setSearchSpl(spl);
 
                 const csrf = getCSRFToken();
@@ -1478,7 +1603,37 @@ function MagicSixModal({ open, onClose, sourcetypes, productName, addonApp }) {
 
     if (!open) return null;
 
-    const sortedSts = results ? Object.keys(results).sort() : [];
+    const sortedSts = results ? Object.keys(results).sort((a, b) => {
+        const dir = sortDirection === 'asc' ? 1 : -1;
+        if (sortColumn === 'sourcetype') {
+            return dir * a.localeCompare(b);
+        }
+        if (sortColumn === 'defining_apps') {
+            const aVal = (results[a].defining_apps || []).join(', ');
+            const bVal = (results[b].defining_apps || []).join(', ');
+            if (!aVal && !bVal) return a.localeCompare(b);
+            if (!aVal) return 1;
+            if (!bVal) return -1;
+            return dir * aVal.localeCompare(bVal);
+        }
+        // Config columns: group empty/missing together at the end
+        const aRaw = results[a][sortColumn];
+        const bRaw = results[b][sortColumn];
+        const aEmpty = aRaw === null || aRaw === undefined || aRaw === '';
+        const bEmpty = bRaw === null || bRaw === undefined || bRaw === '';
+        if (aEmpty && bEmpty) return a.localeCompare(b);
+        if (aEmpty) return 1;
+        if (bEmpty) return -1;
+        return dir * String(aRaw).localeCompare(String(bRaw));
+    }) : [];
+    const handleSort = (col) => {
+        if (sortColumn === col) {
+            setSortDirection(d => d === 'asc' ? 'desc' : 'asc');
+        } else {
+            setSortColumn(col);
+            setSortDirection('asc');
+        }
+    };
     const allConfigured = sortedSts.length > 0 && sortedSts.every(st => {
         const r = results[st];
         return MAGIC_SIX.every(m => r[m.key] !== null && r[m.key] !== undefined && r[m.key] !== '');
@@ -1492,12 +1647,97 @@ function MagicSixModal({ open, onClose, sourcetypes, productName, addonApp }) {
     });
 
     return (
-        <Modal open returnFocus={returnFocusRef} onRequestClose={onClose} style={{ maxWidth: '960px', width: '95vw' }}>
+        <Modal open returnFocus={returnFocusRef} onRequestClose={onClose} style={{ maxWidth: `${modalWidth}px`, width: '92vw', ...(modalHeight ? { height: `${modalHeight}px` } : {}) }}>
             <Modal.Header title={`Props.conf Audit — ${productName || 'Product'}`} />
-            <Modal.Body>
-                <div className="csc-sc4s-info">
+            <Modal.Body style={modalHeight ? { height: `${modalHeight - 130}px`, overflow: 'auto' } : {}}>
+                <div ref={modalRef} className="csc-sc4s-info" style={{ '--info-accent': '#546e7a' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '12px' }}>
+                        {addonApp ? (
+                            <div style={{ fontSize: '13px', color: 'var(--text-secondary, #536070)', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                                <span style={{ fontWeight: 600 }}>Add-on:</span>
+                                <code style={{ fontSize: '12px', padding: '2px 8px', background: 'var(--bg-primary, #f2f5f7)', borderRadius: '4px', border: '1px solid var(--border-light, #E1E6EB)' }}>{addonLabel || addonApp}</code>
+                                {addonLabel && addonLabel !== addonApp && <span style={{ fontSize: '11px', color: 'var(--text-tertiary, #667180)' }}>({addonApp})</span>}
+                            </div>
+                        ) : <div />}
+                        <div style={{ display: 'flex', gap: '2px', background: 'var(--bg-primary, #f2f5f7)', borderRadius: '5px', padding: '2px', border: '1px solid var(--border-light, #E1E6EB)' }}>
+                            {WIDTH_PRESETS.map((preset, i) => (
+                                <button key={preset.label} onClick={() => { setModalWidth(preset.w); setModalHeight(null); }}
+                                    style={{
+                                        padding: '3px 10px', fontSize: '11px', fontWeight: 600, border: 'none', borderRadius: '4px', cursor: 'pointer',
+                                        background: activePreset === i ? 'var(--bg-surface, #fff)' : 'transparent',
+                                        color: activePreset === i ? 'var(--text-primary, #1a2029)' : 'var(--text-tertiary, #667180)',
+                                        boxShadow: activePreset === i ? '0 1px 3px rgba(0,0,0,0.1)' : 'none',
+                                    }}>{preset.label}</button>
+                            ))}
+                        </div>
+                    </div>
+
+                    {/* ── Tier Version Audit ── */}
+                    {tierRows.length > 0 && (() => {
+                        const hasProblems = tierRows.some(r => r.state === 'mismatch' || r.state === 'missing' || r.state === 'disabled');
+                        const borderColor = hasProblems ? '#FF9000' : '#3D851C';
+                        return (
+                            <div style={{ marginBottom: '14px', padding: '10px 14px', borderLeft: `3px solid ${borderColor}`, borderRadius: '6px', background: 'var(--bg-primary, #f8f9fb)', fontSize: '12px' }}>
+                                <div style={{ fontWeight: 700, fontSize: '12px', marginBottom: '6px', color: 'var(--text-primary, #1a2029)', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                                    {hasProblems ? '⚠' : '✓'} Deployment Versions
+                                </div>
+                                <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '12px' }}>
+                                    <thead>
+                                        <tr style={{ borderBottom: '1px solid var(--border-light, #E1E6EB)' }}>
+                                            <th style={{ textAlign: 'left', padding: '3px 8px 3px 0', fontWeight: 600, color: 'var(--text-secondary, #536070)' }}>App</th>
+                                            <th style={{ textAlign: 'left', padding: '3px 8px', fontWeight: 600, color: 'var(--text-secondary, #536070)' }}>SH</th>
+                                            <th style={{ textAlign: 'left', padding: '3px 8px', fontWeight: 600, color: 'var(--text-secondary, #536070)' }}>Indexer Tier</th>
+                                            <th style={{ textAlign: 'left', padding: '3px 8px', fontWeight: 600, color: 'var(--text-secondary, #536070)' }}>Status</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {tierRows.map(r => {
+                                            const stateStyle = {
+                                                ok: { color: '#3D851C', label: 'Matched' },
+                                                mismatch: { color: '#FF9000', label: 'Version Mismatch' },
+                                                missing: { color: '#c07600', label: 'Not on Indexers' },
+                                                disabled: { color: '#d32f2f', label: 'Disabled on IDX' },
+                                                standalone: { color: '#78909c', label: 'Standalone' },
+                                                loading: { color: '#78909c', label: 'Checking…' },
+                                            }[r.state] || { color: '#999', label: '—' };
+                                            return (
+                                                <tr key={r.id} style={{ borderBottom: '1px solid var(--border-light, #E1E6EB)' }}>
+                                                    <td style={{ padding: '4px 8px 4px 0', color: 'var(--text-primary, #1a2029)' }}>
+                                                        <span style={{ fontWeight: 600 }}>{r.label}</span>
+                                                        <span style={{ fontSize: '10px', marginLeft: '6px', padding: '1px 5px', borderRadius: '3px', background: 'var(--bg-surface, #eef1f4)', color: 'var(--text-tertiary, #667180)' }}>{r.role}</span>
+                                                    </td>
+                                                    <td style={{ padding: '4px 8px' }}>
+                                                        <code style={{ fontSize: '11px', padding: '1px 6px', background: 'var(--bg-surface, #eef1f4)', borderRadius: '3px' }}>{r.shVer || '—'}</code>
+                                                    </td>
+                                                    <td style={{ padding: '4px 8px' }}>
+                                                        {r.state === 'standalone' ? (
+                                                            <span style={{ color: '#78909c', fontStyle: 'italic' }}>N/A</span>
+                                                        ) : r.state === 'loading' ? (
+                                                            <span style={{ color: '#78909c', fontStyle: 'italic' }}>…</span>
+                                                        ) : r.state === 'missing' ? (
+                                                            <span style={{ color: '#c07600', fontStyle: 'italic' }}>Not installed</span>
+                                                        ) : (
+                                                            <code style={{ fontSize: '11px', padding: '1px 6px', background: 'var(--bg-surface, #eef1f4)', borderRadius: '3px', color: r.state === 'mismatch' ? '#FF9000' : undefined }}>{r.idxVer || '—'}</code>
+                                                        )}
+                                                    </td>
+                                                    <td style={{ padding: '4px 8px' }}>
+                                                        <span style={{ fontSize: '11px', fontWeight: 600, color: stateStyle.color }}>{stateStyle.label}</span>
+                                                    </td>
+                                                </tr>
+                                            );
+                                        })}
+                                    </tbody>
+                                </table>
+                                {hasProblems && (
+                                    <div style={{ marginTop: '6px', fontSize: '11px', color: 'var(--text-secondary, #536070)', lineHeight: 1.5 }}>
+                                        Version mismatches between SH and indexer tiers can cause props.conf gaps — the indexer may be running older definitions.
+                                    </div>
+                                )}
+                            </div>
+                        );
+                    })()}
+
                     <div className="csc-sc4s-info-hero">
-                        <div className="csc-sc4s-info-hero-icon">⚙️</div>
                         <div className="csc-sc4s-info-hero-text">
                             <h3>The Magic Six — Props.conf Health Check</h3>
                             <p>Every well-tuned sourcetype should explicitly define these six <code>props.conf</code> settings.
@@ -1530,25 +1770,29 @@ function MagicSixModal({ open, onClose, sourcetypes, productName, addonApp }) {
                         <div className="scan-magic6-results">
                             {allConfigured && !anyBad && (
                                 <div className="scan-magic6-allgood">
-                                    ✅ All Magic Six settings are explicitly configured — excellent!
+                                    All Magic Six settings are explicitly configured — excellent!
                                 </div>
                             )}
                             {anyBad && (
                                 <div className="scan-magic6-allgood" style={{ borderLeftColor: 'var(--color-warning, #FF9000)' }}>
-                                    ⚠️ Some settings use non-recommended values — review highlighted cells below.
+                                    Some settings use non-recommended values — review highlighted cells below.
                                 </div>
                             )}
                             <div className="scan-magic6-table-wrap">
                                 <table className="scan-magic6-table">
                                     <thead>
                                         <tr>
-                                            <th className="scan-magic6-th-st">Sourcetype</th>
+                                            <th className="scan-magic6-th-st scan-magic6-th-sort" onClick={() => handleSort('sourcetype')} style={{ cursor: 'pointer', userSelect: 'none' }}>
+                                                Sourcetype {sortColumn === 'sourcetype' && <span style={{ fontSize: '9px', marginLeft: '2px', opacity: 0.7 }}>{sortDirection === 'asc' ? '↑' : '↓'}</span>}
+                                            </th>
                                             {MAGIC_SIX.map(m => (
-                                                <th key={m.key} className="scan-magic6-th-setting" title={`"${m.nickname}" — ${m.detail}`}>
-                                                    {m.key.replace(/_/g, '_\u200B')}
+                                                <th key={m.key} className="scan-magic6-th-setting scan-magic6-th-sort" title={`"${m.nickname}" — ${m.detail}`} onClick={() => handleSort(m.key)} style={{ cursor: 'pointer', userSelect: 'none' }}>
+                                                    {m.key.replace(/_/g, '_\u200B')} {sortColumn === m.key && <span style={{ fontSize: '9px', marginLeft: '2px', opacity: 0.7 }}>{sortDirection === 'asc' ? '↑' : '↓'}</span>}
                                                 </th>
                                             ))}
-                                            <th className="scan-magic6-th-setting" title="App(s) where this sourcetype's props.conf stanza is defined">Defining App</th>
+                                            <th className="scan-magic6-th-setting scan-magic6-th-sort" title="App(s) where this sourcetype's props.conf stanza is defined" onClick={() => handleSort('defining_apps')} style={{ cursor: 'pointer', userSelect: 'none' }}>
+                                                Defining App {sortColumn === 'defining_apps' && <span style={{ fontSize: '9px', marginLeft: '2px', opacity: 0.7 }}>{sortDirection === 'asc' ? '↑' : '↓'}</span>}
+                                            </th>
                                         </tr>
                                     </thead>
                                     <tbody>
@@ -1565,7 +1809,7 @@ function MagicSixModal({ open, onClose, sourcetypes, productName, addonApp }) {
                                                             ? (bad ? 'scan-magic6-bad' : 'scan-magic6-ok')
                                                             : 'scan-magic6-miss';
                                                         const tip = isDefined
-                                                            ? `${m.key} = ${val}${bad ? ' ⚠ Not recommended' : ''}`
+                                                            ? `${m.key} = ${val}${bad ? ' — Not recommended' : ''}`
                                                             : `${m.key} not explicitly set — using default: ${m.defaultVal}`;
                                                         return (
                                                             <td key={m.key} className={`scan-magic6-td ${cellClass}`} title={tip}>
@@ -1604,12 +1848,12 @@ function MagicSixModal({ open, onClose, sourcetypes, productName, addonApp }) {
                                             <p style={{ margin: '0 0 10px' }}>{m.detail}</p>
                                             {m.gotcha && (
                                                 <p style={{ margin: '0 0 8px', padding: '8px 12px', background: 'rgba(255,144,0,0.05)', borderLeft: '2px solid #FF9000', borderRadius: '4px', fontSize: '12px' }}>
-                                                    <strong>⚠ Gotcha:</strong> {m.gotcha}
+                                                    <strong>Gotcha:</strong> {m.gotcha}
                                                 </p>
                                             )}
                                             <div style={{ display: 'flex', gap: '16px', fontSize: '12px', color: 'var(--text-secondary, #536070)', marginTop: 6 }}>
-                                                <span>Default: <code style={{ background: '#F2F5F7', color: '#314257', padding: '1px 5px', borderRadius: '4px' }}>{m.defaultVal}</code></span>
-                                                <span>✓ Recommended: <code style={{ background: '#F2F5F7', color: '#314257', padding: '1px 5px', borderRadius: '4px' }}>{m.recommended}</code></span>
+                                                <span>Default: <code>{m.defaultVal}</code></span>
+                                                <span>✓ Recommended: <code>{m.recommended}</code></span>
                                             </div>
                                         </div>
                                     }
@@ -1617,12 +1861,12 @@ function MagicSixModal({ open, onClose, sourcetypes, productName, addonApp }) {
                                     <div className="csc-sc4s-info-card" style={{ cursor: 'help' }}>
                                         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                                             <strong><code>{m.key}</code></strong>
-                                            <span style={{ fontSize: '10px', padding: '1px 6px', borderRadius: '8px', background: 'var(--bg-primary, #f2f5f7)', color: m.difficulty === 'Easy' ? '#3D851C' : m.difficulty === 'Medium' ? '#C07600' : '#D91821', fontWeight: 600 }}>{m.difficulty}</span>
+                                            <span style={{ fontSize: '10px', padding: '1px 6px', borderRadius: '8px', border: 'none', fontWeight: 600, background: m.difficulty === 'Easy' ? 'rgba(61,133,28,0.10)' : m.difficulty === 'Medium' ? 'rgba(192,118,0,0.10)' : 'rgba(217,24,33,0.10)', color: m.difficulty === 'Easy' ? '#3D851C' : m.difficulty === 'Medium' ? '#C07600' : '#D91821' }}>{m.difficulty}</span>
                                         </div>
                                         <span style={{ fontSize: '12px', fontStyle: 'italic', color: 'var(--text-secondary, #536070)', fontWeight: 600 }}>"{m.nickname}"</span>
                                         <span>{m.desc}</span>
                                         {m.gotcha && (
-                                            <span style={{ fontSize: '11px', color: 'var(--text-secondary, #536070)' }}>⚠ {m.gotcha}</span>
+                                            <span style={{ fontSize: '11px', color: 'var(--text-secondary, #536070)' }}>{m.gotcha}</span>
                                         )}
                                         <span style={{ fontSize: '11px', color: 'var(--text-tertiary, #667180)' }}>Default: <code>{m.defaultVal}</code></span>
                                         <span style={{ fontSize: '11px', color: 'var(--text-secondary, #536070)' }}>✓ Recommended: <code>{m.recommended}</code></span>
@@ -1640,8 +1884,7 @@ function MagicSixModal({ open, onClose, sourcetypes, productName, addonApp }) {
                             answering your searches, not on figuring out where one event ends and the next begins.
                         </p>
                         <div className="csc-sc4s-info-bp">
-                            <div className="csc-sc4s-info-bp-item csc-sc4s-info-bp-warn">
-                                <span className="csc-sc4s-info-bp-marker">📊</span>
+                            <div className="csc-sc4s-info-bp-item csc-sc4s-info-bp-info">
                                 <div>
                                     <strong>Up to 60% CPU Reduction — Measured</strong>
                                     <p>Splunk Professional Services has documented that providing explicit Magic Six values can
@@ -1654,8 +1897,7 @@ function MagicSixModal({ open, onClose, sourcetypes, productName, addonApp }) {
                                     </p>
                                 </div>
                             </div>
-                            <div className="csc-sc4s-info-bp-item csc-sc4s-info-bp-warn">
-                                <span className="csc-sc4s-info-bp-marker">⚡</span>
+                            <div className="csc-sc4s-info-bp-item csc-sc4s-info-bp-info">
                                 <div>
                                     <strong>The SHOULD_LINEMERGE Cost — 4 Regexes × Every Line Boundary</strong>
                                     <p>When SHOULD_LINEMERGE = true (the default), the aggregator processor runs <strong>four separate
@@ -1668,8 +1910,7 @@ function MagicSixModal({ open, onClose, sourcetypes, productName, addonApp }) {
                                     line is its own event." Setting SHOULD_LINEMERGE = false eliminates the entire aggregation phase.</p>
                                 </div>
                             </div>
-                            <div className="csc-sc4s-info-bp-item csc-sc4s-info-bp-warn">
-                                <span className="csc-sc4s-info-bp-marker">🔑</span>
+                            <div className="csc-sc4s-info-bp-item csc-sc4s-info-bp-info">
                                 <div>
                                     <strong>The datetime.xml Tax — 30+ Patterns Tested Per Event</strong>
                                     <p>Without an explicit TIME_FORMAT, Splunk loads datetime.xml — a file containing <strong>30+
@@ -1680,34 +1921,30 @@ function MagicSixModal({ open, onClose, sourcetypes, productName, addonApp }) {
                                     numbers, IP octets, or build IDs that look like dates — causing events to appear at incorrect times.</p>
                                 </div>
                             </div>
-                        </div>
-
-                        <div style={{ marginTop: '16px', padding: '14px 16px', background: 'var(--bg-primary, #f2f5f7)', borderRadius: '8px', border: '1px solid var(--border-light, #E1E6EB)', borderLeft: '3px solid var(--border-medium, #CED4DB)' }}>
-                            <strong style={{ fontSize: '13px' }}>💡 The Recipe Principle</strong>
-                            <p style={{ margin: '8px 0 0', fontSize: '12.5px', lineHeight: 1.6 }}>
-                                Think of it this way: every sourcetype that arrives at your indexers without explicit Magic Six settings
-                                is like handing raw ingredients to a chef with no recipe. The chef has to taste, smell, and test every
-                                combination before cooking — wasting time and likely getting the dish wrong. With a recipe (explicit
-                                props.conf), the chef goes straight to cooking.
-                            </p>
-                            <p style={{ margin: '8px 0 0', fontSize: '12.5px', lineHeight: 1.6 }}>
-                                The impact compounds: <strong>faster indexing = more headroom for searches</strong>. Your indexers have
-                                a finite CPU budget. Every cycle spent on heuristic guesswork during ingestion is a cycle stolen from
-                                search processing. When you optimize props.conf, you're not just making ingestion faster — you're making
-                                your entire Splunk deployment faster because the indexers aren't burning CPU trying to figure out
-                                data they've already been told how to handle.
-                            </p>
-                        </div>
-
-                        <div style={{ marginTop: '16px', padding: '14px 16px', background: 'rgba(255,144,0,0.05)', borderRadius: '8px', border: '1px solid var(--border-light, #E1E6EB)', borderLeft: '2px solid #FF9000' }}>
-                            <strong style={{ fontSize: '13px' }}>⚠️ The Cascade: Missing One Setting Amplifies Others</strong>
-                            <p style={{ margin: '8px 0 0', fontSize: '12.5px', lineHeight: 1.6 }}>
-                                These six settings are interconnected. Without TIME_PREFIX, Splunk scans the entire event for timestamps — but
-                                that scan uses TIME_FORMAT (or datetime.xml), which is bounded by MAX_TIMESTAMP_LOOKAHEAD. Without
-                                LINE_BREAKER, events aren't properly split — so SHOULD_LINEMERGE kicks in to try to reassemble them,
-                                triggering 4 regexes per boundary. And without TRUNCATE tuning, multi-line events silently lose data.
-                                Each missing setting doesn't just add cost — it amplifies the cost of every other missing setting.
-                            </p>
+                            <div className="csc-sc4s-info-bp-item csc-sc4s-info-bp-info">
+                                <div>
+                                    <strong>The Recipe Principle</strong>
+                                    <p>Think of it this way: every sourcetype that arrives at your indexers without explicit Magic Six settings
+                                    is like handing raw ingredients to a chef with no recipe. The chef has to taste, smell, and test every
+                                    combination before cooking — wasting time and likely getting the dish wrong. With a recipe (explicit
+                                    props.conf), the chef goes straight to cooking.</p>
+                                    <p style={{ marginTop: 6 }}>The impact compounds: <strong>faster indexing = more headroom for searches</strong>. Your indexers have
+                                    a finite CPU budget. Every cycle spent on heuristic guesswork during ingestion is a cycle stolen from
+                                    search processing. When you optimize props.conf, you're not just making ingestion faster — you're making
+                                    your entire Splunk deployment faster because the indexers aren't burning CPU trying to figure out
+                                    data they've already been told how to handle.</p>
+                                </div>
+                            </div>
+                            <div className="csc-sc4s-info-bp-item csc-sc4s-info-bp-warn">
+                                <div>
+                                    <strong>The Cascade: Missing One Setting Amplifies Others</strong>
+                                    <p>These six settings are interconnected. Without TIME_PREFIX, Splunk scans the entire event for timestamps — but
+                                    that scan uses TIME_FORMAT (or datetime.xml), which is bounded by MAX_TIMESTAMP_LOOKAHEAD. Without
+                                    LINE_BREAKER, events aren't properly split — so SHOULD_LINEMERGE kicks in to try to reassemble them,
+                                    triggering 4 regexes per boundary. And without TRUNCATE tuning, multi-line events silently lose data.
+                                    Each missing setting doesn't just add cost — it amplifies the cost of every other missing setting.</p>
+                                </div>
+                            </div>
                         </div>
                     </div>
 
@@ -1734,6 +1971,12 @@ function MagicSixModal({ open, onClose, sourcetypes, productName, addonApp }) {
                     />
                 )}
                 <Button appearance="secondary" label="Close" onClick={onClose} />
+                {/* Resize handle */}
+                <div
+                    className="scan-modal-resize-handle"
+                    onMouseDown={onResizeStart}
+                    title="Drag to resize"
+                />
             </Modal.Footer>
         </Modal>
     );
@@ -1752,7 +1995,7 @@ function SOARInfoModal({ open, onClose, soarConnectorUids, splunkbaseData, produ
         <Modal open returnFocus={returnFocusRef} onRequestClose={onClose} style={{ maxWidth: '820px', width: '92vw' }}>
             <Modal.Header title="Splunk SOAR Integration" />
             <Modal.Body>
-                <div className="csc-sc4s-info">
+                <div className="csc-sc4s-info" style={{ '--info-accent': '#00838f' }}>
                     <div className="csc-sc4s-info-hero">
                         <div className="csc-sc4s-info-hero-icon"></div>
                         <div className="csc-sc4s-info-hero-text">
@@ -1762,7 +2005,7 @@ function SOARInfoModal({ open, onClose, soarConnectorUids, splunkbaseData, produ
                     </div>
 
                     <div className="csc-sc4s-info-section">
-                        <h4>🔧 What is Splunk SOAR?</h4>
+                        <h4>What is Splunk SOAR?</h4>
                         <p>Splunk SOAR is a security orchestration and automation platform that connects to 300+ tools and 2,800+ automated actions. It enables security teams to build <strong>playbooks</strong> that automate repetitive tasks — from enriching alerts to blocking malicious IPs — and provides a centralized case management and collaboration workspace.</p>
                     </div>
 
@@ -1794,7 +2037,7 @@ function SOARInfoModal({ open, onClose, soarConnectorUids, splunkbaseData, produ
 
                     {connectors.length > 0 && (
                         <div className="csc-sc4s-info-section">
-                            <h4>📦 {productName ? `${productName} — ` : ''}Available Connectors ({connectors.length})</h4>
+                            <h4>{productName ? `${productName} — ` : ''}Available Connectors ({connectors.length})</h4>
                             <table className="csc-sc4s-info-table">
                                 <thead>
                                     <tr>
@@ -1823,24 +2066,24 @@ function SOARInfoModal({ open, onClose, soarConnectorUids, splunkbaseData, produ
                     )}
 
                     <div className="csc-sc4s-info-section">
-                        <h4>✅ Best Practices</h4>
+                        <h4>Best Practices</h4>
                         <div className="csc-sc4s-info-bp">
                             <div className="csc-sc4s-info-bp-item csc-sc4s-info-bp-good">
-                                <span className="csc-sc4s-info-bp-marker">🔌</span>
+                                <span className="csc-sc4s-info-bp-marker"></span>
                                 <div>
                                     <strong>Install Connectors from Splunkbase</strong>
                                     <p>SOAR connectors are installed within SOAR's "Apps" menu, not via Splunk Enterprise. Download from Splunkbase and import into your SOAR instance.</p>
                                 </div>
                             </div>
                             <div className="csc-sc4s-info-bp-item csc-sc4s-info-bp-good">
-                                <span className="csc-sc4s-info-bp-marker">🔑</span>
+                                <span className="csc-sc4s-info-bp-marker"></span>
                                 <div>
                                     <strong>Use Service Accounts</strong>
                                     <p>Configure SOAR connectors with dedicated service accounts (not personal credentials) with least-privilege access for each Cisco product integration.</p>
                                 </div>
                             </div>
                             <div className="csc-sc4s-info-bp-item csc-sc4s-info-bp-good">
-                                <span className="csc-sc4s-info-bp-marker">📋</span>
+                                <span className="csc-sc4s-info-bp-marker"></span>
                                 <div>
                                     <strong>Start with Investigation Playbooks</strong>
                                     <p>Before enabling automated response actions, start with investigative playbooks that enrich and triage. Graduate to automated containment once confidence is established.</p>
@@ -1876,7 +2119,7 @@ function ITSIInfoModal({ open, onClose, itsiContentPack, productName }) {
         <Modal open returnFocus={returnFocusRef} onRequestClose={onClose} style={{ maxWidth: '820px', width: '92vw' }}>
             <Modal.Header title="ITSI Content Pack" />
             <Modal.Body>
-                <div className="csc-sc4s-info">
+                <div className="csc-sc4s-info" style={{ '--info-accent': '#2e7d32' }}>
                     <div className="csc-sc4s-info-hero">
                         <div className="csc-sc4s-info-hero-icon"></div>
                         <div className="csc-sc4s-info-hero-text">
@@ -1886,7 +2129,7 @@ function ITSIInfoModal({ open, onClose, itsiContentPack, productName }) {
                     </div>
 
                     <div className="csc-sc4s-info-section">
-                        <h4>🔧 What is ITSI?</h4>
+                        <h4>What is ITSI?</h4>
                         <p>Splunk IT Service Intelligence (ITSI) is a monitoring and analytics solution that provides end-to-end visibility into the health and performance of critical IT services. ITSI uses <strong>machine learning</strong> to detect anomalies, predict outages, and correlate events across your entire infrastructure — from network devices to applications to cloud services.</p>
                     </div>
 
@@ -1918,7 +2161,7 @@ function ITSIInfoModal({ open, onClose, itsiContentPack, productName }) {
 
                     {pack.label && (
                         <div className="csc-sc4s-info-section">
-                            <h4>📦 {productName ? `${productName} — ` : ''}Content Pack</h4>
+                            <h4>{productName ? `${productName} — ` : ''}Content Pack</h4>
                             <table className="csc-sc4s-info-table">
                                 <tbody>
                                     <tr>
@@ -1945,24 +2188,24 @@ function ITSIInfoModal({ open, onClose, itsiContentPack, productName }) {
                     )}
 
                     <div className="csc-sc4s-info-section">
-                        <h4>✅ Best Practices</h4>
+                        <h4>Best Practices</h4>
                         <div className="csc-sc4s-info-bp">
                             <div className="csc-sc4s-info-bp-item csc-sc4s-info-bp-good">
-                                <span className="csc-sc4s-info-bp-marker">📊</span>
+                                <span className="csc-sc4s-info-bp-marker"></span>
                                 <div>
                                     <strong>Install the TA First</strong>
                                     <p>Content Packs depend on the Technology Add-on (TA) for data collection and CIM-compliant field extractions. Ensure the TA is installed and data is flowing before importing the content pack.</p>
                                 </div>
                             </div>
                             <div className="csc-sc4s-info-bp-item csc-sc4s-info-bp-good">
-                                <span className="csc-sc4s-info-bp-marker">🔑</span>
+                                <span className="csc-sc4s-info-bp-marker"></span>
                                 <div>
                                     <strong>Use the Content Library</strong>
                                     <p>Import content packs via ITSI's Content Library (Configuration → Content Library), not by installing them as Splunk apps. This ensures proper service template creation.</p>
                                 </div>
                             </div>
                             <div className="csc-sc4s-info-bp-item csc-sc4s-info-bp-good">
-                                <span className="csc-sc4s-info-bp-marker">📋</span>
+                                <span className="csc-sc4s-info-bp-marker"></span>
                                 <div>
                                     <strong>Customize Thresholds</strong>
                                     <p>Content Pack KPIs come with default thresholds. After initial deployment, tune thresholds to match your environment's baseline using ITSI's adaptive thresholding capabilities.</p>
@@ -1993,21 +2236,21 @@ function ITSIInfoModal({ open, onClose, itsiContentPack, productName }) {
 // ────────────────────  ES INFO MODAL  ──────────────────────────────
 
 const CIM_MODEL_LABELS = {
-    Alerts: '🔔 Alerts',
-    Authentication: '🔑 Authentication',
-    Certificates: '📜 Certificates',
-    Change: '🔄 Change',
-    DLP: '🛡️ DLP',
-    Email: '📧 Email',
-    Endpoint: '💻 Endpoint',
-    Intrusion_Detection: '🚨 Intrusion Detection',
-    Malware: '🦠 Malware',
-    Network_Resolution: '🌐 Network Resolution (DNS)',
-    Network_Sessions: '📡 Network Sessions',
-    Network_Traffic: '🔀 Network Traffic',
-    Threat_Intelligence: '🧠 Threat Intelligence',
-    Vulnerabilities: '🔓 Vulnerabilities',
-    Web: '🌍 Web',
+    Alerts: 'Alerts',
+    Authentication: 'Authentication',
+    Certificates: 'Certificates',
+    Change: 'Change',
+    DLP: 'DLP',
+    Email: 'Email',
+    Endpoint: 'Endpoint',
+    Intrusion_Detection: 'Intrusion Detection',
+    Malware: 'Malware',
+    Network_Resolution: 'Network Resolution (DNS)',
+    Network_Sessions: 'Network Sessions',
+    Network_Traffic: 'Network Traffic',
+    Threat_Intelligence: 'Threat Intelligence',
+    Vulnerabilities: 'Vulnerabilities',
+    Web: 'Web',
 };
 
 function ESInfoModal({ open, onClose, productName, cimDataModels, escuStories, escuDetectionCount, escuDetections }) {
@@ -2024,7 +2267,7 @@ function ESInfoModal({ open, onClose, productName, cimDataModels, escuStories, e
         <Modal open returnFocus={returnFocusRef} onRequestClose={onClose} style={{ maxWidth: '860px', width: '92vw' }}>
             <Modal.Header title="Enterprise Security Compatibility" />
             <Modal.Body>
-                <div className="csc-sc4s-info">
+                <div className="csc-sc4s-info" style={{ '--info-accent': '#455a64' }}>
                     <div className="csc-sc4s-info-hero">
                         <div className="csc-sc4s-info-hero-icon"></div>
                         <div className="csc-sc4s-info-hero-text">
@@ -2042,7 +2285,7 @@ function ESInfoModal({ open, onClose, productName, cimDataModels, escuStories, e
                     {/* CIM Data Models */}
                     {models.length > 0 && (
                         <div className="csc-sc4s-info-section">
-                            <h4>📊 CIM Data Models</h4>
+                            <h4>CIM Data Models</h4>
                             <p style={{ marginBottom: '10px', fontSize: '13px' }}>
                                 The add-on tags events into these CIM data models, making them immediately usable by ES:
                             </p>
@@ -2057,14 +2300,14 @@ function ESInfoModal({ open, onClose, productName, cimDataModels, escuStories, e
                     {/* ESCU Analytic Stories */}
                     {stories.length > 0 && (
                         <div className="csc-sc4s-info-section">
-                            <h4>📖 ESCU Analytic Stories</h4>
+                            <h4>ESCU Analytic Stories</h4>
                             <p style={{ marginBottom: '10px', fontSize: '13px' }}>
                                 Enterprise Security Content Update ships these analytic stories with curated detection rules:
                             </p>
                             <div className="csc-es-stories">
                                 {stories.map(s => (
                                     <div key={s} className="csc-es-story-item">
-                                        <span className="csc-es-story-icon">📕</span>
+                                        <span className="csc-es-story-icon"></span>
                                         <span>{s}</span>
                                     </div>
                                 ))}
@@ -2075,7 +2318,7 @@ function ESInfoModal({ open, onClose, productName, cimDataModels, escuStories, e
                     {/* Detection Count + Expandable List */}
                     {hasEscu && (
                         <div className="csc-sc4s-info-section">
-                            <h4>🔍 ESCU Detections ({detCount})</h4>
+                            <h4>ESCU Detections ({detCount})</h4>
                             <p style={{ marginBottom: '10px', fontSize: '13px' }}>
                                 Pre-built detection searches that run as correlation searches in ES:
                             </p>
@@ -2098,7 +2341,7 @@ function ESInfoModal({ open, onClose, productName, cimDataModels, escuStories, e
 
                     {/* How it works */}
                     <div className="csc-sc4s-info-section">
-                        <h4>🔧 How It Works</h4>
+                        <h4>How It Works</h4>
                         <div className="csc-sc4s-info-grid">
                             <div className="csc-sc4s-info-card">
                                 <span className="csc-sc4s-info-card-icon"></span>
@@ -2126,17 +2369,17 @@ function ESInfoModal({ open, onClose, productName, cimDataModels, escuStories, e
                     </div>
 
                     <div className="csc-sc4s-info-section">
-                        <h4>✅ Best Practices</h4>
+                        <h4>Best Practices</h4>
                         <div className="csc-sc4s-info-bp">
                             <div className="csc-sc4s-info-bp-item csc-sc4s-info-bp-good">
-                                <span className="csc-sc4s-info-bp-marker">📊</span>
+                                <span className="csc-sc4s-info-bp-marker"></span>
                                 <div>
                                     <strong>Accelerate CIM Data Models</strong>
                                     <p>In ES, go to Settings → Data Models and ensure the relevant CIM models are accelerated. ES relies on accelerated data models for performant correlation searches.</p>
                                 </div>
                             </div>
                             <div className="csc-sc4s-info-bp-item csc-sc4s-info-bp-good">
-                                <span className="csc-sc4s-info-bp-marker">🔌</span>
+                                <span className="csc-sc4s-info-bp-marker"></span>
                                 <div>
                                     <strong>Install the Add-on First</strong>
                                     <p>The Technology Add-on (TA) provides the CIM field extractions and tag mappings. Install it on search heads (and indexers if needed) before configuring ES.</p>
@@ -2144,7 +2387,7 @@ function ESInfoModal({ open, onClose, productName, cimDataModels, escuStories, e
                             </div>
                             {hasEscu && (
                                 <div className="csc-sc4s-info-bp-item csc-sc4s-info-bp-good">
-                                    <span className="csc-sc4s-info-bp-marker">📦</span>
+                                    <span className="csc-sc4s-info-bp-marker"></span>
                                     <div>
                                         <strong>Keep ESCU Updated</strong>
                                         <p>Splunk releases monthly ESCU updates with new detections. Keep the Enterprise Security Content Update app current to get the latest Cisco-specific detection rules.</p>
@@ -2292,7 +2535,6 @@ function LegacyAuditModal({ open, onClose, legacyUids, installedApps, indexerApp
                 {allApps.length === 0
                     ? (
                         <div style={{ padding: '20px', textAlign: 'center' }}>
-                            <span style={{ fontSize: '48px' }}>✅</span>
                             <p style={{ fontSize: '16px', fontWeight: 600, marginTop: '12px' }}>No legacy apps detected!</p>
                         </div>
                     )
@@ -2347,7 +2589,7 @@ function LegacyAuditModal({ open, onClose, legacyUids, installedApps, indexerApp
                             {/* ── Archived Legacy Apps — CRITICAL ── */}
                             <div className="csc-legacy-section" style={{ marginTop: '20px' }}>
                                 <div className="csc-legacy-section-header csc-legacy-section-archived">
-                                    <span>⚠️ Archived on Splunkbase ({archivedApps.length})</span>
+                                    <span>Archived on Splunkbase ({archivedApps.length})</span>
                                     <span className="csc-legacy-section-hint">No longer available for download — dangerous to leave installed</span>
                                 </div>
                                 {archivedApps.length > 0
@@ -2476,7 +2718,7 @@ function FeedbackModal({ open, onClose }) {
 function FeedbackTab({ onClick }) {
     return (
         <button className="scan-feedback-tab" onClick={onClick} title="Give Feedback">
-            <span className="scan-feedback-tab-icon">💬</span>
+            <span className="scan-feedback-tab-icon"></span>
             <span className="scan-feedback-tab-text">Give Feedback</span>
         </button>
     );
@@ -2585,7 +2827,7 @@ function InfoTooltip({ placement = 'bottom', width = 500, delay = 400, content, 
                                 onClick={(e) => { e.stopPropagation(); setPinned(p => !p); }}
                                 title={pinned ? 'Unpin' : 'Pin to keep open'}
                             >
-                                📌
+                                ⊞
                             </span>
                             {pinned && (
                                 <span
@@ -2709,24 +2951,26 @@ function ProductCard({ product, installedApps, appStatuses, indexerApps, sourcet
     if (app_viz) depItems.push({ label: 'Viz App', installed: !!vizAppStatus?.installed });
     if (app_viz_2) depItems.push({ label: 'Viz App 2', installed: !!vizApp2Status?.installed });
     if (sc4s_supported && !addon) depItems.push({ label: 'SC4S', installed: true, sc4sOnly: true });
-    if (sc4s_supported && addon) depItems.push({ label: 'SC4S', installed: true });
+    // SC4S not shown on collapsed card when addon is present — addon is the primary path
     if (netflow_supported) depItems.push({ label: 'NetFlow', installed: !!netflowAddonStatus?.installed });
     const allDeps = [...depItems];
     const depsMissing = allDeps.filter(d => !d.installed).length;
     const hasDeps = allDeps.length > 0;
 
     // Launch handlers
-    const handleLaunchDefault = () => {
+    const productDashboards = product.dashboards || (product.dashboard ? [product.dashboard] : []);
+    const handleLaunchDashboard = (dash) => {
         const launchTarget = app_viz || addon;
-        if (launchTarget && (vizAppStatus?.installed || appStatus?.installed)) {
-            const dash = product.dashboard || '';
-            if (dash) {
-                const dashApp = app_viz || addon || launchTarget;
-                window.open(createURL(`/app/${dashApp}/${dash}`), '_blank');
-            } else {
-                window.open(createURL(`/app/${launchTarget}/`), '_blank');
-            }
+        if (!launchTarget || !(vizAppStatus?.installed || appStatus?.installed)) return;
+        if (dash) {
+            const dashApp = app_viz || addon || launchTarget;
+            window.open(createURL(`/app/${dashApp}/${dash}`), '_blank');
+        } else {
+            window.open(createURL(`/app/${launchTarget}/`), '_blank');
         }
+    };
+    const handleLaunchDefault = () => {
+        handleLaunchDashboard(productDashboards[0] || '');
     };
     const handleLaunchCustom = () => {
         let cd = (product.custom_dashboard || '').trim();
@@ -2827,7 +3071,7 @@ function ProductCard({ product, installedApps, appStatuses, indexerApps, sourcet
             )}
             {/* ── Add-on Archived ribbon ── */}
             {status === 'deprecated' && !cisco_retired && !coverage_gap && !is_new && (
-                <div className="csc-deprecated-ribbon" aria-label="Add-on archived">⚠ ADD-ON ARCHIVED</div>
+                <div className="csc-deprecated-ribbon" aria-label="Add-on archived">ADD-ON ARCHIVED</div>
             )}
             {/* ── Header: icon + name + tagline + configured badge + info tooltip ── */}
             <div className="csc-card-header">
@@ -2950,7 +3194,7 @@ function ProductCard({ product, installedApps, appStatuses, indexerApps, sourcet
                         <span className="csc-dep-summary-icons">
                             {depItems.map((d) => (
                                 <span key={d.label} className={d.sc4sOnly ? 'csc-dep-chip-sc4s' : d.installed ? 'csc-dep-chip-ok' : 'csc-dep-chip-miss'}>
-                                    {d.sc4sOnly ? '📡' : d.installed ? '✓' : '✗'} {d.label}
+                                    {d.sc4sOnly ? 'SC4S' : d.installed ? '✓' : '✗'} {d.label}
                                 </span>
                             ))}
                         </span>
@@ -3016,10 +3260,11 @@ function ProductCard({ product, installedApps, appStatuses, indexerApps, sourcet
                                 </div>
                                 {/* Tier deployment chips for add-on */}
                                 <div className="scan-tier-chips">
-                                    <span className={`scan-tier-chip ${appStatus?.installed ? 'scan-tier-ok' : 'scan-tier-miss'}`} title={appStatus?.installed ? `Search Head: v${appStatus.version || ''}` : 'Not installed on Search Head'}>
-                                        <CylinderMagnifier size={12} /> Search Head {appStatus?.installed ? '✓' : '✗'}
-                                    </span>
                                     {hasIndexerPeers ? (
+                                        <>
+                                        <span className={`scan-tier-chip ${appStatus?.installed ? 'scan-tier-ok' : 'scan-tier-miss'}`} title={appStatus?.installed ? `Search Head: v${appStatus.version || ''}` : 'Not installed on Search Head'}>
+                                            <CylinderMagnifier size={12} /> Search Head {appStatus?.installed ? '✓' : '✗'}
+                                        </span>
                                         <span className={`scan-tier-chip ${
                                             idxTierState === 'deployed' ? 'scan-tier-ok' :
                                             idxTierState === 'disabled' ? 'scan-tier-alert' :
@@ -3037,9 +3282,10 @@ function ProductCard({ product, installedApps, appStatuses, indexerApps, sourcet
                                                 idxTierState === 'mismatch' ? '≠' : '✗'
                                             }
                                         </span>
+                                        </>
                                     ) : (
-                                        <span className="scan-tier-chip scan-tier-na" title={product.sourcetypes && product.sourcetypes.length > 0 ? 'No indexer peers detected — standalone deployment — Click to audit props.conf' : 'No indexer peers detected — standalone deployment'} onClick={product.sourcetypes && product.sourcetypes.length > 0 ? (e) => { e.stopPropagation(); e.preventDefault(); setMagicSixOpen(true); } : undefined} style={product.sourcetypes && product.sourcetypes.length > 0 ? { cursor: 'pointer' } : undefined}>
-                                            <CylinderIndex size={12} /> Indexers —
+                                        <span className={`scan-tier-chip ${appStatus?.installed ? 'scan-tier-ok' : 'scan-tier-miss'}`} title={appStatus?.installed ? `Standalone: v${appStatus.version || ''} — Click to audit props.conf` : 'Not installed'} onClick={product.sourcetypes && product.sourcetypes.length > 0 ? (e) => { e.stopPropagation(); e.preventDefault(); setMagicSixOpen(true); } : undefined} style={product.sourcetypes && product.sourcetypes.length > 0 ? { cursor: 'pointer' } : undefined}>
+                                            <CylinderMagnifier size={12} /> Search Head {appStatus?.installed ? '✓' : '✗'}
                                         </span>
                                     )}
                                     <span className="scan-tier-chip scan-tier-info" title="Deploy to Heavy Forwarders if using syslog or HEC inputs — Click for details" onClick={(e) => { e.stopPropagation(); e.preventDefault(); setHfInfoOpen(true); }} style={{ cursor: 'pointer' }}>
@@ -3169,6 +3415,7 @@ function ProductCard({ product, installedApps, appStatuses, indexerApps, sourcet
                                 <hr className="csc-dep-divider" />
                                 <div className="scan-sc4s-inline">
                                     <span className="scan-sc4s-inline-label">SC4S Compatible</span>
+                                    {addon && <span className="scan-sc4s-precedence-note">Optional — Add-on is the primary ingestion path</span>}
                                     {sc4s_url && (
                                         <a href={sc4s_url} target="_blank" rel="noopener noreferrer" className="csc-split-pill-seg csc-split-pill-sc4s" title="SC4S setup documentation">
                                             SC4S Docs
@@ -3178,7 +3425,7 @@ function ProductCard({ product, installedApps, appStatuses, indexerApps, sourcet
                                 {hasDifferentSc4sTa && sc4s_search_head_ta && (
                                     <div className="scan-sc4s-ta-note">
                                         <span className="csc-dep-detail">
-                                            SC4S path uses <strong>{sc4s_search_head_ta_label || sc4s_search_head_ta}</strong> instead of {addon_label || addon}
+                                            SC4S path may need <strong>{sc4s_search_head_ta_label || sc4s_search_head_ta}</strong> for full CIM coverage
                                             {sc4s_search_head_ta_splunkbase_id && (
                                                 <a href={generateSplunkbaseUrl(sc4s_search_head_ta_splunkbase_id)} target="_blank" rel="noopener noreferrer" className="csc-split-pill-seg" title="View on Splunkbase" style={{marginLeft: 6}}>
                                                     Splunkbase
@@ -3187,7 +3434,7 @@ function ProductCard({ product, installedApps, appStatuses, indexerApps, sourcet
                                             {sc4sShTaStatus?.installed && (
                                                 <span className="csc-dep-version" style={{marginLeft: 4}}>v{sc4sShTaStatus.version}</span>
                                             )}
-                                            {sc4sShTaStatus && !sc4sShTaStatus.installed && (
+                                            {!addon && sc4sShTaStatus && !sc4sShTaStatus.installed && (
                                                 <span className="csc-dep-status-missing" style={{marginLeft: 4}}>not installed</span>
                                             )}
                                         </span>
@@ -3531,7 +3778,7 @@ function ProductCard({ product, installedApps, appStatuses, indexerApps, sourcet
                         title={!addon_install_url
                             ? `Not available in Browse More Apps — download ${addon_label || addon} from Splunkbase`
                             : `Install ${addon_label || addon}`}>
-                        'Add-on'
+                        Add-on
                     </a>
                 )}
                 {/* Install Viz App */}
@@ -3542,7 +3789,7 @@ function ProductCard({ product, installedApps, appStatuses, indexerApps, sourcet
                         title={!app_viz_install_url
                             ? `Not available in Browse More Apps — download ${app_viz_label || app_viz} from Splunkbase`
                             : `Install ${app_viz_label || app_viz}`}>
-                        'App'
+                        App
                     </a>
                 )}
                 {/* Install Viz App 2 */}
@@ -3553,7 +3800,7 @@ function ProductCard({ product, installedApps, appStatuses, indexerApps, sourcet
                         title={!app_viz_2_install_url
                             ? `Not available in Browse More Apps — download ${app_viz_2_label || app_viz_2} from Splunkbase`
                             : `Install ${app_viz_2_label || app_viz_2}`}>
-                        'App 2'
+                        App 2
                     </a>
                 )}
                 {/* Launch — split button when custom dashboard exists */}
@@ -3573,11 +3820,19 @@ function ProductCard({ product, installedApps, appStatuses, indexerApps, sourcet
                         {launchMenuOpen && ReactDOM.createPortal(
                             <div className="csc-launch-menu" ref={launchMenuRef}
                                 style={{ top: launchMenuPos.top, left: launchMenuPos.left }}>
-                                <button className="csc-launch-menu-item" onClick={() => { handleLaunchDefault(); setLaunchMenuOpen(false); }}>
-                                    {product.dashboard
-                                        ? product.dashboard.replace(/_/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase())
-                                        : (app_viz_label || addon_label || 'Default Dashboard')}
-                                </button>
+                                {productDashboards.length > 1 ? (
+                                    productDashboards.map((dash, i) => (
+                                        <button key={dash} className="csc-launch-menu-item" onClick={() => { handleLaunchDashboard(dash); setLaunchMenuOpen(false); }}>
+                                            {dash.replace(/_/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase())}
+                                        </button>
+                                    ))
+                                ) : (
+                                    <button className="csc-launch-menu-item" onClick={() => { handleLaunchDefault(); setLaunchMenuOpen(false); }}>
+                                        {productDashboards[0]
+                                            ? productDashboards[0].replace(/_/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase())
+                                            : (app_viz_label || addon_label || 'Default Dashboard')}
+                                    </button>
+                                )}
                                 {product.custom_dashboard && (
                                     <button className="csc-launch-menu-item" onClick={() => { handleLaunchCustom(); setLaunchMenuOpen(false); }}>
                                         Custom: {product.custom_dashboard.split('/').pop()}
@@ -3673,9 +3928,9 @@ function ProductCard({ product, installedApps, appStatuses, indexerApps, sourcet
 
             {/* ── SC4S / NetFlow / HF / SOAR / ITSI Modals (rendered outside details so they can open from header) ── */}
             {sc4s_url && <SC4SInfoModal open={sc4sInfoOpen} onClose={() => setSc4sInfoOpen(false)} />}
-            {netflow_supported && <NetFlowInfoModal open={netflowInfoOpen} onClose={() => setNetflowInfoOpen(false)} />}
+            {netflow_supported && <NetFlowInfoModal open={netflowInfoOpen} onClose={() => setNetflowInfoOpen(false)} installedApps={installedApps} />}
             <HFInfoModal open={hfInfoOpen} onClose={() => setHfInfoOpen(false)} isCloud={platformType === 'cloud'} />
-            <MagicSixModal open={magicSixOpen} onClose={() => setMagicSixOpen(false)} sourcetypes={product.sourcetypes} productName={display_name} addonApp={addon} />
+            <MagicSixModal open={magicSixOpen} onClose={() => setMagicSixOpen(false)} sourcetypes={product.sourcetypes} productName={display_name} addonApp={addon} addonLabel={addon_label} appViz={app_viz} appViz2={app_viz_2} installedApps={installedApps} indexerApps={indexerApps} />
             {hasSoar && <SOARInfoModal open={soarInfoOpen} onClose={() => setSoarInfoOpen(false)} soarConnectorUids={soar_connector_uids} splunkbaseData={splunkbaseData} productName={display_name} />}
             {hasItsi && <ITSIInfoModal open={itsiInfoOpen} onClose={() => setItsiInfoOpen(false)} itsiContentPack={itsi_content_pack} productName={display_name} />}
             {hasEs && <ESInfoModal open={esInfoOpen} onClose={() => setEsInfoOpen(false)} productName={display_name} cimDataModels={es_cim_data_models} escuStories={escu_analytic_stories} escuDetectionCount={escu_detection_count} escuDetections={escu_detections} />}
@@ -4167,7 +4422,7 @@ function ConfigViewerModal({ open, onClose, products, initialProductId, installe
 
     return (
         <Modal open returnFocus={returnFocusRef} onRequestClose={onClose} style={{ maxWidth: '900px', width: '92vw' }}>
-            <Modal.Header title="⚙️ Config Viewer — Developer Mode" />
+            <Modal.Header title="Config Viewer — Developer Mode" />
             <Modal.Body>
                 <div className="csc-devmode-controls">
                     <select
@@ -4186,7 +4441,7 @@ function ConfigViewerModal({ open, onClose, products, initialProductId, installe
                         <button
                             className={`csc-devmode-tab ${viewMode === 'tree' ? 'csc-devmode-tab-active' : ''}`}
                             onClick={() => setViewMode('tree')}
-                        >🌳 Tree</button>
+                        >Tree</button>
                         <button
                             className={`csc-devmode-tab ${viewMode === 'json' ? 'csc-devmode-tab-active' : ''}`}
                             onClick={() => setViewMode('json')}
@@ -4198,10 +4453,10 @@ function ConfigViewerModal({ open, onClose, products, initialProductId, installe
                         <button
                             className={`csc-devmode-tab ${viewMode === 'conf' ? 'csc-devmode-tab-active' : ''}`}
                             onClick={() => setViewMode('conf')}
-                        >🔧 Splunk</button>
+                        >Splunk</button>
                     </div>
                     <button className="csc-devmode-copy" onClick={handleCopy}>
-                        {copied ? '✓ Copied!' : '📋 Copy'}
+                        {copied ? '✓ Copied!' : 'Copy'}
                     </button>
                 </div>
                 {viewMode === 'tree' && (
@@ -4597,6 +4852,7 @@ function FilterDrawer({
     showFullPortfolio, versionFilterMode, onToggleVersionFilterMode,
     platformFilterMode, onTogglePlatformFilterMode,
     appidToUidMap,
+    onResetAll,
 }) {
     /* ── Helper: apply platform/version compat filters ── */
     const applyCompatFilters = (list) => {
@@ -4605,6 +4861,7 @@ function FilterDrawer({
             if (platformFilterMode === 'include') {
                 result = result.filter((p) => {
                     const uids = getAllProductUids(p, appidToUidMap);
+                    if (uids.length === 0) return true; // no Splunkbase apps = pass through
                     return uids.some(uid => {
                         const entry = splunkbaseData[uid];
                         if (!entry || !entry.product_compatibility) return false;
@@ -4627,25 +4884,9 @@ function FilterDrawer({
         }
         if (versionFilter.length > 0 && splunkbaseData && Object.keys(splunkbaseData).length > 0) {
             if (versionFilterMode === 'include') {
-                result = result.filter((p) => {
-                    const uids = getAllProductUids(p, appidToUidMap);
-                    return uids.some(uid => {
-                        const entry = splunkbaseData[uid];
-                        if (!entry || !entry.version_compatibility) return false;
-                        const versions = entry.version_compatibility.split(/[|,]/).map(v => v.trim());
-                        return versionFilter.some(vf => versions.includes(vf));
-                    });
-                });
+                result = result.filter((p) => productSupportsVersions(p, versionFilter, splunkbaseData, appidToUidMap));
             } else {
-                result = result.filter((p) => {
-                    const uids = getAllProductUids(p, appidToUidMap);
-                    return !uids.some(uid => {
-                        const entry = splunkbaseData[uid];
-                        if (!entry || !entry.version_compatibility) return false;
-                        const versions = entry.version_compatibility.split(/[|,]/).map(v => v.trim());
-                        return versionFilter.some(vf => versions.includes(vf));
-                    });
-                });
+                result = result.filter((p) => !productSupportsVersions(p, versionFilter, splunkbaseData, appidToUidMap));
             }
         }
         return result;
@@ -5093,6 +5334,18 @@ function FilterDrawer({
                             </div>
                         </div>
                     )}
+
+                    {/* ── Reset All Filters ── */}
+                    <div className="scan-drawer-divider" />
+                    <div style={{ padding: '8px 0 4px' }}>
+                        <button
+                            className="scan-drawer-reset-btn"
+                            onClick={onResetAll}
+                            title="Reset all filters back to factory defaults"
+                        >
+                            Reset Filters
+                        </button>
+                    </div>
                 </div>
             </div>
         </>
@@ -5132,10 +5385,10 @@ function ActiveFilterChips({
             chips.push({ label: labels[level] || level, onRemove: () => onSelectSupportLevel(level) });
         });
     }
-    if (!showRetired) chips.push({ label: 'Hide Retired', onRemove: () => onToggleShowRetired(true) });
-    if (!showDeprecated) chips.push({ label: 'Hide Deprecated', onRemove: () => onToggleShowDeprecated(true) });
-    if (!showComingSoon) chips.push({ label: 'Hide Coming Soon', onRemove: () => onToggleShowComingSoon(true) });
-    if (!showGtmRoadmap) chips.push({ label: 'Hide GTM Roadmap', onRemove: () => onToggleShowGtmRoadmap(true) });
+    if (showRetired) chips.push({ label: 'Show Retired', onRemove: () => onToggleShowRetired(false) });
+    if (showDeprecated) chips.push({ label: 'Show Deprecated', onRemove: () => onToggleShowDeprecated(false) });
+    if (showComingSoon) chips.push({ label: 'Show Coming Soon', onRemove: () => onToggleShowComingSoon(false) });
+    if (showGtmRoadmap) chips.push({ label: 'Show GTM Roadmap', onRemove: () => onToggleShowGtmRoadmap(false) });
     if (streamFilter) chips.push({ label: 'NetFlow', onRemove: () => onToggleStreamFilter(false) });
     if (sc4sFilter) chips.push({ label: 'SC4S', onRemove: () => onToggleSc4sFilter(false) });
     if (platformFilter.length > 0) {
@@ -5155,10 +5408,10 @@ function ActiveFilterChips({
     const clearAll = () => {
         if (crossCutLabels[selectedCategory]) onSelectCategory(null);
         onSelectSupportLevel(null);
-        onToggleShowRetired(true);
-        onToggleShowDeprecated(true);
-        onToggleShowComingSoon(true);
-        onToggleShowGtmRoadmap(true);
+        onToggleShowRetired(false);
+        onToggleShowDeprecated(false);
+        onToggleShowComingSoon(false);
+        onToggleShowGtmRoadmap(false);
         onToggleStreamFilter(false);
         onToggleSc4sFilter(false);
         onSelectPlatform(null);
@@ -5285,12 +5538,12 @@ function PersonaModal({ open, onClose, onSelectPersona, products }) {
 
     return (
         <Modal open returnFocus={returnFocusRef} onRequestClose={onClose} style={{ maxWidth: '780px', width: '92vw' }}>
-            <Modal.Header title="👤 Quick Start — Choose Your Role" />
+            <Modal.Header title="Quick Start — Choose Your Role" />
             <Modal.Body>
                 <div className="csc-persona-intro">
                     Select your primary role to personalize your view. We'll filter to the most relevant products
                     and pre-add top recommendations to <strong>My Products</strong>.
-                    <span className="csc-persona-intro-hint">You can change this anytime via the 👤 button in the header.</span>
+                    <span className="csc-persona-intro-hint">You can change this anytime via the role button in the header.</span>
                 </div>
                 <div className="csc-persona-grid">
                     {PERSONA_PRESETS.map((preset) => {
@@ -5302,7 +5555,11 @@ function PersonaModal({ open, onClose, onSelectPersona, products }) {
                                 onClick={() => handleSelect(preset)}
                                 style={{ '--persona-color': preset.color }}
                             >
-                                <span className="csc-persona-icon">{preset.icon}</span>
+                                <span className="csc-persona-icon">
+                                    {preset.icon
+                                        ? React.createElement('img', { src: createURL(`/static/app/${APP_ID}/icons/${preset.icon}.svg`), alt: '', style: { width: '36px', height: '36px' } })
+                                        : '🔍'}
+                                </span>
                                 <span className="csc-persona-title">{preset.title}</span>
                                 <span className="csc-persona-desc">{preset.description}</span>
                                 {matchCount > 0 && (
@@ -5340,6 +5597,7 @@ function CategoryFilterBar({
             if (platformFilterMode === 'include') {
                 result = result.filter((p) => {
                     const uids = getAllProductUids(p, appidToUidMap);
+                    if (uids.length === 0) return true; // no Splunkbase apps = pass through
                     return uids.some(uid => {
                         const entry = splunkbaseData[uid];
                         if (!entry || !entry.product_compatibility) return false;
@@ -5362,25 +5620,9 @@ function CategoryFilterBar({
         }
         if (versionFilter.length > 0 && splunkbaseData && Object.keys(splunkbaseData).length > 0) {
             if (versionFilterMode === 'include') {
-                result = result.filter((p) => {
-                    const uids = getAllProductUids(p, appidToUidMap);
-                    return uids.some(uid => {
-                        const entry = splunkbaseData[uid];
-                        if (!entry || !entry.version_compatibility) return false;
-                        const versions = entry.version_compatibility.split(/[|,]/).map(v => v.trim());
-                        return versionFilter.some(vf => versions.includes(vf));
-                    });
-                });
+                result = result.filter((p) => productSupportsVersions(p, versionFilter, splunkbaseData, appidToUidMap));
             } else {
-                result = result.filter((p) => {
-                    const uids = getAllProductUids(p, appidToUidMap);
-                    return !uids.some(uid => {
-                        const entry = splunkbaseData[uid];
-                        if (!entry || !entry.version_compatibility) return false;
-                        const versions = entry.version_compatibility.split(/[|,]/).map(v => v.trim());
-                        return versionFilter.some(vf => versions.includes(vf));
-                    });
-                });
+                result = result.filter((p) => !productSupportsVersions(p, versionFilter, splunkbaseData, appidToUidMap));
             }
         }
         return result;
@@ -5388,6 +5630,7 @@ function CategoryFilterBar({
 
     // Cisco official category SVG icons
     const catIconMap = { security: 'cat-security', observability: 'cat-observability', networking: 'cat-networking', collaboration: 'cat-collaboration' };
+    const isDark = document.documentElement.classList.contains('dce-dark');
     const renderCatIcon = (catId, active) => {
         const svgName = catIconMap[catId];
         if (!svgName) return null;
@@ -5395,15 +5638,15 @@ function CategoryFilterBar({
             src: createURL(`/static/app/${APP_ID}/icons/${svgName}.svg`),
             alt: '',
             className: 'csc-filter-pill-icon',
-            style: { width: '18px', height: '18px', filter: active ? 'brightness(0) saturate(100%) invert(15%) sepia(70%) saturate(6000%) hue-rotate(200deg)' : 'none', transition: 'filter 0.2s' },
+            style: { width: '18px', height: '18px', filter: active ? (isDark ? 'brightness(0.15)' : 'brightness(0) invert(1)') : 'none', transition: 'filter 0.2s' },
         });
     };
     const btnStyle = (active) => ({
         display: 'flex', alignItems: 'center', gap: '6px', whiteSpace: 'nowrap',
         padding: '7px 14px', borderRadius: '9999px', border: '1px solid',
-        borderColor: active ? '#02C8FF' : '#E5E7EB',
-        background: active ? '#02C8FF' : '#FFFFFF',
-        color: active ? '#fff' : 'var(--page-color, #333)',
+        borderColor: active ? (isDark ? '#ffffff' : '#314257') : '#E5E7EB',
+        background: active ? (isDark ? '#ffffff' : '#314257') : '#FFFFFF',
+        color: active ? (isDark ? '#1a1f24' : '#fff') : 'var(--page-color, #333)',
         boxShadow: 'none',
         cursor: 'pointer', fontWeight: 600, fontSize: '13px',
         transition: 'all 0.2s', flexShrink: 0,
@@ -5419,7 +5662,8 @@ function CategoryFilterBar({
                 {totalCount != null && (
                     <span style={{
                         fontSize: '10px',
-                        background: !selectedCategory ? 'rgba(255,255,255,0.3)' : 'var(--version-bg, #e8e8e8)',
+                        background: !selectedCategory ? '#536070' : 'var(--version-bg, #e8e8e8)',
+                        color: !selectedCategory ? '#fff' : undefined,
                         padding: '1px 6px', borderRadius: '10px',
                     }}>
                         {totalCount}
@@ -5434,7 +5678,8 @@ function CategoryFilterBar({
                         {categoryCounts?.[cat.id] != null && (
                             <span style={{
                                 fontSize: '10px',
-                                background: active ? 'rgba(255,255,255,0.3)' : 'var(--version-bg, #e8e8e8)',
+                                background: active ? '#536070' : 'var(--version-bg, #e8e8e8)',
+                                color: active ? '#fff' : undefined,
                                 padding: '1px 6px', borderRadius: '10px',
                             }}>
                                 {categoryCounts[cat.id]}
@@ -5462,16 +5707,18 @@ function CategoryFilterBar({
             const subs = SUB_CATEGORIES[selectedCategory];
             const base = applyCompatFilters(products || []);
             const catProducts = base.filter(p => p.category === selectedCategory);
+            // Faceted counts: subcategory counts respect AI filter, AI count respects subcategory
+            const countBase = aiFilter ? catProducts.filter(p => p.ai_enabled) : catProducts;
             const subCounts = {};
-            subs.forEach(s => { subCounts[s.id] = catProducts.filter(p => p.subcategory === s.id).length; });
-            const unassigned = catProducts.filter(p => !p.subcategory || !subs.some(s => s.id === p.subcategory)).length;
-            const hasAnySubs = subs.some(s => subCounts[s.id] > 0);
+            subs.forEach(s => { subCounts[s.id] = countBase.filter(p => p.subcategory === s.id).length; });
+            const unassigned = countBase.filter(p => !p.subcategory || !subs.some(s => s.id === p.subcategory)).length;
+            const hasAnySubs = subs.some(s => subCounts[s.id] > 0) || (!aiFilter && subs.some(s => catProducts.filter(p => p.subcategory === s.id).length > 0));
             if (!hasAnySubs) return null;
             return (
                 <div className="csc-subcategory-bar" style={{ display: 'flex', gap: '6px', marginTop: '8px', paddingLeft: '8px', flexWrap: 'wrap', alignItems: 'center' }}>
                     <span style={{ fontSize: '11px', color: 'var(--faint-color, #888)', fontWeight: 500, marginRight: '4px' }}>Sub:</span>
                     <button onClick={() => onSelectSubCategory(null)} className={`csc-subcategory-pill ${!selectedSubCategory ? 'csc-subcategory-pill-active' : ''}`}>
-                        All <span className="csc-subcategory-count">{catProducts.length}</span>
+                        All <span className="csc-subcategory-count">{countBase.length}</span>
                     </button>
                     {subs.map(sub => {
                         const count = subCounts[sub.id];
@@ -5493,7 +5740,16 @@ function CategoryFilterBar({
                     )}
                     {/* ── AI filter pill ── */}
                     {(() => {
-                        const aiCount = catProducts.filter(p => p.ai_enabled).length;
+                        let aiBase = catProducts;
+                        if (selectedSubCategory) {
+                            if (selectedSubCategory === '__other__') {
+                                const knownSubcats = new Set(subs.map(s => s.id));
+                                aiBase = catProducts.filter(p => !p.subcategory || !knownSubcats.has(p.subcategory));
+                            } else {
+                                aiBase = catProducts.filter(p => p.subcategory === selectedSubCategory);
+                            }
+                        }
+                        const aiCount = aiBase.filter(p => p.ai_enabled).length;
                         if (aiCount === 0) return null;
                         return (
                             <>
@@ -5574,10 +5830,10 @@ function SCANProductsPage() {
     const [advancedFiltersOpen, setAdvancedFiltersOpen] = useState(false);
     const [filterDrawerOpen, setFilterDrawerOpen] = useState(false);
     const [supportLevelFilter, setSupportLevelFilter] = useState([]);
-    const [showRetired, setShowRetired] = useState(true);
-    const [showDeprecated, setShowDeprecated] = useState(true);
-    const [showComingSoon, setShowComingSoon] = useState(true);
-    const [showGtmRoadmap, setShowGtmRoadmap] = useState(true);
+    const [showRetired, setShowRetired] = useState(false);
+    const [showDeprecated, setShowDeprecated] = useState(false);
+    const [showComingSoon, setShowComingSoon] = useState(false);
+    const [showGtmRoadmap, setShowGtmRoadmap] = useState(false);
     const [personaModalOpen, setPersonaModalOpen] = useState(() => {
         try { return localStorage.getItem(PERSONA_STORAGE_KEY) !== 'true'; } catch { return false; }
     });
@@ -5769,7 +6025,7 @@ function SCANProductsPage() {
             setDevMode(prev => {
                 const next = !prev;
                 try { localStorage.setItem(DEVMODE_STORAGE_KEY, String(next)); } catch {}
-                setDevToast(next ? '🛠 Developer Mode ON' : '🛠 Developer Mode OFF');
+                setDevToast(next ? 'Developer Mode ON' : 'Developer Mode OFF');
                 setTimeout(() => setDevToast(null), 2500);
                 return next;
             });
@@ -5979,17 +6235,21 @@ function SCANProductsPage() {
     }, [loading]);
 
     // ── Splunkbase CSV sync handler ──
+    // Runs the "SCAN - Splunkbase Catalog Sync" saved search which:
+    //   1. Downloads the latest CSV from S3 via | downloadsplunkbasecsv
+    //   2. Normalizes and deduplicates the data
+    //   3. Writes the cleaned lookup to scan_splunkbase_apps.csv.gz
+    //   4. Returns a count of entries written
     const handleSyncSplunkbase = useCallback(async () => {
         setCsvSyncStatus('syncing');
-        setCsvSyncMessage('Downloading from S3...');
+        setCsvSyncMessage('Syncing Splunkbase catalog…');
         try {
-            const searchStr = '| downloadsplunkbasecsv input_csv=splunkbase_assets/splunkbase_apps.csv.gz output_csv=scan_splunkbase_apps.csv.gz';
-            // Use app-namespaced endpoint so the custom command is always found
+            const searchStr = '| savedsearch "SCAN - Splunkbase Catalog Sync"';
             const syncEndpoint = `/splunkd/__raw/servicesNS/-/${APP_ID}/search/jobs`;
             const res = await splunkFetch(syncEndpoint, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-                body: `search=${encodeURIComponent(searchStr)}&output_mode=json&exec_mode=oneshot&count=0&timeout=180`,
+                body: `search=${encodeURIComponent(searchStr)}&output_mode=json&exec_mode=oneshot&count=0&timeout=300`,
             });
             if (!res.ok) {
                 setCsvSyncStatus('error');
@@ -5998,10 +6258,11 @@ function SCANProductsPage() {
             }
             const data = await res.json();
             const results = data.results || [];
-            if (results.length > 0 && (results[0].status === 'success' || results[0].status_code === '200' || results[0].bytes_written)) {
+            const entryCount = results.length > 0 ? parseInt(results[0].count, 10) : 0;
+            if (entryCount > 0) {
                 setCsvSyncStatus('success');
-                setCsvSyncMessage(results[0].message || `Downloaded ${results[0].csv_name || 'CSV'} (${results[0].bytes_written || '?'} bytes)`);
-                // Reload the Splunkbase data
+                setCsvSyncMessage(`Catalog synced — ${entryCount.toLocaleString()} apps`);
+                // Reload the Splunkbase data into UI state
                 const reloadSearch = '| inputlookup scan_splunkbase_apps | table uid appid version_compatibility product_compatibility app_version title archive_status';
                 const rRes = await splunkFetch(`/splunkd/__raw/servicesNS/-/${APP_ID}/search/jobs`, {
                     method: 'POST',
@@ -6022,14 +6283,13 @@ function SCANProductsPage() {
                     setSplunkbaseData(lookup);
                     setAppidToUidMap(appidMap);
                     setSplunkbaseLoaded(true);
-                    // console.log(`[SCAN] Reloaded ${Object.keys(lookup).length} Splunkbase entries after sync`);
                 }
             } else {
                 setCsvSyncStatus('error');
-                setCsvSyncMessage(results[0]?.message || 'Download failed');
+                setCsvSyncMessage('Sync returned 0 entries');
             }
         } catch (e) {
-            console.error('[SCAN] Splunkbase sync failed:', e);
+            console.error('[SCAN] Splunkbase catalog sync failed:', e);
             setCsvSyncStatus('error');
             setCsvSyncMessage(e.message || 'Unknown error');
         }
@@ -6118,7 +6378,7 @@ function SCANProductsPage() {
             if (platformFilterMode === 'include') {
                 filtered = filtered.filter((p) => {
                     const uids = getAllProductUids(p, appidToUidMap);
-                    if (uids.length === 0) return false;
+                    if (uids.length === 0) return true; // no Splunkbase apps = pass through
                     return uids.some(uid => {
                         const entry = splunkbaseData[uid];
                         if (!entry || !entry.product_compatibility) return false;
@@ -6140,31 +6400,12 @@ function SCANProductsPage() {
                 });
             }
         }
-        // ── Splunkbase version compatibility filter (multi-select) ──
+        // ── Splunkbase version compatibility filter (addon-first: addon MUST support the version) ──
         if (versionFilter.length > 0 && splunkbaseData && Object.keys(splunkbaseData).length > 0) {
             if (versionFilterMode === 'include') {
-                filtered = filtered.filter((p) => {
-                    const uids = getAllProductUids(p, appidToUidMap);
-                    if (uids.length === 0) return false;
-                    return uids.some(uid => {
-                        const entry = splunkbaseData[uid];
-                        if (!entry || !entry.version_compatibility) return false;
-                        const versions = entry.version_compatibility.split(/[|,]/).map(v => v.trim());
-                        return versionFilter.some(vf => versions.includes(vf));
-                    });
-                });
+                filtered = filtered.filter((p) => productSupportsVersions(p, versionFilter, splunkbaseData, appidToUidMap));
             } else {
-                // Exclude mode: show products that do NOT support the selected version(s)
-                filtered = filtered.filter((p) => {
-                    const uids = getAllProductUids(p, appidToUidMap);
-                    if (uids.length === 0) return true; // no Splunkbase data = keep (can't verify)
-                    return !uids.some(uid => {
-                        const entry = splunkbaseData[uid];
-                        if (!entry || !entry.version_compatibility) return false;
-                        const versions = entry.version_compatibility.split(/[|,]/).map(v => v.trim());
-                        return versionFilter.some(vf => versions.includes(vf));
-                    });
-                });
+                filtered = filtered.filter((p) => !productSupportsVersions(p, versionFilter, splunkbaseData, appidToUidMap));
             }
         }
         return filtered;
@@ -6186,10 +6427,10 @@ function SCANProductsPage() {
         let count = 0;
         if (selectedCategory && crossCutLabels[selectedCategory]) count++;
         if (supportLevelFilter.length > 0) count++;
-        if (!showRetired) count++;
-        if (!showDeprecated) count++;
-        if (!showComingSoon) count++;
-        if (!showGtmRoadmap) count++;
+        if (showRetired) count++;
+        if (showDeprecated) count++;
+        if (showComingSoon) count++;
+        if (showGtmRoadmap) count++;
         if (streamFilter) count++;
         if (sc4sFilter) count++;
         if (platformFilter.length > 0) count++;
@@ -6237,6 +6478,7 @@ function SCANProductsPage() {
         if (platformFilter.length > 0 && splunkbaseData && Object.keys(splunkbaseData).length > 0) {
             base = base.filter((p) => {
                 const uids = getAllProductUids(p, appidToUidMap);
+                if (uids.length === 0) return true; // no Splunkbase apps = pass through
                 return uids.some(uid => {
                     const entry = splunkbaseData[uid];
                     if (!entry || !entry.product_compatibility) return false;
@@ -6246,15 +6488,7 @@ function SCANProductsPage() {
             });
         }
         if (versionFilter.length > 0 && splunkbaseData && Object.keys(splunkbaseData).length > 0) {
-            base = base.filter((p) => {
-                const uids = getAllProductUids(p, appidToUidMap);
-                return uids.some(uid => {
-                    const entry = splunkbaseData[uid];
-                    if (!entry || !entry.version_compatibility) return false;
-                    const versions = entry.version_compatibility.split(/[|,]/).map(v => v.trim());
-                    return versionFilter.some(vf => versions.includes(vf));
-                });
-            });
+            base = base.filter((p) => productSupportsVersions(p, versionFilter, splunkbaseData, appidToUidMap));
         }
         // Apply addon filter so category counts reflect the selected addon
         if (selectedAddon) {
@@ -6358,7 +6592,7 @@ function SCANProductsPage() {
                     {(effectivePlatformType || effectiveSplunkVersion) && (
                         <span className={`scan-util-pill scan-util-platform ${devMode && cloudSimulation ? 'scan-util-cloud-sim' : ''}`} title={
                             devMode && cloudSimulation
-                                ? `☁️ Cloud Simulation — Splunk Cloud v${SIMULATED_CLOUD_VERSION}`
+                                ? `Cloud Simulation — Splunk Cloud v${SIMULATED_CLOUD_VERSION}`
                                 : effectivePlatformType === 'cloud' ? `Splunk Cloud${effectiveSplunkVersion ? ' v' + effectiveSplunkVersion : ''}` : `Splunk Enterprise${effectiveSplunkVersion ? ' v' + effectiveSplunkVersion : ''}`
                         }>
                             <img
@@ -6399,15 +6633,28 @@ function SCANProductsPage() {
                             {themeOverride === 'auto' ? '◐' : themeOverride === 'light' ? '☀' : '☾'}
                         </span>
                     </button>
-                    <button
-                        className={`scan-util-pill scan-util-sync ${csvSyncStatus === 'success' ? 'scan-sync-ok' : csvSyncStatus === 'error' ? 'scan-sync-err' : csvSyncStatus === 'syncing' ? 'scan-sync-busy' : ''}`}
-                        onClick={handleSyncSplunkbase}
-                        disabled={csvSyncStatus === 'syncing'}
-                        title={csvSyncStatus === 'success' ? `✓ ${csvSyncMessage}` : csvSyncStatus === 'error' ? `✗ ${csvSyncMessage}` : csvSyncStatus === 'syncing' ? 'Downloading…' : 'Sync Splunkbase catalog from S3'}
-                        style={{ cursor: csvSyncStatus === 'syncing' ? 'wait' : 'pointer' }}
+                    <InfoTooltip
+                        title="Splunkbase Catalog Sync"
+                        placement="bottom"
+                        width={360}
+                        content={
+                            <div style={{ fontSize: '13px', lineHeight: 1.6 }}>
+                                <p style={{ margin: '0 0 8px' }}>Downloads the latest Splunkbase app catalog from S3, normalizes the data, and updates the local lookup used for version compatibility, platform filters, and ecosystem intelligence.</p>
+                                <p style={{ margin: '0 0 8px' }}>This runs <strong>automatically every night</strong> via a scheduled saved search. Use this button when you need fresh data immediately.</p>
+                                <p style={{ margin: 0, fontSize: '11px', color: 'var(--text-tertiary, #667180)' }}>Saved search: SCAN - Splunkbase Catalog Sync</p>
+                            </div>
+                        }
                     >
-                        Sync
-                    </button>
+                        <button
+                            className={`scan-util-pill scan-util-sync ${csvSyncStatus === 'success' ? 'scan-sync-ok' : csvSyncStatus === 'error' ? 'scan-sync-err' : csvSyncStatus === 'syncing' ? 'scan-sync-busy' : ''}`}
+                            onClick={handleSyncSplunkbase}
+                            disabled={csvSyncStatus === 'syncing'}
+                            title={csvSyncStatus === 'success' ? `✓ ${csvSyncMessage}` : csvSyncStatus === 'error' ? `✗ ${csvSyncMessage}` : csvSyncStatus === 'syncing' ? 'Syncing…' : 'Sync Splunkbase catalog now'}
+                            style={{ cursor: csvSyncStatus === 'syncing' ? 'wait' : 'pointer' }}
+                        >
+                            Sync Catalog
+                        </button>
+                    </InfoTooltip>
                     <button
                         className="scan-util-pill"
                         ref={guideReturnRef}
@@ -6432,14 +6679,14 @@ function SCANProductsPage() {
                             onClick={() => {
                                 setCloudSimulation(prev => {
                                     const next = !prev;
-                                    setDevToast(next ? '☁️ Cloud Simulation ON — v' + SIMULATED_CLOUD_VERSION : '🏢 Cloud Simulation OFF — using real platform');
+                                    setDevToast(next ? 'Cloud Simulation ON — v' + SIMULATED_CLOUD_VERSION : 'Cloud Simulation OFF — using real platform');
                                     setTimeout(() => setDevToast(null), 2500);
                                     return next;
                                 });
                             }}
                             title={cloudSimulation ? `Cloud Simulation ON — Simulating Splunk Cloud v${SIMULATED_CLOUD_VERSION} — click to disable` : 'Simulate Splunk Cloud environment — click to enable'}
                         >
-                            {cloudSimulation ? '☁️ Cloud' : '☁️'}
+                            {cloudSimulation ? 'Cloud' : 'Cloud'}
                         </button>
                         <button
                             className="scan-util-pill scan-util-devmode"
@@ -6584,6 +6831,26 @@ function SCANProductsPage() {
                 onToggleVersionFilterMode={handleVersionFilterModeToggle}
                 platformFilterMode={platformFilterMode}
                 onTogglePlatformFilterMode={handlePlatformFilterModeToggle}
+                onResetAll={() => {
+                    setSelectedCategory(null);
+                    setSelectedSubCategory(null);
+                    setAiFilter(false);
+                    setStreamFilter(false);
+                    setSc4sFilter(false);
+                    setSelectedAddon(null);
+                    setSupportLevelFilter([]);
+                    setShowRetired(false);
+                    setShowDeprecated(false);
+                    setShowComingSoon(false);
+                    setShowGtmRoadmap(false);
+                    setPlatformFilter([]);
+                    setVersionFilter([]);
+                    setVersionFilterMode('include');
+                    setPlatformFilterMode('include');
+                    setSearchBarQuery('');
+                    setShowFullPortfolio(false);
+                    savePortfolioPreference(false);
+                }}
             />
 
             {/* Section 1: Configured */}
@@ -6671,7 +6938,7 @@ function SCANProductsPage() {
                     </div>
                 ) : (
                     <div className="empty-section">
-                        {searchQuery || selectedCategory ? 'No products match your search criteria.' : 'All products are configured! 🎉'}
+                        {searchQuery || selectedCategory ? 'No products match your search criteria.' : 'All products are configured!'}
                     </div>
                 )}
             </CollapsiblePanel>
@@ -6851,66 +7118,60 @@ function SCANProductsPage() {
 
             {/* Usage Guide Modal */}
             {cardLegendOpen && (
-                <Modal open returnFocus={guideReturnRef} onRequestClose={() => setCardLegendOpen(false)} style={{ maxWidth: '640px', width: '92vw' }}>
+                <Modal open returnFocus={guideReturnRef} onRequestClose={() => setCardLegendOpen(false)} style={{ maxWidth: '680px', width: '92vw' }}>
                     <Modal.Header title="How to Use SCAN" />
                     <Modal.Body>
-                        <div className="csc-sc4s-info" style={{ fontSize: '13px', lineHeight: '1.7', color: 'var(--page-color, #333)' }}>
+                        <div className="csc-sc4s-info scan-guide" style={{ fontSize: '14px', lineHeight: '1.7', color: 'var(--page-color, #333)' }}>
 
-                            <div style={{ marginBottom: '16px' }}>
-                                <div style={{ fontWeight: 700, fontSize: '14px', marginBottom: '4px' }}>Browse &amp; Search</div>
-                                <ul style={{ margin: '4px 0 0 18px', padding: 0 }}>
-                                    <li>Use <strong>category tabs</strong> (Security, Networking, etc.) and <strong>subcategory pills</strong> to filter.</li>
-                                    <li>Cross-cutting pills — <strong>SOAR</strong>, <strong>AI-Powered</strong>, <strong>Alert Actions</strong>, <strong>Secure Networking</strong> — filter across all categories.</li>
-                                    <li>The <strong>search bar</strong> matches product names, keywords, aliases, and sourcetypes.</li>
-                                </ul>
+                            {/* Quick-start cheat sheet — always visible */}
+                            <div className="scan-guide-quick">
+                                <div className="scan-guide-quick-row"><span className="scan-guide-key">Category tabs</span><span className="scan-guide-val">Filter by Security, Networking, etc.</span></div>
+                                <div className="scan-guide-quick-row"><span className="scan-guide-key">Subcategory pills</span><span className="scan-guide-val">Narrow within a category</span></div>
+                                <div className="scan-guide-quick-row"><span className="scan-guide-key">Search bar</span><span className="scan-guide-val">Matches names, keywords, aliases, sourcetypes</span></div>
+                                <div className="scan-guide-quick-row"><span className="scan-guide-key">+ Details</span><span className="scan-guide-val">Expand deployment guide with tier chips</span></div>
+                                <div className="scan-guide-quick-row"><span className="scan-guide-key">Filters sidebar</span><span className="scan-guide-val">Platform, Version, SC4S, NetFlow, support level</span></div>
+                                <div className="scan-guide-quick-row"><span className="scan-guide-key">Add to My Products</span><span className="scan-guide-val">Pin cards to the Configured section</span></div>
                             </div>
 
-                            <div style={{ marginBottom: '16px' }}>
-                                <div style={{ fontWeight: 700, fontSize: '14px', marginBottom: '4px' }}>Filter &amp; Refine</div>
-                                <ul style={{ margin: '4px 0 0 18px', padding: 0 }}>
-                                    <li>Click <strong>Filters</strong> to open the sidebar drawer with support level, visibility, SC4S / NetFlow, and add-on family filters.</li>
-                                    <li>Use <strong>Platform</strong> and <strong>Version</strong> checkboxes to filter by Splunkbase compatibility.</li>
-                                    <li>Toggle <strong>Include / Exclude</strong> on version filter to find products <em>not yet compatible</em> with a version.</li>
-                                    <li>Use <strong>✅ Supported Only / 📂 All Products</strong> to toggle the full portfolio.</li>
+                            {/* Expandable details */}
+                            <details className="scan-guide-section">
+                                <summary className="scan-guide-summary">Product Cards</summary>
+                                <ul className="scan-guide-list">
+                                    <li>Intelligence badges show <strong>install status</strong>, <strong>updates</strong>, <strong>data flowing</strong> (7d), and <strong>legacy apps</strong>.</li>
+                                    <li>Header badges (<span className="csc-badge-btn csc-badge-sc4s" style={{ fontSize: '12px', padding: '3px 8px' }}>SC4S</span> <span className="csc-badge-btn csc-badge-netflow" style={{ fontSize: '12px', padding: '3px 8px' }}>NetFlow</span> <span className="csc-badge-btn csc-badge-soar" style={{ fontSize: '12px', padding: '3px 8px' }}>SOAR</span> <span className="csc-badge-btn csc-badge-itsi" style={{ fontSize: '12px', padding: '3px 8px' }}>ITSI</span> <span className="csc-badge-btn csc-badge-es" style={{ fontSize: '12px', padding: '3px 8px' }}>ES</span>) open info panels.</li>
+                                    <li>Hover <strong>ⓘ</strong> for description, value proposition, and former names.</li>
                                 </ul>
-                            </div>
+                            </details>
 
-                            <div style={{ marginBottom: '16px' }}>
-                                <div style={{ fontWeight: 700, fontSize: '14px', marginBottom: '4px' }}>Product Cards</div>
-                                <ul style={{ margin: '4px 0 0 18px', padding: 0 }}>
-                                    <li><strong>Add to My Products</strong> pins a card to the <em>Configured</em> section at the top.</li>
-                                    <li>Intelligence badges show <strong>install status</strong>, <strong>updates available</strong>, <strong>data flowing</strong> (last 7 days), and <strong>legacy apps</strong> detected.</li>
-                                    <li>Header badges (<strong>SC4S</strong>, <strong>NetFlow</strong>, <strong>SOAR</strong>, <strong>ITSI</strong>) open info panels on click.</li>
-                                    <li>Hover the <strong>ⓘ</strong> icon for description, value proposition, and former names.</li>
-                                </ul>
-                            </div>
-
-                            <div style={{ marginBottom: '16px' }}>
-                                <div style={{ fontWeight: 700, fontSize: '14px', marginBottom: '4px' }}>Deployment Details</div>
-                                <ul style={{ margin: '4px 0 0 18px', padding: 0 }}>
-                                    <li>Click <strong>+ Details</strong> to expand the deployment guide showing add-on, dashboard app, and tier chips.</li>
-                                    <li>Tier chips show deployment status: <strong>Search Head</strong>, <strong>Indexers</strong> (✓ deployed, ≠ mismatch, ✗ missing, ⊘ disabled), and <strong>Heavy Forwarder</strong> info.</li>
-                                    <li>Each component links to <strong>Splunkbase</strong>, <strong>Docs</strong>, and <strong>Troubleshoot</strong> pages.</li>
+                            <details className="scan-guide-section">
+                                <summary className="scan-guide-summary">Deployment Details</summary>
+                                <ul className="scan-guide-list">
+                                    <li>Tier chips: <strong>Search Head</strong>, <strong>Indexers</strong> (✓ deployed, ≠ mismatch, ✗ missing, ⊘ disabled), <strong>Heavy Forwarder</strong>.</li>
+                                    <li>Each component links to <strong>Splunkbase</strong>, <strong>Docs</strong>, and <strong>Troubleshoot</strong>.</li>
                                     <li><strong>SC4S</strong> and <strong>NetFlow</strong> sections appear inline when applicable.</li>
                                 </ul>
-                            </div>
+                            </details>
 
-                            <div style={{ marginBottom: '16px' }}>
-                                <div style={{ fontWeight: 700, fontSize: '14px', marginBottom: '4px' }}>Actions &amp; Launch</div>
-                                <ul style={{ margin: '4px 0 0 18px', padding: 0 }}>
+                            <details className="scan-guide-section">
+                                <summary className="scan-guide-summary">Filters &amp; Compatibility</summary>
+                                <ul className="scan-guide-list">
+                                    <li>Click <strong>Filters</strong> to open the sidebar with support level, visibility, and onboarding filters.</li>
+                                    <li><strong>Platform</strong> and <strong>Version</strong> checkboxes filter by Splunkbase compatibility.</li>
+                                    <li>Toggle <strong>Include / Exclude</strong> to find products <em>not yet compatible</em> with a version.</li>
+                                    <li>Use <strong>Supported Only / All Products</strong> to show the full portfolio.</li>
+                                </ul>
+                            </details>
+
+                            <details className="scan-guide-section">
+                                <summary className="scan-guide-summary">Actions &amp; Personalization</summary>
+                                <ul className="scan-guide-list">
                                     <li>Click <strong>Launch ▾</strong> to open an installed app's dashboard directly.</li>
-                                    <li>Click <strong>? Best Practices</strong> for platform-specific tips and SC4S links.</li>
-                                    <li>Use <strong>Sync Catalog</strong> in the toolbar to refresh Splunkbase compatibility data.</li>
+                                    <li><strong>? Best Practices</strong> provides platform-specific tips and SC4S links.</li>
+                                    <li><strong>Sync Catalog</strong> downloads and refreshes the Splunkbase app catalog (runs nightly, but click for on-demand sync).</li>
+                                    <li><strong>Role</strong> picks a persona for a curated quick-start.</li>
+                                    <li>Cycle through <strong>Light / Dark / Auto</strong> themes.</li>
                                 </ul>
-                            </div>
-
-                            <div style={{ marginBottom: '4px' }}>
-                                <div style={{ fontWeight: 700, fontSize: '14px', marginBottom: '4px' }}>Personalization</div>
-                                <ul style={{ margin: '4px 0 0 18px', padding: 0 }}>
-                                    <li>Click <strong>Role</strong> to pick a persona (SOC Analyst, Network Engineer, etc.) for a curated quick-start.</li>
-                                    <li>Cycle through <strong>Light / Dark / Auto</strong> themes with the theme button.</li>
-                                </ul>
-                            </div>
+                            </details>
 
                         </div>
                     </Modal.Body>
