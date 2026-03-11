@@ -112,7 +112,7 @@ function buildProduct(name, c) {
         legacy_uids: laUids.filter(Boolean),
         community_uids: caUids.filter(Boolean),
         sourcetypes: csvToArray(c.sourcetypes),
-        dashboard: (c.dashboards || '').trim(),
+        dashboards: csvToArray(c.dashboards),
         custom_dashboard: c.custom_dashboard || '',
         icon_emoji: c.icon_emoji || '',
         icon_svg: c.icon_svg || '',
