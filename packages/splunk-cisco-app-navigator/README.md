@@ -24,15 +24,21 @@ ln -s "$(pwd)/stage" /opt/splunk/etc/apps/splunk-cisco-app-navigator
 ## Key Features
 
 - **79 product cards** with real-time intelligence badges
-- **128 Cisco brand icons** (126 SVGs + 2 PNGs) with light/dark variants
+- **97 Cisco brand icons** (SVGs) with light/dark variants
 - **429+ sourcetypes** validated via `metadata` search for data flow detection
 - **13 subcategories** across Security, Networking, and Observability
-- **Cross-cutting badges** — SOAR (12), ITSI (6), Alert Actions (6), AI-Powered (15)
+- **Cross-cutting badges** — SOAR (12), ITSI (6), Alert Actions (8), AI-Powered (16)
 - **SC4S integration** — 18 products with SC4S links
 - **Secure Networking GTM** — 65 products tagged
-- **Splunkbase compatibility** — Platform & version filters synced from S3 catalog
-- **35 saved searches** — 7 categories of analytics + scheduled sync
+- **Splunkbase compatibility** — Platform & multi-select version filters synced from S3
+- **40 saved searches** — 7 categories of analytics + scheduled sync
 - **Custom search command** — `downloadsplunkbasecsv` for catalog sync
+- **Props.conf Audit (Magic Eight)** — per-product ingestion health check with 8-setting analysis
+- **Indexer Tier Detection** — validates add-on deployment across SH and indexer tiers
+- **Ecosystem Intelligence Dashboard** — Dashboard Studio v2 with portfolio analytics + Cisco Splunkbase intel
+- **Catalog Vault** — hidden disabled products accessible via vault toggle
+- **FilterDrawer** — sidebar drawer with advanced filters (support level, visibility, onboarding, platform, version)
+- **Portal-based resizable modals** — draggable + resizable using ReactDOM.createPortal (DRM pattern)
 - **Category Filter Bar** — domain pills + subcategory expansion + cross-cutting filters
 - **Universal Finder** — deep keyword search
 - **Best Practices Modal** — platform-aware tips, custom guidance, SC4S links
@@ -46,14 +52,14 @@ ln -s "$(pwd)/stage" /opt/splunk/etc/apps/splunk-cisco-app-navigator
 
 | Category | Count | Subcategories |
 |---|---|---|
-| Security | 39 | cloud_security, network_security, identity_access, endpoint_security, email_security, threat_response, workload_security, application_security |
+| Security | 56 | cloud_security, network_security, identity_access, endpoint_security, email_security, threat_response, workload_security, application_security |
 | Networking | 31 | campus_wireless, routing_wan, data_center_net, compute_infra |
 | Collaboration | 6 | — |
 | Observability | 3 | infrastructure_monitoring |
 
 | Status | Count |
 |---|---|
-| Active | 47 |
+| Active | 48 |
 | Deprecated | 3 |
 | Roadmap | 16 |
 | Retired | 11 |
@@ -61,21 +67,24 @@ ln -s "$(pwd)/stage" /opt/splunk/etc/apps/splunk-cisco-app-navigator
 
 ## Architecture
 
-- **Product catalog:** `default/products.conf` — 79 stanzas (~3386 lines)
-- **React UI:** `index.jsx` (~5561 lines) via Simple XML + RequireJS + webpack
-- **Styles:** `products.css` (~4547 lines) with CSS variables and dark mode
+- **Product catalog:** `default/products.conf` — 79 stanzas (~2669 lines)
+- **React UI:** `index.jsx` (~7373 lines) via Simple XML + RequireJS + webpack
+- **Styles:** `products.css` (~6123 lines) with CSS variables and dark mode
 - **Build:** `node bin/build.js build` runs generate-catalog.js + webpack
-- **Logging:** `props.conf` with Magic Six + field extractions via `transforms.conf`
+- **Logging:** `props.conf` with Magic Eight + field extractions via `transforms.conf`
 - **Sync:** `downloadsplunkbasecsv` custom search command (Python 3, splunklib 2.1.1)
+- **Dashboard:** `ecosystem_intelligence.xml` (Dashboard Studio v2) — Cisco ecosystem analytics
+- **Modals:** Portal-based resizable modals using `ReactDOM.createPortal` (DRM pattern)
 
 ## Key Files
 
 | File | Lines | Purpose |
 |---|---|---|
-| `src/main/webapp/pages/products/index.jsx` | ~5561 | Main React component |
-| `src/main/resources/splunk/default/products.conf` | ~3386 | Product catalog (79 stanzas) |
-| `src/main/resources/splunk/appserver/static/products.css` | ~4547 | All styles including dark mode |
-| `src/main/resources/splunk/default/savedsearches.conf` | ~794 | 35 saved searches |
+| `src/main/webapp/pages/products/index.jsx` | ~7373 | Main React component |
+| `src/main/resources/splunk/default/products.conf` | ~2669 | Product catalog (79 stanzas) |
+| `src/main/resources/splunk/appserver/static/products.css` | ~6123 | All styles including dark mode |
+| `src/main/resources/splunk/default/savedsearches.conf` | ~994 | 40 saved searches |
+| `src/main/resources/splunk/default/data/ui/views/ecosystem_intelligence.xml` | — | Ecosystem Intelligence dashboard (Studio v2) |
 | `src/main/resources/splunk/default/props.conf` | — | Sourcetype + field extractions |
 | `src/main/resources/splunk/default/transforms.conf` | — | Lookup definitions |
 | `src/main/resources/splunk/default/commands.conf` | — | Custom search command registration |

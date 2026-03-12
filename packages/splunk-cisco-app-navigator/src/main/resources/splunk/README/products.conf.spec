@@ -64,6 +64,10 @@ coverage_gap = true | false
 addon = <string>
 * The Splunk app_id of the add-on / TA this card is associated with (e.g. "CiscoSecurityCloud").
 
+addon_uid = <string>
+* The Splunkbase UID of the add-on (e.g. "7404" for CiscoSecurityCloud).
+* Multiple products may share the same addon_uid when they use the same TA.
+
 addon_family = <string>
 * Add-on family grouping used by the build-time catalog generator to map
 * products to their parent add-on install flow (e.g. "security-cloud",
@@ -109,6 +113,10 @@ app_viz = <string>
 * Optional. The Splunk app_id of the visualization / dashboard app (e.g. "cisco-catalyst-app").
 * When empty, the UI assumes addon provides both data ingestion and visualization.
 
+app_viz_uid = <string>
+* The Splunkbase UID of the visualization app (e.g. "7539" for cisco-catalyst-app).
+* Multiple products may share the same app_viz_uid when they use the same dashboard app.
+
 app_viz_label = <string>
 * Human-readable label for the visualization app (e.g. "Cisco Enterprise Networking for Splunk Platform").
 
@@ -129,6 +137,9 @@ app_viz_install_url = <string>
 app_viz_2 = <string>
 * Optional. A second visualization / dashboard app (e.g. an ITSI content pack).
 * When empty, only the primary app_viz is shown.
+
+app_viz_2_uid = <string>
+* The Splunkbase UID of the second visualization app (e.g. "8365").
 
 app_viz_2_label = <string>
 * Human-readable label for the second visualization app.
