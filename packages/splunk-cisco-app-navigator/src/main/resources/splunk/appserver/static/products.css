@@ -89,7 +89,7 @@
     /* ── Backward-compat aliases ── */
     --page-bg: var(--bg-primary);
     --page-color: var(--text-primary);
-    --heading-color: var(--text-primary);
+    --heading-color: #07182D;
     --subtitle-color: var(--text-secondary);
     --muted-color: var(--text-secondary);
     --faint-color: var(--text-tertiary);
@@ -388,7 +388,7 @@ html.dce-dark [data-view="views/shared/Page"] {
     flex-shrink: 0;
 }
 
-/* ===== Utility Strip ===== */
+/* ===== Utility Strip — Clean light bar with Cisco accents ===== */
 .scan-utility-strip {
     display: flex !important;
     flex-wrap: nowrap !important;
@@ -396,14 +396,16 @@ html.dce-dark [data-view="views/shared/Page"] {
     justify-content: space-between !important;
     padding: 5px 14px !important;
     margin: 2px 0 12px 0 !important;
-    background: linear-gradient(180deg, #f4f5f7 0%, #ecedef 100%) !important;
-    border: 1px solid #ddd !important;
+    background: #ffffff !important;
+    border: 1px solid #CED4DB !important;
     border-radius: 8px !important;
     min-height: 32px !important;
+    color: #314257 !important;
 }
 :root.dce-dark .scan-utility-strip {
-    background: linear-gradient(180deg, #23272e 0%, #1e2228 100%) !important;
-    border-color: #3a3f46 !important;
+    background: #1e262c !important;
+    border-color: #444e56 !important;
+    color: #d4d4d4 !important;
 }
 
 .scan-utility-left,
@@ -431,9 +433,9 @@ html.dce-dark [data-view="views/shared/Page"] {
 
 /* Platform pill */
 .scan-util-platform {
-    color: var(--heading-color, #333) !important;
-    background: #fff !important;
-    border-color: #d0d0d0 !important;
+    color: #07182D !important;
+    background: #f2f5f7 !important;
+    border-color: #CED4DB !important;
     cursor: default;
 }
 .scan-util-icon {
@@ -448,24 +450,25 @@ html.dce-dark [data-view="views/shared/Page"] {
 }
 :root.dce-dark .scan-util-platform {
     background: rgba(255,255,255,0.06) !important;
-    border-color: #3d434a !important;
+    border-color: #444e56 !important;
+    color: #d4d4d4 !important;
 }
 
 /* Version pill */
 .scan-util-version {
-    color: #555 !important;
-    background: #e8e8e8 !important;
+    color: #07182D !important;
+    background: #E8EBEE !important;
 }
 :root.dce-dark .scan-util-version {
     background: rgba(255,255,255,0.08) !important;
-    color: #aab !important;
+    color: #d4d4d4 !important;
 }
 
 /* Splunk version label (inline within platform pill) */
 .scan-util-splunk-ver {
     font-weight: 400;
     font-size: 11px;
-    color: #888;
+    color: #667180;
     margin-left: 2px;
     opacity: 0.85;
 }
@@ -478,12 +481,12 @@ html.dce-dark [data-view="views/shared/Page"] {
     display: inline-block;
     width: 1px;
     height: 16px;
-    background: #d0d0d0;
+    background: #CED4DB;
     margin: 0 2px;
     flex-shrink: 0;
 }
 :root.dce-dark .scan-util-sep {
-    background: #3d434a;
+    background: #444e56;
 }
 
 /* Cloud simulation toggle */
@@ -537,24 +540,25 @@ html.dce-dark [data-view="views/shared/Page"] {
 
 /* Theme pill */
 .scan-util-theme {
-    color: var(--heading-color, #333) !important;
-    background: #fff !important;
-    border-color: #d0d0d0 !important;
+    color: #07182D !important;
+    background: #f2f5f7 !important;
+    border-color: #CED4DB !important;
     cursor: pointer;
     font-weight: 600 !important;
     padding: 3px 12px 3px 8px !important;
 }
 .scan-util-theme:hover {
-    background: #f0f0f0 !important;
-    border-color: #bbb !important;
+    background: #E8EBEE !important;
+    border-color: #07182D !important;
 }
 :root.dce-dark .scan-util-theme {
     background: rgba(255,255,255,0.06) !important;
-    border-color: #3d434a !important;
+    border-color: #444e56 !important;
+    color: #d4d4d4 !important;
 }
 :root.dce-dark .scan-util-theme:hover {
     background: rgba(255,255,255,0.10) !important;
-    border-color: #555 !important;
+    border-color: #02C8FF !important;
 }
 .scan-util-theme-label {
     font-size: 11.5px;
@@ -608,17 +612,17 @@ html.dce-dark [data-view="views/shared/Page"] {
     text-transform: uppercase;
 }
 
-/* Sync Splunkbase pill */
+/* Sync Splunkbase pill — on Midnight Blue strip */
 .scan-util-sync {
-    color: var(--heading-color, #333) !important;
-    background: #fff !important;
-    border-color: #d0d0d0 !important;
+    color: #ffffff !important;
+    background: #07182D !important;
+    border-color: transparent !important;
     cursor: pointer;
     font-weight: 600 !important;
 }
 .scan-util-sync:hover {
-    background: #f0f0f0 !important;
-    border-color: #bbb !important;
+    background: #0A60FF !important;
+    border-color: transparent !important;
 }
 .scan-util-sync:disabled {
     opacity: 0.7 !important;
@@ -640,12 +644,13 @@ html.dce-dark [data-view="views/shared/Page"] {
     border-color: #e0c36e !important;
 }
 :root.dce-dark .scan-util-sync {
-    background: rgba(255,255,255,0.06) !important;
-    border-color: #3d434a !important;
+    background: #02C8FF !important;
+    border-color: transparent !important;
+    color: #07182D !important;
 }
 :root.dce-dark .scan-util-sync:hover {
-    background: rgba(255,255,255,0.10) !important;
-    border-color: #555 !important;
+    background: #00b0e0 !important;
+    border-color: transparent !important;
 }
 :root.dce-dark .scan-sync-ok {
     color: #7ee787 !important;
@@ -1132,7 +1137,7 @@ html.dce-dark [data-view="views/shared/Page"] {
     position: absolute;
     top: -1px;
     right: -1px;
-    background: linear-gradient(135deg, #455a64, #607d8b);
+    background: linear-gradient(135deg, #0A60FF, #02C8FF);
     color: #fff;
     font-size: 9px;
     font-weight: 800;
@@ -1146,8 +1151,8 @@ html.dce-dark [data-view="views/shared/Page"] {
     line-height: 1.2;
 }
 :root.dce-dark .csc-coverage-gap-ribbon {
-    background: linear-gradient(135deg, #546e7a, #78909c);
-    box-shadow: 0 2px 6px rgba(84, 110, 122, 0.5);
+    background: linear-gradient(135deg, #0A60FF, #02C8FF);
+    box-shadow: 0 2px 6px rgba(2, 200, 255, 0.3);
 }
 
 /* ── Top accent stripe — removed for clean design ── */
@@ -1277,47 +1282,53 @@ html.dce-dark [data-view="views/shared/Page"] {
 }
 
 /* Badge variants — subtle tinted tags */
+/* ── Badge colors: soft Cisco palette tints ── */
 .csc-badge-sc4s {
-    background: #e0f2f1;
-    color: #00695c;
+    background: #e8f7f6;
+    color: #049e8f;
+    border: 1px solid rgba(4, 158, 143, 0.2);
 }
-.csc-badge-sc4s:hover { background: #b2dfdb; }
+.csc-badge-sc4s:hover { background: #d4f0ee; }
 
 .csc-badge-netflow {
-    background: #e3f2fd;
-    color: #1565c0;
+    background: #e6f8fd;
+    color: #0896b5;
+    border: 1px solid rgba(2, 200, 255, 0.2);
 }
-.csc-badge-netflow:hover { background: #bbdefb; }
+.csc-badge-netflow:hover { background: #ccf1fa; }
 
 .csc-badge-soar {
-    background: #e0f7fa;
-    color: #00838f;
+    background: #edf2ff;
+    color: #0A60FF;
+    border: 1px solid rgba(10, 96, 255, 0.15);
 }
-.csc-badge-soar:hover { background: #b2ebf2; }
+.csc-badge-soar:hover { background: #dce6ff; }
 
 .csc-badge-itsi {
-    background: #e8f5e9;
-    color: #2e7d32;
+    background: #ecf7ed;
+    color: #3a8a3f;
+    border: 1px solid rgba(58, 138, 63, 0.15);
 }
-.csc-badge-itsi:hover { background: #c8e6c9; }
+.csc-badge-itsi:hover { background: #d8eeda; }
 
 .csc-badge-es {
-    background: #eceff1;
-    color: #455a64;
+    background: #edf2ff;
+    color: #0A60FF;
+    border: 1px solid rgba(10, 96, 255, 0.2);
 }
-.csc-badge-es:hover { background: #cfd8dc; }
+.csc-badge-es:hover { background: #dce6ff; }
 
 /* Dark mode badge tints */
-:root.dce-dark .csc-badge-sc4s { background: rgba(0, 137, 123, 0.15); color: #4db6ac; }
-:root.dce-dark .csc-badge-sc4s:hover { background: rgba(0, 137, 123, 0.25); }
-:root.dce-dark .csc-badge-netflow { background: rgba(21, 101, 192, 0.15); color: #64b5f6; }
-:root.dce-dark .csc-badge-netflow:hover { background: rgba(21, 101, 192, 0.25); }
-:root.dce-dark .csc-badge-soar { background: rgba(0, 131, 143, 0.15); color: #4dd0e1; }
-:root.dce-dark .csc-badge-soar:hover { background: rgba(0, 131, 143, 0.25); }
-:root.dce-dark .csc-badge-itsi { background: rgba(46, 125, 50, 0.15); color: #81c784; }
-:root.dce-dark .csc-badge-itsi:hover { background: rgba(46, 125, 50, 0.25); }
-:root.dce-dark .csc-badge-es { background: rgba(69, 90, 100, 0.18); color: #90a4ae; }
-:root.dce-dark .csc-badge-es:hover { background: rgba(69, 90, 100, 0.28); }
+:root.dce-dark .csc-badge-sc4s { background: rgba(4, 158, 143, 0.12); color: #5ec5b9; border-color: rgba(4, 158, 143, 0.25); }
+:root.dce-dark .csc-badge-sc4s:hover { background: rgba(4, 158, 143, 0.2); }
+:root.dce-dark .csc-badge-netflow { background: rgba(2, 200, 255, 0.1); color: #40d4ff; border-color: rgba(2, 200, 255, 0.2); }
+:root.dce-dark .csc-badge-netflow:hover { background: rgba(2, 200, 255, 0.18); }
+:root.dce-dark .csc-badge-soar { background: rgba(10, 96, 255, 0.1); color: #6ea0ff; border-color: rgba(10, 96, 255, 0.2); }
+:root.dce-dark .csc-badge-soar:hover { background: rgba(10, 96, 255, 0.18); }
+:root.dce-dark .csc-badge-itsi { background: rgba(58, 138, 63, 0.12); color: #81c784; border-color: rgba(58, 138, 63, 0.2); }
+:root.dce-dark .csc-badge-itsi:hover { background: rgba(58, 138, 63, 0.2); }
+:root.dce-dark .csc-badge-es { background: rgba(10, 96, 255, 0.12); color: #6ea0ff; border-color: rgba(10, 96, 255, 0.2); }
+:root.dce-dark .csc-badge-es:hover { background: rgba(10, 96, 255, 0.18); }
 
 /* ── Guide Modal (cheat sheet + expandable) ── */
 .scan-guide-quick {
@@ -1408,6 +1419,9 @@ html.dce-dark [data-view="views/shared/Page"] {
 :root.dce-dark .scan-guide-summary:hover { background: rgba(255,255,255,0.08); }
 
 /* ── Modal Resize Handle ── */
+/* ── DRM (Portal-based Resizable Modal) Dark Mode ── */
+:root.dce-dark .scan-drm-overlay { background: rgba(0,0,0,0.55) !important; }
+
 .scan-modal-resize-handle {
     position: absolute;
     bottom: 0;
@@ -1746,16 +1760,25 @@ html.dce-dark [data-view="views/shared/Page"] {
     color: #ffffff;
 }
 
+.csc-btn-disabled-label {
+    background: transparent;
+    color: #9e6b15;
+    border: 1px solid #d4a843;
+    font-weight: 600;
+    cursor: default;
+    opacity: 0.85;
+    font-size: 11px;
+}
 .csc-btn-upgrade {
-    background: #197E25;
+    background: #c57400;
     color: #ffffff;
-    border: 1px solid #197E25;
+    border: 1px solid #c57400;
     font-weight: 700;
 }
 
 .csc-btn-upgrade:hover {
-    background: #126B1C;
-    border-color: #126B1C;
+    background: #a86200;
+    border-color: #a86200;
     color: #ffffff;
 }
 
@@ -1799,14 +1822,19 @@ html.dce-dark [data-view="views/shared/Page"] {
     color: #fff;
     border-color: #0A60FF;
 }
+:root.dce-dark .csc-btn-disabled-label {
+    background: transparent;
+    color: #d4a843;
+    border-color: #8b6d2e;
+}
 :root.dce-dark .csc-btn-upgrade {
-    background: #197E25;
+    background: #c57400;
     color: #ffffff;
-    border-color: #197E25;
+    border-color: #c57400;
 }
 :root.dce-dark .csc-btn-upgrade:hover {
-    background: #126B1C;
-    border-color: #126B1C;
+    background: #a86200;
+    border-color: #a86200;
     color: #fff;
 }
 :root.dce-dark .csc-btn-outline {
@@ -1861,11 +1889,11 @@ html.dce-dark [data-view="views/shared/Page"] {
     color: #ced4db;
 }
 :root.dce-dark .csc-split-pill-seg {
-    color: #a1a9b2;
+    color: #02C8FF;
 }
 :root.dce-dark .csc-split-pill-seg:hover {
-    background: #606C7A;
-    color: #fff;
+    background: #02C8FF;
+    color: #07182D;
 }
 :root.dce-dark .csc-sourcetype-link {
     color: #a1a9b2;
@@ -1873,6 +1901,8 @@ html.dce-dark [data-view="views/shared/Page"] {
 :root.dce-dark .csc-dep-chip-miss {
     color: #FF9000;
 }
+:root.dce-dark .csc-dep-inline-miss { color: #FF9000; }
+:root.dce-dark .csc-dep-inline-disabled { color: #d4a843; }
 :root.dce-dark .csc-dep-update {
     color: #FF9000;
 }
@@ -2110,6 +2140,17 @@ html.dce-dark [data-view="views/shared/Page"] {
 }
 .csc-dep-chip-ok { color: var(--faint-color, #888); }
 .csc-dep-chip-miss { color: #bf5600; }
+.csc-dep-summary-text {
+    font-size: 12px;
+    color: var(--faint-color, #6c7785);
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 0;
+}
+.csc-dep-inline-ok { color: var(--faint-color, #6c7785); }
+.csc-dep-inline-miss { color: #bf5600; font-weight: 600; }
+.csc-dep-inline-disabled { color: #9e6b15; font-style: italic; }
 .csc-dep-chip-sc4s {
     font-size: 11px;
     font-weight: 600;
@@ -2256,7 +2297,7 @@ html.dce-dark [data-view="views/shared/Page"] {
     border-color: rgba(229, 231, 235, 0.15);
 }
 
-/* ── Magic Six Props.conf Audit Table ── */
+/* ── Magic Eight Props.conf Audit Table ── */
 .scan-magic6-results {
     margin: 12px 0 8px;
 }
@@ -3196,12 +3237,12 @@ a.csc-dep-name-link:hover {
 .csc-split-pill-seg {
     padding: 3px 7px;
     text-decoration: none;
-    color: #606C7A;
+    color: #0A60FF;
     white-space: nowrap;
     transition: background 0.15s, color 0.15s;
 }
 .csc-split-pill-seg:hover {
-    background: #606C7A;
+    background: #07182D;
     color: #fff;
     text-decoration: none;
 }
@@ -3209,11 +3250,11 @@ a.csc-dep-name-link:hover {
     border-left: 1px solid var(--card-border, #dce0e4);
 }
 .csc-split-pill-sc4s {
-    color: #606C7A;
+    color: #0A60FF;
     font-weight: 600;
 }
 .csc-split-pill-sc4s:hover {
-    background: #606C7A;
+    background: #07182D;
     color: #fff;
 }
 
@@ -3410,11 +3451,11 @@ a.csc-dep-name-link:hover {
     color: #86efac;
 }
 .csc-badge-data-none {
-    color: #9e9e9e;
+    color: #FF9000;
     font-style: italic;
 }
 :root.dce-dark .csc-badge-data-none {
-    color: #757575;
+    color: #FF9000;
 }
 .csc-badge-link {
     color: inherit;
@@ -3425,7 +3466,7 @@ a.csc-dep-name-link:hover {
     text-decoration: underline;
 }
 .csc-badge-update {
-    color: #bf5600;
+    color: #FF9000;
 }
 :root.dce-dark .csc-badge-update {
     color: #FF9000;
@@ -3434,19 +3475,19 @@ a.csc-dep-name-link:hover {
     color: #757575;
 }
 .csc-badge-archived {
-    color: #8d6e63;
+    color: #FF007F;
     font-style: italic;
 }
 :root.dce-dark .csc-badge-archived {
-    color: #bcaaa4;
+    color: #FF007F;
 }
 .csc-badge-legacy {
-    color: #c62828;
+    color: #FF9000;
     cursor: help;
     position: relative;
 }
 :root.dce-dark .csc-badge-legacy {
-    color: #ef9a9a;
+    color: #FF9000;
 }
 
 /* ===== Sourcetype chips ===== */
@@ -3515,6 +3556,119 @@ a.csc-dep-name-link:hover {
     background: #1b3a1f;
     color: #86efac;
     border-color: #4caf50;
+}
+
+/* ── Sourcetype show/hide toggle ── */
+.csc-st-show-toggle {
+    display: inline-block;
+    font-size: 10px;
+    font-weight: 600;
+    padding: 2px 8px;
+    border-radius: 3px;
+    background: transparent;
+    color: #0A60FF;
+    border: 1px dashed #0A60FF;
+    cursor: pointer;
+    white-space: nowrap;
+    line-height: 1.4;
+    transition: background 0.15s, color 0.15s;
+}
+.csc-st-show-toggle:hover {
+    background: #0A60FF;
+    color: #fff;
+}
+:root.dce-dark .csc-st-show-toggle {
+    color: #02C8FF;
+    border-color: #02C8FF;
+}
+:root.dce-dark .csc-st-show-toggle:hover {
+    background: #02C8FF;
+    color: #07182D;
+}
+
+/* ── Data Paths section tags ── */
+.csc-dp-tag {
+    display: inline-block;
+    font-size: 9px;
+    font-weight: 700;
+    padding: 1px 6px;
+    border-radius: 3px;
+    margin-left: 6px;
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
+    vertical-align: middle;
+}
+.csc-dp-tag-sc4s {
+    background: #e8f5e9;
+    color: #2e7d32;
+    border: 1px solid #a5d6a7;
+}
+.csc-dp-tag-nf {
+    background: #e3f2fd;
+    color: #1565c0;
+    border: 1px solid #90caf9;
+}
+.csc-dp-tag-neutral {
+    background: #f5f5f5;
+    color: #666;
+    border: 1px solid #ddd;
+    text-transform: none;
+    font-weight: 600;
+}
+:root.dce-dark .csc-dp-tag-sc4s {
+    background: rgba(46,125,50,0.15);
+    color: #81c784;
+    border-color: #388e3c;
+}
+:root.dce-dark .csc-dp-tag-nf {
+    background: rgba(21,101,192,0.15);
+    color: #90caf9;
+    border-color: #1565c0;
+}
+:root.dce-dark .csc-dp-tag-neutral {
+    background: rgba(255,255,255,0.06);
+    color: #999;
+    border-color: #444;
+}
+
+/* ── Data Paths group styling ── */
+.csc-dp-group {
+    padding: 2px 0;
+}
+.csc-dp-group-header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+    margin-bottom: 4px;
+}
+.csc-dp-group-title {
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--text-primary, #314257);
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
+}
+:root.dce-dark .csc-dp-group-title {
+    color: #d4d4d4;
+}
+.csc-dp-note {
+    font-size: 11px;
+    color: var(--muted-color, #666);
+    padding: 3px 0 3px 10px;
+    border-left: 2px solid #CED4DB;
+    margin: 2px 0;
+}
+:root.dce-dark .csc-dp-note {
+    border-left-color: #444;
+}
+.csc-dp-notes-list {
+    margin: 4px 0 2px 0 !important;
+    padding-left: 18px !important;
+    font-size: 11px;
+}
+.csc-dp-notes-list li {
+    margin-bottom: 2px;
 }
 
 /* ===== Legacy App Hover Tooltip ===== */
@@ -5169,19 +5323,20 @@ tr.scan-ts-ahead .scan-ts-name {
     transform: translateX(0);
 }
 
-/* Drawer header */
+/* Drawer header — Cisco Midnight Blue */
 .scan-drawer-header {
     display: flex;
     align-items: center;
     justify-content: space-between;
     padding: 16px 20px 12px;
-    border-bottom: 1px solid var(--card-border, #ddd);
+    background: #07182D;
+    border-bottom: none;
     flex-shrink: 0;
 }
 .scan-drawer-title {
     font-size: 16px;
     font-weight: 700;
-    color: var(--page-color, #222);
+    color: #ffffff;
     display: flex;
     align-items: center;
     gap: 8px;
@@ -5191,8 +5346,8 @@ tr.scan-ts-ahead .scan-ts-name {
     height: 32px;
     border-radius: 8px;
     border: none;
-    background: var(--card-bg, #f5f5f5);
-    color: var(--page-color, #555);
+    background: rgba(255,255,255,0.1);
+    color: #02C8FF;
     font-size: 18px;
     cursor: pointer;
     display: flex;
@@ -5201,8 +5356,8 @@ tr.scan-ts-ahead .scan-ts-name {
     transition: background 0.15s, color 0.15s;
 }
 .scan-drawer-close:hover {
-    background: #e0e0e0;
-    color: #333;
+    background: rgba(255,255,255,0.2);
+    color: #fff;
 }
 
 /* Scrollable body */
@@ -5221,7 +5376,7 @@ tr.scan-ts-ahead .scan-ts-name {
     font-weight: 700;
     text-transform: uppercase;
     letter-spacing: 0.08em;
-    color: var(--faint-color, #888);
+    color: #07182D;
     margin-bottom: 8px;
     display: flex;
     align-items: center;
@@ -5243,16 +5398,16 @@ tr.scan-ts-ahead .scan-ts-name {
     gap: 6px;
 }
 
-/* Drawer pills — compact version of filter pills */
+/* Drawer pills — Cisco-branded, consistent with category pills */
 .scan-drawer-pill {
     display: inline-flex;
     align-items: center;
     gap: 5px;
     padding: 5px 12px;
     border-radius: 16px;
-    border: 1.5px solid var(--card-border, #ddd);
-    background: var(--card-bg, #f5f5f5);
-    color: var(--page-color, #333);
+    border: 1px solid #CED4DB;
+    background: #ffffff;
+    color: #314257;
     font-size: 12px;
     font-weight: 600;
     cursor: pointer;
@@ -5261,8 +5416,8 @@ tr.scan-ts-ahead .scan-ts-name {
     line-height: 1.3;
 }
 .scan-drawer-pill:hover {
-    border-color: #02C8FF;
-    background: #f0f9ff;
+    border-color: #07182D;
+    background: rgba(7, 24, 45, 0.04);
 }
 .scan-drawer-pill img {
     width: 14px;
@@ -5276,14 +5431,15 @@ tr.scan-ts-ahead .scan-ts-name {
     border-radius: 10px;
 }
 
-/* Active states for drawer pills */
+/* Active states for drawer pills — Midnight Blue */
 .scan-drawer-pill-active {
-    border-color: #02C8FF;
-    background: rgba(2,200,255,0.06);
-    color: #0A60FF;
+    border-color: #07182D;
+    background: #07182D;
+    color: #ffffff;
 }
 .scan-drawer-pill-active .scan-drawer-pill-count {
-    background: rgba(255, 255, 255, 0.4);
+    background: rgba(255, 255, 255, 0.2);
+    color: #fff;
 }
 
 /* Colored active variants */
@@ -5532,6 +5688,33 @@ tr.scan-ts-ahead .scan-ts-name {
     font-size: 12px;
 }
 
+/* Version chevron toggle */
+.scan-drawer-version-chevron {
+    transition: transform 0.2s ease;
+    flex-shrink: 0;
+}
+.scan-drawer-version-chevron-open {
+    transform: rotate(90deg);
+}
+.scan-drawer-version-header-toggle:hover {
+    background: rgba(4, 159, 217, 0.04);
+}
+/* Selected-count badge when version section is collapsed */
+.scan-drawer-version-badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 18px;
+    height: 18px;
+    padding: 0 5px;
+    border-radius: 9px;
+    background: #02C8FF;
+    color: #fff;
+    font-size: 10px;
+    font-weight: 700;
+    line-height: 1;
+}
+
 /* Sync button in drawer */
 .scan-drawer-sync-row {
     display: flex;
@@ -5653,9 +5836,9 @@ tr.scan-ts-ahead .scan-ts-name {
     background: #f0f9ff;
 }
 .scan-filter-trigger-active {
-    border-color: #5c6bc0;
-    background: #e8eaf6;
-    color: #283593;
+    border-color: #07182D;
+    background: rgba(7, 24, 45, 0.06);
+    color: #07182D;
 }
 .scan-filter-trigger-badge {
     position: absolute;
@@ -5754,15 +5937,19 @@ tr.scan-ts-ahead .scan-ts-name {
     box-shadow: 8px 0 32px rgba(0, 0, 0, 0.4);
 }
 :root.dce-dark .scan-drawer-header {
-    border-bottom-color: #333d44;
+    background: #0d1a2a;
+    border-bottom-color: #1a3050;
 }
 :root.dce-dark .scan-drawer-close {
-    background: #2a353d;
-    color: #ccc;
+    background: rgba(255,255,255,0.1);
+    color: #02C8FF;
 }
 :root.dce-dark .scan-drawer-close:hover {
-    background: #333d44;
+    background: rgba(255,255,255,0.2);
     color: #fff;
+}
+:root.dce-dark .scan-drawer-section-title {
+    color: #d4d4d4;
 }
 :root.dce-dark .scan-drawer-divider {
     background: #333d44;
@@ -5925,9 +6112,9 @@ tr.scan-ts-ahead .scan-ts-name {
     background: rgba(4, 159, 217, 0.1);
 }
 :root.dce-dark .scan-filter-trigger-active {
-    border-color: #5c6bc0;
-    background: rgba(92, 107, 192, 0.2);
-    color: #9fa8da;
+    border-color: #02C8FF;
+    background: rgba(2, 200, 255, 0.12);
+    color: #02C8FF;
 }
 :root.dce-dark .scan-active-chip {
     background: rgba(176, 190, 197, 0.12);
@@ -5941,6 +6128,9 @@ tr.scan-ts-ahead .scan-ts-name {
 :root.dce-dark .scan-active-chip-close:hover {
     background: rgba(176, 190, 197, 0.3);
 }
+:root.dce-dark .scan-drawer-pill { background: #1e262c; border-color: #444e56; color: #d4d4d4; }
+:root.dce-dark .scan-drawer-pill:hover { border-color: #02C8FF; background: rgba(2, 200, 255, 0.08); }
+:root.dce-dark .scan-drawer-pill-active { background: #02C8FF; border-color: #02C8FF; color: #07182D; }
 :root.dce-dark .scan-drawer-pill-secnet-active { border-color: #26a69a; background: rgba(38,166,154,0.18); color: #80cbc4; }
 :root.dce-dark .scan-drawer-pill-soar-active { border-color: #ffa726; background: rgba(255,167,38,0.15); color: #ffcc80; }
 :root.dce-dark .scan-drawer-pill-alert-active { border-color: #42a5f5; background: rgba(66,165,245,0.15); color: #90caf9; }
@@ -5965,7 +6155,7 @@ tr.scan-ts-ahead .scan-ts-name {
 }
 
 .csc-card:hover {
-    border-color: #93C5FD !important; 
+    border-color: #02C8FF !important;
     box-shadow: none !important;
     transform: none !important;
 }
@@ -5984,57 +6174,63 @@ tr.scan-ts-ahead .scan-ts-name {
     display: none !important;
 }
 
-/* 2. Round the Filter Pills & Hide Icons (Top Bar) */
+/* 2. Round the Filter Pills & Hide Icons (Top Bar) — Cisco Midnight Blue theme */
+/* ── Subcategory pills: soft Cisco Blue outlines ── */
 .csc-subcategory-pill {
     border-radius: 9999px !important;
     box-shadow: none !important;
-    border: 1px solid #E5E7EB !important;
+    border: 1.5px solid rgba(10, 96, 255, 0.25) !important;
     background: #FFFFFF !important;
+    color: #314257 !important;
 }
-
+.csc-subcategory-pill:hover {
+    border-color: #0A60FF !important;
+    background: rgba(10, 96, 255, 0.04) !important;
+    color: #0A60FF !important;
+}
 .csc-subcategory-pill-active {
-    background: var(--color-primary, #0A60FF) !important;
-    border-color: var(--color-primary, #0A60FF) !important;
+    background: #0A60FF !important;
+    border-color: #0A60FF !important;
     color: #ffffff !important;
 }
+.csc-subcategory-pill-active .csc-subcategory-count {
+    background: rgba(255, 255, 255, 0.22) !important;
+    color: #fff !important;
+}
 
-/* AI-Powered pill — matches primary blue when active */
+/* AI-Powered pill — Midnight Blue when active */
 .csc-ai-pill-active {
-    background: var(--color-primary, #0A60FF) !important;
-    border-color: var(--color-primary, #0A60FF) !important;
+    background: #07182D !important;
+    border-color: #07182D !important;
     color: #fff !important;
 }
 
 :root.dce-dark .csc-subcategory-pill {
-    background: #252e36 !important;
-    border-color: #4a5568 !important;
-    color: var(--page-color) !important;
+    background: #1e262c !important;
+    border-color: rgba(10, 96, 255, 0.3) !important;
+    color: #d4d4d4 !important;
 }
-
 :root.dce-dark .csc-subcategory-pill:hover {
-    border-color: #02C8FF !important;
-    background: rgba(4, 159, 217, 0.12) !important;
+    border-color: #0A60FF !important;
+    background: rgba(10, 96, 255, 0.1) !important;
+    color: #6ea0ff !important;
 }
-
 :root.dce-dark .csc-subcategory-pill-active {
-    background: #ffffff !important;
-    border-color: #ffffff !important;
-    color: #1a1f24 !important;
+    background: #0A60FF !important;
+    border-color: #0A60FF !important;
+    color: #ffffff !important;
 }
-
 :root.dce-dark .csc-ai-pill-active {
-    background: #7c3aed !important;
-    border-color: #7c3aed !important;
-    color: #fff !important;
+    background: #02C8FF !important;
+    border-color: #02C8FF !important;
+    color: #07182D !important;
 }
-
 :root.dce-dark .csc-subcategory-count {
-    background: rgba(255, 255, 255, 0.18) !important;
+    background: rgba(255, 255, 255, 0.15) !important;
 }
-
 :root.dce-dark .csc-subcategory-pill-active .csc-subcategory-count {
-    background: #e8ebee !important;
-    color: #1a1f24 !important;
+    background: rgba(7, 24, 45, 0.3) !important;
+    color: #07182D !important;
 }
 
 /* Hide the icons inside the top pills */

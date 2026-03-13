@@ -8,9 +8,12 @@ The **Splunk Cisco App Navigator** is a Splunkbase app that provides a unified
 Product Catalog UI — the single entry point for all Cisco-Splunk integrations.
 It catalogs **79 Cisco products**, maps each to the correct Splunk add-on,
 validates data flow, detects legacy debt, and provides one-click install and
-launch actions. Each product card displays Cisco brand SVG icons (128 icons),
+launch actions. Each product card displays Cisco brand SVG icons (97 icons),
 AI/SOAR/ITSI/Alert badges, SC4S documentation links, Splunkbase compatibility
-filters, and platform-aware best practices.
+filters, platform-aware best practices, and a **Props.conf Audit (Magic Eight)**
+for ingestion health. The app also includes an **Ecosystem Intelligence**
+dashboard for portfolio analytics, **Indexer Tier detection** for deployment
+validation, and a **Catalog Vault** for disabled products.
 
 ---
 
@@ -38,8 +41,8 @@ splunk-cisco-app-navigator/
         │   ├── resources/splunk/
         │   │   ├── default/
         │   │   │   ├── app.conf       # Version 1.0.6
-        │   │   │   ├── products.conf  # 79 products (~3386 lines)
-        │   │   │   ├── savedsearches.conf  # 35 saved searches
+        │   │   │   ├── products.conf  # 79 products (~2669 lines)
+        │   │   │   ├── savedsearches.conf  # 40 saved searches (~994 lines)
         │   │   │   ├── props.conf     # Sourcetype + field extractions
         │   │   │   ├── transforms.conf    # Lookup definitions
         │   │   │   ├── commands.conf  # Custom search commands
@@ -48,13 +51,13 @@ splunk-cisco-app-navigator/
         │   │   │   ├── download_splunkbase_csv.py  # Custom command
         │   │   │   └── splunklib/     # Bundled splunklib 2.1.1
         │   │   ├── appserver/static/
-        │   │   │   ├── products.css   # ~4547 lines (incl. dark mode)
-        │   │   │   ├── icons/         # 128 Cisco brand icons
+        │   │   │   ├── products.css   # ~6123 lines (incl. dark mode)
+        │   │   │   ├── icons/         # 97 Cisco brand icons
         │   │   │   └── fonts/         # CiscoSansTT
         │   │   ├── lookups/           # Splunkbase CSV catalog
         │   │   └── README/products.conf.spec
         │   └── webapp/pages/products/
-        │       ├── index.jsx          # ~5561 lines (React UI)
+        │       ├── index.jsx          # ~7373 lines (React UI)
         │       └── productCatalog.generated.js
         └── stage/                     # Build output
 ```
@@ -83,20 +86,26 @@ curl -sk -u admin:changeme \
 
 | Feature | Description |
 |---|---|
-| **79 Product Cards** | Security (39), Networking (31), Observability (3), Collaboration (6) |
-| **Product Status** | 47 active, 3 deprecated, 16 roadmap, 2 under development, 11 retired |
-| **128 Cisco Brand Icons** | 126 SVGs + 2 PNGs with light/dark variants |
-| **Cross-Cutting Badges** | SOAR (12), ITSI (6), Alert Actions (6), AI-Powered (15) |
+| **79 Product Cards** | Security (56), Networking (31), Observability (3), Collaboration (6) |
+| **Product Status** | 48 active, 3 deprecated, 16 roadmap, 2 under development, 11 retired |
+| **97 Cisco Brand Icons** | SVGs with light/dark variants |
+| **Cross-Cutting Badges** | SOAR (12), ITSI (6), Alert Actions (8), AI-Powered (16) |
 | **SC4S Integration** | 18 products with SC4S documentation links |
 | **429+ Sourcetypes** | Data flow detection via `metadata` search |
 | **13 Subcategories** | Granular filtering within Security, Networking, Observability |
 | **Secure Networking GTM** | 65 products tagged for go-to-market strategy |
 | **Dark/Light/Auto Theme** | Three-state toggle with frosted glass card icons |
+| **Props.conf Audit (Magic Eight)** | Per-product ingestion health check with tier version audit |
+| **Indexer Tier Detection** | Validates add-on deployment across SH and indexer tiers |
+| **Ecosystem Intelligence** | Dashboard Studio v2 with portfolio analytics + Splunkbase intel |
+| **Catalog Vault** | Hidden disabled products accessible via vault toggle |
 | **Best Practices Modal** | Platform-aware tips (Cloud vs Enterprise) |
 | **Legacy Debt Auditor** | Detects legacy apps with per-card badges |
-| **Splunkbase Compatibility** | Platform & version filters synced from S3 catalog |
-| **35 Saved Searches** | 7 categories of analytics + scheduled sync job |
+| **Splunkbase Compatibility** | Platform & multi-select version filters synced from S3 |
+| **FilterDrawer** | Sidebar drawer with advanced filters (support, visibility, onboarding) |
+| **40 Saved Searches** | 7 categories of analytics + scheduled sync job |
 | **Custom Search Command** | `downloadsplunkbasecsv` for catalog sync from S3 |
+| **Portal-based Resizable Modals** | Draggable + resizable modals using ReactDOM.createPortal |
 | **Strategic Sort Order** | Related products adjacent within categories |
 | **Give Feedback** | In-app feedback form |
 
@@ -128,6 +137,7 @@ The icons actually used in the app are already committed in
 ## Documentation
 
 - [Architecture Guide](docs/SCAN_Architecture_Guide.md) — comprehensive A-Z documentation
+- [The Magic Eight](docs/The_Magic_Eight.md) — props.conf ingestion health check guide
 - [Package README](packages/splunk-cisco-app-navigator/README.md)
 - [Changelog](packages/splunk-cisco-app-navigator/CHANGELOG.md)
 - [Copilot Instructions](.github/copilot-instructions.md) — full technical context

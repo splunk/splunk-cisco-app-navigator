@@ -92,19 +92,19 @@ function buildProduct(name, c) {
         ai_description: c.ai_description || '',
         cisco_retired: c.cisco_retired === 'true' || c.cisco_retired === '1',
         coverage_gap: c.coverage_gap === 'true' || c.coverage_gap === '1',
-        addon_splunkbase_uid: c.addon_splunkbase_uid || '',
+        addon_splunkbase_uid: c.addon_uid || c.addon_splunkbase_uid || '',
         addon_docs_url: c.addon_docs_url || '',
         addon_troubleshoot_url: c.addon_troubleshoot_url || '',
         addon_install_url: c.addon_install_url || '',
         app_viz: c.app_viz || '',
         app_viz_label: c.app_viz_label || '',
-        app_viz_splunkbase_uid: c.app_viz_splunkbase_uid || '',
+        app_viz_splunkbase_uid: c.app_viz_uid || c.app_viz_splunkbase_uid || '',
         app_viz_docs_url: c.app_viz_docs_url || '',
         app_viz_troubleshoot_url: c.app_viz_troubleshoot_url || '',
         app_viz_install_url: c.app_viz_install_url || '',
         app_viz_2: c.app_viz_2 || '',
         app_viz_2_label: c.app_viz_2_label || '',
-        app_viz_2_splunkbase_uid: c.app_viz_2_splunkbase_uid || '',
+        app_viz_2_splunkbase_uid: c.app_viz_2_uid || c.app_viz_2_splunkbase_uid || '',
         app_viz_2_docs_url: c.app_viz_2_docs_url || '',
         app_viz_2_troubleshoot_url: c.app_viz_2_troubleshoot_url || '',
         app_viz_2_install_url: c.app_viz_2_install_url || '',
@@ -165,8 +165,11 @@ const confText = fs.readFileSync(CONF_PATH, 'utf8');
 const stanzas = parseConf(confText);
 
 const products = stanzas
-    .filter(s => s.fields.disabled !== "1" && s.fields.disabled !== "true")
-    .map(s => buildProduct(s.name, s.fields))
+    .map(s => {
+        const prod = buildProduct(s.name, s.fields);
+        prod.catalog_disabled = s.fields.disabled === "1" || s.fields.disabled === "true";
+        return prod;
+    })
     .filter(p => !HIDDEN_CATEGORIES.has(p.category))
     .sort((a, b) => a.sort_order - b.sort_order || a.display_name.localeCompare(b.display_name));
 

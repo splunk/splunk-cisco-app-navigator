@@ -1,12 +1,12 @@
 # coding=utf-8
 """
-download_splunkbase_csv.py — Custom search command for SCAN
+synclookup.py — Custom search command for SCAN
 
 Downloads a CSV from S3 and stores it in the app's lookups folder.
 Handles gzip compression/decompression automatically.
 
 Usage:
-    | downloadsplunkbasecsv input_csv=splunkbase_assets/splunkbase_apps.csv.gz output_csv=scan_splunkbase_apps.csv.gz
+    | synclookup input_csv=splunkbase_assets/splunkbase_apps.csv.gz output_csv=scan_splunkbase_apps.csv.gz
 
 Source:  https://is4s.s3.amazonaws.com/<input_csv>
 Target:  $SPLUNK_HOME/etc/apps/splunk-cisco-app-navigator/lookups/<output_csv>
@@ -34,11 +34,11 @@ GZIP_MAGIC_NUMBER = b"\x1f\x8b"
 GZIP_MAGIC_NUMBER_LEN = len(GZIP_MAGIC_NUMBER)
 SPLUNK_HOME = os.environ["SPLUNK_HOME"]
 LOG_PATH = os.path.join(
-    SPLUNK_HOME, "var", "log", "splunk", "download_splunkbase_csv.log"
+    SPLUNK_HOME, "var", "log", "splunk", "synclookup.log"
 )
 LOOKUP_PATH = os.path.join(SPLUNK_HOME, "etc", "apps", APP_NAME, "lookups")
 S3_BASE_URL = "https://is4s.s3.amazonaws.com/"
-LOGGER = logging.getLogger("downloadsplunkbasecsv")
+LOGGER = logging.getLogger("synclookup")
 LOG_FILE_FORMAT = "%(asctime)s [%(levelname)s] %(name)s - %(message)s"
 LOG_STREAM_FORMAT = "[%(levelname)s] %(message)s"
 LOG_DATE_FORMAT = "%Y-%m-%d %H:%M:%S"
@@ -76,13 +76,13 @@ def set_up_logging():
 
 
 @Configuration(type="events")
-class DownloadSplunkbaseCSV(GeneratingCommand):
+class SyncLookup(GeneratingCommand):
     """
-    downloadsplunkbasecsv: download a file from S3, save it as a CSV optionally in gzipped format
+    synclookup: download a file from S3, save it as a CSV optionally in gzipped format
 
     Example:
 
-    ``| downloadsplunkbasecsv input_csv=splunkbase_assets/splunkbase_apps.csv.gz output_csv=scan_splunkbase_apps.csv.gz``
+    ``| synclookup input_csv=splunkbase_assets/splunkbase_apps.csv.gz output_csv=scan_splunkbase_apps.csv.gz``
 
     Note: Overwrites existing file without warning
     """
@@ -176,4 +176,4 @@ class DownloadSplunkbaseCSV(GeneratingCommand):
 
 
 set_up_logging()
-dispatch(DownloadSplunkbaseCSV, sys.argv, sys.stdin, sys.stdout, __name__)
+dispatch(SyncLookup, sys.argv, sys.stdin, sys.stdout, __name__)
