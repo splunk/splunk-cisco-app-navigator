@@ -179,7 +179,9 @@ class SyncCatalog(GeneratingCommand):
         headers = {"Authorization": f"Splunk {session_key}"}
         INFO(f"Triggering config reload at: {reload_url}")
         try:
-            response = requests.post(reload_url, headers=headers, verify=False)
+            certifi_path = os.path.join(SPLUNK_HOME, "etc", "auth", "cacert.pem")
+            verify_tls = certifi_path if os.path.isfile(certifi_path) else False
+            response = requests.post(reload_url, headers=headers, verify=verify_tls)
             INFO(f"Reload returned status {response.status_code}")
             response.raise_for_status()
             return {"status": "Success", "message": "Reloaded conf-products."}

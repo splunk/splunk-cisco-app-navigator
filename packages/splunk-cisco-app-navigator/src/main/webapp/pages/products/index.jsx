@@ -348,19 +348,19 @@ async function loadProductsFromConf() {
             ai_description: c.ai_description || '',
             cisco_retired: c.cisco_retired === 'true' || c.cisco_retired === '1' || c.cisco_retired === true,
             coverage_gap: c.coverage_gap === 'true' || c.coverage_gap === '1' || c.coverage_gap === true,
-            addon_splunkbase_uid: c.addon_splunkbase_uid || extractSplunkbaseUid(c.addon_splunkbase_url) || '',
+            addon_splunkbase_uid: c.addon_uid || c.addon_splunkbase_uid || extractSplunkbaseUid(c.addon_splunkbase_url) || '',
             addon_docs_url: c.addon_docs_url || '',
             addon_troubleshoot_url: c.addon_troubleshoot_url || '',
             addon_install_url: c.addon_install_url || '',
             app_viz: c.app_viz || '',
             app_viz_label: c.app_viz_label || '',
-            app_viz_splunkbase_uid: c.app_viz_splunkbase_uid || extractSplunkbaseUid(c.app_viz_splunkbase_url) || '',
+            app_viz_splunkbase_uid: c.app_viz_uid || c.app_viz_splunkbase_uid || extractSplunkbaseUid(c.app_viz_splunkbase_url) || '',
             app_viz_docs_url: c.app_viz_docs_url || '',
             app_viz_troubleshoot_url: c.app_viz_troubleshoot_url || '',
             app_viz_install_url: c.app_viz_install_url || '',
             app_viz_2: c.app_viz_2 || '',
             app_viz_2_label: c.app_viz_2_label || '',
-            app_viz_2_splunkbase_uid: c.app_viz_2_splunkbase_uid || extractSplunkbaseUid(c.app_viz_2_splunkbase_url) || '',
+            app_viz_2_splunkbase_uid: c.app_viz_2_uid || c.app_viz_2_splunkbase_uid || extractSplunkbaseUid(c.app_viz_2_splunkbase_url) || '',
             app_viz_2_docs_url: c.app_viz_2_docs_url || '',
             app_viz_2_troubleshoot_url: c.app_viz_2_troubleshoot_url || '',
             app_viz_2_install_url: c.app_viz_2_install_url || '',
@@ -5075,7 +5075,7 @@ function FilterDrawer({
                 if (p.sc4s_supported) { sc4sOnly++; } else { standalone++; }
                 return;
             }
-            if (!map[p.addon]) map[p.addon] = { label: p.addon_label || p.addon, count: 0 };
+            if (!map[p.addon]) map[p.addon] = { label: p.addon_label || p.addon, folder: p.addon, uid: p.addon_splunkbase_uid || '', count: 0 };
             map[p.addon].count++;
         });
         const entries = Object.entries(map)
@@ -5453,7 +5453,7 @@ function FilterDrawer({
                                         key={id}
                                         className={`scan-drawer-addon-item ${selectedAddon === id ? 'scan-drawer-addon-item-active' : ''}`}
                                         onClick={() => onSelectAddon(selectedAddon === id ? null : id)}
-                                        title={g.label}
+                                        title={g.folder ? `${g.folder}${g.uid ? `  •  UID ${g.uid}` : ''}` : g.label}
                                     >
                                         <span className="scan-drawer-addon-name">{g.label}</span>
                                         <span className="scan-drawer-addon-count">{g.count}</span>
@@ -5577,7 +5577,7 @@ function AddonFilterBar({ selectedAddon, onSelectAddon, products }) {
     const ref = useRef(null);
 
     const groups = useMemo(() => {
-        const map = {};          // addon → { label, count }
+        const map = {};          // addon → { label, folder, uid, count }
         let standalone = 0;
         let sc4sOnly = 0;
         (products || []).forEach((p) => {
@@ -5586,7 +5586,7 @@ function AddonFilterBar({ selectedAddon, onSelectAddon, products }) {
                 else { standalone++; }
                 return;
             }
-            if (!map[p.addon]) map[p.addon] = { label: p.addon_label || p.addon, count: 0 };
+            if (!map[p.addon]) map[p.addon] = { label: p.addon_label || p.addon, folder: p.addon, uid: p.addon_splunkbase_uid || '', count: 0 };
             map[p.addon].count++;
         });
         // Sort by count desc, then alphabetical
@@ -5594,7 +5594,7 @@ function AddonFilterBar({ selectedAddon, onSelectAddon, products }) {
             .sort((a, b) => b[1].count - a[1].count || a[1].label.localeCompare(b[1].label));
         if (sc4sOnly > 0) entries.push(['__sc4s__', { label: 'Splunk Connect for Syslog (SC4S)', count: sc4sOnly }]);
         if (standalone > 0) entries.push(['__standalone__', { label: 'Standalone', count: standalone }]);
-        return entries;          // [[ addonId, { label, count }], …]
+        return entries;          // [[ addonId, { label, folder, uid, count }], …]
     }, [products]);
 
     // Close on outside click
@@ -5641,7 +5641,7 @@ function AddonFilterBar({ selectedAddon, onSelectAddon, products }) {
                             key={id}
                             className={`addon-dropdown-item${selectedAddon === id ? ' addon-dropdown-item-active' : ''}`}
                             onClick={() => handleSelect(id)}
-                            title={id === '__standalone__' ? 'Products with their own dedicated add-on' : id === '__sc4s__' ? 'Products powered exclusively by Splunk Connect for Syslog' : g.label}
+                            title={id === '__standalone__' ? 'Products with their own dedicated add-on' : id === '__sc4s__' ? 'Products powered exclusively by Splunk Connect for Syslog' : g.folder ? `${g.folder}${g.uid ? `  •  UID ${g.uid}` : ''}` : g.label}
                         >
                             {g.label} <span className="addon-pill-count">{g.count}</span>
                         </button>
@@ -6393,11 +6393,8 @@ function SCANProductsPage() {
             }
             const data = await res.json();
             const results = data.results || [];
-            console.log('[SCAN] Sync results:', results); // TEMP DEBUG
-            const catalogRow = results.find(r => r.status != null);
             const countRow = results.find(r => r.count != null);
             const entryCount = countRow ? parseInt(countRow.count, 10) : 0;
-            if (catalogRow) console.log('[SCAN] Catalog sync:', catalogRow.status, catalogRow.message); // TEMP DEBUG
             if (entryCount > 0) {
                 setCsvSyncStatus('success');
                 setCsvSyncMessage(`Catalog synced — ${entryCount.toLocaleString()} apps`);
