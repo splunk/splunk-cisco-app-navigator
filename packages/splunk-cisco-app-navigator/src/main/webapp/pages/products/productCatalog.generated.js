@@ -2,7 +2,7 @@
 /**
  * AUTO-GENERATED from products.conf — DO NOT EDIT BY HAND.
  * Regenerate:  node bin/generate-catalog.js
- * Generated:   2026-03-12T02:20:51.248Z
+ * Generated:   2026-03-12T14:07:00.700Z
  * Products:    79
  */
 

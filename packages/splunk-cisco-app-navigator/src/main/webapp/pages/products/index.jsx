@@ -6371,7 +6371,7 @@ function SCANProductsPage() {
 
     // ── Splunkbase CSV sync handler ──
     // Runs the "SCAN - Splunkbase Catalog Sync" saved search which:
-    //   1. Downloads the latest CSV from S3 via | downloadsplunkbasecsv
+    //   1. Downloads the latest CSV from S3 via | synclookup
     //   2. Normalizes and deduplicates the data
     //   3. Writes the cleaned lookup to scan_splunkbase_apps.csv.gz
     //   4. Returns a count of entries written
@@ -6393,7 +6393,11 @@ function SCANProductsPage() {
             }
             const data = await res.json();
             const results = data.results || [];
-            const entryCount = results.length > 0 ? parseInt(results[0].count, 10) : 0;
+            console.log('[SCAN] Sync results:', results); // TEMP DEBUG
+            const catalogRow = results.find(r => r.status != null);
+            const countRow = results.find(r => r.count != null);
+            const entryCount = countRow ? parseInt(countRow.count, 10) : 0;
+            if (catalogRow) console.log('[SCAN] Catalog sync:', catalogRow.status, catalogRow.message); // TEMP DEBUG
             if (entryCount > 0) {
                 setCsvSyncStatus('success');
                 setCsvSyncMessage(`Catalog synced — ${entryCount.toLocaleString()} apps`);
