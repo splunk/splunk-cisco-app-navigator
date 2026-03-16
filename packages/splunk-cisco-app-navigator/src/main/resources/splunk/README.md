@@ -121,7 +121,7 @@ Each Cisco product is represented by an **intelligent card** that actively inspe
 | `README/products.conf.spec` | Spec file documenting all products.conf fields |
 | `appserver/static/` | React bundle (products.js), CSS (products.css), app icons, SVG badges |
 | `appserver/templates/` | HTML template for legacy browser fallback |
-| `lookups/cisco_apps.csv` | Reference CSV of all Cisco Splunkbase apps |
+| `lookups/scan_splunkbase_apps.csv.gz` | Canonical Splunkbase catalog (synced by SCAN - Splunkbase Catalog Sync); used for app metadata, legacy/deprecated resolution, and SOAR connectors |
 | `static/` | Splunkbase listing icons |
 
 ## Technology Stack

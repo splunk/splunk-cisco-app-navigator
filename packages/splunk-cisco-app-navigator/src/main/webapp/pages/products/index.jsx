@@ -60,6 +60,20 @@ const THEME_STORAGE_KEY = 'scan_theme_preference'; // 'light' | 'dark' | 'auto'
 const PORTFOLIO_STORAGE_KEY = 'scan_show_full_portfolio'; // 'true' | 'false'
 const DEVMODE_STORAGE_KEY = 'scan_developer_mode'; // 'true' | 'false'
 const PERSONA_STORAGE_KEY = 'scan_persona_shown'; // 'true' once persona modal dismissed
+const FILTERS_STORAGE_KEY = 'scan_filter_state';
+const PANELS_STORAGE_KEY = 'scan_panel_state';
+
+const DEFAULT_PANEL_STATE = {
+    configured_products: true,
+    detected_products: true,
+    available_products: true,
+    unsupported_products: false,
+    coming_soon_products: true,
+    deprecated_products: false,
+    retired_products: false,
+    gtm_coverage_gaps: false,
+    vault_products: true,
+};
 const SUPPORTED_LEVELS = new Set(['cisco_supported', 'splunk_supported']);
 
 /** Toggle to show/hide value proposition text on the card face (always visible in ⓘ tooltip) */
@@ -168,6 +182,16 @@ const SUB_CATEGORIES = {
     ],
 };
 
+// Cisco Secure Networking GTM pillars (per https://www.cisco.com/c/en/us/solutions/collateral/transform-infrastructure/secure-networking-so.html).
+// Used on GTM Roadmap cards to show how a product maps to the GTM strategy.
+const GTM_PILLAR_LABELS = {
+    1: 'Pillar 1: Secure Campus & Branch',
+    2: 'Pillar 2: Secure WAN Edge',
+    3: 'Pillar 3: Data Center & Cloud',
+    4: 'Pillar 4: End-to-End Visibility & Assurance',
+    5: 'Pillar 5: Industrial / OT',
+};
+
 // Icon mapping removed — all products now use icon_svg with letter fallback.
 
 // ─────────────────  STATIC PRODUCT CATALOG  ─────────────────
@@ -202,6 +226,29 @@ function savePortfolioPreference(show) {
     catch (e) { /* quota */ }
 }
 
+function getSavedFilters() {
+    try {
+        const raw = localStorage.getItem(FILTERS_STORAGE_KEY);
+        return raw ? JSON.parse(raw) : {};
+    } catch { return {}; }
+}
+function saveFilters(state) {
+    try { localStorage.setItem(FILTERS_STORAGE_KEY, JSON.stringify(state)); }
+    catch { /* quota */ }
+}
+const _savedFilters = getSavedFilters();
+
+function getSavedPanelState() {
+    try {
+        const raw = localStorage.getItem(PANELS_STORAGE_KEY);
+        return raw ? JSON.parse(raw) : {};
+    } catch { return {}; }
+}
+function savePanelState(state) {
+    try { localStorage.setItem(PANELS_STORAGE_KEY, JSON.stringify(state)); }
+    catch { /* quota */ }
+}
+
 function splunkFetch(url, options = {}) {
     const headers = {
         'X-Splunk-Form-Key': getCSRFToken() || '',
@@ -215,6 +262,9 @@ function csvToArray(val) {
     if (!val) return [];
     return val.split(',').map(s => s.trim()).filter(Boolean);
 }
+
+const SC4S_SPLUNKBASE_UID = '4740';
+const CISCO_PRODUCT_DIRECTORY_URL = 'https://www.cisco.com/site/us/en/products/index.html';
 
 /**
  * Generate Splunkbase app URL from UID.
@@ -284,7 +334,22 @@ function getAllProductUids(product, appidToUidMap) {
  * Products without add-ons (SC4S-only, standalone dashboards) pass if ANY
  * of their apps support the version.
  */
+/**
+ * SC4S-supported products are compatible with both Splunk Cloud and
+ * Splunk Enterprise on every version.  Returns true when the product's
+ * sc4s_supported flag satisfies at least one of the requested platform
+ * filter values, allowing the caller to skip Splunkbase lookups.
+ */
+function sc4sCoversFilter(product, platformFilter) {
+    if (!product.sc4s_supported) return false;
+    return platformFilter.some(pf => {
+        const lc = pf.toLowerCase();
+        return lc.includes('cloud') || lc.includes('enterprise');
+    });
+}
+
 function productSupportsVersions(product, versions, splunkbaseData, appidToUidMap) {
+    if (product.sc4s_supported) return true;
     const uidSupports = (uid) => {
         const entry = splunkbaseData[uid];
         if (!entry || !entry.version_compatibility) return false;
@@ -319,6 +384,9 @@ function sortVersionsDesc(versions) {
 
 /**
  * Load products.conf via Splunk's built-in configs/conf-products endpoint.
+ * Normalizes field names: products.conf uses addon_uid / app_viz_uid; we expose
+ * addon_splunkbase_uid / app_viz_splunkbase_uid for UI and saved searches so
+ * catalog, REST, and generated fallback stay consistent.
  */
 async function loadProductsFromConf() {
     const res = await splunkFetch(`${CONF_ENDPOINT}?output_mode=json&count=0`);
@@ -348,6 +416,7 @@ async function loadProductsFromConf() {
             ai_description: c.ai_description || '',
             cisco_retired: c.cisco_retired === 'true' || c.cisco_retired === '1' || c.cisco_retired === true,
             coverage_gap: c.coverage_gap === 'true' || c.coverage_gap === '1' || c.coverage_gap === true,
+            gap_type: c.gap_type || '',
             addon_splunkbase_uid: c.addon_uid || c.addon_splunkbase_uid || extractSplunkbaseUid(c.addon_splunkbase_url) || '',
             addon_docs_url: c.addon_docs_url || '',
             addon_troubleshoot_url: c.addon_troubleshoot_url || '',
@@ -739,7 +808,9 @@ function getBestPractices(product, platformType, splunkbaseData) {
         tips.push({ text: `On Splunk Enterprise, consider using Splunk Connect for Syslog (SC4S) to reliably ingest data for ${pn}. SC4S handles syslog parsing and routes events to the correct sourcetype automatically.` });
     }
 
-    tips.push({ text: `The required add-on for data ingestion is "${ta}". Make sure it is installed and enabled on your search heads and heavy forwarders.` });
+    if (ta) {
+        tips.push({ text: `The required add-on for data ingestion is "${ta}". Make sure it is installed and enabled on your search heads and heavy forwarders.` });
+    }
 
     if (viz) {
         tips.push({ text: `To visualise dashboards and reports, install "${viz}" on your search heads.` });
@@ -769,7 +840,7 @@ function getBestPractices(product, platformType, splunkbaseData) {
 
 // ───────────────────  INTELLIGENCE BADGES COMPONENT  ────────────────
 
-function IntelligenceBadges({ appStatus, vizAppStatus, vizApp2Status, sourcetypeInfo, legacyInstalled, allLegacyUids, splunkbaseData, sourcetypeSearchUrl, isArchived, onViewLegacy }) {
+function IntelligenceBadges({ appStatus, vizAppStatus, vizApp2Status, sourcetypeInfo, sourcetypeSearchUrl, isArchived, isRoadmapCard }) {
     const items = [];
 
     if (isArchived) {
@@ -781,53 +852,22 @@ function IntelligenceBadges({ appStatus, vizAppStatus, vizApp2Status, sourcetype
             items.push({ cls: 'data-ok', label: `✓ Data flowing (${sourcetypeInfo.detail})`, key: 'data-ok', url: sourcetypeSearchUrl });
         } else if (sourcetypeInfo.hasData && !appStatus?.installed) {
             items.push({ cls: 'data-ok', label: `Data found (${sourcetypeInfo.detail})`, key: 'data-no-ta', url: sourcetypeSearchUrl });
-        } else if (!sourcetypeInfo.hasData) {
+        } else if (!sourcetypeInfo.hasData && !isRoadmapCard) {
+            // Roadmap/coverage_gap products have no add-on yet — don't show "No sourcetypes defined"
             items.push({ cls: 'data-none', label: sourcetypeInfo.detail || 'No data (7d)', key: 'data-none', url: sourcetypeSearchUrl });
         }
     }
     if (items.length === 0) return null;
 
-    const handleLegacyClick = (e) => {
-        e.stopPropagation();
-        if (onViewLegacy && allLegacyUids) onViewLegacy(allLegacyUids);
-    };
-
     return (
         <div className="csc-intelligence-badges">
             {items.map(b => (
-                <span key={b.key} className={`csc-badge-item csc-badge-${b.cls}`}
-                      {...(b.key === 'legacy' ? { onClick: handleLegacyClick, style: { cursor: 'pointer' } } : {})}>
+                <span key={b.key} className={`csc-badge-item csc-badge-${b.cls}`}>
                     {b.url ? (
                         <a href={b.url} target="_blank" rel="noopener noreferrer" className="csc-badge-link" onClick={e => e.stopPropagation()}>
                             {b.label}
                         </a>
                     ) : b.label}
-                    {b.key === 'legacy' && b.legacyApps && b.legacyApps.length > 0 && (
-                        <div className="csc-legacy-tooltip">
-                            <div className="csc-legacy-tooltip-inner">
-                                <div className="csc-legacy-tooltip-title">Legacy Apps Detected</div>
-                                {b.legacyApps.slice(0, 5).map((uid, i) => {
-                                    const sb = splunkbaseData && splunkbaseData[uid];
-                                    const title = sb ? (sb.title || sb.appid || `App #${uid}`) : `App #${uid}`;
-                                    const appid = sb?.appid || '';
-                                    const sbStatus = sb?.status || 'unknown';
-                                    return (
-                                    <div key={i} className="csc-legacy-tooltip-item">
-                                        <span className={`csc-legacy-tooltip-status ${sbStatus === 'archived' ? 'csc-lt-archived' : 'csc-lt-active'}`}>
-                                            {sbStatus === 'archived' ? '' : ''}
-                                        </span>
-                                        <strong>{title}</strong>
-                                        {appid && <span className="csc-legacy-tooltip-appid">{appid}</span>}
-                                    </div>
-                                    );
-                                })}
-                                {b.legacyApps.length > 5 && (
-                                    <div className="csc-legacy-tooltip-more">…and {b.legacyApps.length - 5} more</div>
-                                )}
-                                <div className="csc-legacy-tooltip-hint">Click badge to view full audit report</div>
-                            </div>
-                        </div>
-                    )}
                 </span>
             ))}
         </div>
@@ -966,6 +1006,9 @@ function SC4SInfoModal({ open, onClose }) {
                     </div>
 
                     <div className="csc-sc4s-info-footer">
+                        <a href="https://splunkbase.splunk.com/app/4740" target="_blank" rel="noopener noreferrer" className="csc-sc4s-info-link">
+                             Splunkbase
+                        </a>
                         <a href="https://splunk.github.io/splunk-connect-for-syslog/main/" target="_blank" rel="noopener noreferrer" className="csc-sc4s-info-link">
                              SC4S Official Documentation
                         </a>
@@ -1004,7 +1047,7 @@ function NetFlowInfoModal({ open, onClose, installedApps }) {
                         <div className="csc-sc4s-info-hero-icon"></div>
                         <div className="csc-sc4s-info-hero-text">
                             <h3>Technical Overview</h3>
-                            <p>The NetFlow / Splunk Stream solution provides network traffic visibility from Cisco devices using <strong>4 complementary packages</strong> — <strong>3 from Splunk</strong> (the Stream platform) and <strong>1 from Cisco</strong> (enhanced Netflow). Together they collect, parse, enrich, and visualize NetFlow v9, IPFIX, and wire data from your Cisco infrastructure.</p>
+                            <p>The NetFlow / Splunk Stream solution provides network traffic visibility from Cisco devices using <strong>4 complementary packages</strong> — <strong>3 from Splunk</strong> (the Stream platform) and <strong>1 from Cisco</strong> (enhanced Netflow). Together they collect, parse, enrich, and visualize NetFlow v9, v10 (IPFIX), and wire data from your Cisco infrastructure.</p>
                         </div>
                     </div>
 
@@ -1050,13 +1093,13 @@ function NetFlowInfoModal({ open, onClose, installedApps }) {
                                 <span className="csc-sc4s-info-card-icon"></span>
                                 <strong>Splunk Add-on for Stream Wire Data</strong>
                                 <span style={{ fontSize: '11px', fontStyle: 'italic' }}><a href="https://splunkbase.splunk.com/app/5234" target="_blank" rel="noopener noreferrer">Splunkbase 5234</a> &middot; Splunk</span>
-                                <span><strong>Knowledge objects &amp; CIM mappings</strong> for parsing and normalizing Stream data. Install on <strong>Search Heads</strong> (for search-time parsing) and <strong>Indexers</strong> (for field extractions at index time).</span>
+                                <span>Companion add-on to App for Stream and Add-on for Stream Forwarders. Contains <strong>knowledge objects and CIM mappings</strong> for data generated by the Add-on for Stream Forwarders (5238). Installed on <strong>Indexers and Search Heads</strong> — required on both for full parsing and normalized fields (search-time on Search Heads, index-time on Indexers).</span>
                             </div>
                             <div className="csc-sc4s-info-card">
                                 <span className="csc-sc4s-info-card-icon"></span>
                                 <strong>Cisco Catalyst Enhanced Netflow Add-on</strong>
                                 <span style={{ fontSize: '11px', fontStyle: 'italic' }}><a href="https://splunkbase.splunk.com/app/6872" target="_blank" rel="noopener noreferrer">Splunkbase 6872</a> &middot; Cisco</span>
-                                <span>Extends Stream with <strong>Cisco-specific IPFIX templates</strong> and field extractions for Cisco Catalyst SD-WAN devices. Provides Netflow element mapping for Cisco Netflow v9 and IPFIX data. Install on <strong>Search Heads</strong>.</span>
+                                <span>Provides <strong>Netflow element mapping</strong> for Cisco Netflow data (v9 and v10/IPFIX) from <strong>Cisco Catalyst SD-WAN</strong> devices (supported product per Splunkbase). Extends Stream with Cisco-specific IPFIX templates and field extractions. For Stream deployments, install on <strong>Search Heads</strong>.</span>
                             </div>
                         </div>
                     </div>
@@ -1140,11 +1183,11 @@ function NetFlowInfoModal({ open, onClose, installedApps }) {
                                 </tr>
                                 <tr>
                                     <td className="csc-sc4s-info-table-label">Indexers</td>
-                                    <td><strong>Add-on for Stream Wire Data</strong> (5234) — index-time field extractions and CIM mappings</td>
+                                    <td><strong>Add-on for Stream Wire Data</strong> (5234) — required for index-time field extractions and CIM mappings</td>
                                 </tr>
                                 <tr>
                                     <td className="csc-sc4s-info-table-label">Search Heads</td>
-                                    <td><strong>App for Stream</strong> (1809) + <strong>Add-on for Stream Wire Data</strong> (5234) + <strong>Cisco Enhanced Netflow Add-on</strong> (6872, for Catalyst SD-WAN / IOS-XE)</td>
+                                    <td><strong>App for Stream</strong> (1809) + <strong>Add-on for Stream Wire Data</strong> (5234, required for search-time parsing and normalized fields) + <strong>Cisco Catalyst Enhanced Netflow Add-on</strong> (6872, for Cisco Catalyst SD-WAN)</td>
                                 </tr>
                             </tbody>
                         </table>
@@ -1156,7 +1199,7 @@ function NetFlowInfoModal({ open, onClose, installedApps }) {
                             <div className="csc-sc4s-info-card">
                                 <span className="csc-sc4s-info-card-icon"></span>
                                 <strong>Deep Cisco Visibility</strong>
-                                <span>The Cisco Enhanced Netflow Add-on decodes proprietary IPFIX information elements for Application Visibility, Performance Routing, SD-WAN, and media metrics from Cisco Catalyst devices.</span>
+                                <span>The Cisco Catalyst Enhanced Netflow Add-on decodes proprietary IPFIX information elements for Application Visibility, Performance Routing, SD-WAN, and media metrics from Cisco Catalyst SD-WAN devices (supported product per Splunkbase).</span>
                             </div>
                             <div className="csc-sc4s-info-card">
                                 <span className="csc-sc4s-info-card-icon"></span>
@@ -1183,14 +1226,14 @@ function NetFlowInfoModal({ open, onClose, installedApps }) {
                                 <span className="csc-sc4s-info-bp-marker"></span>
                                 <div>
                                     <strong>Install All 3 Stream Packages</strong>
-                                    <p>All three Splunk Stream packages are required: the Forwarder TA on forwarders, the App on search heads, and the Wire Data TA on both search heads and indexers. Missing any one will result in incomplete data parsing.</p>
+                                    <p>All three Splunk Stream packages are required: Add-on for Stream Forwarders (5238) on forwarders; App for Stream (1809) on search heads; Add-on for Stream Wire Data (5234) on <strong>indexers and search heads</strong> — 5234 on search heads is required for search-time parsing and normalized fields. Missing any one will result in incomplete or unnormalized data.</p>
                                 </div>
                             </div>
                             <div className="csc-sc4s-info-bp-item csc-sc4s-info-bp-good">
                                 <span className="csc-sc4s-info-bp-marker"></span>
                                 <div>
-                                    <strong>Add Cisco Enhanced Netflow for IOS-XE</strong>
-                                    <p>If your Cisco devices run IOS-XE (Catalyst SD-WAN, ISR, ASR, WLC), install the Cisco Enhanced Netflow Add-on on search heads. It is <em>not</em> needed for NX-OS (Nexus), ACI, or Meraki.</p>
+                                    <strong>Add Cisco Enhanced Netflow for Catalyst SD-WAN</strong>
+                                    <p>The Cisco Catalyst Enhanced Netflow Add-on (6872) supports <strong>Cisco Catalyst SD-WAN</strong> per Splunkbase. Install it on search heads for Stream deployments. It is <em>not</em> needed for NX-OS (Nexus), ACI, or Meraki.</p>
                                 </div>
                             </div>
                             <div className="csc-sc4s-info-bp-item csc-sc4s-info-bp-good">
@@ -2211,6 +2254,46 @@ function SOARInfoModal({ open, onClose, soarConnectorUids, splunkbaseData, produ
     );
 }
 
+// ────────────────────  ALERT ACTIONS INFO MODAL  ───────────────────
+
+function AlertActionsInfoModal({ open, onClose, alertActionUids, splunkbaseData, productName }) {
+    const returnFocusRef = useRef(null);
+    if (!open) return null;
+    const actions = (alertActionUids || []).map(uid => {
+        const sb = splunkbaseData && splunkbaseData[uid];
+        return { uid, label: sb ? (sb.title || sb.appid || `App #${uid}`) : `App #${uid}` };
+    });
+    return (
+        <Modal open returnFocus={returnFocusRef} onRequestClose={onClose} style={{ maxWidth: '560px', width: '92vw' }}>
+            <Modal.Header title="Alert Actions" />
+            <Modal.Body>
+                <div className="csc-sc4s-info" style={{ fontSize: '13px' }}>
+                    <p>This product has <strong>custom alert actions</strong> available on Splunkbase. Install them to send Splunk alerts to {productName ? productName : 'Cisco'} systems (e.g. create tickets, trigger workflows).</p>
+                    {actions.length > 0 && (
+                        <div style={{ marginTop: '12px' }}>
+                            <h4 style={{ marginBottom: '8px' }}>Available alert actions</h4>
+                            <ul style={{ margin: 0, paddingLeft: '20px' }}>
+                                {actions.map((a) => (
+                                    <li key={a.uid} style={{ marginBottom: '4px' }}>
+                                        <a href={generateSplunkbaseUrl(a.uid)} target="_blank" rel="noopener noreferrer" style={{ fontWeight: 600 }}>
+                                            {a.label}
+                                        </a>
+                                        {' '}
+                                        <span style={{ fontSize: '11px', color: 'var(--text-muted, #666)' }}>(UID {a.uid})</span>
+                                    </li>
+                                ))}
+                            </ul>
+                        </div>
+                    )}
+                </div>
+            </Modal.Body>
+            <Modal.Footer>
+                <Button appearance="secondary" label="Close" onClick={onClose} />
+            </Modal.Footer>
+        </Modal>
+    );
+}
+
 // ────────────────────  ITSI INFO MODAL  ─────────────────────────────
 
 function ITSIInfoModal({ open, onClose, itsiContentPack, productName }) {
@@ -2543,7 +2626,7 @@ function BestPracticesModal({ open, onClose, product, platformType, splunkbaseDa
                         }}>
                             {tip.icon && <span style={{ marginRight: '6px' }}>{tip.icon}</span>}
                             {tip.text}
-                            {tip.linkUrl && (
+                            {tip.linkUrl && typeof tip.linkUrl === 'string' && tip.linkUrl.startsWith('http') && (
                                 <div style={{ marginTop: '6px' }}>
                                     <a href={tip.linkUrl} target="_blank" rel="noopener noreferrer"
                                        style={{ fontWeight: 600, textDecoration: 'underline' }}>
@@ -2964,8 +3047,10 @@ function InfoTooltip({ placement = 'bottom', width = 500, delay = 400, content, 
 // CardInfoPopover removed — now using InfoTooltip portal popup instead
 
 // ────────────────────────  PRODUCT CARD  ─────────────────────
+// Renders one product: icon, name, links, support bar (bottom), install/configure actions.
+// Support indicator: one blue bar at bottom via supportBadgeClass / data-support-level (see products.css).
 
-function ProductCard({ product, installedApps, appStatuses, indexerApps, sourcetypeData, splunkbaseData, appidToUidMap, isConfigured, isComingSoon, platformType, onToggleConfigured, onShowBestPractices, onViewLegacy, onSetCustomDashboard, devMode, onViewConfig }) {
+function ProductCard({ product, installedApps, appStatuses, indexerApps, sourcetypeData, splunkbaseData, appidToUidMap, isConfigured, isComingSoon, platformType, onToggleConfigured, onShowBestPractices, onViewLegacy, onSetCustomDashboard, devMode, onViewConfig, showGtmRibbon = false }) {
     const {
         product_id, display_name, version, status, description, value_proposition, vendor, tagline,
         icon_svg, learn_more_url, addon_docs_url, addon_troubleshoot_url, addon_install_url,
@@ -2973,7 +3058,7 @@ function ProductCard({ product, installedApps, appStatuses, indexerApps, sourcet
         app_viz, app_viz_label, app_viz_docs_url, app_viz_troubleshoot_url, app_viz_install_url,
         app_viz_2, app_viz_2_label, app_viz_2_docs_url, app_viz_2_troubleshoot_url, app_viz_2_install_url,
         legacy_uids, soar_connector_uids, alert_action_uids, community_uids, itsi_content_pack,
-        is_new, support_level, cisco_retired, coverage_gap,
+        is_new, support_level, cisco_retired, coverage_gap, gap_type, gtm_pillar,
         sc4s_url, sc4s_supported, sc4s_search_head_ta, sc4s_search_head_ta_label,
         sc4s_search_head_ta_splunkbase_id, sc4s_search_head_ta_install_url, sc4s_sourcetypes, sc4s_config_notes,
         netflow_supported, netflow_addon, netflow_addon_label,
@@ -3114,6 +3199,7 @@ function ProductCard({ product, installedApps, appStatuses, indexerApps, sourcet
     const hasSoar = soar_connector_uids && soar_connector_uids.length > 0;
     const hasEs = !!es_compatible;
     const [soarInfoOpen, setSoarInfoOpen] = useState(false);
+    const [alertActionsInfoOpen, setAlertActionsInfoOpen] = useState(false);
     const [itsiInfoOpen, setItsiInfoOpen] = useState(false);
     const [esInfoOpen, setEsInfoOpen] = useState(false);
     const addonFamily = product.addon_family || 'default';
@@ -3151,10 +3237,18 @@ function ProductCard({ product, installedApps, appStatuses, indexerApps, sourcet
         ? buildSourcetypeSearchUrl(product.sourcetypes)
         : null;
 
+    // Support indicator: one blue bar at bottom of card for cisco_supported or splunk_supported
+    // (CSS: .csc-card-cisco-supported / .csc-card-splunk-supported; data-support-level for fallback)
+    const hasWorkingIntegration = !!(addon || app_viz || app_viz_2 || sc4s_supported);
+    const supportBadgeClass = support_level === 'cisco_supported' ? 'csc-card-cisco-supported'
+        : support_level === 'splunk_supported' ? 'csc-card-splunk-supported'
+        : hasWorkingIntegration && (support_level === 'developer_supported' || support_level === 'community_supported' || support_level === 'not_supported') ? 'csc-card-unsupported-tier' : '';
+    const supportLevelAttr = supportBadgeClass ? support_level : undefined;
     return (
         <div
-            className="csc-card"
+            className={`csc-card ${supportBadgeClass}`.trim()}
             data-addon-family={addonFamily}
+            data-support-level={supportLevelAttr}
         >
             {/* ── NEW! corner ribbon ── */}
             {is_new && (
@@ -3164,8 +3258,14 @@ function ProductCard({ product, installedApps, appStatuses, indexerApps, sourcet
             {cisco_retired && !is_new && (
                 <div className="csc-retired-ribbon" aria-label="Cisco retired product">CISCO RETIRED</div>
             )}
-            {/* ── GTM Roadmap ribbon ── */}
-            {coverage_gap && !cisco_retired && !is_new && (
+            {/* ── GTM ribbons ── */}
+            {coverage_gap && !cisco_retired && !is_new && gap_type === 'enhancement' && (
+                <div className="csc-tracking-ribbon" aria-label="Syslog via SC4S — basic coverage, may need enrichment">BASIC COVERAGE</div>
+            )}
+            {(showGtmRibbon || gap_type === 'rebuild') && coverage_gap && !cisco_retired && !is_new && gap_type !== 'enhancement' && (addon || app_viz || app_viz_2) && (
+                <div className="csc-vendor-support-gap-ribbon" aria-label="Developer add-on exists — need Cisco- or Splunk-supported solution">CISCO/SPLUNK SUPPORT NEEDED</div>
+            )}
+            {showGtmRibbon && coverage_gap && !cisco_retired && !is_new && gap_type !== 'enhancement' && !addon && !app_viz && !app_viz_2 && (
                 <div className="csc-coverage-gap-ribbon" aria-label="On the GTM roadmap">ROADMAP</div>
             )}
             {/* ── Add-on Archived ribbon ── */}
@@ -3240,7 +3340,7 @@ function ProductCard({ product, installedApps, appStatuses, indexerApps, sourcet
                             </span>
                         </div>
                         <div className="csc-header-badges">
-                            {sc4s_url && (
+                            {sc4s_supported && (
                                 <button className="csc-badge-btn csc-badge-sc4s" title="Supported by Splunk Connect for Syslog (SC4S) — Click for Info" onClick={(e) => { e.stopPropagation(); e.preventDefault(); setSc4sInfoOpen(true); }}>SC4S</button>
                             )}
                             {netflow_supported && (
@@ -3254,6 +3354,9 @@ function ProductCard({ product, installedApps, appStatuses, indexerApps, sourcet
                             )}
                             {hasEs && (
                                 <button className="csc-badge-btn csc-badge-es" title={`ES Compatible${escu_detection_count ? ` — ${escu_detection_count} ESCU Detections` : ''} — Click for Info`} onClick={(e) => { e.stopPropagation(); e.preventDefault(); setEsInfoOpen(true); }}>ES</button>
+                            )}
+                            {alert_action_uids && alert_action_uids.length > 0 && (
+                                <button className="csc-badge-btn csc-badge-alert" title={`${alert_action_uids.length} custom Alert Action${alert_action_uids.length !== 1 ? 's' : ''} — Click for Info`} onClick={(e) => { e.stopPropagation(); e.preventDefault(); setAlertActionsInfoOpen(true); }}>Alert Actions</button>
                             )}
                         </div>
                     </div>
@@ -3269,6 +3372,21 @@ function ProductCard({ product, installedApps, appStatuses, indexerApps, sourcet
                     {tagline && (
                         <span className="csc-card-tagline">
                             {tagline}
+                        </span>
+                    )}
+                    {showGtmRibbon && coverage_gap && gtm_pillar && GTM_PILLAR_LABELS[String(gtm_pillar).trim()] && (
+                        <span className="csc-card-gtm-pillar" title="Cisco Secure Networking GTM pillar">
+                            {GTM_PILLAR_LABELS[String(gtm_pillar).trim()]}
+                        </span>
+                    )}
+                    {coverage_gap && gap_type === 'rebuild' && (
+                        <span className="csc-card-vendor-support-gap-note" title="Need to build or acquire and ship as Cisco- or Splunk-supported">
+                            Need Cisco- or Splunk-supported add-on (build or acquire)
+                        </span>
+                    )}
+                    {coverage_gap && gap_type === 'enhancement' && (
+                        <span className="csc-card-vendor-support-gap-note" title="Syslog via SC4S — may need field extractions, CIM mapping, or dashboards">
+                            Syslog via SC4S — may need integration enrichment
                         </span>
                     )}
                 </div>
@@ -3287,12 +3405,9 @@ function ProductCard({ product, installedApps, appStatuses, indexerApps, sourcet
                 vizAppStatus={vizAppStatus}
                 vizApp2Status={vizApp2Status}
                 sourcetypeInfo={sourcetypeInfo}
-                legacyInstalled={legacyInstalled}
-                allLegacyUids={legacy_uids}
-                splunkbaseData={splunkbaseData}
+                isRoadmapCard={coverage_gap}
                 sourcetypeSearchUrl={sourcetypeSearchUrl}
                 isArchived={!!(!addon_install_url && addon_splunkbase_uid)}
-                onViewLegacy={onViewLegacy}
             />
 
 
@@ -3410,6 +3525,9 @@ function ProductCard({ product, installedApps, appStatuses, indexerApps, sourcet
                                 <div className="csc-dep-detail scan-sc4s-primary-notice">
                                     <span className="scan-sc4s-primary-badge">SC4S Primary</span>
                                     <span className="scan-sc4s-primary-hint">No Splunk add-on required — data is ingested via SC4S (Splunk Connect for Syslog)</span>
+                                    <a href={generateSplunkbaseUrl(SC4S_SPLUNKBASE_UID)} target="_blank" rel="noopener noreferrer" className="csc-split-pill-seg" title="Get SC4S on Splunkbase" style={{marginLeft: 6, fontSize: '11px'}}>
+                                        Get SC4S
+                                    </a>
                                 </div>
                                 {sc4s_sourcetypes && sc4s_sourcetypes.length > 0 && (
                                     <div className="scan-sc4s-primary-sts">
@@ -3529,6 +3647,9 @@ function ProductCard({ product, installedApps, appStatuses, indexerApps, sourcet
                                                             Docs
                                                         </a>
                                                     )}
+                                                    <a href={generateSplunkbaseUrl(SC4S_SPLUNKBASE_UID)} target="_blank" rel="noopener noreferrer" className="csc-split-pill-seg" title="SC4S on Splunkbase">
+                                                        Splunkbase
+                                                    </a>
                                                 </div>
                                                 {hasDifferentSc4sTa && sc4s_search_head_ta && (
                                                     <div className="csc-dp-note">
@@ -3645,27 +3766,37 @@ function ProductCard({ product, installedApps, appStatuses, indexerApps, sourcet
 
                             {/* ── Legacy & Compatibility (consolidated) ── */}
                             {(() => {
-                                const hasLegacy = legacyInstalled.length > 0;
+                                const hasLegacyInstalled = legacyInstalled.length > 0;
+                                const hasLegacyCataloged = legacy_uids && legacy_uids.length > 0;
                                 const uids = [addon_splunkbase_uid, app_viz_splunkbase_uid, app_viz_2_splunkbase_uid].filter(Boolean);
                                 const compatEntries = splunkbaseData ? uids.map(uid => {
                                     const entry = splunkbaseData[uid];
                                     return entry ? { ...entry, uid } : null;
                                 }).filter(Boolean) : [];
                                 const hasCompat = compatEntries.length > 0;
-                                if (!hasLegacy && !hasCompat) return null;
+                                const hasSc4sCompat = sc4s_supported && !hasCompat;
+                                if (!hasLegacyInstalled && !hasCompat && !hasSc4sCompat && !hasLegacyCataloged) return null;
                                 const tagParts = [];
-                                if (hasLegacy) tagParts.push(`${legacyInstalled.length} legacy`);
-                                if (hasCompat) tagParts.push(`${compatEntries.length} compat`);
+                                if (hasLegacyInstalled) tagParts.push(`${legacyInstalled.length} legacy`);
+                                if (hasLegacyCataloged && !hasLegacyInstalled) tagParts.push(`${legacy_uids.length} legacy (catalog)`);
+                                if (hasCompat || hasSc4sCompat) tagParts.push('compat');
                                 return (
                                     <>
                                     <hr className="csc-dep-divider" />
                                     <details className="csc-dep-details csc-section-legacy-compat">
                                         <summary className="csc-dep-details-summary">
                                             Legacy & Compatibility
-                                            <span className="csc-dp-tag csc-dp-tag-neutral">{tagParts.join(' · ')}</span>
+                                            <span className="csc-dp-tag csc-dp-tag-neutral csc-dp-tag-legacy-compat">{tagParts.join(' · ')}</span>
                                         </summary>
                                         <div className="csc-dep-details-body">
-                                            {hasLegacy && (
+                                            {hasLegacyCataloged && (
+                                                <div className="csc-dp-group" style={{ marginBottom: hasLegacyInstalled || hasCompat ? 12 : 0 }}>
+                                                    <button type="button" className="csc-btn csc-btn-outline csc-btn-legacy-audit" style={{ fontSize: 12 }} onClick={() => onViewLegacy(legacy_uids)}>
+                                                        View full legacy audit ({legacy_uids.length} app{legacy_uids.length !== 1 ? 's' : ''})
+                                                    </button>
+                                                </div>
+                                            )}
+                                            {hasLegacyInstalled && (
                                                 <div className="csc-dp-group">
                                                     <div className="csc-dp-group-header">
                                                         <span className="csc-dp-group-title">Legacy ({legacyInstalled.length} installed)</span>
@@ -3694,7 +3825,7 @@ function ProductCard({ product, installedApps, appStatuses, indexerApps, sourcet
                                                     })}
                                                 </div>
                                             )}
-                                            {hasLegacy && hasCompat && <hr className="csc-dep-divider" />}
+                                            {hasLegacyInstalled && (hasCompat || hasSc4sCompat) && <hr className="csc-dep-divider" />}
                                             {hasCompat && (
                                                 <div className="csc-dp-group">
                                                     <div className="csc-dp-group-header">
@@ -3732,6 +3863,23 @@ function ProductCard({ product, installedApps, appStatuses, indexerApps, sourcet
                                                             </div>
                                                         );
                                                     })}
+                                                </div>
+                                            )}
+                                            {hasSc4sCompat && (
+                                                <div className="csc-dp-group">
+                                                    <div className="csc-dp-group-header">
+                                                        <span className="csc-dp-group-title">Compatibility (SC4S)</span>
+                                                    </div>
+                                                    <div className="csc-compat-entry">
+                                                        <div className="csc-compat-row">
+                                                            <span className="csc-compat-label">Platform</span>
+                                                            <span className="csc-compat-value">Splunk Cloud, Splunk Enterprise</span>
+                                                        </div>
+                                                        <div className="csc-compat-row">
+                                                            <span className="csc-compat-label">Splunk Versions</span>
+                                                            <span className="csc-compat-value">All supported versions</span>
+                                                        </div>
+                                                    </div>
                                                 </div>
                                             )}
                                         </div>
@@ -3800,14 +3948,12 @@ function ProductCard({ product, installedApps, appStatuses, indexerApps, sourcet
 
             {/* ── Footer: clean button row ── */}
             <div className="csc-card-footer">
-                {/* Learn More — full text, outline */}
-                {learn_more_url && (
-                    <a href={learn_more_url} target="_blank" rel="noopener noreferrer"
-                        className="csc-btn csc-btn-outline"
-                        title={`Learn more about ${display_name}`}>
-                        Learn More
-                    </a>
-                )}
+                {/* Learn More — full text, outline; falls back to Cisco A-to-Z directory */}
+                <a href={learn_more_url || CISCO_PRODUCT_DIRECTORY_URL} target="_blank" rel="noopener noreferrer"
+                    className="csc-btn csc-btn-outline"
+                    title={learn_more_url ? `Learn more about ${display_name}` : `Browse Cisco products (${display_name})`}>
+                    Learn More
+                </a>
                 {/* Disabled TA — link to app manager */}
                 {!isComingSoon && isConfigured && appStatus?.installed && appStatus?.disabled && (
                     <a href={createURL('/manager/splunk-cisco-app-navigator/apps/local')}
@@ -3926,15 +4072,15 @@ function ProductCard({ product, installedApps, appStatuses, indexerApps, sourcet
                         )}
                     </div>
                 )}
-                {/* Add to My Products */}
-                {!isComingSoon && !isConfigured && !coverage_gap && (
+                {/* Add to My Products — allowed for coverage_gap products too (e.g. AppDynamics, Webex) */}
+                {!isComingSoon && !isConfigured && (
                     <button className="csc-btn csc-btn-green" onClick={() => onToggleConfigured(product_id)}
                         title="Add to My Products">
                         <Plus style={{marginRight: 4}} /> Add
                     </button>
                 )}
-                {/* Best Practices */}
-                {!isComingSoon && (
+                {/* Best Practices — hidden for roadmap/coverage_gap products (no add-on yet) */}
+                {!isComingSoon && !coverage_gap && (
                     <button className="csc-btn csc-btn-icon csc-btn-outline" onClick={() => onShowBestPractices(product)}
                         title="Best Practices">
                         <QuestionCircle size={16} />
@@ -4007,13 +4153,16 @@ function ProductCard({ product, installedApps, appStatuses, indexerApps, sourcet
             )}
 
             {/* ── SC4S / NetFlow / HF / SOAR / ITSI Modals (rendered outside details so they can open from header) ── */}
-            {sc4s_url && <SC4SInfoModal open={sc4sInfoOpen} onClose={() => setSc4sInfoOpen(false)} />}
+            {sc4s_supported && <SC4SInfoModal open={sc4sInfoOpen} onClose={() => setSc4sInfoOpen(false)} />}
             {netflow_supported && <NetFlowInfoModal open={netflowInfoOpen} onClose={() => setNetflowInfoOpen(false)} installedApps={installedApps} />}
             <HFInfoModal open={hfInfoOpen} onClose={() => setHfInfoOpen(false)} isCloud={platformType === 'cloud'} />
             <MagicEightModal open={magicEightOpen} onClose={() => setMagicEightOpen(false)} sourcetypes={product.sourcetypes} productName={display_name} addonApp={addon} addonLabel={addon_label} appViz={app_viz} appViz2={app_viz_2} installedApps={installedApps} indexerApps={indexerApps} />
             {hasSoar && <SOARInfoModal open={soarInfoOpen} onClose={() => setSoarInfoOpen(false)} soarConnectorUids={soar_connector_uids} splunkbaseData={splunkbaseData} productName={display_name} />}
             {hasItsi && <ITSIInfoModal open={itsiInfoOpen} onClose={() => setItsiInfoOpen(false)} itsiContentPack={itsi_content_pack} productName={display_name} />}
             {hasEs && <ESInfoModal open={esInfoOpen} onClose={() => setEsInfoOpen(false)} productName={display_name} cimDataModels={es_cim_data_models} escuStories={escu_analytic_stories} escuDetectionCount={escu_detection_count} escuDetections={escu_detections} />}
+            {alert_action_uids && alert_action_uids.length > 0 && (
+                <AlertActionsInfoModal open={alertActionsInfoOpen} onClose={() => setAlertActionsInfoOpen(false)} alertActionUids={alert_action_uids} splunkbaseData={splunkbaseData} productName={display_name} />
+            )}
 
             {/* ── Gradient bottom border ── */}
             <div className={`csc-card-bottom-border ${
@@ -4043,6 +4192,7 @@ function toSplunkConf(data) {
             'app_viz_2_docs_url', 'app_viz_2_install_url',
             'learn_more_url',
             'support_level', 'icon_emoji', 'sort_order',
+            'gtm_pillar',
             'sc4s_url', 'sc4s_label', 'sc4s_search_head_ta', 'sc4s_search_head_ta_label',
             'sc4s_search_head_ta_splunkbase_id',
             'sc4s_search_head_ta_install_url',
@@ -4054,6 +4204,7 @@ function toSplunkConf(data) {
         // Boolean fields
         if (p.is_new) lines.push('is_new = true');
         if (p.secure_networking_gtm) lines.push('secure_networking_gtm = true');
+        if (p.coverage_gap) lines.push('coverage_gap = true');
         if (p.sc4s_supported) lines.push('sc4s_supported = true');
         // CSV array fields
         if (p.sourcetypes && p.sourcetypes.length) lines.push(`sourcetypes = ${p.sourcetypes.join(',')}`);
@@ -4935,8 +5086,6 @@ function FilterDrawer({
     showDeprecated, onToggleShowDeprecated,
     showComingSoon, onToggleShowComingSoon,
     showGtmRoadmap, onToggleShowGtmRoadmap,
-    streamFilter, onToggleStreamFilter,
-    sc4sFilter, onToggleSc4sFilter,
     platformFilter, onSelectPlatform,
     versionFilter, onSelectVersion,
     splunkbaseData,
@@ -4957,8 +5106,9 @@ function FilterDrawer({
         if (platformFilter.length > 0 && splunkbaseData && Object.keys(splunkbaseData).length > 0) {
             if (platformFilterMode === 'include') {
                 result = result.filter((p) => {
+                    if (sc4sCoversFilter(p, platformFilter)) return true;
                     const uids = getAllProductUids(p, appidToUidMap);
-                    if (uids.length === 0) return true; // no Splunkbase apps = pass through
+                    if (uids.length === 0) return true;
                     return uids.some(uid => {
                         const entry = splunkbaseData[uid];
                         if (!entry || !entry.product_compatibility) return false;
@@ -4968,6 +5118,7 @@ function FilterDrawer({
                 });
             } else {
                 result = result.filter((p) => {
+                    if (sc4sCoversFilter(p, platformFilter)) return false;
                     const uids = getAllProductUids(p, appidToUidMap);
                     if (uids.length === 0) return true;
                     return !uids.some(uid => {
@@ -4989,17 +5140,22 @@ function FilterDrawer({
         return result;
     };
 
-    /* ── Counter logic (replicated from old Advanced panel) ── */
+    /* ── Counter logic: base sets then category/capability filters ── */
     const rawBase = applyCompatFilters(allProducts || products);
     const portfolioBase = showFullPortfolio
         ? rawBase
         : rawBase.filter(p => SUPPORTED_LEVELS.has(p.support_level) && p.status !== 'under_development');
 
+    // Category + capability: main categories (security, networking, …) or cross-cutting (es, itsi, sc4s, netflow, soar, alert_actions, etc.)
     let catBase = portfolioBase;
     if (selectedCategory === 'soar') catBase = catBase.filter(p => p.soar_connector_uids && p.soar_connector_uids.length > 0);
     else if (selectedCategory === 'alert_actions') catBase = catBase.filter(p => p.alert_action_uids && p.alert_action_uids.length > 0);
     else if (selectedCategory === 'secure_networking') catBase = catBase.filter(p => p.secure_networking_gtm);
     else if (selectedCategory === 'ai_powered') catBase = catBase.filter(p => p.ai_enabled);
+    else if (selectedCategory === 'es') catBase = catBase.filter(p => p.es_compatible);
+    else if (selectedCategory === 'itsi') catBase = catBase.filter(p => p.itsi_content_pack);
+    else if (selectedCategory === 'sc4s') catBase = catBase.filter(p => p.sc4s_supported);
+    else if (selectedCategory === 'netflow') catBase = catBase.filter(p => p.netflow_supported);
     else if (selectedCategory) catBase = catBase.filter(p => p.category === selectedCategory);
 
     /* Support counts */
@@ -5007,9 +5163,7 @@ function FilterDrawer({
     if (!showRetired) supportCountBase = supportCountBase.filter(p => p.status !== 'retired');
     if (!showDeprecated) supportCountBase = supportCountBase.filter(p => p.status !== 'deprecated');
     if (!showComingSoon) supportCountBase = supportCountBase.filter(p => p.status !== 'under_development');
-    if (!showGtmRoadmap) supportCountBase = supportCountBase.filter(p => !p.coverage_gap);
-    if (streamFilter) supportCountBase = supportCountBase.filter(p => p.netflow_supported);
-    if (sc4sFilter) supportCountBase = supportCountBase.filter(p => p.sc4s_supported);
+    if (!showGtmRoadmap) supportCountBase = supportCountBase.filter(p => !p.coverage_gap || (p.addon || p.app_viz || p.app_viz_2 || p.sc4s_supported));
     const supportCounts = {
         cisco_supported: supportCountBase.filter(p => p.support_level === 'cisco_supported').length,
         splunk_supported: supportCountBase.filter(p => p.support_level === 'splunk_supported').length,
@@ -5021,24 +5175,12 @@ function FilterDrawer({
     /* Visibility counts */
     let visCountBase = catBase;
     if (supportLevelFilter.length > 0) visCountBase = visCountBase.filter(p => supportLevelFilter.includes(p.support_level));
-    if (streamFilter) visCountBase = visCountBase.filter(p => p.netflow_supported);
-    if (sc4sFilter) visCountBase = visCountBase.filter(p => p.sc4s_supported);
     const retiredCount = visCountBase.filter(p => p.status === 'retired').length;
     const deprecatedCount = visCountBase.filter(p => p.status === 'deprecated').length;
     const comingSoonCount = visCountBase.filter(p => p.status === 'under_development').length;
-    const gtmRoadmapCount = visCountBase.filter(p => p.coverage_gap).length;
+    const gtmRoadmapCount = visCountBase.filter(p => p.coverage_gap && !(p.addon || p.app_viz || p.app_viz_2 || p.sc4s_supported)).length;
 
-    /* Onboarding counts */
-    let onboardingBase = catBase;
-    if (supportLevelFilter.length > 0) onboardingBase = onboardingBase.filter(p => supportLevelFilter.includes(p.support_level));
-    if (!showRetired) onboardingBase = onboardingBase.filter(p => p.status !== 'retired');
-    if (!showDeprecated) onboardingBase = onboardingBase.filter(p => p.status !== 'deprecated');
-    if (!showComingSoon) onboardingBase = onboardingBase.filter(p => p.status !== 'under_development');
-    if (!showGtmRoadmap) onboardingBase = onboardingBase.filter(p => !p.coverage_gap);
-    const streamCount = (sc4sFilter ? onboardingBase.filter(p => p.sc4s_supported) : onboardingBase).filter(p => p.netflow_supported).length;
-    const sc4sCount = (streamFilter ? onboardingBase.filter(p => p.netflow_supported) : onboardingBase).filter(p => p.sc4s_supported).length;
-
-    /* Cross-cutting counts */
+    /* Cross-cutting counts (all from categoryCounts) */
     const soarCount = categoryCounts?.soar || 0;
     const alertCount = categoryCounts?.alert_actions || 0;
     const secNetCount = categoryCounts?.secure_networking || 0;
@@ -5064,13 +5206,14 @@ function FilterDrawer({
         return sortVersionsDesc([...cardVersions]);
     })();
 
-    /* Addon (Powered By) groups — derived from preAddonProducts for faceted counts */
-    const addonSource = preAddonProducts || products;
+    /* Addon (Powered By) groups — derived from full product list so the
+       section never vanishes when a category/search filter narrows the view */
     const addonGroups = useMemo(() => {
+        const src = products || [];
         const map = {};
         let standalone = 0;
         let sc4sOnly = 0;
-        (addonSource || []).forEach((p) => {
+        src.forEach((p) => {
             if (!p.addon) {
                 if (p.sc4s_supported) { sc4sOnly++; } else { standalone++; }
                 return;
@@ -5083,10 +5226,10 @@ function FilterDrawer({
         if (sc4sOnly > 0) entries.push(['__sc4s__', { label: 'SC4S Only', count: sc4sOnly }]);
         if (standalone > 0) entries.push(['__standalone__', { label: 'Standalone', count: standalone }]);
         return entries;
-    }, [addonSource]);
+    }, [products]);
 
-    const isCrossCutting = (cat) => ['soar', 'alert_actions', 'secure_networking', 'ai_powered'].includes(cat);
-    const addonTotal = (addonSource || []).length;
+    const isCrossCutting = (cat) => ['soar', 'alert_actions', 'secure_networking', 'ai_powered', 'es', 'itsi', 'sc4s', 'netflow'].includes(cat);
+    const addonTotal = (products || []).length;
 
     return (
         <>
@@ -5101,11 +5244,11 @@ function FilterDrawer({
                 </div>
                 <div className="scan-drawer-body">
 
-                    {/* ── Cross-Cutting Filters ── */}
+                    {/* ── By capability (aligns with card badges: ES, SOAR, ITSI, etc.) ── */}
                     <div className="scan-drawer-section">
                         <div className="scan-drawer-section-title">
                             <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 014 10 15.3 15.3 0 01-4 10 15.3 15.3 0 01-4-10 15.3 15.3 0 014-10z"/></svg>
-                            Cross-Cutting
+                            By capability
                         </div>
                         <div className="scan-drawer-pill-grid">
                             {secNetCount > 0 && (
@@ -5146,6 +5289,46 @@ function FilterDrawer({
                                 >
                                     AI-Powered
                                     <span className="scan-drawer-pill-count">{aiPoweredCount}</span>
+                                </button>
+                            )}
+                            {(categoryCounts?.es || 0) > 0 && (
+                                <button
+                                    className={`scan-drawer-pill ${selectedCategory === 'es' ? 'scan-drawer-pill-cisco-active' : ''}`}
+                                    onClick={() => { onSelectCategory(selectedCategory === 'es' ? null : 'es'); }}
+                                    title="ES (Enterprise Security) compatible products"
+                                >
+                                    ES
+                                    <span className="scan-drawer-pill-count">{categoryCounts.es}</span>
+                                </button>
+                            )}
+                            {(categoryCounts?.itsi || 0) > 0 && (
+                                <button
+                                    className={`scan-drawer-pill ${selectedCategory === 'itsi' ? 'scan-drawer-pill-cisco-active' : ''}`}
+                                    onClick={() => { onSelectCategory(selectedCategory === 'itsi' ? null : 'itsi'); }}
+                                    title="Products with ITSI Content Pack"
+                                >
+                                    ITSI
+                                    <span className="scan-drawer-pill-count">{categoryCounts.itsi}</span>
+                                </button>
+                            )}
+                            {(categoryCounts?.sc4s || 0) > 0 && (
+                                <button
+                                    className={`scan-drawer-pill ${selectedCategory === 'sc4s' ? 'scan-drawer-pill-sc4s-active' : ''}`}
+                                    onClick={() => { onSelectCategory(selectedCategory === 'sc4s' ? null : 'sc4s'); }}
+                                    title="SC4S-supported products"
+                                >
+                                    SC4S
+                                    <span className="scan-drawer-pill-count">{categoryCounts.sc4s}</span>
+                                </button>
+                            )}
+                            {(categoryCounts?.netflow || 0) > 0 && (
+                                <button
+                                    className={`scan-drawer-pill ${selectedCategory === 'netflow' ? 'scan-drawer-pill-stream-active' : ''}`}
+                                    onClick={() => { onSelectCategory(selectedCategory === 'netflow' ? null : 'netflow'); }}
+                                    title="NetFlow / IPFIX supported products"
+                                >
+                                    NetFlow
+                                    <span className="scan-drawer-pill-count">{categoryCounts.netflow}</span>
                                 </button>
                             )}
                         </div>
@@ -5276,39 +5459,6 @@ function FilterDrawer({
                         </div>
                     </div>
                     <div className="scan-drawer-divider" />
-
-                    {/* ── Onboarding ── */}
-                    {(streamCount > 0 || sc4sCount > 0) && (
-                        <>
-                            <div className="scan-drawer-section">
-                                <div className="scan-drawer-section-title">
-                                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M22 11.08V12a10 10 0 11-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
-                                    Onboarding Path
-                                </div>
-                                <div className="scan-drawer-pill-grid">
-                                    {sc4sCount > 0 && (
-                                        <button
-                                            className={`scan-drawer-pill ${sc4sFilter ? 'scan-drawer-pill-sc4s-active' : ''}`}
-                                            onClick={() => onToggleSc4sFilter(!sc4sFilter)}
-                                            title={sc4sFilter ? 'Showing SC4S products — click to clear' : 'Show only SC4S-supported products'}
-                                        >
-                                            SC4S <span className="scan-drawer-pill-count">{sc4sCount}</span>
-                                        </button>
-                                    )}
-                                    {streamCount > 0 && (
-                                        <button
-                                            className={`scan-drawer-pill ${streamFilter ? 'scan-drawer-pill-stream-active' : ''}`}
-                                            onClick={() => onToggleStreamFilter(!streamFilter)}
-                                            title={streamFilter ? 'Showing NetFlow products — click to clear' : 'Show only NetFlow-supported products'}
-                                        >
-                                            NetFlow <span className="scan-drawer-pill-count">{streamCount}</span>
-                                        </button>
-                                    )}
-                                </div>
-                            </div>
-                            <div className="scan-drawer-divider" />
-                        </>
-                    )}
 
                     {/* ── Compatibility ── */}
                     {splunkbaseData && Object.keys(splunkbaseData).length > 0 && (
@@ -5463,17 +5613,15 @@ function FilterDrawer({
                         </div>
                     )}
 
-                    {/* ── Reset All Filters ── */}
-                    <div className="scan-drawer-divider" />
-                    <div style={{ padding: '8px 0 4px' }}>
-                        <button
-                            className="scan-drawer-reset-btn"
-                            onClick={onResetAll}
-                            title="Reset all filters back to factory defaults"
-                        >
-                            Reset Filters
-                        </button>
-                    </div>
+                </div>
+                <div className="scan-drawer-footer">
+                    <button
+                        className="scan-drawer-reset-btn"
+                        onClick={onResetAll}
+                        title="Reset all filters back to factory defaults"
+                    >
+                        Reset Filters
+                    </button>
                 </div>
             </div>
         </>
@@ -5493,8 +5641,6 @@ function ActiveFilterChips({
     showDeprecated, onToggleShowDeprecated,
     showComingSoon, onToggleShowComingSoon,
     showGtmRoadmap, onToggleShowGtmRoadmap,
-    streamFilter, onToggleStreamFilter,
-    sc4sFilter, onToggleSc4sFilter,
     platformFilter, onSelectPlatform,
     versionFilter, onSelectVersion,
     selectedAddon, onSelectAddon,
@@ -5504,7 +5650,7 @@ function ActiveFilterChips({
     const chips = [];
 
     // Cross-cutting category filters
-    const crossCutLabels = { soar: 'SOAR', alert_actions: 'Alert Actions', secure_networking: 'Secure Networking GTM', ai_powered: 'AI-Powered' };
+    const crossCutLabels = { soar: 'SOAR', alert_actions: 'Alert Actions', secure_networking: 'Secure Networking GTM', ai_powered: 'AI-Powered', es: 'ES', itsi: 'ITSI', sc4s: 'SC4S', netflow: 'NetFlow' };
     if (selectedCategory && crossCutLabels[selectedCategory]) {
         chips.push({ label: crossCutLabels[selectedCategory], onRemove: () => onSelectCategory(null) });
     }
@@ -5519,8 +5665,6 @@ function ActiveFilterChips({
     if (showComingSoon) chips.push({ label: 'Show Coming Soon', onRemove: () => onToggleShowComingSoon(false) });
     if (showGtmRoadmap) chips.push({ label: 'Show GTM Roadmap', onRemove: () => onToggleShowGtmRoadmap(false) });
     if (showVault) chips.push({ label: 'Catalog Vault', onRemove: () => onToggleShowVault(false) });
-    if (streamFilter) chips.push({ label: 'NetFlow', onRemove: () => onToggleStreamFilter(false) });
-    if (sc4sFilter) chips.push({ label: 'SC4S', onRemove: () => onToggleSc4sFilter(false) });
     if (platformFilter.length > 0) {
         platformFilter.forEach(p => {
             chips.push({ label: p, onRemove: () => onSelectPlatform(p) });
@@ -5542,8 +5686,6 @@ function ActiveFilterChips({
         onToggleShowDeprecated(false);
         onToggleShowComingSoon(false);
         onToggleShowGtmRoadmap(false);
-        onToggleStreamFilter(false);
-        onToggleSc4sFilter(false);
         onSelectPlatform(null);
         onSelectVersion(null);
         onSelectAddon(null);
@@ -5726,8 +5868,9 @@ function CategoryFilterBar({
         if (platformFilter.length > 0 && splunkbaseData && Object.keys(splunkbaseData).length > 0) {
             if (platformFilterMode === 'include') {
                 result = result.filter((p) => {
+                    if (sc4sCoversFilter(p, platformFilter)) return true;
                     const uids = getAllProductUids(p, appidToUidMap);
-                    if (uids.length === 0) return true; // no Splunkbase apps = pass through
+                    if (uids.length === 0) return true;
                     return uids.some(uid => {
                         const entry = splunkbaseData[uid];
                         if (!entry || !entry.product_compatibility) return false;
@@ -5737,6 +5880,7 @@ function CategoryFilterBar({
                 });
             } else {
                 result = result.filter((p) => {
+                    if (sc4sCoversFilter(p, platformFilter)) return false;
                     const uids = getAllProductUids(p, appidToUidMap);
                     if (uids.length === 0) return true;
                     return !uids.some(uid => {
@@ -5771,31 +5915,44 @@ function CategoryFilterBar({
             style: { width: '18px', height: '18px', filter: active ? (isDark ? 'brightness(0.15)' : 'brightness(0) invert(1)') : 'none', transition: 'filter 0.2s' },
         });
     };
-    const btnStyle = (active) => ({
-        display: 'flex', alignItems: 'center', gap: '6px', whiteSpace: 'nowrap',
-        padding: '7px 14px', borderRadius: '9999px', border: '1px solid',
-        borderColor: active ? (isDark ? '#ffffff' : '#314257') : '#E5E7EB',
-        background: active ? (isDark ? '#ffffff' : '#314257') : '#FFFFFF',
-        color: active ? (isDark ? '#1a1f24' : '#fff') : 'var(--page-color, #333)',
-        boxShadow: 'none',
-        cursor: 'pointer', fontWeight: 600, fontSize: '13px',
-        transition: 'all 0.2s', flexShrink: 0,
-    });
+    const btnStyle = (active) => {
+        if (isDark) {
+            return {
+                display: 'flex', alignItems: 'center', gap: '6px', whiteSpace: 'nowrap',
+                padding: '7px 14px', borderRadius: '9999px', border: '1px solid',
+                borderColor: active ? '#0A60FF' : 'rgba(10, 96, 255, 0.3)',
+                background: active ? '#0A60FF' : '#1e262c',
+                color: active ? '#ffffff' : '#d4d4d4',
+                boxShadow: 'none',
+                cursor: 'pointer', fontWeight: 600, fontSize: '13px',
+                transition: 'all 0.2s', flexShrink: 0,
+            };
+        }
+        return {
+            display: 'flex', alignItems: 'center', gap: '6px', whiteSpace: 'nowrap',
+            padding: '7px 14px', borderRadius: '9999px', border: '1px solid',
+            borderColor: active ? '#314257' : '#E5E7EB',
+            background: active ? '#314257' : '#FFFFFF',
+            color: active ? '#fff' : 'var(--page-color, #333)',
+            boxShadow: 'none',
+            cursor: 'pointer', fontWeight: 600, fontSize: '13px',
+            transition: 'all 0.2s', flexShrink: 0,
+        };
+    };
 
-    const isCrossCutting = ['soar', 'alert_actions', 'secure_networking', 'ai_powered'].includes(selectedCategory);
-    const totalCount = categoryCounts ? Object.keys(categoryCounts).reduce((sum, k) => (['soar', 'alert_actions', 'secure_networking', 'ai_powered'].includes(k)) ? sum : sum + categoryCounts[k], 0) : null;
+    const isCrossCutting = ['soar', 'alert_actions', 'secure_networking', 'ai_powered', 'es', 'itsi', 'sc4s', 'netflow'].includes(selectedCategory);
+    const CROSS_CUT_IDS = ['soar', 'alert_actions', 'secure_networking', 'ai_powered', 'es', 'itsi', 'sc4s', 'netflow'];
+    const totalCount = categoryCounts ? Object.keys(categoryCounts).reduce((sum, k) => (CROSS_CUT_IDS.includes(k)) ? sum : sum + categoryCounts[k], 0) : null;
 
     return (<>
         <div style={{ display: 'flex', gap: '8px', overflowX: 'auto', paddingBottom: '4px', scrollBehavior: 'smooth', alignItems: 'center' }}>
             <button onClick={() => onSelectCategory(null)} style={btnStyle(!selectedCategory)}>
                 All
                 {totalCount != null && (
-                    <span style={{
-                        fontSize: '10px',
-                        background: !selectedCategory ? '#536070' : 'var(--version-bg, #e8e8e8)',
-                        color: !selectedCategory ? '#fff' : undefined,
-                        padding: '1px 6px', borderRadius: '10px',
-                    }}>
+                    <span style={isDark
+                        ? { fontSize: '10px', background: !selectedCategory ? 'rgba(255,255,255,0.22)' : 'rgba(255,255,255,0.15)', color: !selectedCategory ? '#ffffff' : '#d4d4d4', padding: '1px 6px', borderRadius: '10px' }
+                        : { fontSize: '10px', background: !selectedCategory ? '#536070' : 'var(--version-bg, #e8e8e8)', color: !selectedCategory ? '#fff' : undefined, padding: '1px 6px', borderRadius: '10px' }
+                    }>
                         {totalCount}
                     </span>
                 )}
@@ -5806,12 +5963,10 @@ function CategoryFilterBar({
                     <button key={cat.id} onClick={() => onSelectCategory(cat.id)} title={cat.description} style={btnStyle(active)}>
                         {cat.name}
                         {categoryCounts?.[cat.id] != null && (
-                            <span style={{
-                                fontSize: '10px',
-                                background: active ? '#536070' : 'var(--version-bg, #e8e8e8)',
-                                color: active ? '#fff' : undefined,
-                                padding: '1px 6px', borderRadius: '10px',
-                            }}>
+                            <span style={isDark
+                                ? { fontSize: '10px', background: active ? 'rgba(255,255,255,0.22)' : 'rgba(255,255,255,0.15)', color: active ? '#ffffff' : '#d4d4d4', padding: '1px 6px', borderRadius: '10px' }
+                                : { fontSize: '10px', background: active ? '#536070' : 'var(--version-bg, #e8e8e8)', color: active ? '#fff' : undefined, padding: '1px 6px', borderRadius: '10px' }
+                            }>
                                 {categoryCounts[cat.id]}
                             </span>
                         )}
@@ -5915,6 +6070,9 @@ function CategoryFilterBar({
 }
 
 // ─────────────────────────  MAIN PAGE  ───────────────────────
+// Products page: category/capability filters, product cards, install status from REST.
+// Data: loadProductsFromConf() prefers products.conf REST; falls back to static PRODUCT_CATALOG.
+// Each card shows support (Cisco/Splunk), links, and actions (configure, best practices, etc.).
 
 function SCANProductsPage() {
     const [products, setProducts] = useState(PRODUCT_CATALOG.filter(p => CATEGORY_IDS.has(p.category) && !p.catalog_disabled));
@@ -5928,12 +6086,10 @@ function SCANProductsPage() {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
     const [searchQuery, setSearchQuery] = useState('');
-    const [selectedCategory, setSelectedCategory] = useState(null);
-    const [selectedSubCategory, setSelectedSubCategory] = useState(null);
-    const [aiFilter, setAiFilter] = useState(false);
-    const [streamFilter, setStreamFilter] = useState(false);
-    const [sc4sFilter, setSc4sFilter] = useState(false);
-    const [selectedAddon, setSelectedAddon] = useState(null);
+    const [selectedCategory, setSelectedCategory] = useState(_savedFilters.selectedCategory ?? null);
+    const [selectedSubCategory, setSelectedSubCategory] = useState(_savedFilters.selectedSubCategory ?? null);
+    const [aiFilter, setAiFilter] = useState(_savedFilters.aiFilter || false);
+    const [selectedAddon, setSelectedAddon] = useState(_savedFilters.selectedAddon ?? null);
     const [legacyModalOpen, setLegacyModalOpen] = useState(false);
     const [legacyModalApps, setLegacyModalApps] = useState([]);
     const [bpModalOpen, setBpModalOpen] = useState(false);
@@ -5961,11 +6117,11 @@ function SCANProductsPage() {
     const [searchBarQuery, setSearchBarQuery] = useState('');
     const [advancedFiltersOpen, setAdvancedFiltersOpen] = useState(false);
     const [filterDrawerOpen, setFilterDrawerOpen] = useState(false);
-    const [supportLevelFilter, setSupportLevelFilter] = useState([]);
-    const [showRetired, setShowRetired] = useState(false);
-    const [showDeprecated, setShowDeprecated] = useState(false);
-    const [showComingSoon, setShowComingSoon] = useState(false);
-    const [showGtmRoadmap, setShowGtmRoadmap] = useState(false);
+    const [supportLevelFilter, setSupportLevelFilter] = useState(_savedFilters.supportLevelFilter || []);
+    const [showRetired, setShowRetired] = useState(_savedFilters.showRetired || false);
+    const [showDeprecated, setShowDeprecated] = useState(_savedFilters.showDeprecated || false);
+    const [showComingSoon, setShowComingSoon] = useState(_savedFilters.showComingSoon || false);
+    const [showGtmRoadmap, setShowGtmRoadmap] = useState(_savedFilters.showGtmRoadmap || false);
     const [personaModalOpen, setPersonaModalOpen] = useState(() => {
         try { return localStorage.getItem(PERSONA_STORAGE_KEY) !== 'true'; } catch { return false; }
     });
@@ -5974,7 +6130,7 @@ function SCANProductsPage() {
     const [splunkbaseLoaded, setSplunkbaseLoaded] = useState(false);
     const [csvSyncStatus, setCsvSyncStatus] = useState(null);    // null | 'syncing' | 'success' | 'error'
     const [csvSyncMessage, setCsvSyncMessage] = useState('');
-    const [platformFilter, setPlatformFilter] = useState([]);    // [] | ['Splunk Cloud'] | ...
+    const [platformFilter, setPlatformFilter] = useState(_savedFilters.platformFilter || []);    // [] | ['Splunk Cloud'] | ...
 
     /** Toggle a platform in/out of the multi-select filter. Pass null to clear all. */
     const handlePlatformToggle = (platform) => {
@@ -5987,9 +6143,32 @@ function SCANProductsPage() {
             );
         }
     };
-    const [versionFilter, setVersionFilter] = useState([]);        // [] | ['10.2', '10.1', ...]
-    const [versionFilterMode, setVersionFilterMode] = useState('include'); // 'include' | 'exclude'
-    const [platformFilterMode, setPlatformFilterMode] = useState('include'); // 'include' | 'exclude'
+    const [versionFilter, setVersionFilter] = useState(_savedFilters.versionFilter || []);        // [] | ['10.2', '10.1', ...]
+    const [versionFilterMode, setVersionFilterMode] = useState(_savedFilters.versionFilterMode || 'include'); // 'include' | 'exclude'
+    const [platformFilterMode, setPlatformFilterMode] = useState(_savedFilters.platformFilterMode || 'include'); // 'include' | 'exclude'
+
+    useEffect(() => {
+        saveFilters({
+            selectedCategory, selectedSubCategory, aiFilter,
+            selectedAddon, supportLevelFilter, showRetired, showDeprecated,
+            showComingSoon, showGtmRoadmap, platformFilter, platformFilterMode,
+            versionFilter, versionFilterMode,
+        });
+    }, [selectedCategory, selectedSubCategory, aiFilter,
+        selectedAddon, supportLevelFilter, showRetired, showDeprecated,
+        showComingSoon, showGtmRoadmap, platformFilter, platformFilterMode,
+        versionFilter, versionFilterMode]);
+
+    // ── Collapsible panel state (persisted) ──
+    const [panelState, setPanelState] = useState(() => ({ ...DEFAULT_PANEL_STATE, ...getSavedPanelState() }));
+
+    const handlePanelToggle = useCallback((_e, { panelId, action }) => {
+        setPanelState(prev => {
+            const next = { ...prev, [panelId]: action === 'open' };
+            savePanelState(next);
+            return next;
+        });
+    }, []);
 
     /** Toggle a version in/out of the multi-select filter. Pass null to clear all. */
     const handleVersionToggle = (version) => {
@@ -6207,7 +6386,7 @@ function SCANProductsPage() {
         setLoading(true);
         setError(null);
         try {
-            // 1. Try live conf-products
+            // 1. Try live conf-products (single source of truth when app is installed)
             try {
                 const confProducts = await loadProductsFromConf();
                 if (confProducts.length > 0) {
@@ -6216,6 +6395,7 @@ function SCANProductsPage() {
                 }
             } catch (e) {
                 console.warn('conf-products unavailable, using static catalog:', e);
+                // If REST fails (e.g. outside Splunk), products stay from PRODUCT_CATALOG (generate-catalog.js)
             }
 
             // 2. Installed apps lookup
@@ -6393,11 +6573,19 @@ function SCANProductsPage() {
             }
             const data = await res.json();
             const results = data.results || [];
+            const catalogRow = results.find(r => r.status != null);
             const countRow = results.find(r => r.count != null);
             const entryCount = countRow ? parseInt(countRow.count, 10) : 0;
+            const catStatus = catalogRow ? catalogRow.status : '';
+            const catNote = catStatus === 'Success' ? 'Product catalog updated'
+                : catStatus === 'Skipped' ? 'Product catalog current'
+                : catStatus === 'Failed' ? 'Product catalog sync failed'
+                : '';
             if (entryCount > 0) {
-                setCsvSyncStatus('success');
-                setCsvSyncMessage(`Catalog synced — ${entryCount.toLocaleString()} apps`);
+                setCsvSyncStatus(catStatus === 'Failed' ? 'error' : 'success');
+                const parts = [`${entryCount.toLocaleString()} apps`];
+                if (catNote) parts.push(catNote);
+                setCsvSyncMessage(`Synced — ${parts.join(' · ')}`);
                 // Reload the Splunkbase data into UI state
                 const reloadSearch = '| inputlookup scan_splunkbase_apps | table uid appid version_compatibility product_compatibility app_version title archive_status';
                 const rRes = await splunkFetch(`/splunkd/__raw/servicesNS/-/${APP_ID}/search/jobs`, {
@@ -6429,7 +6617,7 @@ function SCANProductsPage() {
             setCsvSyncStatus('error');
             setCsvSyncMessage(e.message || 'Unknown error');
         }
-    }, []);
+    }, [products.length]);
 
     // ── Portfolio toggle handler ──
     const handlePortfolioToggle = useCallback(() => {
@@ -6462,7 +6650,7 @@ function SCANProductsPage() {
             base = base.filter((p) => p.status !== 'under_development');
         }
         if (!showGtmRoadmap) {
-            base = base.filter((p) => !p.coverage_gap);
+            base = base.filter((p) => !p.coverage_gap || (p.addon || p.app_viz || p.app_viz_2 || p.sc4s_supported));
         }
         return base;
     }, [products, supportLevelFilter, showFullPortfolio, showRetired, showDeprecated, showComingSoon, showGtmRoadmap]);
@@ -6478,6 +6666,14 @@ function SCANProductsPage() {
             filtered = filtered.filter((p) => p.secure_networking_gtm);
         } else if (selectedCategory === 'ai_powered') {
             filtered = filtered.filter((p) => p.ai_enabled);
+        } else if (selectedCategory === 'es') {
+            filtered = filtered.filter((p) => p.es_compatible);
+        } else if (selectedCategory === 'itsi') {
+            filtered = filtered.filter((p) => p.itsi_content_pack);
+        } else if (selectedCategory === 'sc4s') {
+            filtered = filtered.filter((p) => p.sc4s_supported);
+        } else if (selectedCategory === 'netflow') {
+            filtered = filtered.filter((p) => p.netflow_supported);
         } else if (selectedCategory) {
             filtered = filtered.filter((p) => p.category === selectedCategory);
         }
@@ -6493,28 +6689,34 @@ function SCANProductsPage() {
         if (aiFilter) {
             filtered = filtered.filter((p) => p.ai_enabled);
         }
-        if (streamFilter) {
-            filtered = filtered.filter((p) => p.netflow_supported);
-        }
-        if (sc4sFilter) {
-            filtered = filtered.filter((p) => p.sc4s_supported);
-        }
         if (searchQuery) {
             const q = searchQuery.toLowerCase().trim();
             filtered = filtered.filter((p) => {
-                const kws = (p.keywords || []).map((k) => k.toLowerCase());
-                if (kws.some((k) => k.includes(q) || q.includes(k))) return true;
+                const nameField = `${p.display_name} ${p.tagline} ${p.description} ${p.vendor} ${p.product_id}`.toLowerCase();
+                if (nameField.includes(q)) return true;
                 const als = (p.aliases || []).map((a) => a.toLowerCase());
                 if (als.some((a) => a.includes(q) || q.includes(a))) return true;
-                return `${p.display_name} ${p.tagline} ${p.description} ${p.vendor} ${p.product_id}`.toLowerCase().includes(q);
+                const kws = (p.keywords || []).map((k) => k.toLowerCase());
+                if (kws.some((k) => k === q || q.startsWith(k + ' ') || q.endsWith(' ' + k) || q.includes(' ' + k + ' ') || k.includes(q))) return true;
+                return false;
+            });
+            filtered.sort((a, b) => {
+                const aExact = a.display_name.toLowerCase().includes(q) ? 0 : 1;
+                const bExact = b.display_name.toLowerCase().includes(q) ? 0 : 1;
+                if (aExact !== bExact) return aExact - bExact;
+                const aAlias = (a.aliases || []).some(al => al.toLowerCase().includes(q)) ? 0 : 1;
+                const bAlias = (b.aliases || []).some(al => al.toLowerCase().includes(q)) ? 0 : 1;
+                if (aAlias !== bAlias) return aAlias - bAlias;
+                return (a.sort_order || 100) - (b.sort_order || 100);
             });
         }
         // ── Splunkbase platform filter ──
         if (platformFilter.length > 0 && splunkbaseData && Object.keys(splunkbaseData).length > 0) {
             if (platformFilterMode === 'include') {
                 filtered = filtered.filter((p) => {
+                    if (sc4sCoversFilter(p, platformFilter)) return true;
                     const uids = getAllProductUids(p, appidToUidMap);
-                    if (uids.length === 0) return true; // no Splunkbase apps = pass through
+                    if (uids.length === 0) return true;
                     return uids.some(uid => {
                         const entry = splunkbaseData[uid];
                         if (!entry || !entry.product_compatibility) return false;
@@ -6523,10 +6725,10 @@ function SCANProductsPage() {
                     });
                 });
             } else {
-                // Exclude mode: show products that do NOT support the selected platform(s)
                 filtered = filtered.filter((p) => {
+                    if (sc4sCoversFilter(p, platformFilter)) return false;
                     const uids = getAllProductUids(p, appidToUidMap);
-                    if (uids.length === 0) return true; // no Splunkbase data = keep (can't verify)
+                    if (uids.length === 0) return true;
                     return !uids.some(uid => {
                         const entry = splunkbaseData[uid];
                         if (!entry || !entry.product_compatibility) return false;
@@ -6545,7 +6747,7 @@ function SCANProductsPage() {
             }
         }
         return filtered;
-    }, [portfolioProducts, selectedCategory, selectedSubCategory, aiFilter, streamFilter, sc4sFilter, searchQuery, platformFilter, versionFilter, splunkbaseData, appidToUidMap, versionFilterMode, platformFilterMode]);
+    }, [portfolioProducts, selectedCategory, selectedSubCategory, aiFilter, searchQuery, platformFilter, versionFilter, splunkbaseData, appidToUidMap, versionFilterMode, platformFilterMode]);
 
     const filteredProducts = useMemo(() => {
         if (!selectedAddon) return preAddonProducts;
@@ -6558,7 +6760,7 @@ function SCANProductsPage() {
     }, [preAddonProducts, selectedAddon]);
 
     /* Active filter count for the "Filters" button badge */
-    const crossCutLabels = { soar: 1, alert_actions: 1, secure_networking: 1, ai_powered: 1 };
+    const crossCutLabels = { soar: 1, alert_actions: 1, secure_networking: 1, ai_powered: 1, es: 1, itsi: 1, sc4s: 1, netflow: 1 };
     const activeFilterCount = useMemo(() => {
         let count = 0;
         if (selectedCategory && crossCutLabels[selectedCategory]) count++;
@@ -6567,13 +6769,11 @@ function SCANProductsPage() {
         if (showDeprecated) count++;
         if (showComingSoon) count++;
         if (showGtmRoadmap) count++;
-        if (streamFilter) count++;
-        if (sc4sFilter) count++;
         if (platformFilter.length > 0) count++;
         if (versionFilter.length > 0) count++;
         if (selectedAddon) count++;
         return count;
-    }, [selectedCategory, supportLevelFilter, showRetired, showDeprecated, showComingSoon, showGtmRoadmap, streamFilter, sc4sFilter, platformFilter, versionFilter, selectedAddon]);
+    }, [selectedCategory, supportLevelFilter, showRetired, showDeprecated, showComingSoon, showGtmRoadmap, platformFilter, versionFilter, selectedAddon]);
 
     /* Addon label for active chip display */
     const activeAddonLabel = useMemo(() => {
@@ -6585,36 +6785,101 @@ function SCANProductsPage() {
         return match ? (match.addon_label || match.addon) : selectedAddon;
     }, [selectedAddon, preAddonProducts]);
 
-    const configuredProducts = filteredProducts.filter((p) => p.status !== 'under_development' && p.status !== 'retired' && p.status !== 'deprecated' && !p.coverage_gap && configuredIds.includes(p.product_id));
-    const detectedProducts = filteredProducts.filter((p) => p.status !== 'under_development' && p.status !== 'retired' && p.status !== 'deprecated' && !p.coverage_gap && p.support_level !== 'not_supported' && !configuredIds.includes(p.product_id) && sourcetypeData[p.product_id] && sourcetypeData[p.product_id].hasData);
+    const includeInMainSections = (p) => !p.coverage_gap || !!(p.addon || p.app_viz || p.app_viz_2 || p.sc4s_supported);
+    const configuredProducts = filteredProducts.filter((p) => p.status !== 'under_development' && p.status !== 'retired' && p.status !== 'deprecated' && includeInMainSections(p) && configuredIds.includes(p.product_id));
+    const detectedProducts = filteredProducts.filter((p) => p.status !== 'under_development' && p.status !== 'retired' && p.status !== 'deprecated' && includeInMainSections(p) && p.support_level !== 'not_supported' && !configuredIds.includes(p.product_id) && sourcetypeData[p.product_id] && sourcetypeData[p.product_id].hasData);
     const detectedIds = new Set(detectedProducts.map((p) => p.product_id));
-    const availableProducts = filteredProducts.filter((p) => p.status !== 'under_development' && p.status !== 'retired' && p.status !== 'deprecated' && !p.coverage_gap && p.support_level !== 'not_supported' && !configuredIds.includes(p.product_id) && !detectedIds.has(p.product_id));
-    const unsupportedProducts = filteredProducts.filter((p) => p.status !== 'under_development' && p.status !== 'retired' && p.status !== 'deprecated' && !p.coverage_gap && p.support_level === 'not_supported' && !configuredIds.includes(p.product_id));
+    const availableProducts = filteredProducts.filter((p) => p.status !== 'under_development' && p.status !== 'retired' && p.status !== 'deprecated' && includeInMainSections(p) && p.support_level !== 'not_supported' && !configuredIds.includes(p.product_id) && !detectedIds.has(p.product_id));
+    const unsupportedProducts = filteredProducts.filter((p) => p.status !== 'under_development' && p.status !== 'retired' && p.status !== 'deprecated' && includeInMainSections(p) && p.support_level === 'not_supported' && !configuredIds.includes(p.product_id));
     const comingSoonProducts = filteredProducts.filter((p) => p.status === 'under_development');
     const deprecatedProducts = filteredProducts.filter((p) => p.status === 'deprecated');
     const retiredProducts = filteredProducts.filter((p) => p.status === 'retired');
-    const gtmGapProducts = filteredProducts.filter((p) => p.coverage_gap);
+    const gtmGapProducts = filteredProducts.filter((p) => p.coverage_gap && !(p.addon || p.app_viz || p.app_viz_2 || p.sc4s_supported));
+
+    // ── Effective panel open state (search overrides collapsed panels) ──
+    const effectivePanelOpen = useMemo(() => {
+        if (!searchQuery) return panelState;
+        const overrides = {};
+        if (configuredProducts.length > 0)  overrides.configured_products = true;
+        if (detectedProducts.length > 0)    overrides.detected_products = true;
+        if (availableProducts.length > 0)   overrides.available_products = true;
+        if (unsupportedProducts.length > 0) overrides.unsupported_products = true;
+        if (comingSoonProducts.length > 0)  overrides.coming_soon_products = true;
+        if (deprecatedProducts.length > 0)  overrides.deprecated_products = true;
+        if (retiredProducts.length > 0)     overrides.retired_products = true;
+        if (gtmGapProducts.length > 0)      overrides.gtm_coverage_gaps = true;
+        return { ...panelState, ...overrides };
+    }, [searchQuery, panelState, configuredProducts.length, detectedProducts.length,
+        availableProducts.length, unsupportedProducts.length, comingSoonProducts.length,
+        deprecatedProducts.length, retiredProducts.length, gtmGapProducts.length]);
+
+    // ── Scroll to first matching card when search changes ──
+    const prevSearchRef = useRef('');
+    useEffect(() => {
+        if (!searchQuery || searchQuery === prevSearchRef.current) {
+            prevSearchRef.current = searchQuery;
+            return;
+        }
+        prevSearchRef.current = searchQuery;
+        const timer = setTimeout(() => {
+            const card = document.querySelector('.csc-card-grid .csc-product-card');
+            if (card) {
+                card.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                card.classList.add('csc-card-search-pulse');
+                setTimeout(() => card.classList.remove('csc-card-search-pulse'), 1200);
+            }
+        }, 150);
+        return () => clearTimeout(timer);
+    }, [searchQuery]);
+
+    // GTM Roadmap: sort by pillar (Campus & Branch first, then WAN Edge, Data Center, Visibility, Industrial)
+    // and group for section headings so the order matches "roadmap begins with Campus and Branch and will expand."
+    const gtmGapProductsByPillar = useMemo(() => {
+        const gapProducts = filteredProducts.filter((p) => p.coverage_gap && !(p.addon || p.app_viz || p.app_viz_2 || p.sc4s_supported));
+        const sorted = [...gapProducts].sort((a, b) => {
+            const pa = (a.gtm_pillar && String(a.gtm_pillar).trim()) ? parseInt(a.gtm_pillar, 10) : 99;
+            const pb = (b.gtm_pillar && String(b.gtm_pillar).trim()) ? parseInt(b.gtm_pillar, 10) : 99;
+            if (pa !== pb) return pa - pb;
+            return (a.sort_order || 100) - (b.sort_order || 100) || (a.display_name || '').localeCompare(b.display_name || '');
+        });
+        const groups = [];
+        let currentPillar = null;
+        let currentProducts = [];
+        for (const p of sorted) {
+            const pillar = (p.gtm_pillar && String(p.gtm_pillar).trim()) || '';
+            const pillarNum = pillar ? parseInt(pillar, 10) : 0;
+            if (pillarNum !== currentPillar) {
+                if (currentProducts.length > 0) groups.push({ pillarNum: currentPillar, pillarLabel: GTM_PILLAR_LABELS[currentPillar] || `Pillar ${currentPillar}`, products: currentProducts });
+                currentPillar = pillarNum;
+                currentProducts = [];
+            }
+            currentProducts.push(p);
+        }
+        if (currentProducts.length > 0) groups.push({ pillarNum: currentPillar, pillarLabel: GTM_PILLAR_LABELS[currentPillar] || (currentPillar ? `Pillar ${currentPillar}` : 'Other'), products: currentProducts });
+        return groups;
+    }, [filteredProducts]);
 
     const categoryCounts = useMemo(() => {
         let base = portfolioProducts;
         // Apply cross-cutting filters so category counts reflect the active filter state
-        if (streamFilter) base = base.filter((p) => p.netflow_supported);
-        if (sc4sFilter) base = base.filter((p) => p.sc4s_supported);
         if (aiFilter) base = base.filter((p) => p.ai_enabled);
         if (searchQuery) {
             const q = searchQuery.toLowerCase().trim();
             base = base.filter((p) => {
-                const kws = (p.keywords || []).map((k) => k.toLowerCase());
-                if (kws.some((k) => k.includes(q) || q.includes(k))) return true;
+                const nameField = `${p.display_name} ${p.tagline} ${p.description} ${p.vendor} ${p.product_id}`.toLowerCase();
+                if (nameField.includes(q)) return true;
                 const als = (p.aliases || []).map((a) => a.toLowerCase());
                 if (als.some((a) => a.includes(q) || q.includes(a))) return true;
-                return `${p.display_name} ${p.tagline} ${p.description} ${p.vendor} ${p.product_id}`.toLowerCase().includes(q);
+                const kws = (p.keywords || []).map((k) => k.toLowerCase());
+                if (kws.some((k) => k === q || q.startsWith(k + ' ') || q.endsWith(' ' + k) || q.includes(' ' + k + ' ') || k.includes(q))) return true;
+                return false;
             });
         }
         if (platformFilter.length > 0 && splunkbaseData && Object.keys(splunkbaseData).length > 0) {
             base = base.filter((p) => {
+                if (sc4sCoversFilter(p, platformFilter)) return true;
                 const uids = getAllProductUids(p, appidToUidMap);
-                if (uids.length === 0) return true; // no Splunkbase apps = pass through
+                if (uids.length === 0) return true;
                 return uids.some(uid => {
                     const entry = splunkbaseData[uid];
                     if (!entry || !entry.product_compatibility) return false;
@@ -6642,8 +6907,12 @@ function SCANProductsPage() {
         counts.alert_actions = base.filter((p) => p.alert_action_uids && p.alert_action_uids.length > 0).length;
         counts.secure_networking = base.filter((p) => p.secure_networking_gtm).length;
         counts.ai_powered = base.filter((p) => p.ai_enabled).length;
+        counts.es = base.filter((p) => p.es_compatible).length;
+        counts.itsi = base.filter((p) => p.itsi_content_pack).length;
+        counts.sc4s = base.filter((p) => p.sc4s_supported).length;
+        counts.netflow = base.filter((p) => p.netflow_supported).length;
         return counts;
-    }, [portfolioProducts, streamFilter, sc4sFilter, aiFilter, searchQuery, platformFilter, versionFilter, splunkbaseData, selectedAddon, appidToUidMap]);
+    }, [portfolioProducts, aiFilter, searchQuery, platformFilter, versionFilter, splunkbaseData, selectedAddon, appidToUidMap]);
 
     // ── Render ──
     if (loading) {
@@ -6674,14 +6943,6 @@ function SCANProductsPage() {
                     <p className="products-page-subtitle">
                         The Front Door to the Cisco–Splunk Ecosystem
                     </p>
-                </div>
-                <div className="header-right">
-                    <img
-                        className="scan-hero-logo"
-                        src={createURL(`/static/app/${APP_ID}/cisco-hero-logo.svg`)}
-                        alt="Cisco"
-                        onError={(e) => { e.target.style.display = 'none'; }}
-                    />
                 </div>
             </div>
 
@@ -6770,12 +7031,16 @@ function SCANProductsPage() {
                         </span>
                     </button>
                     <InfoTooltip
-                        title="Splunkbase Catalog Sync"
+                        title="Catalog Sync"
                         placement="bottom"
-                        width={360}
+                        width={380}
                         content={
                             <div style={{ fontSize: '13px', lineHeight: 1.6 }}>
-                                <p style={{ margin: '0 0 8px' }}>Downloads the latest Splunkbase app catalog from S3, normalizes the data, and updates the local lookup used for version compatibility, platform filters, and ecosystem intelligence.</p>
+                                <p style={{ margin: '0 0 6px', fontWeight: 600 }}>This job performs two syncs:</p>
+                                <ol style={{ margin: '0 0 8px', paddingLeft: '18px' }}>
+                                    <li style={{ marginBottom: '4px' }}><strong>Product catalog</strong> — Checks S3 for a newer <code style={{ fontSize: '11px' }}>products.conf</code> and updates it if a compatible version is available ({products.length} products).</li>
+                                    <li><strong>Splunkbase apps</strong> — Downloads the latest app catalog from S3 and refreshes the local lookup used for version compatibility, platform filters, and ecosystem intelligence.</li>
+                                </ol>
                                 <p style={{ margin: '0 0 8px' }}>This runs <strong>automatically every night</strong> via a scheduled saved search. Use this button when you need fresh data immediately.</p>
                                 <p style={{ margin: 0, fontSize: '11px', color: 'var(--text-tertiary, #667180)' }}>Saved search: SCAN - Splunkbase Catalog Sync</p>
                             </div>
@@ -6785,7 +7050,7 @@ function SCANProductsPage() {
                             className={`scan-util-pill scan-util-sync ${csvSyncStatus === 'success' ? 'scan-sync-ok' : csvSyncStatus === 'error' ? 'scan-sync-err' : csvSyncStatus === 'syncing' ? 'scan-sync-busy' : ''}`}
                             onClick={handleSyncSplunkbase}
                             disabled={csvSyncStatus === 'syncing'}
-                            title={csvSyncStatus === 'success' ? `✓ ${csvSyncMessage}` : csvSyncStatus === 'error' ? `✗ ${csvSyncMessage}` : csvSyncStatus === 'syncing' ? 'Syncing…' : 'Sync Splunkbase catalog now'}
+                            title={csvSyncStatus === 'success' ? `✓ ${csvSyncMessage}` : csvSyncStatus === 'error' ? `✗ ${csvSyncMessage}` : csvSyncStatus === 'syncing' ? 'Syncing…' : 'Sync product catalog and Splunkbase apps'}
                             style={{ cursor: csvSyncStatus === 'syncing' ? 'wait' : 'pointer' }}
                         >
                             Sync Catalog
@@ -6905,10 +7170,6 @@ function SCANProductsPage() {
                     onToggleShowComingSoon={setShowComingSoon}
                     showGtmRoadmap={showGtmRoadmap}
                     onToggleShowGtmRoadmap={setShowGtmRoadmap}
-                    streamFilter={streamFilter}
-                    onToggleStreamFilter={setStreamFilter}
-                    sc4sFilter={sc4sFilter}
-                    onToggleSc4sFilter={setSc4sFilter}
                     platformFilter={platformFilter}
                     onSelectPlatform={handlePlatformToggle}
                     versionFilter={versionFilter}
@@ -6946,10 +7207,6 @@ function SCANProductsPage() {
                 onToggleShowComingSoon={setShowComingSoon}
                 showGtmRoadmap={showGtmRoadmap}
                 onToggleShowGtmRoadmap={setShowGtmRoadmap}
-                streamFilter={streamFilter}
-                onToggleStreamFilter={setStreamFilter}
-                sc4sFilter={sc4sFilter}
-                onToggleSc4sFilter={setSc4sFilter}
                 platformFilter={platformFilter}
                 onSelectPlatform={handlePlatformToggle}
                 versionFilter={versionFilter}
@@ -6976,8 +7233,6 @@ function SCANProductsPage() {
                     setSelectedCategory(null);
                     setSelectedSubCategory(null);
                     setAiFilter(false);
-                    setStreamFilter(false);
-                    setSc4sFilter(false);
                     setSelectedAddon(null);
                     setSupportLevelFilter([]);
                     setShowRetired(false);
@@ -6989,15 +7244,18 @@ function SCANProductsPage() {
                     setVersionFilter([]);
                     setVersionFilterMode('include');
                     setPlatformFilterMode('include');
+                    setSearchQuery('');
                     setSearchBarQuery('');
                     setShowFullPortfolio(false);
                     savePortfolioPreference(false);
+                    setPanelState({ ...DEFAULT_PANEL_STATE });
+                    savePanelState({ ...DEFAULT_PANEL_STATE });
                 }}
             />
 
             {/* Section 1: Configured */}
             <div id="configured_products">
-            <CollapsiblePanel title={`Configured Products (${configuredProducts.length})`} defaultOpen panelId="configured_products">
+            <CollapsiblePanel title={`Configured Products (${configuredProducts.length})`} open={effectivePanelOpen.configured_products} onChange={handlePanelToggle} panelId="configured_products">
                 {configuredProducts.length > 0 && (
                     <div className="csc-section-toolbar">
                         <button
@@ -7036,7 +7294,7 @@ function SCANProductsPage() {
             {/* Section 1b: Data Detected — products with flowing sourcetypes not yet configured */}
             {detectedProducts.length > 0 && (
                 <div id="detected_products">
-                <CollapsiblePanel title={`Data Detected (${detectedProducts.length})`} defaultOpen panelId="detected_products">
+                <CollapsiblePanel title={`Data Detected (${detectedProducts.length})`} open={effectivePanelOpen.detected_products} onChange={handlePanelToggle} panelId="detected_products">
                     <div style={{ padding: '8px 12px', marginBottom: '12px', background: 'var(--status-info-bg, #f0f9ff)', borderLeft: '4px solid var(--color-primary-hover, #02C8FF)', borderRadius: '4px', fontSize: '13px', color: 'var(--page-color, #333)' }}>
                         These products have <strong>active sourcetype data flowing</strong> into your Splunk environment but haven't been added to your configured list yet. Click <strong>Add to My Products</strong> to start managing them.
                     </div>
@@ -7061,7 +7319,7 @@ function SCANProductsPage() {
 
             {/* Section 2: Available */}
             <div id="available_products">
-            <CollapsiblePanel title={`Available Products (${availableProducts.length})`} defaultOpen panelId="available_products">
+            <CollapsiblePanel title={`Available Products (${availableProducts.length})`} open={effectivePanelOpen.available_products} onChange={handlePanelToggle} panelId="available_products">
                 {availableProducts.length > 0 ? (
                     <div className="csc-card-grid">
                         {availableProducts.map((p) => (
@@ -7089,7 +7347,7 @@ function SCANProductsPage() {
             {/* Section 3: Unsupported */}
             {unsupportedProducts.length > 0 && (
                 <div id="unsupported_products">
-                <CollapsiblePanel title={`Unsupported Products (${unsupportedProducts.length})`} defaultOpen={false} panelId="unsupported_products">
+                <CollapsiblePanel title={`Unsupported Products (${unsupportedProducts.length})`} open={effectivePanelOpen.unsupported_products} onChange={handlePanelToggle} panelId="unsupported_products">
                     <div style={{ padding: '8px 12px', marginBottom: '12px', background: 'var(--warning-bg, #fff3e0)', borderLeft: '4px solid #bf360c', borderRadius: '4px', fontSize: '13px', color: 'var(--page-color, #333)' }}>
                         These products have a <strong>Not Supported</strong> support level — there is no official Cisco or Splunk support commitment. They may still function correctly but use at your own discretion.
                     </div>
@@ -7114,7 +7372,7 @@ function SCANProductsPage() {
 
             {/* Section 4: Coming Soon */}
             <div id="coming_soon_products">
-            <CollapsiblePanel title={`Coming Soon (${comingSoonProducts.length})`} defaultOpen panelId="coming_soon_products">
+            <CollapsiblePanel title={`Coming Soon (${comingSoonProducts.length})`} open={effectivePanelOpen.coming_soon_products} onChange={handlePanelToggle} panelId="coming_soon_products">
                 {comingSoonProducts.length > 0 ? (
                     <div className="csc-card-grid">
                         {comingSoonProducts.map((p) => (
@@ -7140,7 +7398,7 @@ function SCANProductsPage() {
             {/* Section 5: Deprecated Products */}
             {deprecatedProducts.length > 0 && (
                 <div id="deprecated_products">
-                <CollapsiblePanel title={`Deprecated Products (${deprecatedProducts.length})`} defaultOpen={false} panelId="deprecated_products">
+                <CollapsiblePanel title={`Deprecated Products (${deprecatedProducts.length})`} open={effectivePanelOpen.deprecated_products} onChange={handlePanelToggle} panelId="deprecated_products">
                     <div style={{ padding: '8px 12px', marginBottom: '12px', background: 'var(--warning-bg, #fff3e0)', borderLeft: '4px solid #FF9000', borderRadius: '4px', fontSize: '13px', color: 'var(--page-color, #333)' }}>
                         These Splunk add-ons or apps have been <strong>deprecated</strong> — the Cisco product may still be active but the integration is being sunset or replaced by a newer add-on.
                     </div>
@@ -7166,7 +7424,7 @@ function SCANProductsPage() {
             {/* Section 6: Retired Products (Cisco EOL) */}
             {retiredProducts.length > 0 && (
                 <div id="retired_products">
-                <CollapsiblePanel title={`Retired Products (${retiredProducts.length})`} defaultOpen={false} panelId="retired_products">
+                <CollapsiblePanel title={`Retired Products (${retiredProducts.length})`} open={effectivePanelOpen.retired_products} onChange={handlePanelToggle} panelId="retired_products">
                     <div style={{ padding: '8px 12px', marginBottom: '12px', background: 'var(--status-neutral-bg, #fce4ec)', borderLeft: '4px solid var(--color-error, #c62828)', borderRadius: '4px', fontSize: '13px', color: 'var(--page-color, #333)' }}>
                         These Cisco products have reached <strong>end-of-life / end-of-sale</strong> and have been superseded by newer offerings. Their Splunk add-ons may still function if already installed.
                     </div>
@@ -7189,28 +7447,34 @@ function SCANProductsPage() {
                 </div>
             )}
 
-            {/* Section 6: GTM Roadmap — Coverage Gaps */}
-            {gtmGapProducts.length > 0 && (
+            {/* Section 6: GTM Roadmap — Coverage Gaps (only when user has turned on "GTM Roadmap" in filters) */}
+            {showGtmRoadmap && gtmGapProducts.length > 0 && (
                 <div id="gtm_coverage_gaps">
-                <CollapsiblePanel title={`GTM Roadmap — Coming Soon (${gtmGapProducts.length})`} defaultOpen={false} panelId="gtm_coverage_gaps">
+                <CollapsiblePanel title={`GTM Roadmap — Coming Soon (${gtmGapProducts.length})`} open={effectivePanelOpen.gtm_coverage_gaps} onChange={handlePanelToggle} panelId="gtm_coverage_gaps">
                     <div style={{ padding: '8px 12px', marginBottom: '12px', background: 'var(--status-neutral-bg, #eceff1)', borderLeft: '4px solid var(--text-tertiary, #607d8b)', borderRadius: '4px', fontSize: '13px', color: 'var(--page-color, #333)' }}>
-                        These Cisco products are on the <strong>Secure Networking GTM roadmap</strong> for Splunk integration. They represent upcoming opportunities to extend visibility and detection coverage across the Cisco portfolio.
+                        These Cisco products are on the <strong>Secure Networking GTM roadmap</strong> for Splunk integration. Items are ordered by GTM pillar — <strong>Campus &amp; Branch first</strong>, then WAN Edge, Data Center &amp; Cloud, Visibility &amp; Assurance, and Industrial/OT.
                     </div>
-                    <div className="csc-card-grid">
-                        {gtmGapProducts.map((p) => (
-                            <ProductCard
-                                key={p.product_id} product={p}
-                                installedApps={installedApps} appStatuses={appStatuses} indexerApps={indexerApps}
-                                sourcetypeData={sourcetypeData} splunkbaseData={splunkbaseData} appidToUidMap={appidToUidMap} isConfigured={false} isComingSoon={false}
-                                platformType={effectivePlatformType}
-                                onToggleConfigured={handleToggleConfigured}
-                                onShowBestPractices={handleShowBestPractices}
-                                onViewLegacy={handleViewLegacy}
-                                onSetCustomDashboard={handleSetCustomDashboard}
-                                devMode={devMode} onViewConfig={handleOpenConfigViewer}
-                            />
-                        ))}
-                    </div>
+                    {gtmGapProductsByPillar.map(({ pillarNum, pillarLabel, products }) => (
+                        <div key={pillarNum ?? 'other'} style={{ marginBottom: '20px' }}>
+                            <h4 style={{ fontSize: '13px', fontWeight: 600, color: 'var(--text-secondary, #546e7a)', margin: '0 0 10px', paddingBottom: '4px', borderBottom: '1px solid var(--border-light, #e0e0e0)' }}>{pillarLabel}</h4>
+                            <div className="csc-card-grid">
+                                {products.map((p) => (
+                                    <ProductCard
+                                        key={p.product_id} product={p}
+                                        installedApps={installedApps} appStatuses={appStatuses} indexerApps={indexerApps}
+                                        sourcetypeData={sourcetypeData} splunkbaseData={splunkbaseData} appidToUidMap={appidToUidMap} isConfigured={false} isComingSoon={false}
+                                        platformType={effectivePlatformType}
+                                        onToggleConfigured={handleToggleConfigured}
+                                        onShowBestPractices={handleShowBestPractices}
+                                        onViewLegacy={handleViewLegacy}
+                                        onSetCustomDashboard={handleSetCustomDashboard}
+                                        devMode={devMode} onViewConfig={handleOpenConfigViewer}
+                                        showGtmRibbon
+                                    />
+                                ))}
+                            </div>
+                        </div>
+                    ))}
                 </CollapsiblePanel>
                 </div>
             )}
@@ -7218,7 +7482,7 @@ function SCANProductsPage() {
             {/* Section 7: Catalog Vault — Disabled Products */}
             {showVault && vaultProducts.length > 0 && (
                 <div id="vault_products">
-                <CollapsiblePanel title={`Catalog Vault (${vaultProducts.length})`} defaultOpen panelId="vault_products">
+                <CollapsiblePanel title={`Catalog Vault (${vaultProducts.length})`} open={effectivePanelOpen.vault_products} onChange={handlePanelToggle} panelId="vault_products">
                     <div style={{ padding: '8px 12px', marginBottom: '12px', background: 'var(--status-neutral-bg, #f1f5f9)', borderLeft: '4px solid #64748b', borderRadius: '4px', fontSize: '13px', color: 'var(--page-color, #333)' }}>
                         These catalog entries are <strong>disabled</strong> in products.conf and hidden from the main view. They may be placeholders, duplicates, or products intentionally removed from the active catalog.
                     </div>
@@ -7306,7 +7570,7 @@ function SCANProductsPage() {
                                 <summary className="scan-guide-summary">Product Cards</summary>
                                 <ul className="scan-guide-list">
                                     <li>Intelligence badges show <strong>install status</strong>, <strong>updates</strong>, <strong>data flowing</strong> (7d), and <strong>legacy apps</strong>.</li>
-                                    <li>Header badges (<span className="csc-badge-btn csc-badge-sc4s" style={{ fontSize: '12px', padding: '3px 8px' }}>SC4S</span> <span className="csc-badge-btn csc-badge-netflow" style={{ fontSize: '12px', padding: '3px 8px' }}>NetFlow</span> <span className="csc-badge-btn csc-badge-soar" style={{ fontSize: '12px', padding: '3px 8px' }}>SOAR</span> <span className="csc-badge-btn csc-badge-itsi" style={{ fontSize: '12px', padding: '3px 8px' }}>ITSI</span> <span className="csc-badge-btn csc-badge-es" style={{ fontSize: '12px', padding: '3px 8px' }}>ES</span>) open info panels.</li>
+                                    <li>Header badges (<span className="csc-badge-btn csc-badge-sc4s" style={{ fontSize: '12px', padding: '3px 8px' }}>SC4S</span> <span className="csc-badge-btn csc-badge-netflow" style={{ fontSize: '12px', padding: '3px 8px' }}>NetFlow</span> <span className="csc-badge-btn csc-badge-soar" style={{ fontSize: '12px', padding: '3px 8px' }}>SOAR</span> <span className="csc-badge-btn csc-badge-itsi" style={{ fontSize: '12px', padding: '3px 8px' }}>ITSI</span> <span className="csc-badge-btn csc-badge-es" style={{ fontSize: '12px', padding: '3px 8px' }}>ES</span> <span className="csc-badge-btn csc-badge-alert" style={{ fontSize: '12px', padding: '3px 8px' }}>Alert Actions</span>) open info panels.</li>
                                     <li>Hover <strong>ⓘ</strong> for description, value proposition, and former names.</li>
                                 </ul>
                             </details>
@@ -7335,7 +7599,7 @@ function SCANProductsPage() {
                                 <ul className="scan-guide-list">
                                     <li>Click <strong>Launch ▾</strong> to open an installed app's dashboard directly.</li>
                                     <li><strong>? Best Practices</strong> provides platform-specific tips and SC4S links.</li>
-                                    <li><strong>Sync Catalog</strong> downloads and refreshes the Splunkbase app catalog (runs nightly, but click for on-demand sync).</li>
+                                    <li><strong>Sync Catalog</strong> checks S3 for a newer product catalog (<code>products.conf</code>) and downloads the latest Splunkbase app lookup. Runs nightly, but click for on-demand sync.</li>
                                     <li><strong>Role</strong> picks a persona for a curated quick-start.</li>
                                     <li>Cycle through <strong>Light / Dark / Auto</strong> themes.</li>
                                 </ul>

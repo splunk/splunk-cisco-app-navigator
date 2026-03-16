@@ -14,6 +14,33 @@ const glob = require('glob');
 const cmd = process.argv[2] || 'build';
 const pkgRoot = path.join(__dirname, '..');
 
+// --- Pre-build: stamp products.conf line 1 (date/time) and min_app_version ---
+function stampProductsConf() {
+  const productsConfPath = path.join(pkgRoot, 'src/main/resources/splunk/default/products.conf');
+  const appConfPath = path.join(pkgRoot, 'src/main/resources/splunk/default/app.conf');
+  if (!fs.existsSync(productsConfPath)) return;
+
+  let appVersion = '1.0.0';
+  if (fs.existsSync(appConfPath)) {
+    const appConf = fs.readFileSync(appConfPath, 'utf8');
+    const idMatch = appConf.match(/\[id\][\s\S]*?version\s*=\s*(\S+)/m);
+    if (idMatch) appVersion = idMatch[1].trim();
+  }
+
+  const now = new Date();
+  const pad = (n) => String(n).padStart(2, '0');
+  const versionStamp = `${now.getUTCFullYear()}_${pad(now.getUTCMonth() + 1)}_${pad(now.getUTCDate())}_${pad(now.getUTCHours())}${pad(now.getUTCMinutes())}`;
+  const line1 = `# version = ${versionStamp}`;
+  const line2 = `# min_app_version = ${appVersion}`;
+
+  let content = fs.readFileSync(productsConfPath, 'utf8');
+  const lines = content.split(/\r?\n/);
+  const rest = lines.slice(2).join('\n');
+  const newContent = line1 + '\n' + line2 + '\n' + rest;
+  fs.writeFileSync(productsConfPath, newContent, 'utf8');
+  console.log(`\x1b[36m[build-stamp]\x1b[0m products.conf: version = ${versionStamp}, min_app_version = ${appVersion}`);
+}
+
 // --- Pre-build: stamp build hash in app.conf ---
 function stampBuildHash() {
   const appConfPath = path.join(pkgRoot, 'src/main/resources/splunk/default/app.conf');
@@ -97,6 +124,8 @@ function postBuildRefresh() {
 if (cmd === 'build') {
   // 0. Stamp build hash in app.conf (git short hash or date fallback)
   stampBuildHash();
+  // 0b. Stamp products.conf line 1 (date/time) and min_app_version from app.conf
+  stampProductsConf();
   // 1. Generate static catalog from products.conf
   const genResult = spawnSync('node', [path.join(pkgRoot, 'bin', 'generate-catalog.js')], {
     stdio: 'inherit',

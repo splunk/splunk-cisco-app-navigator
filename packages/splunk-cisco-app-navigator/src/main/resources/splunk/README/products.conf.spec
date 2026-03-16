@@ -61,6 +61,23 @@ coverage_gap = true | false
 * in the "GTM Roadmap — Coverage Gaps" section to highlight future
 * integration opportunities.  Typically paired with status = roadmap.
 
+gap_type = new_integration | rebuild | enhancement
+* Type of coverage gap. Only used when coverage_gap = true.
+*   new_integration — No Splunk integration exists; needs to be built from scratch.
+*   rebuild         — A developer/community add-on exists but needs a Cisco- or
+*                     Splunk-supported replacement (build or acquire).
+*   enhancement     — Data flows through an existing path (e.g. SC4S syslog or
+*                     another TA) but the integration may need field extractions,
+*                     CIM mapping, dashboards, or dedicated enrichment.
+* Default: (empty).
+
+gtm_pillar = 1 | 2 | 3 | 4 | 5
+* Optional. Cisco Secure Networking GTM pillar for roadmap products.
+* Only used when coverage_gap = true; shown on the card to map the product
+* to the GTM strategy. 1 = Secure Campus & Branch, 2 = Secure WAN Edge,
+* 3 = Data Center & Cloud, 4 = End-to-End Visibility & Assurance, 5 = Industrial/OT.
+* Reference: https://www.cisco.com/c/en/us/solutions/collateral/transform-infrastructure/secure-networking-so.html
+
 addon = <string>
 * The Splunk app_id of the add-on / TA this card is associated with (e.g. "CiscoSecurityCloud").
 
@@ -167,7 +184,8 @@ legacy_labels = <comma-separated list>
 * Display names parallel to legacy_apps.
 
 legacy_uids = <comma-separated list>
-* Splunkbase numeric app IDs parallel to legacy_apps (e.g. "1808,3662").
+* Splunkbase numeric app IDs for legacy, predecessor, and community/third-party
+* apps (e.g. "1808,3662,5543"). One list for all; no separate community_uids.
 * Used to construct links: https://splunkbase.splunk.com/app/<uid>
 
 legacy_urls = <comma-separated list>
@@ -245,21 +263,6 @@ alert_action_uids = <comma-separated list>
 * Comma-separated Splunkbase numeric app IDs for all alert actions associated
 * with this product. Used by the UI to look up alert action metadata from the
 * Splunkbase CSV catalog.
-
-community_apps = <comma-separated list>
-* Comma-separated folder names of third-party community add-ons that shadow
-* or duplicate the official Cisco add-on for this product.
-* When one of these apps is detected at runtime, a migration warning is shown
-* on the card advising the admin to switch to the official Cisco add-on.
-
-community_labels = <comma-separated list>
-* Display names parallel to community_apps.
-
-community_uids = <comma-separated list>
-* Splunkbase numeric app IDs parallel to community_apps.
-
-community_urls = <comma-separated list>
-* Splunkbase URLs parallel to community_apps.
 
 soar_connector_label = <string>
 * Optional. Human-readable label for the SOAR connector.
