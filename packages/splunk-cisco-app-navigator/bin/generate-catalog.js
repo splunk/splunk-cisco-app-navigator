@@ -92,6 +92,8 @@ function buildProduct(name, c) {
         ai_description: c.ai_description || '',
         cisco_retired: c.cisco_retired === 'true' || c.cisco_retired === '1',
         coverage_gap: c.coverage_gap === 'true' || c.coverage_gap === '1',
+        gap_type: c.gap_type || '',
+        gtm_pillar: (c.gtm_pillar && String(c.gtm_pillar).trim()) || '',
         addon_splunkbase_uid: c.addon_uid || c.addon_splunkbase_uid || '',
         addon_docs_url: c.addon_docs_url || '',
         addon_troubleshoot_url: c.addon_troubleshoot_url || '',

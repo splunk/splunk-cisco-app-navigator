@@ -2,6 +2,7 @@
    Products page styles — scoped to .products-page
    IMPORTANT: Do NOT style body, .main-section-body, [data-view], etc.
    Those are Splunk chrome elements (nav, menus). Only style our content.
+   Production: no debug-only rules; theme vars on :root; dark mode via .dce-dark.
    ===================================================================== */
 
 /* ── Cisco Sans Font Family ── */
@@ -633,15 +634,30 @@ html.dce-dark [data-view="views/shared/Page"] {
     background: #dff7e1 !important;
     border-color: #a3d9a5 !important;
 }
+.scan-sync-ok:hover {
+    background: #c8eecb !important;
+    border-color: #82c985 !important;
+    color: #1a7f37 !important;
+}
 .scan-sync-err {
     color: #cf222e !important;
     background: #ffebe9 !important;
     border-color: #ff8182 !important;
 }
+.scan-sync-err:hover {
+    background: #ffd7d5 !important;
+    border-color: #f56d6e !important;
+    color: #cf222e !important;
+}
 .scan-sync-busy {
     color: #6e4b00 !important;
     background: #fff3cd !important;
     border-color: #e0c36e !important;
+}
+.scan-sync-busy:hover {
+    background: #ffe9a3 !important;
+    border-color: #d4a83a !important;
+    color: #6e4b00 !important;
 }
 :root.dce-dark .scan-util-sync {
     background: #02C8FF !important;
@@ -657,15 +673,30 @@ html.dce-dark [data-view="views/shared/Page"] {
     background: rgba(35, 134, 54, 0.15) !important;
     border-color: #238636 !important;
 }
+:root.dce-dark .scan-sync-ok:hover {
+    background: rgba(35, 134, 54, 0.25) !important;
+    border-color: #2ea043 !important;
+    color: #7ee787 !important;
+}
 :root.dce-dark .scan-sync-err {
     color: #ff7b72 !important;
     background: rgba(248, 81, 73, 0.15) !important;
     border-color: #f85149 !important;
 }
+:root.dce-dark .scan-sync-err:hover {
+    background: rgba(248, 81, 73, 0.25) !important;
+    border-color: #fa6e67 !important;
+    color: #ff7b72 !important;
+}
 :root.dce-dark .scan-sync-busy {
     color: #e3b341 !important;
     background: rgba(187, 128, 9, 0.15) !important;
     border-color: #9e6a03 !important;
+}
+:root.dce-dark .scan-sync-busy:hover {
+    background: rgba(187, 128, 9, 0.25) !important;
+    border-color: #bb8009 !important;
+    color: #e3b341 !important;
 }
 
 /* ── Compatibility filter selects ── */
@@ -1054,6 +1085,15 @@ html.dce-dark [data-view="views/shared/Page"] {
     z-index: 50;
 }
 
+/* ── Option B: Support indicator — single blue accent for all supported (Cisco + Splunk) for consistent card look ── */
+/* Support indicator: colored bar at bottom of card */
+.csc-card.csc-card-cisco-supported {
+    border-bottom: 4px solid #049FD9 !important;
+}
+.csc-card.csc-card-splunk-supported {
+    border-bottom: 4px solid #E4449C !important;
+}
+
 /* ── Bottom border (removed — clean flat card design) ── */
 .csc-card-bottom-border {
     display: none;
@@ -1153,6 +1193,63 @@ html.dce-dark [data-view="views/shared/Page"] {
 :root.dce-dark .csc-coverage-gap-ribbon {
     background: linear-gradient(135deg, #0A60FF, #02C8FF);
     box-shadow: 0 2px 6px rgba(2, 200, 255, 0.3);
+}
+
+/* ── GTM "Tracking" ribbon (data flows through existing TA; tracked for future enrichment) ── */
+.csc-tracking-ribbon {
+    position: absolute;
+    top: -1px;
+    right: -1px;
+    background: linear-gradient(135deg, #546e7a, #78909c);
+    color: #fff;
+    font-size: 9px;
+    font-weight: 800;
+    letter-spacing: 0.6px;
+    padding: 3px 10px 3px 8px;
+    border-radius: 0 10px 0 10px;
+    z-index: 3;
+    box-shadow: 0 2px 6px rgba(84, 110, 122, 0.4);
+    text-transform: uppercase;
+    pointer-events: none;
+    line-height: 1.2;
+}
+:root.dce-dark .csc-tracking-ribbon {
+    background: linear-gradient(135deg, #78909c, #90a4ae);
+    box-shadow: 0 2px 6px rgba(120, 144, 156, 0.4);
+}
+
+/* ── GTM "Vendor support needed" ribbon (developer add-on exists; need Cisco/Splunk) ── */
+.csc-vendor-support-gap-ribbon {
+    position: absolute;
+    top: -1px;
+    right: -1px;
+    background: linear-gradient(135deg, #e65100, #ff8f00);
+    color: #fff;
+    font-size: 9px;
+    font-weight: 800;
+    letter-spacing: 0.6px;
+    padding: 3px 10px 3px 8px;
+    border-radius: 0 10px 0 10px;
+    z-index: 3;
+    box-shadow: 0 2px 6px rgba(230, 81, 0, 0.4);
+    text-transform: uppercase;
+    pointer-events: none;
+    line-height: 1.2;
+}
+:root.dce-dark .csc-vendor-support-gap-ribbon {
+    background: linear-gradient(135deg, #ff8f00, #ffb74d);
+    box-shadow: 0 2px 6px rgba(255, 143, 0, 0.4);
+}
+.csc-card-vendor-support-gap-note {
+    display: block;
+    margin-top: 4px;
+    font-size: 11px;
+    color: var(--text-tertiary, #607d8b);
+    font-style: italic;
+    line-height: 1.3;
+}
+:root.dce-dark .csc-card-vendor-support-gap-note {
+    color: rgba(255, 255, 255, 0.7);
 }
 
 /* ── Top accent stripe — removed for clean design ── */
@@ -1318,6 +1415,13 @@ html.dce-dark [data-view="views/shared/Page"] {
 }
 .csc-badge-es:hover { background: #dce6ff; }
 
+.csc-badge-alert {
+    background: #fff4e6;
+    color: #e65100;
+    border: 1px solid rgba(230, 81, 0, 0.25);
+}
+.csc-badge-alert:hover { background: #ffe0b2; }
+
 /* Dark mode badge tints */
 :root.dce-dark .csc-badge-sc4s { background: rgba(4, 158, 143, 0.12); color: #5ec5b9; border-color: rgba(4, 158, 143, 0.25); }
 :root.dce-dark .csc-badge-sc4s:hover { background: rgba(4, 158, 143, 0.2); }
@@ -1329,6 +1433,8 @@ html.dce-dark [data-view="views/shared/Page"] {
 :root.dce-dark .csc-badge-itsi:hover { background: rgba(58, 138, 63, 0.2); }
 :root.dce-dark .csc-badge-es { background: rgba(10, 96, 255, 0.12); color: #6ea0ff; border-color: rgba(10, 96, 255, 0.2); }
 :root.dce-dark .csc-badge-es:hover { background: rgba(10, 96, 255, 0.18); }
+:root.dce-dark .csc-badge-alert { background: rgba(230, 81, 0, 0.15); color: #ffab91; border-color: rgba(230, 81, 0, 0.25); }
+:root.dce-dark .csc-badge-alert:hover { background: rgba(230, 81, 0, 0.22); }
 
 /* ── Guide Modal (cheat sheet + expandable) ── */
 .scan-guide-quick {
@@ -1580,6 +1686,25 @@ html.dce-dark [data-view="views/shared/Page"] {
     font-weight: 400;
 }
 
+/* GTM Roadmap cards: Secure Networking GTM pillar (Campus & Branch, WAN Edge, Data Center & Cloud, etc.) */
+.csc-card-gtm-pillar {
+    display: block;
+    font-size: 11px;
+    color: var(--text-tertiary, #607d8b);
+    line-height: 1.3;
+    margin-top: 4px;
+    font-weight: 500;
+    padding: 2px 6px;
+    border-radius: 4px;
+    background: var(--bg-secondary, #eceff1);
+    width: fit-content;
+}
+
+:root.dce-dark .csc-card-gtm-pillar {
+    background: rgba(255, 255, 255, 0.08);
+    color: var(--text-tertiary);
+}
+
 .csc-card-aliases {
     display: block;
     font-size: 12px;
@@ -1735,6 +1860,40 @@ html.dce-dark [data-view="views/shared/Page"] {
     border-color: #a1a9b2;
     color: #606C7A;
     text-decoration: none;
+}
+
+/* View full legacy audit — primary hint a bit stronger so it reads as the main action */
+.csc-btn-legacy-audit {
+    background: var(--status-info-bg, rgba(10, 96, 255, 0.1));
+    color: var(--text-secondary, #536070);
+    border: 1px solid rgba(10, 96, 255, 0.3);
+}
+.csc-btn-legacy-audit:hover {
+    background: rgba(10, 96, 255, 0.14);
+    border-color: rgba(10, 96, 255, 0.45);
+    color: var(--color-primary, #0A60FF);
+}
+:root.dce-dark .csc-btn-legacy-audit {
+    background: var(--status-info-bg, rgba(10, 96, 255, 0.12));
+    border-color: rgba(10, 96, 255, 0.35);
+    color: var(--text-secondary);
+}
+:root.dce-dark .csc-btn-legacy-audit:hover {
+    background: rgba(10, 96, 255, 0.18);
+    border-color: rgba(10, 96, 255, 0.5);
+    color: var(--color-primary);
+}
+
+/* Legacy & Compatibility section summary tag — subtle blue tint to match the audit button */
+.csc-dp-tag-legacy-compat {
+    background: rgba(10, 96, 255, 0.08);
+    color: var(--text-secondary, #536070);
+    border: 1px solid rgba(10, 96, 255, 0.2);
+}
+:root.dce-dark .csc-dp-tag-legacy-compat {
+    background: rgba(10, 96, 255, 0.1);
+    color: var(--text-secondary);
+    border-color: rgba(10, 96, 255, 0.25);
 }
 
 .csc-btn-green {
@@ -2530,12 +2689,12 @@ html.dce-dark [data-view="views/shared/Page"] {
     margin-bottom: 6px;
 }
 .csc-support-cisco_supported     { background: rgba(10,96,255,0.06); color: #0A60FF; }
-.csc-support-splunk_supported    { background: #e3f2fd; color: #1565c0; }
+.csc-support-splunk_supported    { background: rgba(228,68,156,0.08); color: #C43A87; }
 .csc-support-developer_supported { background: rgba(255,144,0,0.08); color: #FF9000; }
 .csc-support-community_supported { background: rgba(10,96,255,0.08); color: #0A60FF; }
 .csc-support-not_supported       { background: #fafafa; color: #9e9e9e; }
 :root.dce-dark .csc-support-cisco_supported     { background: rgba(10,96,255,0.18); color: #02C8FF; }
-:root.dce-dark .csc-support-splunk_supported    { background: rgba(21,101,192,0.18); color: #90caf9; }
+:root.dce-dark .csc-support-splunk_supported    { background: rgba(228,68,156,0.18); color: #F0A0D0; }
 :root.dce-dark .csc-support-developer_supported { background: rgba(255,144,0,0.18); color: #FF9000; }
 :root.dce-dark .csc-support-community_supported { background: rgba(10,96,255,0.18); color: #02C8FF; }
 :root.dce-dark .csc-support-not_supported       { background: rgba(158,158,158,0.12); color: #757575; }
@@ -2836,12 +2995,12 @@ html.dce-dark [data-view="views/shared/Page"] {
     background: rgba(46, 125, 50, 0.12) !important;
 }
 .csc-support-pill-splunk-active {
-    background: #e3f2fd !important;
-    border-color: #2196f3 !important;
-    color: #1565c0 !important;
+    background: rgba(228,68,156,0.08) !important;
+    border-color: #E4449C !important;
+    color: #C43A87 !important;
 }
 .csc-support-pill-splunk-active .csc-subcategory-count {
-    background: rgba(21, 101, 192, 0.12) !important;
+    background: rgba(228, 68, 156, 0.12) !important;
 }
 .csc-support-pill-dev-active {
     background: rgba(255,144,0,0.06) !important;
@@ -2887,9 +3046,9 @@ html.dce-dark [data-view="views/shared/Page"] {
     color: #02C8FF !important;
 }
 :root.dce-dark .csc-support-pill-splunk-active {
-    background: rgba(33, 150, 243, 0.15) !important;
-    border-color: #42a5f5 !important;
-    color: #64b5f6 !important;
+    background: rgba(228, 68, 156, 0.15) !important;
+    border-color: #F0A0D0 !important;
+    color: #F0A0D0 !important;
 }
 :root.dce-dark .csc-support-pill-dev-active {
     background: rgba(255, 152, 0, 0.15) !important;
@@ -3164,6 +3323,16 @@ html.dce-dark [data-view="views/shared/Page"] {
 .csc-dep-details-body {
     padding: 4px 0 4px 12px;
     border-left: 2px solid var(--card-border, #dce0e4);
+}
+
+/* Legacy & Compatibility: thinner, subtler border; clean top-left corner (no protrusion) */
+.csc-section-legacy-compat.csc-dep-details[open] > .csc-dep-details-body {
+    border-left: 1px solid rgba(10, 96, 255, 0.2);
+    border-radius: 4px 0 0 4px;
+    padding-left: 10px;
+}
+:root.dce-dark .csc-section-legacy-compat.csc-dep-details[open] > .csc-dep-details-body {
+    border-left-color: rgba(2, 200, 255, 0.25);
 }
 
 /* ── Compatibility rows inside card ── */
@@ -3442,6 +3611,13 @@ a.csc-dep-name-link:hover {
     padding: 2px 0;
     white-space: nowrap;
     position: relative;
+}
+/* Separator so "No data..." and "Legacy (4)" read as two distinct badges */
+.csc-badge-item:not(:last-child)::after {
+    content: " · ";
+    font-weight: 400;
+    color: var(--text-tertiary, #667180);
+    margin-left: 2px;
 }
 
 .csc-badge-data-ok {
@@ -5305,17 +5481,18 @@ tr.scan-ts-ahead .scan-ts-name {
 .scan-drawer {
     position: fixed;
     top: 0;
-    right: 0; /* Changed from left: 0 */
+    right: 0;
     width: 340px;
     max-width: 92vw;
     height: 100vh;
+    height: 100dvh;
     background: var(--card-bg, #fff);
-    border-left: 1px solid var(--card-border, #ddd); /* Changed from border-right */
-    box-shadow: -8px 0 32px rgba(0, 0, 0, 0.15); /* Flipped shadow direction */
+    border-left: 1px solid var(--card-border, #ddd);
+    box-shadow: -8px 0 32px rgba(0, 0, 0, 0.15);
     z-index: 9999;
     display: flex;
     flex-direction: column;
-    transform: translateX(100%); /* Changed from -100% to slide from right */
+    transform: translateX(100%);
     transition: transform 0.28s cubic-bezier(0.4, 0, 0.2, 1);
     overflow: hidden;
 }
@@ -5364,7 +5541,20 @@ tr.scan-ts-ahead .scan-ts-name {
 .scan-drawer-body {
     flex: 1;
     overflow-y: auto;
-    padding: 12px 20px 24px;
+    padding: 12px 20px 12px;
+    min-height: 0;
+}
+
+/* Sticky footer pinned to drawer bottom */
+.scan-drawer-footer {
+    flex-shrink: 0;
+    padding: 10px 20px 14px;
+    border-top: 1px solid var(--card-border, #ddd);
+    background: var(--card-bg, #fff);
+}
+:root.dce-dark .scan-drawer-footer {
+    border-top-color: #333;
+    background: #1a222a;
 }
 
 /* Each filter section */
@@ -6169,6 +6359,34 @@ tr.scan-ts-ahead .scan-ts-name {
     border-color: #02C8FF !important;
 }
 
+/* Support indicator: colored bar at bottom of card */
+.csc-card.csc-card-cisco-supported {
+    border-bottom: 4px solid #049FD9 !important;
+}
+.csc-card.csc-card-splunk-supported {
+    border-bottom: 4px solid #E4449C !important;
+}
+:root.dce-dark .csc-card.csc-card-cisco-supported {
+    border-bottom: 4px solid #049FD9 !important;
+}
+:root.dce-dark .csc-card.csc-card-splunk-supported {
+    border-bottom: 4px solid #E4449C !important;
+}
+.csc-card.csc-card-unsupported-tier {
+    border-bottom: 4px solid #d32f2f !important;
+}
+:root.dce-dark .csc-card.csc-card-unsupported-tier {
+    border-bottom: 4px solid #ef5350 !important;
+}
+
+/* Fallback: support accent via data attribute if class is missing */
+.csc-card[data-support-level="cisco_supported"] {
+    border-bottom: 4px solid #049FD9 !important;
+}
+.csc-card[data-support-level="splunk_supported"] {
+    border-bottom: 4px solid #E4449C !important;
+}
+
 /* Remove the colored bottom border from cards */
 .csc-card-bottom-border {
     display: none !important;
@@ -6286,4 +6504,13 @@ tr.scan-ts-ahead .scan-ts-name {
     display: none !important;
 }
 
+/* ── Search highlight pulse ── */
+@keyframes csc-search-pulse {
+    0%   { box-shadow: 0 0 0 0 rgba(2, 200, 255, 0.5); }
+    50%  { box-shadow: 0 0 0 8px rgba(2, 200, 255, 0.15); }
+    100% { box-shadow: 0 0 0 0 rgba(2, 200, 255, 0); }
+}
+.csc-card-search-pulse {
+    animation: csc-search-pulse 0.6s ease-out 2;
+}
 

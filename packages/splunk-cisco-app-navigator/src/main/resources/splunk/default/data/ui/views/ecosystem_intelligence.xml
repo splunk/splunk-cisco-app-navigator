@@ -242,6 +242,12 @@
 			},
 			"type": "splunk.markdown"
 		},
+		"viz_header_gtm": {
+			"options": {
+				"markdown": "### GTM Roadmap — Coming Soon\nCisco products on the Secure Networking GTM roadmap for Splunk integration, ordered by GTM pillar: **Campus & Branch** first, then WAN Edge, Data Center & Cloud, Visibility & Assurance, and Industrial/OT. Uses **coverage_gap** and **gtm_pillar** from products.conf."
+			},
+			"type": "splunk.markdown"
+		},
 		"viz_header_health": {
 			"options": {
 				"markdown": "### Ecosystem Health\nCisco product catalog rollup — 79 products across Security, Networking, Observability, and Collaboration"
@@ -256,7 +262,7 @@
 		},
 		"viz_header_magic6": {
 			"options": {
-				"markdown": "### Magic Eight Audit\nAudits every props.conf stanza (sourcetype, source, host) against 8 best-practice settings — SHOULD_LINEMERGE, LINE_BREAKER, TRUNCATE, TIME_FORMAT, TIME_PREFIX, MAX_TIMESTAMP_LOOKAHEAD, ANNOTATE_PUNCT, LEARN_SOURCETYPE. REST returns the effective merged configuration."
+				"markdown": "### Magic Eight Audit\nOne row per data stream: **Sourcetype** and **Stanza** (the stanza that governs ingestion). When a source or host stanza sets sourcetype (e.g. source::...synclookup.log → scan:synclookup:log), only that stanza is audited; the sourcetype-level stanza is skipped. Otherwise the sourcetype stanza is audited. Audits 8 best-practice settings: SHOULD_LINEMERGE, LINE_BREAKER, TRUNCATE, TIME_FORMAT, TIME_PREFIX, MAX_TIMESTAMP_LOOKAHEAD, ANNOTATE_PUNCT, LEARN_SOURCETYPE."
 			},
 			"type": "splunk.markdown"
 		},
@@ -636,6 +642,24 @@
 			"title": "Cisco Validation & Compliance Status",
 			"type": "splunk.table"
 		},
+		"viz_table_gtm": {
+			"dataSources": {
+				"primary": "ds_table_gtm"
+			},
+			"options": {
+				"count": 50,
+				"dataOverlayMode": "none",
+				"drilldown": "none",
+				"showRowNumbers": true,
+				"tableFormat": {
+					"headerBackgroundColor": "#E8EDF2",
+					"headerFontColor": "#314257",
+					"rowBackgroundColors": "> table | seriesByIndex(0) | pick(#f9fafb,#ffffff)"
+				}
+			},
+			"title": "GTM Roadmap by Pillar",
+			"type": "splunk.table"
+		},
 		"viz_table_installed": {
 			"dataSources": {
 				"primary": "ds_table_installed"
@@ -975,7 +999,7 @@
 		"ds_magic6_app_choices": {
 			"name": "Magic Eight App Choices",
 			"options": {
-				"query": "| rest splunk_server=local /services/apps/local f=title f=core | where core=0 | rename title as label | eval value=label | fields label value | dedup label | sort label"
+				"query": "| rest splunk_server=local /services/apps/local f=title f=core \n| where core=0 \n| search NOT title IN (system,SplunkDeploymentServerConfig,learned,Splunk_SA_CIM,python_upgrade_readiness_app,splunk_instrumentation,splunk_internal_metrics,splunk_monitoring_console,splunk_secure_gateway,splunk_ingest_actions)\n| rename title as label \n| eval value=label \n| fields label value \n| dedup label \n| sort label"
 			},
 			"type": "ds.search"
 		},
@@ -1063,6 +1087,13 @@
 			},
 			"type": "ds.search"
 		},
+		"ds_table_gtm": {
+			"name": "Table GTM Roadmap by Pillar",
+			"options": {
+				"query": "| savedsearch \"SCAN - GTM Roadmap by Pillar\""
+			},
+			"type": "ds.search"
+		},
 		"ds_table_installed": {
 			"name": "Table Installed Cisco Estate",
 			"options": {
@@ -1093,11 +1124,7 @@
 		}
 	},
 	"layout": {
-		"globalInputs": [
-			"input_min_version",
-			"input_m6_scope",
-			"input_m6_app"
-		],
+		"globalInputs": [],
 		"layoutDefinitions": {
 			"layout_tab1": {
 				"options": {
@@ -1545,6 +1572,16 @@
 							"y": 710
 						},
 						"type": "block"
+					},
+					{
+						"item": "input_min_version",
+						"type": "input",
+						"position": {
+							"x": 1470,
+							"y": 20,
+							"w": 198,
+							"h": 82
+						}
 					}
 				],
 				"type": "absolute"
@@ -1569,10 +1606,10 @@
 					{
 						"item": "viz_header_magic6",
 						"position": {
-							"h": 60,
-							"w": 1920,
+							"h": 120,
+							"w": 840,
 							"x": 20,
-							"y": 10
+							"y": 0
 						},
 						"type": "block"
 					},
@@ -1582,7 +1619,7 @@
 							"h": 110,
 							"w": 620,
 							"x": 20,
-							"y": 80
+							"y": 120
 						},
 						"type": "block"
 					},
@@ -1592,7 +1629,7 @@
 							"h": 110,
 							"w": 620,
 							"x": 660,
-							"y": 80
+							"y": 120
 						},
 						"type": "block"
 					},
@@ -1602,7 +1639,7 @@
 							"h": 110,
 							"w": 620,
 							"x": 1300,
-							"y": 80
+							"y": 120
 						},
 						"type": "block"
 					},
@@ -1612,7 +1649,7 @@
 							"h": 300,
 							"w": 940,
 							"x": 20,
-							"y": 200
+							"y": 240
 						},
 						"type": "block"
 					},
@@ -1622,17 +1659,77 @@
 							"h": 300,
 							"w": 940,
 							"x": 980,
-							"y": 200
+							"y": 240
 						},
 						"type": "block"
 					},
 					{
 						"item": "viz_table_magic6",
 						"position": {
-							"h": 580,
+							"h": 540,
 							"w": 1920,
 							"x": 20,
-							"y": 510
+							"y": 550
+						},
+						"type": "block"
+					},
+					{
+						"item": "input_m6_scope",
+						"position": {
+							"h": 82,
+							"w": 198,
+							"x": 910,
+							"y": 10
+						},
+						"type": "input"
+					},
+					{
+						"item": "input_m6_app",
+						"position": {
+							"h": 82,
+							"w": 198,
+							"x": 1150,
+							"y": 10
+						},
+						"type": "input"
+					}
+				],
+				"type": "absolute"
+			},
+			"layout_tab5": {
+				"options": {
+					"display": "fit-to-width",
+					"height": 1150,
+					"width": 1960
+				},
+				"structure": [
+					{
+						"item": "viz_umspZWQb",
+						"position": {
+							"h": 1150,
+							"w": 1960,
+							"x": 0,
+							"y": 0
+						},
+						"type": "block"
+					},
+					{
+						"item": "viz_header_gtm",
+						"position": {
+							"h": 50,
+							"w": 1920,
+							"x": 20,
+							"y": 10
+						},
+						"type": "block"
+					},
+					{
+						"item": "viz_table_gtm",
+						"position": {
+							"h": 1040,
+							"w": 1920,
+							"x": 20,
+							"y": 70
 						},
 						"type": "block"
 					}
@@ -1657,6 +1754,10 @@
 				{
 					"label": "Magic 8 Audit",
 					"layoutId": "layout_tab4"
+				},
+				{
+					"label": "GTM Roadmap",
+					"layoutId": "layout_tab5"
 				}
 			]
 		}

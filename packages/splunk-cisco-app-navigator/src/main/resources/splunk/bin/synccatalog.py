@@ -8,6 +8,7 @@ original, and reloads the configuration.
 
 Version stamp format: YYYY_MM_DD_HHMM on line 1 of products.conf
     # version = 2026_03_11_1700
+    # min_app_version = 1.0.13   (optional; if present, sync only when running app >= this)
 
 Usage:
     | synccatalog dryrun=false
@@ -82,6 +83,59 @@ def set_up_logging():
     sh.setLevel(logging.WARNING)
     LOGGER.addHandler(sh)
     LOGGER.propagate = False
+
+
+def parse_min_app_version(content: bytes) -> str:
+    """Parse min_app_version from the first few lines of products.conf. Returns '' if not found."""
+    try:
+        for raw_line in content.splitlines()[:15]:
+            line = raw_line.decode("utf-8").strip()
+            match = re.search(r"#?\s*min_app_version\s*=\s*(\S+)", line)
+            if match:
+                return match.group(1).strip()
+    except (UnicodeDecodeError, IndexError):
+        pass
+    return ""
+
+
+def get_running_app_version() -> str:
+    """Read [id] version from the app's default/app.conf."""
+    app_conf_path = os.path.join(SPLUNK_HOME, "etc", "apps", APP_NAME, "default", "app.conf")
+    if not os.path.isfile(app_conf_path):
+        return "0.0.0"
+    try:
+        with open(app_conf_path, "r", encoding="utf-8") as f:
+            in_id = False
+            for line in f:
+                line = line.strip()
+                if line == "[id]":
+                    in_id = True
+                    continue
+                if in_id and line.startswith("version"):
+                    match = re.search(r"version\s*=\s*(\S+)", line)
+                    if match:
+                        return match.group(1).strip()
+                    break
+                if in_id and line.startswith("["):
+                    break
+    except (IOError, OSError):
+        pass
+    return "0.0.0"
+
+
+def version_at_least(running: str, required: str) -> bool:
+    """True if running >= required (semver-like comparison, e.g. 1.0.13 >= 1.0.15 -> False)."""
+    if not required:
+        return True
+    def parts(v):
+        return [int(x) if x.isdigit() else 0 for x in (v or "0").split(".")[:3]]
+    rp = parts(running)
+    qp = parts(required)
+    while len(rp) < 3:
+        rp.append(0)
+    while len(qp) < 3:
+        qp.append(0)
+    return rp >= qp
 
 
 def get_file_version(content: bytes) -> int:
@@ -198,6 +252,7 @@ class SyncCatalog(GeneratingCommand):
             yield {
                 "_time": time.time(),
                 "status": "Error",
+                "reason": "No option provided.",
                 "message": "Specify dryrun=true to check or dryrun=false to update.",
             }
             return
@@ -224,20 +279,36 @@ class SyncCatalog(GeneratingCommand):
             s3_version = get_file_version(s3_content)
         except requests.exceptions.RequestException as e:
             ERROR(f"Failed to download from S3: {e}")
-            yield {"_time": time.time(), "status": "Failed", "error": str(e)}
+            yield {
+                "_time": time.time(),
+                "status": "Failed",
+                "reason": "Could not download catalog from S3.",
+                "message": f"Download failed: {e}",
+                "error": str(e),
+            }
             return
 
         INFO(f"Version check: local={local_version}, s3={s3_version}")
 
         if self.dryrun is True:
-            recommendation = "Local is current or newer. No action needed."
+            reason = "Local is current or newer. No action needed."
+            recommendation = reason
             if s3_version > local_version:
-                recommendation = "Newer version in S3. Run dryrun=false to update."
+                min_required = parse_min_app_version(s3_content)
+                running_version = get_running_app_version()
+                if min_required and not version_at_least(running_version, min_required):
+                    reason = f"Did not sync: catalog in S3 requires app v{min_required}+ (this instance is v{running_version}). Upgrade the app first."
+                    recommendation = f"Newer catalog in S3 requires app v{min_required} or newer (this instance is v{running_version}). Upgrade the app, then run dryrun=false to update."
+                else:
+                    reason = "Newer catalog in S3; run dryrun=false to update."
+                    recommendation = "Newer version in S3. Run dryrun=false to update."
             elif s3_version == 0 and local_version > 0:
+                reason = "Did not sync: could not parse S3 catalog version; do not update."
                 recommendation = "WARNING: Could not parse S3 version. Do not update."
             yield {
                 "_time": time.time(),
                 "status": "Dry Run",
+                "reason": reason,
                 "local_version": format_version_timestamp(local_version),
                 "s3_version": format_version_timestamp(s3_version),
                 "recommendation": recommendation,
@@ -249,11 +320,29 @@ class SyncCatalog(GeneratingCommand):
             yield {
                 "_time": time.time(),
                 "status": "Skipped",
-                "message": f"Local ({local_version}) is current or newer than S3 ({s3_version}).",
+                "reason": "Did not sync: local catalog is current or newer than S3; no update needed.",
+                "message": f"Local ({format_version_timestamp(local_version)}) is current or newer than S3 ({format_version_timestamp(s3_version)}).",
                 "local_version": format_version_timestamp(local_version),
                 "s3_version": format_version_timestamp(s3_version),
             }
             return
+
+        min_required = parse_min_app_version(s3_content)
+        if min_required:
+            running_version = get_running_app_version()
+            if not version_at_least(running_version, min_required):
+                INFO(f"Catalog requires app >= {min_required}; running app is {running_version}. Skipping overwrite.")
+                yield {
+                    "_time": time.time(),
+                    "status": "Skipped",
+                    "reason": f"Did not sync: catalog requires app v{min_required} or newer; this instance is v{running_version}. Upgrade the app to use this catalog.",
+                    "message": f"Catalog requires app v{min_required} or newer. This instance is v{running_version}. Upgrade the app to use this catalog.",
+                    "local_version": format_version_timestamp(local_version),
+                    "s3_version": format_version_timestamp(s3_version),
+                    "min_app_version": min_required,
+                    "running_app_version": running_version,
+                }
+                return
 
         INFO(f"Updating: S3 ({s3_version}) > local ({local_version}).")
         session_key = self.metadata.searchinfo.session_key
@@ -270,6 +359,7 @@ class SyncCatalog(GeneratingCommand):
             yield {
                 "_time": time.time(),
                 "status": "Success",
+                "reason": f"Synced: updated catalog from {format_version_timestamp(local_version)} to {format_version_timestamp(s3_version)}.",
                 "message": f"Updated from {local_version} to {s3_version}.",
                 "bytes_written": bytes_written,
                 "destination": full_path,
@@ -279,7 +369,13 @@ class SyncCatalog(GeneratingCommand):
             }
         except Exception as e:
             ERROR(f"Update failed: {e}")
-            yield {"_time": time.time(), "status": "Failed", "error": str(e)}
+            yield {
+                "_time": time.time(),
+                "status": "Failed",
+                "reason": "Did not sync: update failed (see error).",
+                "message": str(e),
+                "error": str(e),
+            }
 
 
 set_up_logging()

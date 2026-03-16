@@ -15,9 +15,9 @@
       <collection label="Catalog Analysis">
         <saved name="SCAN - Product Catalog - By Category" />
         <saved name="SCAN - Product Catalog - By Add-on Family" />
+        <saved name="SCAN - GTM Roadmap by Pillar" />
         <saved name="SCAN - Sourcetype Coverage" />
         <saved name="SCAN - SOAR Connector Inventory" />
-        <saved name="SCAN - Products with Prerequisites" />
         <saved name="SCAN - Data Quality - Missing Fields Audit" />
       </collection>
 
@@ -41,18 +41,23 @@
       <!-- ── Splunkbase Intelligence ── -->
       <collection label="Splunkbase Intelligence">
         <saved name="SCAN - Splunkbase Ecosystem Overview" />
+        <saved name="SCAN - Cisco Splunkbase Ecosystem" />
+        <saved name="SCAN - Cisco Splunkbase Apps Detailed" />
         <saved name="SCAN - Splunkbase Category Breakdown" />
         <saved name="SCAN - Support Level Distribution" />
         <saved name="SCAN - Support x Category Heatmap" />
         <saved name="SCAN - Download Popularity Ranking" />
-        <saved name="SCAN - Top Rated Apps" />
       </collection>
 
       <!-- ── Versions &amp; Compliance ── -->
       <collection label="Versions &amp; Compliance">
+        <saved name="SCAN - Release History Explorer" />
         <saved name="SCAN - Version and Update Tracker" />
         <saved name="SCAN - App Age Analysis" />
         <saved name="SCAN - Splunk Version Compatibility" />
+        <saved name="SCAN - Product Version Support Matrix" />
+        <saved name="SCAN - Products WITHOUT Version Support" />
+        <saved name="SCAN - Cisco and Splunk Supported Apps" />
         <saved name="SCAN - CIM Compatibility Report" />
         <saved name="SCAN - Validation and AppInspect Status" />
         <saved name="SCAN - Compliance Status (FedRAMP and FIPS)" />
@@ -64,6 +69,13 @@
       <collection label="Data Coverage">
         <saved name="SCAN - Sourcetype Cross-Reference" />
         <saved name="SCAN - Cisco Products Coverage Matrix" />
+      </collection>
+
+      <!-- ── Health &amp; Troubleshooting ── -->
+      <collection label="Health &amp; Troubleshooting">
+        <saved name="SCAN - Magic Eight Audit" />
+        <saved name="SCAN - Environment Health Summary" />
+        <saved name="SCAN - Command Logs" />
       </collection>
 
       <divider />
