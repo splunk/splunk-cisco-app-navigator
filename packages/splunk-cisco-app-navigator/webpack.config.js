@@ -5,11 +5,18 @@ const baseConfig = require('@splunk/webpack-configs').default;
 const CopyPlugin = require('copy-webpack-plugin');
 const pkg = require('./package.json');
 
-// Extract dependency versions from package.json for the Tech Stack dev-mode panel
+// Extract *installed* dependency versions for the Tech Stack dev-mode panel.
+// We read each package's own package.json from node_modules so the modal shows
+// the real resolved version (e.g. 18.3.1) instead of the semver range floor (18.0.0).
 const depVersions = {};
 const allDeps = { ...(pkg.dependencies || {}), ...(pkg.devDependencies || {}) };
-Object.entries(allDeps).forEach(([name, version]) => {
-  depVersions[name] = version.replace(/^[\^~]/, '');
+Object.entries(allDeps).forEach(([name, range]) => {
+  try {
+    const pkgPath = require.resolve(path.join(name, 'package.json'), { paths: [__dirname] });
+    depVersions[name] = require(pkgPath).version;
+  } catch {
+    depVersions[name] = range.replace(/^[\^~]/, '');
+  }
 });
 
 const commonConfig = webpackMerge(baseConfig, {

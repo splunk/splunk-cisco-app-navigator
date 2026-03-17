@@ -33,3 +33,4 @@ docs/
 /scripts
 /reference_design
 .github/copilot-instructions.md
+*.bak

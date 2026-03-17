@@ -1064,15 +1064,15 @@ function NetFlowInfoModal({ open, onClose, installedApps }) {
                                         const info = installedApps[ta.id];
                                         return (
                                             <div key={ta.id} style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '12px' }}>
-                                                <span style={{ color: info ? '#2e7d32' : '#9e9e9e', fontWeight: 700, width: '14px' }}>{info ? '✓' : '—'}</span>
-                                                <span style={{ flex: 1 }}>{ta.label} <span style={{ fontSize: '10px', color: '#9e9e9e' }}>({ta.vendor})</span></span>
-                                                {info && <span style={{ fontSize: '10px', color: '#6b7280' }}>v{info.version}</span>}
-                                                {!info && <span style={{ fontSize: '10px', color: '#9e9e9e', fontStyle: 'italic' }}>not on this SH</span>}
+                                                <span className={info ? 'scan-m8-ok' : 'scan-m8-faint'} style={{ fontWeight: 700, width: '14px' }}>{info ? '✓' : '—'}</span>
+                                                <span style={{ flex: 1 }}>{ta.label} <span className="scan-m8-faint" style={{ fontSize: '10px' }}>({ta.vendor})</span></span>
+                                                {info && <span className="scan-m8-subtle" style={{ fontSize: '10px' }}>v{info.version}</span>}
+                                                {!info && <span className="scan-m8-faint" style={{ fontSize: '10px', fontStyle: 'italic' }}>not on this SH</span>}
                                             </div>
                                         );
                                     })}
                                 </div>
-                                <div style={{ fontSize: '10px', color: '#9e9e9e', marginTop: '6px', fontStyle: 'italic' }}>Stream Forwarder TA (5238) is installed on forwarders — not checkable from the Search Head.</div>
+                                <div className="scan-m8-faint" style={{ fontSize: '10px', marginTop: '6px', fontStyle: 'italic' }}>Stream Forwarder TA (5238) is installed on forwarders — not checkable from the Search Head.</div>
                             </div>
                         )}
 
@@ -1109,43 +1109,43 @@ function NetFlowInfoModal({ open, onClose, installedApps }) {
                         <table className="csc-sc4s-info-table">
                             <thead>
                                 <tr>
-                                    <th className="csc-sc4s-info-table-label" style={{ width: '28%', background: '#e0f2f1', color: '#00695c' }}>Cisco Platform</th>
-                                    <th className="csc-sc4s-info-table-label" style={{ width: '42%', background: '#e0f2f1', color: '#00695c' }}>3 Splunk Stream Packages</th>
-                                    <th className="csc-sc4s-info-table-label" style={{ width: '30%', background: '#e0f2f1', color: '#00695c' }}>Cisco Enhanced Netflow</th>
+                                    <th className="csc-sc4s-info-table-label scan-nf-th" style={{ width: '28%' }}>Cisco Platform</th>
+                                    <th className="csc-sc4s-info-table-label scan-nf-th" style={{ width: '42%' }}>3 Splunk Stream Packages</th>
+                                    <th className="csc-sc4s-info-table-label scan-nf-th" style={{ width: '30%' }}>Cisco Enhanced Netflow</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 <tr>
-                                    <td className="csc-sc4s-info-table-label" style={{ borderLeft: '3px solid #00897b' }}>IOS-XE Devices</td>
-                                    <td><span style={{ display: 'inline-block', padding: '1px 8px', borderRadius: '4px', fontSize: '11px', fontWeight: 700, background: '#e0f2f1', color: '#00695c', marginRight: '6px' }}>Required</span> core Stream platform</td>
-                                    <td><span style={{ display: 'inline-block', padding: '1px 8px', borderRadius: '4px', fontSize: '11px', fontWeight: 700, background: '#e0f2f1', color: '#00695c', marginRight: '6px' }}>Required</span> decodes Cisco IPFIX templates</td>
+                                    <td className="csc-sc4s-info-table-label scan-nf-td-border">IOS-XE Devices</td>
+                                    <td><span className="scan-nf-badge-req">Required</span> core Stream platform</td>
+                                    <td><span className="scan-nf-badge-req">Required</span> decodes Cisco IPFIX templates</td>
                                 </tr>
                                 <tr style={{ fontSize: '12px' }}>
                                     <td style={{ paddingLeft: '20px', border: 'none', paddingTop: 0, borderLeft: '3px solid transparent' }}></td>
                                     <td colSpan="2" style={{ border: 'none', paddingTop: 0 }}><em>Catalyst SD-WAN, ISR, ASR, WLC, Catalyst Switches</em></td>
                                 </tr>
                                 <tr>
-                                    <td className="csc-sc4s-info-table-label" style={{ borderLeft: '3px solid #00897b' }}>NX-OS &amp; ACI Fabric</td>
-                                    <td><span style={{ display: 'inline-block', padding: '1px 8px', borderRadius: '4px', fontSize: '11px', fontWeight: 700, background: '#e0f2f1', color: '#00695c', marginRight: '6px' }}>Required</span> core Stream platform</td>
-                                    <td><span style={{ display: 'inline-block', padding: '1px 8px', borderRadius: '4px', fontSize: '11px', fontWeight: 700, background: '#eceff1', color: '#607d8b', marginRight: '6px' }}>Not needed</span> standard NetFlow v9</td>
+                                    <td className="csc-sc4s-info-table-label scan-nf-td-border">NX-OS &amp; ACI Fabric</td>
+                                    <td><span className="scan-nf-badge-req">Required</span> core Stream platform</td>
+                                    <td><span className="scan-nf-badge-na">Not needed</span> standard NetFlow v9</td>
                                 </tr>
                                 <tr style={{ fontSize: '12px' }}>
                                     <td style={{ paddingLeft: '20px', border: 'none', paddingTop: 0, borderLeft: '3px solid transparent' }}></td>
                                     <td colSpan="2" style={{ border: 'none', paddingTop: 0 }}><em>Nexus switches (standalone NX-OS) and ACI leaf/spine fabric (NetFlow v9 via APIC policy, ACI 4.1+)</em></td>
                                 </tr>
                                 <tr>
-                                    <td className="csc-sc4s-info-table-label" style={{ borderLeft: '3px solid #1565c0' }}>IOS-XR Devices</td>
-                                    <td><span style={{ display: 'inline-block', padding: '1px 8px', borderRadius: '4px', fontSize: '11px', fontWeight: 700, background: '#e0f2f1', color: '#00695c', marginRight: '6px' }}>Required</span> core Stream platform</td>
-                                    <td><span style={{ display: 'inline-block', padding: '1px 8px', borderRadius: '4px', fontSize: '11px', fontWeight: 700, background: '#e3f2fd', color: '#1565c0', marginRight: '6px' }}>Optional</span> may enhance IPFIX decoding</td>
+                                    <td className="csc-sc4s-info-table-label scan-nf-td-border-xr">IOS-XR Devices</td>
+                                    <td><span className="scan-nf-badge-req">Required</span> core Stream platform</td>
+                                    <td><span className="scan-nf-badge-opt">Optional</span> may enhance IPFIX decoding</td>
                                 </tr>
                                 <tr style={{ fontSize: '12px' }}>
                                     <td style={{ paddingLeft: '20px', border: 'none', paddingTop: 0, borderLeft: '3px solid transparent' }}></td>
                                     <td colSpan="2" style={{ border: 'none', paddingTop: 0 }}><em>CRS carrier routers, ASR 9000 (IPFIX-capable)</em></td>
                                 </tr>
                                 <tr>
-                                    <td className="csc-sc4s-info-table-label" style={{ borderLeft: '3px solid #546e7a' }}>Meraki</td>
-                                    <td><span style={{ display: 'inline-block', padding: '1px 8px', borderRadius: '4px', fontSize: '11px', fontWeight: 700, background: '#e0f2f1', color: '#00695c', marginRight: '6px' }}>Required</span> core Stream platform</td>
-                                    <td><span style={{ display: 'inline-block', padding: '1px 8px', borderRadius: '4px', fontSize: '11px', fontWeight: 700, background: '#eceff1', color: '#607d8b', marginRight: '6px' }}>Not needed</span> standard NetFlow v9</td>
+                                    <td className="csc-sc4s-info-table-label scan-nf-td-border-meraki">Meraki</td>
+                                    <td><span className="scan-nf-badge-req">Required</span> core Stream platform</td>
+                                    <td><span className="scan-nf-badge-na">Not needed</span> standard NetFlow v9</td>
                                 </tr>
                                 <tr style={{ fontSize: '12px' }}>
                                     <td style={{ paddingLeft: '20px', border: 'none', paddingTop: 0, borderLeft: '3px solid transparent' }}></td>
@@ -1830,13 +1830,13 @@ function MagicEightModal({ open, onClose, sourcetypes, productName, addonApp, ad
                                     <tbody>
                                         {tierRows.map(r => {
                                             const stateStyle = {
-                                                ok: { color: '#3D851C', label: 'Matched' },
-                                                mismatch: { color: '#FF9000', label: 'Version Mismatch' },
-                                                missing: { color: '#c07600', label: 'Not on Indexers' },
-                                                disabled: { color: '#d32f2f', label: 'Disabled on IDX' },
-                                                standalone: { color: '#78909c', label: 'Standalone' },
-                                                loading: { color: '#78909c', label: 'Checking…' },
-                                            }[r.state] || { color: '#999', label: '—' };
+                                                ok: { cls: 'scan-m8-state-ok', label: 'Matched' },
+                                                mismatch: { cls: 'scan-m8-state-mismatch', label: 'Version Mismatch' },
+                                                missing: { cls: 'scan-m8-state-missing', label: 'Not on Indexers' },
+                                                disabled: { cls: 'scan-m8-state-disabled', label: 'Disabled on IDX' },
+                                                standalone: { cls: 'scan-m8-state-standalone', label: 'Standalone' },
+                                                loading: { cls: 'scan-m8-state-standalone', label: 'Checking…' },
+                                            }[r.state] || { cls: 'scan-m8-state-standalone', label: '—' };
                                             return (
                                                 <tr key={r.id} style={{ borderBottom: '1px solid var(--border-light, #E1E6EB)' }}>
                                                     <td style={{ padding: '4px 8px 4px 0', color: 'var(--text-primary, #1a2029)' }}>
@@ -1848,17 +1848,17 @@ function MagicEightModal({ open, onClose, sourcetypes, productName, addonApp, ad
                                                     </td>
                                                     <td style={{ padding: '4px 8px' }}>
                                                         {r.state === 'standalone' ? (
-                                                            <span style={{ color: '#78909c', fontStyle: 'italic' }}>N/A</span>
+                                                            <span className="scan-m8-muted">N/A</span>
                                                         ) : r.state === 'loading' ? (
-                                                            <span style={{ color: '#78909c', fontStyle: 'italic' }}>…</span>
+                                                            <span className="scan-m8-muted">…</span>
                                                         ) : r.state === 'missing' ? (
-                                                            <span style={{ color: '#c07600', fontStyle: 'italic' }}>Not installed</span>
+                                                            <span className="scan-m8-warn">Not installed</span>
                                                         ) : (
-                                                            <code style={{ fontSize: '11px', padding: '1px 6px', background: 'var(--bg-surface, #eef1f4)', borderRadius: '3px', color: r.state === 'mismatch' ? '#FF9000' : undefined }}>{r.idxVer || '—'}</code>
+                                                            <code className={r.state === 'mismatch' ? 'scan-m8-state-mismatch' : ''} style={{ fontSize: '11px', padding: '1px 6px', background: 'var(--bg-surface, #eef1f4)', borderRadius: '3px' }}>{r.idxVer || '—'}</code>
                                                         )}
                                                     </td>
                                                     <td style={{ padding: '4px 8px' }}>
-                                                        <span style={{ fontSize: '11px', fontWeight: 600, color: stateStyle.color }}>{stateStyle.label}</span>
+                                                        <span className={stateStyle.cls} style={{ fontSize: '11px', fontWeight: 600 }}>{stateStyle.label}</span>
                                                     </td>
                                                 </tr>
                                             );
@@ -1984,7 +1984,7 @@ function MagicEightModal({ open, onClose, sourcetypes, productName, addonApp, ad
                                         <div style={{ fontSize: '13px', lineHeight: 1.65 }}>
                                             <p style={{ margin: '0 0 10px' }}>{m.detail}</p>
                                             {m.gotcha && (
-                                                <p style={{ margin: '0 0 8px', padding: '8px 12px', background: 'rgba(255,144,0,0.05)', borderLeft: '2px solid #FF9000', borderRadius: '4px', fontSize: '12px' }}>
+                                                <p className="scan-tooltip-gotcha" style={{ margin: '0 0 8px', padding: '8px 12px', borderRadius: '4px', fontSize: '12px' }}>
                                                     <strong>Gotcha:</strong> {m.gotcha}
                                                 </p>
                                             )}
@@ -2029,7 +2029,7 @@ function MagicEightModal({ open, onClose, sourcetypes, productName, addonApp, ad
                                     The two biggest contributors are SHOULD_LINEMERGE (disabling the aggregator's 4-regex heuristic cycle)
                                     and TIME_FORMAT (eliminating the datetime.xml keyring scan). These savings are cumulative — each
                                     setting you define removes an entire phase of guesswork from the indexing pipeline.</p>
-                                    <p style={{ fontSize: '11px', color: '#6b7280', marginTop: 6 }}>
+                                    <p className="scan-m8-subtle" style={{ fontSize: '11px', marginTop: 6 }}>
                                         Source: <em>"The Importance of Being Earnest/Propped"</em> — Splunk Professional Services
                                     </p>
                                 </div>
@@ -2099,7 +2099,7 @@ function MagicEightModal({ open, onClose, sourcetypes, productName, addonApp, ad
                 </div>
                 </div>
                 {/* Footer */}
-                <div style={{
+                <div className="scan-drm-footer" style={{
                     display: 'flex', alignItems: 'center', justifyContent: 'flex-end', gap: '8px',
                     padding: '12px 20px', borderTop: '1px solid var(--border-light, #E1E6EB)',
                     background: 'var(--bg-surface, #f8f9fb)', borderRadius: '0 0 8px 8px',
@@ -2200,7 +2200,7 @@ function SOARInfoModal({ open, onClose, soarConnectorUids, splunkbaseData, produ
                                                         View on Splunkbase
                                                     </a>
                                                 ) : (
-                                                    <span style={{ color: '#999', fontSize: '12px' }}>—</span>
+                                                    <span className="scan-m8-dash">—</span>
                                                 )}
                                             </td>
                                         </tr>
@@ -2893,7 +2893,7 @@ function FeedbackModal({ open, onClose }) {
                 <Button appearance="secondary" label="Cancel" onClick={onClose} />
                 {submitting
                     ? <WaitSpinner size="medium" />
-                    : <Button appearance="primary" label="Submit Feedback" onClick={handleSubmit} />
+                    : <Button appearance="primary" className="scan-btn-primary" label="Submit Feedback" onClick={handleSubmit} />
                 }
             </Modal.Footer>
         </Modal>
@@ -3019,7 +3019,7 @@ function InfoTooltip({ placement = 'bottom', width = 500, delay = 400, content, 
                                     className="scan-tooltip-drag"
                                     onMouseDown={handleDragStart}
                                     title="Drag to move"
-                                    style={{ cursor: isDragging ? 'grabbing' : 'grab', fontSize: '18px', color: '#b0b0b0', userSelect: 'none' }}
+                                    style={{ cursor: isDragging ? 'grabbing' : 'grab', fontSize: '18px', userSelect: 'none' }}
                                 >
                                     ⠿
                                 </span>
@@ -3532,7 +3532,7 @@ function ProductCard({ product, installedApps, appStatuses, indexerApps, sourcet
                                 {sc4s_sourcetypes && sc4s_sourcetypes.length > 0 && (
                                     <div className="scan-sc4s-primary-sts">
                                         <span className="csc-dep-label" style={{ fontSize: '10px' }}>SC4S Sourcetypes</span>
-                                        <span style={{ fontSize: '11px', color: '#6b7280', fontFamily: 'monospace' }}>{sc4s_sourcetypes.join(', ')}</span>
+                                        <span className="scan-sc4s-st-list">{sc4s_sourcetypes.join(', ')}</span>
                                     </div>
                                 )}
                                 </>
@@ -4146,7 +4146,7 @@ function ProductCard({ product, installedApps, appStatuses, indexerApps, sourcet
                         <Button appearance="secondary" label="Cancel" onClick={() => { setCustomDashModalOpen(false); setCustomDashMsg(null); }} />
                         {customDashSaving
                             ? <WaitSpinner size="medium" />
-                            : <Button appearance="primary" label="Save" onClick={handleSaveCustomDashboard} />
+                            : <Button appearance="primary" className="scan-btn-primary" label="Save" onClick={handleSaveCustomDashboard} />
                         }
                     </Modal.Footer>
                 </Modal>
@@ -4752,7 +4752,7 @@ const KNOWN_LATEST_VERSIONS = {
     'react-dom': '18.3.1',
     'styled-components': '6.1.14',
     // Build tools (from npmjs.com)
-    '@babel/core': '7.26.9',
+    '@babel/core': '7.29.0',
     'babel-loader': '9.2.1',
     'webpack': '5.98.0',
     'webpack-cli': '6.0.1',
@@ -4773,7 +4773,16 @@ const PYTHON_LIBRARY_VERSIONS = {
     'requests': '2.31.0',               // ships with Splunk Python
 };
 
-const LATEST_VERSIONS_CHECKED = '2026-03-05';
+const LATEST_VERSIONS_CHECKED = '2026-03-17';
+
+const HOLD_REASONS = {
+    'styled-components': 'Held at v5 — @splunk/react-ui peer dependency does not support v6 yet',
+    'eslint': 'Held at v7 — upgrading to v9 requires migrating to flat config (eslint.config.js)',
+    'webpack-cli': 'Held at v5 — v6 is a major rewrite with breaking CLI changes',
+    'webpack-merge': 'Held at v5 — v6 drops legacy merge strategies used by @splunk/webpack-configs',
+    'copy-webpack-plugin': 'Held at v11 — v13 requires Webpack 5.88+ API changes not yet validated',
+    'requests': 'Managed by Splunk — bundled with the Splunk Python runtime, not upgradable independently',
+};
 
 /** Compare two semver strings. Returns -1 (behind), 0 (match), 1+ (ahead) */
 function compareSemver(current, latest) {
@@ -4803,6 +4812,7 @@ function TechStackModal({ open, onClose }) {
         const entry = { name, current: version };
         entry.latest = KNOWN_LATEST_VERSIONS[name] || null;
         entry.cmp = entry.latest ? compareSemver(version, entry.latest) : 0;
+        entry.hold = HOLD_REASONS[name] || null;
         if (name.startsWith('@splunk/')) {
             splunkDeps.push(entry);
         } else if (['react', 'react-dom', 'styled-components'].includes(name)) {
@@ -4818,6 +4828,7 @@ function TechStackModal({ open, onClose }) {
         const entry = { name, current: version };
         entry.latest = KNOWN_LATEST_VERSIONS[name] || null;
         entry.cmp = entry.latest ? compareSemver(version, entry.latest) : 0;
+        entry.hold = HOLD_REASONS[name] || null;
         pythonDeps.push(entry);
     });
 
@@ -4839,7 +4850,8 @@ function TechStackModal({ open, onClose }) {
             lines.push(`## ${title}`);
             arr.forEach(d => {
                 const status = d.latest ? (d.cmp < 0 ? 'OUTDATED' : d.cmp > 0 ? 'AHEAD' : 'CURRENT') : '';
-                lines.push(`  ${d.name}: ${d.current}${d.latest ? ` → latest ${d.latest} ${status}` : ''}`);
+                const hold = d.hold ? ` [${d.hold}]` : '';
+                lines.push(`  ${d.name}: ${d.current}${d.latest ? ` → latest ${d.latest} ${status}` : ''}${hold}`);
             });
             lines.push('');
         };
@@ -4868,6 +4880,7 @@ function TechStackModal({ open, onClose }) {
                 <td className="scan-ts-version">{d.current}</td>
                 <td className="scan-ts-latest">{d.latest || '—'}</td>
                 <td className="scan-ts-status">{statusIcon}</td>
+                <td className="scan-ts-note">{d.hold || ''}</td>
             </tr>
         );
     };
@@ -4883,6 +4896,7 @@ function TechStackModal({ open, onClose }) {
                             <th>Current</th>
                             <th>Latest</th>
                             <th>Status</th>
+                            <th>Note</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -4894,7 +4908,7 @@ function TechStackModal({ open, onClose }) {
     );
 
     return (
-        <Modal open returnFocus={returnFocusRef} onRequestClose={onClose} style={{ maxWidth: '720px', width: '90vw' }}>
+        <Modal open returnFocus={returnFocusRef} onRequestClose={onClose} style={{ maxWidth: '860px', width: '92vw' }}>
             <Modal.Header title="Tech Stack — Developer Mode" />
             <Modal.Body>
                 <div className="scan-ts-summary">
@@ -7621,13 +7635,9 @@ function SCANProductsPage() {
                     />
                     <Modal.Body>
                         <div style={{ fontSize: '13px', lineHeight: '1.7' }}>
-                            <div style={{
-                                padding: '12px 16px',
-                                background: '#fff3cd',
-                                border: '1px solid #ffe082',
+                            <div className="scan-warn-banner" style={{
                                 borderRadius: '6px',
                                 marginBottom: '14px',
-                                color: '#6d4c00',
                             }}>
                                 <strong>Warning:</strong> This action will remove <strong>all {configuredProducts.length} product{configuredProducts.length !== 1 ? 's' : ''}</strong> from your configured list.
                             </div>
@@ -7640,7 +7650,7 @@ function SCANProductsPage() {
                     </Modal.Body>
                     <Modal.Footer>
                         <Button appearance="secondary" label="Cancel" onClick={() => setRemoveAllModalOpen(false)} />
-                        <Button appearance="destructive" label="Yes, Remove All" onClick={handleRemoveAllConfigured} />
+                        <Button appearance="destructive" className="scan-btn-destructive" label="Yes, Remove All" onClick={handleRemoveAllConfigured} />
                     </Modal.Footer>
                 </Modal>
             )}
