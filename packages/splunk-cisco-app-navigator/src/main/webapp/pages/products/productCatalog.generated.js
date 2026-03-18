@@ -2,7 +2,7 @@
 /**
  * AUTO-GENERATED from products.conf — DO NOT EDIT BY HAND.
  * Regenerate:  node bin/generate-catalog.js
- * Generated:   2026-03-17T13:01:06.844Z
+ * Generated:   2026-03-18T23:20:37.732Z
  * Products:    84
  */
 
@@ -99,7 +99,10 @@ export const PRODUCT_CATALOG = [
       "security analytics and logging",
       "sal",
       "encrypted visibility engine",
-      "eve"
+      "eve",
+      "snort",
+      "secure firewall cloud native",
+      "sfcn"
     ],
     "alert_action_uids": [],
     "soar_connector_uids": [
@@ -285,7 +288,10 @@ export const PRODUCT_CATALOG = [
       "eta",
       "netflow analytics",
       "cisco security cloud",
-      "network detection and response"
+      "network detection and response",
+      "flow analytics",
+      "flow collector",
+      "anomaly detection"
     ],
     "alert_action_uids": [],
     "soar_connector_uids": [],
@@ -557,7 +563,9 @@ export const PRODUCT_CATALOG = [
       "hypershield",
       "distributed firewall",
       "autonomous security",
-      "ai firewall"
+      "ai firewall",
+      "ai native security",
+      "self qualifying update"
     ],
     "alert_action_uids": [],
     "soar_connector_uids": [],
@@ -835,7 +843,10 @@ export const PRODUCT_CATALOG = [
       "sso",
       "zero trust",
       "cisco security cloud",
-      "user protection suite"
+      "user protection suite",
+      "passwordless",
+      "fido2",
+      "phishing resistant mfa"
     ],
     "alert_action_uids": [],
     "soar_connector_uids": [],
@@ -1138,7 +1149,9 @@ export const PRODUCT_CATALOG = [
       "endpoint detection",
       "threat hunting",
       "cisco security cloud",
-      "xdr endpoint"
+      "xdr endpoint",
+      "orbital",
+      "malware defense"
     ],
     "alert_action_uids": [],
     "soar_connector_uids": [
@@ -1478,7 +1491,10 @@ export const PRODUCT_CATALOG = [
       "soc",
       "threat response",
       "cisco security cloud",
-      "securex"
+      "securex",
+      "ai assistant",
+      "attack path analysis",
+      "automated investigation"
     ],
     "alert_action_uids": [],
     "soar_connector_uids": [],
@@ -2231,7 +2247,10 @@ export const PRODUCT_CATALOG = [
       "sig",
       "secure internet gateway",
       "cisco security cloud",
-      "user protection suite"
+      "user protection suite",
+      "investigate",
+      "roaming security",
+      "roaming client"
     ],
     "alert_action_uids": [
       "5558"
@@ -2651,7 +2670,11 @@ export const PRODUCT_CATALOG = [
       "calisti",
       "cloud native",
       "kubernetes security",
-      "cisco ai defense"
+      "cisco ai defense",
+      "cspm",
+      "cwpp",
+      "cloud posture",
+      "runtime protection"
     ],
     "alert_action_uids": [],
     "soar_connector_uids": [],
@@ -2953,8 +2976,6 @@ export const PRODUCT_CATALOG = [
       "microsegmentation",
       "workload protection",
       "zero trust segmentation",
-      "cisco ai defense",
-      "hypershield",
       "ebpf",
       "distributed firewall"
     ],
@@ -3686,7 +3707,11 @@ export const PRODUCT_CATALOG = [
       "ios-xe",
       "campus network",
       "encrypted traffic analytics",
-      "eta"
+      "eta",
+      "stackwise",
+      "poe",
+      "voice vlan",
+      "smartnet"
     ],
     "alert_action_uids": [],
     "soar_connector_uids": [],
@@ -3832,7 +3857,11 @@ export const PRODUCT_CATALOG = [
       "sgacl",
       "guest access",
       "zero trust",
-      "sd-access"
+      "sd-access",
+      "posture",
+      "profiling",
+      "byod",
+      "guest portal"
     ],
     "alert_action_uids": [
       "7548"
@@ -4192,9 +4221,15 @@ export const PRODUCT_CATALOG = [
       "cloud managed networking",
       "meraki dashboard",
       "meraki api",
-      "meraki sd-wan",
+      "meraki sdwan",
       "client analytics",
-      "cisco networking cloud"
+      "cisco networking cloud",
+      "meraki mx",
+      "meraki mr",
+      "meraki ms",
+      "meraki mt",
+      "meraki mv",
+      "wireless lan"
     ],
     "alert_action_uids": [],
     "soar_connector_uids": [
@@ -4435,7 +4470,12 @@ export const PRODUCT_CATALOG = [
       "catalyst sd-wan",
       "wan optimization",
       "sase",
-      "secure access service edge"
+      "secure access service edge",
+      "cedge",
+      "omp",
+      "tloc",
+      "bfd",
+      "cflowd"
     ],
     "alert_action_uids": [],
     "soar_connector_uids": [],
@@ -4649,7 +4689,10 @@ export const PRODUCT_CATALOG = [
       "traffic engineering",
       "service health",
       "nso",
-      "network services orchestrator"
+      "network services orchestrator",
+      "wan automation engine",
+      "segment routing",
+      "mpls"
     ],
     "alert_action_uids": [],
     "soar_connector_uids": [],
@@ -5325,7 +5368,11 @@ export const PRODUCT_CATALOG = [
       "micro-segmentation",
       "sdn",
       "software defined networking",
-      "nexus one"
+      "nexus one",
+      "contract",
+      "bridge domain",
+      "tenant",
+      "multi-site orchestrator"
     ],
     "alert_action_uids": [],
     "soar_connector_uids": [],
@@ -5435,7 +5482,11 @@ export const PRODUCT_CATALOG = [
       "spine leaf",
       "vxlan",
       "data center switch",
-      "nexus one"
+      "nexus one",
+      "vpc",
+      "fabric extender",
+      "fex",
+      "fabricpath"
     ],
     "alert_action_uids": [],
     "soar_connector_uids": [],
@@ -6091,7 +6142,11 @@ export const PRODUCT_CATALOG = [
       "cimc",
       "ucsm",
       "c-series",
-      "b-series"
+      "b-series",
+      "x-series",
+      "x-fabric",
+      "hyperflex",
+      "intersight managed"
     ],
     "alert_action_uids": [],
     "soar_connector_uids": [],
@@ -6390,7 +6445,10 @@ export const PRODUCT_CATALOG = [
       "ir8340",
       "ot networking",
       "din rail",
-      "industrial threat defense"
+      "industrial threat defense",
+      "iot gateway",
+      "iec 62443",
+      "resilient network"
     ],
     "alert_action_uids": [],
     "soar_connector_uids": [],
@@ -6493,7 +6551,11 @@ export const PRODUCT_CATALOG = [
       "scada",
       "operational technology asset discovery",
       "iot security",
-      "industrial threat defense"
+      "industrial threat defense",
+      "purdue model",
+      "modbus",
+      "profinet",
+      "industrial protocol"
     ],
     "alert_action_uids": [],
     "soar_connector_uids": [],
@@ -6599,7 +6661,11 @@ export const PRODUCT_CATALOG = [
       "synthetic monitoring",
       "internet insights",
       "full stack observability",
-      "fso"
+      "fso",
+      "cloud agent",
+      "enterprise agent",
+      "network path",
+      "outage detection"
     ],
     "alert_action_uids": [],
     "soar_connector_uids": [],
@@ -6710,7 +6776,11 @@ export const PRODUCT_CATALOG = [
       "business transactions",
       "full stack observability",
       "fso",
-      "cisco observability platform"
+      "cisco observability platform",
+      "dash",
+      "brum",
+      "dbmon",
+      "infrastructure monitoring"
     ],
     "alert_action_uids": [],
     "soar_connector_uids": [],
@@ -6821,7 +6891,11 @@ export const PRODUCT_CATALOG = [
       "webex calling",
       "webex teams",
       "webex events",
-      "video conferencing"
+      "video conferencing",
+      "webex connect",
+      "messaging",
+      "webex devices",
+      "collaboration"
     ],
     "alert_action_uids": [
       "8358"
@@ -6919,7 +6993,13 @@ export const PRODUCT_CATALOG = [
       "voip",
       "jabber",
       "cdr",
-      "cmr"
+      "cmr",
+      "sip",
+      "h323",
+      "cti",
+      "jtapi",
+      "presence",
+      "cisco phone"
     ],
     "alert_action_uids": [],
     "soar_connector_uids": [],
@@ -7207,7 +7287,6 @@ export const PRODUCT_CATALOG = [
       "vcs",
       "telepresence",
       "video communication server",
-      "expressway",
       "firewall traversal"
     ],
     "alert_action_uids": [],
@@ -7383,7 +7462,7 @@ export const PRODUCT_CATALOG = [
     "dashboards": [],
     "custom_dashboard": "",
     "icon_emoji": "headphone",
-    "icon_svg": "cisco_phone",
+    "icon_svg": "cisco_desk_phone",
     "aliases": [
       "Cisco Unified Contact Center Enterprise",
       "Cisco Unified Contact Center Express",
@@ -7405,7 +7484,11 @@ export const PRODUCT_CATALOG = [
       "uccx",
       "ucce",
       "finesse",
-      "cisco contact center"
+      "cisco contact center",
+      "wxcc",
+      "supervisor",
+      "quality management",
+      "recording"
     ],
     "alert_action_uids": [],
     "soar_connector_uids": [],
@@ -8068,7 +8151,10 @@ export const PRODUCT_CATALOG = [
       "security advisory",
       "cve advisory",
       "patch management",
-      "vulnerability disclosure"
+      "vulnerability disclosure",
+      "openVuln api",
+      "critical advisory",
+      "high advisory"
     ],
     "alert_action_uids": [],
     "soar_connector_uids": [],
@@ -8533,7 +8619,11 @@ export const PRODUCT_CATALOG = [
       "bug search tool",
       "bst",
       "cisco defect",
-      "bug analytics"
+      "bug analytics",
+      "field notice",
+      "eox",
+      "end of life",
+      "caveat"
     ],
     "alert_action_uids": [],
     "soar_connector_uids": [],

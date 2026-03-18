@@ -4757,6 +4757,18 @@ body:has(.scan-drawer-open) .scan-feedback-tab {
     background: rgba(0, 212, 255, 0.18) !important;
 }
 
+.csc-btn-copied {
+    background: rgba(46, 125, 50, 0.1) !important;
+    border-color: #4caf50 !important;
+    color: #2e7d32 !important;
+    transition: all 0.2s ease;
+}
+:root.dce-dark .csc-btn-copied {
+    background: rgba(76, 175, 80, 0.15) !important;
+    border-color: #66bb6a !important;
+    color: #66bb6a !important;
+}
+
 .csc-btn-devmode {
     font-family: 'SF Mono', 'Fira Code', 'Consolas', monospace !important;
     font-size: 10px !important;
@@ -5120,6 +5132,25 @@ body:has(.scan-drawer-open) .scan-feedback-tab {
 @keyframes devpulse {
     0%, 100% { opacity: 0.4; transform: scale(0.8); }
     50% { opacity: 1; transform: scale(1.2); }
+}
+
+/* GTM mode banner — orange/amber theme */
+.scan-gtmmode-banner {
+    background: linear-gradient(90deg, #1a0f00 0%, #2e1a00 25%, #1a1000 50%, #2e1a00 75%, #1a0f00 100%);
+    background-size: 200% 100%;
+    border-bottom-color: #f59e0b;
+    box-shadow: 0 2px 20px rgba(245, 158, 11, 0.3), 0 0 40px rgba(245, 158, 11, 0.08) inset;
+}
+.scan-gtmmode-banner .scan-devmode-banner-text {
+    color: #f59e0b;
+    text-shadow: 0 0 8px rgba(245, 158, 11, 0.6), 0 0 20px rgba(245, 158, 11, 0.3);
+}
+.scan-gtmmode-banner .scan-devmode-banner-pulse {
+    background: #f59e0b;
+    box-shadow: 0 0 6px #f59e0b, 0 0 12px rgba(245, 158, 11, 0.5);
+}
+.scan-gtmmode-banner::before {
+    background: linear-gradient(90deg, transparent, rgba(245, 158, 11, 0.08), transparent);
 }
 
 /* Page background effects when dev mode is active */
@@ -6783,3 +6814,30 @@ tr.scan-ts-ahead .scan-ts-name {
 :root.dce-dark .scan-m8-state-disabled   { color: #ef5350; }
 :root.dce-dark .scan-m8-state-standalone { color: #90a4ae; }
 
+/* ── Modal copy button ── */
+.csc-modal-copy-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 4px 10px;
+    font-size: 12px;
+    border-radius: 4px;
+    border: 1px solid var(--border-light, #ccc);
+    background: transparent;
+    color: var(--text-secondary, #555);
+    cursor: pointer;
+    transition: all 0.15s ease;
+}
+.csc-modal-copy-btn:hover {
+    background: var(--bg-secondary, #f0f0f0);
+    border-color: var(--border-medium, #aaa);
+}
+:root.dce-dark .csc-modal-copy-btn {
+    border-color: #555;
+    color: #bbb;
+}
+:root.dce-dark .csc-modal-copy-btn:hover {
+    background: #3a3a3a;
+    border-color: #777;
+    color: #ddd;
+}

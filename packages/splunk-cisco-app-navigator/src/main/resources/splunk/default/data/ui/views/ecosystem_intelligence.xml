@@ -242,12 +242,6 @@
 			},
 			"type": "splunk.markdown"
 		},
-		"viz_header_gtm": {
-			"options": {
-				"markdown": "### GTM Roadmap — Coming Soon\nCisco products on the Secure Networking GTM roadmap for Splunk integration, ordered by GTM pillar: **Campus & Branch** first, then WAN Edge, Data Center & Cloud, Visibility & Assurance, and Industrial/OT. Uses **coverage_gap** and **gtm_pillar** from products.conf."
-			},
-			"type": "splunk.markdown"
-		},
 		"viz_header_health": {
 			"options": {
 				"markdown": "### Ecosystem Health\nCisco product catalog rollup — 79 products across Security, Networking, Observability, and Collaboration"
@@ -642,24 +636,6 @@
 			"title": "Cisco Validation & Compliance Status",
 			"type": "splunk.table"
 		},
-		"viz_table_gtm": {
-			"dataSources": {
-				"primary": "ds_table_gtm"
-			},
-			"options": {
-				"count": 50,
-				"dataOverlayMode": "none",
-				"drilldown": "none",
-				"showRowNumbers": true,
-				"tableFormat": {
-					"headerBackgroundColor": "#E8EDF2",
-					"headerFontColor": "#314257",
-					"rowBackgroundColors": "> table | seriesByIndex(0) | pick(#f9fafb,#ffffff)"
-				}
-			},
-			"title": "GTM Roadmap by Pillar",
-			"type": "splunk.table"
-		},
 		"viz_table_installed": {
 			"dataSources": {
 				"primary": "ds_table_installed"
@@ -827,14 +803,14 @@
 			"name": "Chart Products by Status",
 			"options": {
 				"extend": "ds_ecosystem_summary",
-				"query": "| eval _r=1 | table _r active deprecated coming_soon | rename active as Active, deprecated as Deprecated, coming_soon as \"Under Development\" | untable _r Status Count | fields Status Count"
+				"query": "| eval _r=1 | table _r active deprecated | rename active as Active, deprecated as Deprecated | untable _r Status Count | fields Status Count"
 			},
 			"type": "ds.chain"
 		},
 		"ds_chart_support": {
 			"name": "Chart Support Level",
 			"options": {
-				"query": "| rest splunk_server=local /servicesNS/-/-/configs/conf-products | fields support_level | eval Support=case(support_level==\"cisco_supported\",\"Cisco\",support_level==\"splunk_supported\",\"Splunk\",support_level==\"developer_supported\",\"Developer\",support_level==\"community_supported\",\"Community\",1==1,\"Not Supported\") | stats count as Count by Support | sort - Count"
+				"query": "| rest splunk_server=local /servicesNS/-/-/configs/conf-products | rename eai:acl.app as app | foreach * [ eval <<FIELD>>=if(isnull(<<FIELD>>) OR <<FIELD>>=\"\", null(), <<FIELD>>) ] | where disabled!=\"1\" AND status!=\"roadmap\" AND status!=\"under_development\" | where NOT match(title, \"^catalog_disabled_\") | eval Support=case(support_level==\"cisco_supported\",\"Cisco\",support_level==\"splunk_supported\",\"Splunk\",support_level==\"developer_supported\",\"Developer\",support_level==\"community_supported\",\"Community\",1==1,\"Not Supported\") | stats count as Count by Support | sort - Count"
 			},
 			"type": "ds.search"
 		},
@@ -1084,13 +1060,6 @@
 			"name": "Table Add-on Families",
 			"options": {
 				"query": "| savedsearch \"SCAN - Product Catalog - By Add-on Family\""
-			},
-			"type": "ds.search"
-		},
-		"ds_table_gtm": {
-			"name": "Table GTM Roadmap by Pillar",
-			"options": {
-				"query": "| savedsearch \"SCAN - GTM Roadmap by Pillar\""
 			},
 			"type": "ds.search"
 		},
@@ -1695,46 +1664,6 @@
 					}
 				],
 				"type": "absolute"
-			},
-			"layout_tab5": {
-				"options": {
-					"display": "fit-to-width",
-					"height": 1150,
-					"width": 1960
-				},
-				"structure": [
-					{
-						"item": "viz_umspZWQb",
-						"position": {
-							"h": 1150,
-							"w": 1960,
-							"x": 0,
-							"y": 0
-						},
-						"type": "block"
-					},
-					{
-						"item": "viz_header_gtm",
-						"position": {
-							"h": 50,
-							"w": 1920,
-							"x": 20,
-							"y": 10
-						},
-						"type": "block"
-					},
-					{
-						"item": "viz_table_gtm",
-						"position": {
-							"h": 1040,
-							"w": 1920,
-							"x": 20,
-							"y": 70
-						},
-						"type": "block"
-					}
-				],
-				"type": "absolute"
 			}
 		},
 		"tabs": {
@@ -1754,10 +1683,6 @@
 				{
 					"label": "Magic 8 Audit",
 					"layoutId": "layout_tab4"
-				},
-				{
-					"label": "GTM Roadmap",
-					"layoutId": "layout_tab5"
 				}
 			]
 		}
