@@ -15,7 +15,7 @@
       <collection label="Catalog Analysis">
         <saved name="SCAN - Product Catalog - By Category" />
         <saved name="SCAN - Product Catalog - By Add-on Family" />
-        <saved name="SCAN - GTM Roadmap by Pillar" />
+        <!-- <saved name="SCAN - GTM Roadmap by Pillar" /> -->
         <saved name="SCAN - Sourcetype Coverage" />
         <saved name="SCAN - SOAR Connector Inventory" />
         <saved name="SCAN - Data Quality - Missing Fields Audit" />
