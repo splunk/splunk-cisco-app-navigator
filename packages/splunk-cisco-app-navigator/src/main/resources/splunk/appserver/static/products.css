@@ -371,14 +371,42 @@ html.dce-dark [data-view="views/shared/Page"] {
     background-color: rgba(2, 200, 255, 0.10);
     border-color: rgba(2, 200, 255, 0.25);
 }
+:root.dce-dark .scan-tooltip-card {
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+    border: 1px solid #3a3f46;
+}
 :root.dce-dark .scan-tooltip-header {
     background: #2a2f35;
-    color: #e0e0e0;
+    color: #e8e8e8;
 }
 :root.dce-dark .scan-tooltip-body {
     background: #1e2228;
-    color: #ccc;
+    color: #d8d8d8;
     border-top-color: #3a3f46;
+}
+:root.dce-dark .scan-tooltip-body strong {
+    color: #e8e8e8;
+}
+:root.dce-dark .scan-tooltip-body p {
+    color: #d0d0d0;
+}
+:root.dce-dark .scan-tooltip-body code {
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    color: #e0e0e0;
+}
+/* Gotcha callout inside tooltip */
+.scan-tooltip-gotcha {
+    background: rgba(255, 144, 0, 0.05);
+    border-left: 2px solid #FF9000;
+}
+:root.dce-dark .scan-tooltip-gotcha {
+    background: rgba(255, 144, 0, 0.12);
+    border-left-color: #ffa726;
+    color: #e0c8a0;
+}
+:root.dce-dark .scan-tooltip-gotcha strong {
+    color: #ffb74d;
 }
 
 .header-right {
@@ -2103,6 +2131,12 @@ html.dce-dark [data-view="views/shared/Page"] {
 :root.dce-dark .scan-info-pill-icon {
     color: #02C8FF;
 }
+:root.dce-dark .scan-tooltip-pin {
+    color: #888;
+}
+:root.dce-dark .scan-tooltip-pin:hover {
+    color: #ccc;
+}
 :root.dce-dark .scan-tooltip-pin.pinned {
     color: #02C8FF;
 }
@@ -2111,6 +2145,9 @@ html.dce-dark [data-view="views/shared/Page"] {
 }
 :root.dce-dark .scan-tooltip-drag:hover {
     color: #bbb;
+}
+:root.dce-dark .scan-tooltip-drag:active {
+    color: #e0e0e0;
 }
 :root.dce-dark .cpb-link {
     background: #197E25;
@@ -4610,18 +4647,41 @@ body:has(.scan-drawer-open) .scan-feedback-tab {
 :root.dce-dark .csc-sc4s-info-section h4 {
     border-bottom-color: var(--border-light);
 }
+[data-theme="dark"] .csc-sc4s-info-card,
+:root.dce-dark .csc-sc4s-info-card {
+    background: rgba(255, 255, 255, 0.04);
+    border-color: rgba(255, 255, 255, 0.1);
+    border-left-color: var(--info-accent, rgba(255, 255, 255, 0.2));
+}
 [data-theme="dark"] .csc-sc4s-info-card strong,
 :root.dce-dark .csc-sc4s-info-card strong {
     color: var(--text-primary);
 }
+[data-theme="dark"] .csc-sc4s-info-card span:last-child,
+:root.dce-dark .csc-sc4s-info-card span:last-child {
+    color: var(--text-secondary);
+}
 [data-theme="dark"] .csc-sc4s-info-card:hover,
 :root.dce-dark .csc-sc4s-info-card:hover {
-    /* no colored shadow */
+    background: rgba(255, 255, 255, 0.07);
+}
+[data-theme="dark"] .csc-sc4s-info-table,
+:root.dce-dark .csc-sc4s-info-table {
+    border-color: var(--border-light);
+}
+[data-theme="dark"] .csc-sc4s-info-table td,
+:root.dce-dark .csc-sc4s-info-table td {
+    border-bottom-color: var(--border-light);
+    color: var(--text-primary);
 }
 [data-theme="dark"] .csc-sc4s-info-table-label,
 :root.dce-dark .csc-sc4s-info-table-label {
     color: var(--text-primary);
     background: var(--bg-primary);
+}
+[data-theme="dark"] .csc-sc4s-info-footer,
+:root.dce-dark .csc-sc4s-info-footer {
+    border-top-color: var(--border-light);
 }
 [data-theme="dark"] .csc-sc4s-info-table code,
 [data-theme="dark"] .csc-sc4s-info-list code,
@@ -4695,6 +4755,18 @@ body:has(.scan-drawer-open) .scan-feedback-tab {
 }
 .scan-util-devmode:hover {
     background: rgba(0, 212, 255, 0.18) !important;
+}
+
+.csc-btn-copied {
+    background: rgba(46, 125, 50, 0.1) !important;
+    border-color: #4caf50 !important;
+    color: #2e7d32 !important;
+    transition: all 0.2s ease;
+}
+:root.dce-dark .csc-btn-copied {
+    background: rgba(76, 175, 80, 0.15) !important;
+    border-color: #66bb6a !important;
+    color: #66bb6a !important;
 }
 
 .csc-btn-devmode {
@@ -5062,6 +5134,25 @@ body:has(.scan-drawer-open) .scan-feedback-tab {
     50% { opacity: 1; transform: scale(1.2); }
 }
 
+/* GTM mode banner — orange/amber theme */
+.scan-gtmmode-banner {
+    background: linear-gradient(90deg, #1a0f00 0%, #2e1a00 25%, #1a1000 50%, #2e1a00 75%, #1a0f00 100%);
+    background-size: 200% 100%;
+    border-bottom-color: #f59e0b;
+    box-shadow: 0 2px 20px rgba(245, 158, 11, 0.3), 0 0 40px rgba(245, 158, 11, 0.08) inset;
+}
+.scan-gtmmode-banner .scan-devmode-banner-text {
+    color: #f59e0b;
+    text-shadow: 0 0 8px rgba(245, 158, 11, 0.6), 0 0 20px rgba(245, 158, 11, 0.3);
+}
+.scan-gtmmode-banner .scan-devmode-banner-pulse {
+    background: #f59e0b;
+    box-shadow: 0 0 6px #f59e0b, 0 0 12px rgba(245, 158, 11, 0.5);
+}
+.scan-gtmmode-banner::before {
+    background: linear-gradient(90deg, transparent, rgba(245, 158, 11, 0.08), transparent);
+}
+
 /* Page background effects when dev mode is active */
 .scan-devmode-active {
     position: relative;
@@ -5367,6 +5458,12 @@ body:has(.scan-drawer-open) .scan-feedback-tab {
     text-align: center;
     width: 50px;
 }
+.scan-ts-note {
+    font-size: 11px;
+    color: #888;
+    font-style: italic;
+    white-space: nowrap;
+}
 tr.scan-ts-outdated {
     background: #fff8f7;
 }
@@ -5457,6 +5554,9 @@ tr.scan-ts-ahead .scan-ts-name {
 }
 :root.dce-dark tr.scan-ts-ahead .scan-ts-name {
     color: #90caf9;
+}
+:root.dce-dark .scan-ts-note {
+    color: #888;
 }
 :root.dce-dark .scan-ts-footer-note {
     background: #1a1a2e;
@@ -6514,3 +6614,230 @@ tr.scan-ts-ahead .scan-ts-name {
     animation: csc-search-pulse 0.6s ease-out 2;
 }
 
+/* ══════════════════════════════════════════════════════════════════════
+   DARK MODE — COMPREHENSIVE AUDIT FIXES
+   Addresses Splunk UI component visibility, modal content,
+   info-panel borders, and inline-color fallbacks.
+   ══════════════════════════════════════════════════════════════════════ */
+
+/* ── Splunk React UI <Button> overrides in dark mode ──
+   Splunk Modals and our DRM render in portals (document.body),
+   so we target globally under :root.dce-dark.
+   Splunk Button renders <button> with styled-component classes.
+   We use multiple selectors for resilience across Splunk UI versions. */
+/* All secondary/default buttons in modal footers and DRM footer */
+:root.dce-dark [data-test="modal"] [data-test="footer"] button[data-test="button"],
+:root.dce-dark .scan-drm-footer button[data-test="button"] {
+    background: rgba(255, 255, 255, 0.08) !important;
+    color: #d4d4d4 !important;
+    border-color: #4a5568 !important;
+}
+:root.dce-dark [data-test="modal"] [data-test="footer"] button[data-test="button"]:hover,
+:root.dce-dark .scan-drm-footer button[data-test="button"]:hover {
+    background: rgba(255, 255, 255, 0.14) !important;
+    color: #ffffff !important;
+    border-color: #02C8FF !important;
+}
+/* Restore primary / destructive appearance (class added in JSX) */
+:root.dce-dark .scan-btn-primary {
+    background: #0A60FF !important;
+    color: #ffffff !important;
+    border-color: #0A60FF !important;
+}
+:root.dce-dark .scan-btn-primary:hover {
+    background: #0850DD !important;
+}
+:root.dce-dark .scan-btn-destructive {
+    background: #d32f2f !important;
+    color: #ffffff !important;
+    border-color: #d32f2f !important;
+}
+:root.dce-dark .scan-btn-destructive:hover {
+    background: #b71c1c !important;
+}
+/* Modal close (X) button — transparent, no fill */
+:root.dce-dark [data-test="modal"] button[data-test="close"] {
+    background: transparent !important;
+    border-color: transparent !important;
+    color: #d4d4d4 !important;
+}
+/* Splunk Modal chrome (header, footer, body) */
+:root.dce-dark [data-test="modal"] [data-test="header"],
+:root.dce-dark .modal .modal-header {
+    background: var(--bg-surface, #1e262c) !important;
+    color: var(--text-primary, #d4d4d4) !important;
+    border-bottom-color: var(--border-light, #333d44) !important;
+}
+:root.dce-dark [data-test="modal"] [data-test="body"],
+:root.dce-dark .modal .modal-body {
+    background: var(--bg-surface, #1e262c) !important;
+    color: var(--text-primary, #d4d4d4) !important;
+}
+:root.dce-dark [data-test="modal"] [data-test="footer"],
+:root.dce-dark .modal .modal-footer {
+    background: var(--bg-primary, #1a1f24) !important;
+    border-top-color: var(--border-light, #333d44) !important;
+}
+/* DRM footer — make sure border adapts to dark mode */
+:root.dce-dark .scan-drm-footer {
+    background: var(--bg-primary, #1a1f24) !important;
+    border-top-color: var(--border-light, #333d44) !important;
+}
+/* Splunk Modal dialog wrapper (the container itself) */
+:root.dce-dark [data-test="modal"] [data-test="dialog"],
+:root.dce-dark [data-test="modal"] [role="dialog"] {
+    background: var(--bg-surface, #1e262c) !important;
+    color: var(--text-primary, #d4d4d4) !important;
+    border-color: var(--border-light, #333d44) !important;
+}
+/* Title text inside modal header */
+:root.dce-dark [data-test="modal"] [data-test="title"] {
+    color: var(--text-primary, #d4d4d4) !important;
+}
+/* Splunk Modal backdrop */
+:root.dce-dark [data-test="modal-backdrop"] {
+    background: rgba(0, 0, 0, 0.55) !important;
+}
+
+/* ── Info panel best-practice items — full dark override ── */
+:root.dce-dark .csc-sc4s-info-bp-item {
+    background: rgba(10, 96, 255, 0.06);
+    border-color: rgba(255, 255, 255, 0.1);
+    border-left-color: #4a90d9;
+}
+:root.dce-dark .csc-sc4s-info-bp-item strong {
+    color: var(--text-primary, #d4d4d4);
+}
+:root.dce-dark .csc-sc4s-info-bp-item p {
+    color: var(--text-secondary, #a0aab0);
+}
+/* Variant border-left colors in dark mode */
+:root.dce-dark .csc-sc4s-info-bp-good {
+    border-left-color: #66bb6a;
+}
+:root.dce-dark .csc-sc4s-info-bp-warn {
+    border-left-color: #ffa726;
+}
+:root.dce-dark .csc-sc4s-info-bp-info {
+    border-left-color: #42a5f5;
+}
+
+/* ── NetFlow table header/badge classes (avoid inline hardcodes) ── */
+.scan-nf-th {
+    background: #e0f2f1;
+    color: #00695c;
+}
+:root.dce-dark .scan-nf-th {
+    background: rgba(0, 105, 92, 0.2);
+    color: #80cbc4;
+}
+.scan-nf-td-border { border-left: 3px solid #00897b; }
+:root.dce-dark .scan-nf-td-border { border-left-color: #26a69a; }
+.scan-nf-td-border-xr { border-left: 3px solid #1565c0; }
+:root.dce-dark .scan-nf-td-border-xr { border-left-color: #42a5f5; }
+.scan-nf-td-border-meraki { border-left: 3px solid #546e7a; }
+:root.dce-dark .scan-nf-td-border-meraki { border-left-color: #78909c; }
+
+.scan-nf-badge-req {
+    display: inline-block; padding: 1px 8px; border-radius: 4px;
+    font-size: 11px; font-weight: 700; margin-right: 6px;
+    background: #e0f2f1; color: #00695c;
+}
+:root.dce-dark .scan-nf-badge-req {
+    background: rgba(0, 105, 92, 0.25); color: #80cbc4;
+}
+.scan-nf-badge-opt {
+    display: inline-block; padding: 1px 8px; border-radius: 4px;
+    font-size: 11px; font-weight: 700; margin-right: 6px;
+    background: #e3f2fd; color: #1565c0;
+}
+:root.dce-dark .scan-nf-badge-opt {
+    background: rgba(21, 101, 192, 0.2); color: #90caf9;
+}
+.scan-nf-badge-na {
+    display: inline-block; padding: 1px 8px; border-radius: 4px;
+    font-size: 11px; font-weight: 700; margin-right: 6px;
+    background: #eceff1; color: #607d8b;
+}
+:root.dce-dark .scan-nf-badge-na {
+    background: rgba(96, 125, 139, 0.2); color: #90a4ae;
+}
+
+/* ── Magic Eight modal — tier/status inline overrides ── */
+.scan-m8-muted    { color: #78909c; font-style: italic; }
+.scan-m8-warn     { color: #c07600; font-style: italic; }
+.scan-m8-subtle   { color: #6b7280; }
+.scan-m8-faint    { color: #9e9e9e; }
+.scan-m8-ok       { color: #2e7d32; font-weight: 700; width: 14px; display: inline-block; }
+.scan-m8-dash     { color: #999; font-size: 12px; }
+:root.dce-dark .scan-m8-muted    { color: #90a4ae; }
+:root.dce-dark .scan-m8-warn     { color: #ffb74d; }
+:root.dce-dark .scan-m8-subtle   { color: #9ca3af; }
+:root.dce-dark .scan-m8-faint    { color: #6b7280; }
+:root.dce-dark .scan-m8-ok       { color: #81c784; }
+:root.dce-dark .scan-m8-dash     { color: #555; }
+
+/* ── Warning banner (e.g. data-quality notices) ── */
+.scan-warn-banner {
+    padding: 12px 16px;
+    background: #fff3cd;
+    border: 1px solid #ffe082;
+    border-radius: 8px;
+    font-size: 13px;
+    color: #664d03;
+}
+:root.dce-dark .scan-warn-banner {
+    background: rgba(255, 193, 7, 0.1);
+    border-color: rgba(255, 193, 7, 0.25);
+    color: #ffd54f;
+}
+
+/* ── SC4S sourcetype monospace listing ── */
+.scan-sc4s-st-list {
+    font-size: 11px;
+    color: #6b7280;
+    font-family: monospace;
+}
+:root.dce-dark .scan-sc4s-st-list {
+    color: #9ca3af;
+}
+
+/* ── Magic Eight tier-state label colors ── */
+.scan-m8-state-ok         { color: #3D851C; }
+.scan-m8-state-mismatch   { color: #FF9000; }
+.scan-m8-state-missing    { color: #c07600; }
+.scan-m8-state-disabled   { color: #d32f2f; }
+.scan-m8-state-standalone { color: #78909c; }
+:root.dce-dark .scan-m8-state-ok         { color: #81c784; }
+:root.dce-dark .scan-m8-state-mismatch   { color: #ffb74d; }
+:root.dce-dark .scan-m8-state-missing    { color: #ffb74d; }
+:root.dce-dark .scan-m8-state-disabled   { color: #ef5350; }
+:root.dce-dark .scan-m8-state-standalone { color: #90a4ae; }
+
+/* ── Modal copy button ── */
+.csc-modal-copy-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 4px 10px;
+    font-size: 12px;
+    border-radius: 4px;
+    border: 1px solid var(--border-light, #ccc);
+    background: transparent;
+    color: var(--text-secondary, #555);
+    cursor: pointer;
+    transition: all 0.15s ease;
+}
+.csc-modal-copy-btn:hover {
+    background: var(--bg-secondary, #f0f0f0);
+    border-color: var(--border-medium, #aaa);
+}
+:root.dce-dark .csc-modal-copy-btn {
+    border-color: #555;
+    color: #bbb;
+}
+:root.dce-dark .csc-modal-copy-btn:hover {
+    background: #3a3a3a;
+    border-color: #777;
+    color: #ddd;
+}

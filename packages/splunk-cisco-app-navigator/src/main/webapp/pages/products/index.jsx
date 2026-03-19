@@ -38,6 +38,7 @@ import CylinderMagnifier from '@splunk/react-icons/CylinderMagnifier';
 import CylinderIndex from '@splunk/react-icons/CylinderIndex';
 import ForwarderHeavy from '@splunk/react-icons/ForwarderHeavy';
 import External from '@splunk/react-icons/ArrowSquareTopRight';
+import Clipboard from '@splunk/react-icons/Clipboard';
 import Code from '@splunk/react-icons/Script';
 import Search from '@splunk/react-icons/Magnifier';
 import Button from '@splunk/react-ui/Button';
@@ -58,7 +59,7 @@ const SEARCH_ENDPOINT = '/splunkd/__raw/services/search/jobs';
 const CONFIGURED_STORAGE_KEY = 'scan_configured_products';
 const THEME_STORAGE_KEY = 'scan_theme_preference'; // 'light' | 'dark' | 'auto'
 const PORTFOLIO_STORAGE_KEY = 'scan_show_full_portfolio'; // 'true' | 'false'
-const DEVMODE_STORAGE_KEY = 'scan_developer_mode'; // 'true' | 'false'
+// devMode and gtmMode are session-only (no localStorage) — hard refresh resets to normal
 const PERSONA_STORAGE_KEY = 'scan_persona_shown'; // 'true' once persona modal dismissed
 const FILTERS_STORAGE_KEY = 'scan_filter_state';
 const PANELS_STORAGE_KEY = 'scan_panel_state';
@@ -874,6 +875,154 @@ function IntelligenceBadges({ appStatus, vizAppStatus, vizApp2Status, sourcetype
     );
 }
 
+// ────────────────────  MODAL COPY BUTTON  ────────────────────
+// Copies the full rendered modal body as rich HTML by cloning the DOM.
+
+function CopyModalButton() {
+    const [copied, setCopied] = useState(false);
+    const btnRef = useRef(null);
+    const handleClick = useCallback(() => {
+        const modal = btnRef.current?.closest('[data-test="modal"]');
+        const body = modal?.querySelector('.csc-sc4s-info');
+        if (!body) return;
+        // Expand any collapsed sections before cloning (e.g. "Show all N detections")
+        body.querySelectorAll('.csc-es-show-all-btn').forEach(btn => btn.click());
+        // Allow React to re-render expanded content, then proceed
+        setTimeout(() => {
+            _doCopy(body);
+        }, 150);
+    }, []);
+    const _doCopy = useCallback((body) => {
+        const clone = body.cloneNode(true);
+        // Phase 1: structural cleanup (while classes still exist)
+        clone.querySelectorAll('button, input, select, .scan-modal-resize-handle, .csc-sc4s-info-footer, .csc-sc4s-info-card-icon').forEach(el => el.remove());
+        // Remove install status blocks by class before classes are stripped
+        clone.querySelectorAll('[class*="scan-m8-"]').forEach(el => {
+            let target = el.closest('[class*="csc-sc4s-info-section"]') ? el.closest('div[style]') : el.closest('div');
+            if (target && /install\s*status|not on this SH/i.test(target.textContent)) target.remove();
+        });
+        // Convert info-card grids into clean separated blocks
+        clone.querySelectorAll('.csc-sc4s-info-grid').forEach(grid => {
+            const frag = document.createElement('div');
+            grid.querySelectorAll('.csc-sc4s-info-card').forEach(card => {
+                const block = document.createElement('div');
+                block.style.cssText = 'margin:0 0 12px;padding:8px 12px;border-left:3px solid #003366;background:#f8f9fa;';
+                const title = card.querySelector('strong');
+                if (title) {
+                    const h = document.createElement('p');
+                    h.style.cssText = 'margin:0 0 3px;font-weight:700;font-size:13px;color:#003366;';
+                    h.textContent = title.textContent;
+                    block.appendChild(h);
+                }
+                card.querySelectorAll(':scope > span').forEach(sp => {
+                    if (sp.classList.contains('csc-sc4s-info-card-icon')) return;
+                    const p = document.createElement('p');
+                    p.style.cssText = 'margin:0 0 3px;font-size:12px;line-height:1.5;color:#333;';
+                    p.innerHTML = sp.innerHTML;
+                    block.appendChild(p);
+                });
+                frag.appendChild(block);
+            });
+            grid.replaceWith(frag);
+        });
+        // Convert CIM pill badges into a comma-separated paragraph
+        clone.querySelectorAll('.csc-es-cim-pills').forEach(container => {
+            const names = [];
+            container.querySelectorAll('.csc-es-cim-pill').forEach(pill => names.push(pill.textContent.trim()));
+            if (names.length) {
+                const p = document.createElement('p');
+                p.textContent = names.join(', ');
+                container.replaceWith(p);
+            }
+        });
+        // Convert ESCU story items into a bullet list
+        clone.querySelectorAll('.csc-es-stories').forEach(container => {
+            const ul = document.createElement('ul');
+            container.querySelectorAll('.csc-es-story-item').forEach(item => {
+                item.querySelectorAll('.csc-es-story-icon').forEach(ic => ic.remove());
+                const li = document.createElement('li');
+                li.textContent = item.textContent.trim();
+                ul.appendChild(li);
+            });
+            container.replaceWith(ul);
+        });
+        // Convert best-practices items into clean blocks
+        clone.querySelectorAll('.csc-sc4s-info-bp-item').forEach(item => {
+            item.querySelectorAll('.csc-sc4s-info-bp-icon').forEach(ic => ic.remove());
+        });
+        // Expand any <details> elements so their content is visible
+        clone.querySelectorAll('details').forEach(el => el.setAttribute('open', ''));
+        // Strip <summary> click targets (already expanded)
+        clone.querySelectorAll('summary').forEach(el => el.remove());
+        // Strip any remaining hidden/collapsed elements
+        clone.querySelectorAll('[hidden], [aria-hidden="true"]').forEach(el => el.remove());
+        // Remove empty wrapper divs to reduce HTML bulk (helps prevent clipboard truncation)
+        let changed = true;
+        while (changed) {
+            changed = false;
+            clone.querySelectorAll('div, span').forEach(el => {
+                if (!el.children.length && !el.textContent.trim()) {
+                    el.remove(); changed = true;
+                }
+            });
+        }
+        // Unwrap unnecessary single-child wrapper divs/spans to reduce nesting depth
+        let unwrapped = true;
+        while (unwrapped) {
+            unwrapped = false;
+            clone.querySelectorAll('div, span').forEach(el => {
+                const hasOnlyOneChild = el.childNodes.length === 1 && el.firstElementChild;
+                const parent = el.parentNode;
+                if (hasOnlyOneChild && parent && el !== clone) {
+                    parent.replaceChild(el.firstElementChild, el);
+                    unwrapped = true;
+                }
+            });
+        }
+        // Phase 2: nuke ALL inline styles and classes — clean slate
+        clone.querySelectorAll('*').forEach(el => {
+            el.removeAttribute('style');
+            el.removeAttribute('class');
+            el.removeAttribute('data-test');
+            el.removeAttribute('data-reactid');
+            el.removeAttribute('role');
+            el.removeAttribute('tabindex');
+        });
+        // Phase 3: apply clean document-only styles
+        clone.querySelectorAll('h3').forEach(el => { el.style.cssText = 'margin:16px 0 6px;color:#003366;font-size:16px;font-weight:700;border-bottom:1px solid #003366;padding-bottom:4px;'; });
+        clone.querySelectorAll('h4').forEach(el => { el.style.cssText = 'margin:12px 0 4px;color:#003366;font-size:14px;font-weight:700;'; });
+        clone.querySelectorAll('a').forEach(el => { el.style.cssText = 'color:#0066cc;text-decoration:underline;'; });
+        clone.querySelectorAll('p').forEach(el => { if (!el.style.cssText) el.style.cssText = 'margin:0 0 8px;font-size:13px;line-height:1.5;'; });
+        clone.querySelectorAll('ul').forEach(el => { el.style.cssText = 'margin:4px 0 10px;padding-left:24px;'; });
+        clone.querySelectorAll('li').forEach(el => { el.style.cssText = 'margin:0 0 4px;font-size:13px;line-height:1.5;'; });
+        clone.querySelectorAll('strong').forEach(el => { el.style.cssText = 'font-weight:700;color:#1a1a1a;'; });
+        clone.querySelectorAll('em, i').forEach(el => { el.style.cssText = 'font-style:italic;color:#555;'; });
+        clone.querySelectorAll('code').forEach(el => { el.style.cssText = 'background:#f4f4f4;border:1px solid #ddd;border-radius:3px;padding:1px 5px;font-family:Menlo,Consolas,monospace;font-size:12px;color:#333;'; });
+        clone.querySelectorAll('table').forEach(el => { el.style.cssText = 'border-collapse:collapse;width:100%;margin:10px 0;'; });
+        clone.querySelectorAll('th').forEach(el => { el.style.cssText = 'padding:8px 10px;border:1px solid #ccc;text-align:left;font-size:13px;font-weight:700;color:#003366;background:#f0f3f6;'; });
+        clone.querySelectorAll('td').forEach(el => { el.style.cssText = 'padding:6px 10px;border:1px solid #e0e0e0;text-align:left;font-size:13px;vertical-align:top;'; });
+        const wrap = `<div style="font-family:-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;font-size:13px;color:#1a1a1a;line-height:1.6;background:#ffffff;max-width:700px;">${clone.innerHTML}<hr style="border:none;border-top:1px solid #ccc;margin:16px 0 6px;" /><p style="margin:0;font-size:11px;color:#888;">Generated by Splunk Cisco App Navigator (SCAN)</p></div>`;
+        const text = (clone.innerText || clone.textContent || '').trim() + '\n\nGenerated by Splunk Cisco App Navigator (SCAN)';
+        copyRichToClipboard(wrap, text, () => {
+            setCopied(true);
+            setTimeout(() => setCopied(false), 2000);
+        });
+    }, []); // end _doCopy
+    return (
+        <button
+            ref={btnRef}
+            className={`csc-btn csc-btn-icon csc-btn-outline csc-modal-copy-btn ${copied ? 'csc-btn-copied' : ''}`}
+            onClick={handleClick}
+            title={copied ? 'Copied to clipboard!' : 'Copy full modal content to clipboard'}
+            style={{ marginRight: 'auto' }}
+        >
+            {copied
+                ? <span style={{ fontSize: '13px', fontWeight: 600 }}>✓ Copied</span>
+                : <><Clipboard size={14} /><span style={{ marginLeft: '4px', fontSize: '12px' }}>Copy</span></>}
+        </button>
+    );
+}
+
 // ────────────────────  SC4S INFO MODAL  ───────────────────────
 
 function SC4SInfoModal({ open, onClose }) {
@@ -1019,6 +1168,7 @@ function SC4SInfoModal({ open, onClose }) {
                 </div>
             </Modal.Body>
             <Modal.Footer>
+                <CopyModalButton />
                 <Button appearance="secondary" label="Close" onClick={onClose} />
             </Modal.Footer>
         </Modal>
@@ -1064,15 +1214,15 @@ function NetFlowInfoModal({ open, onClose, installedApps }) {
                                         const info = installedApps[ta.id];
                                         return (
                                             <div key={ta.id} style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '12px' }}>
-                                                <span style={{ color: info ? '#2e7d32' : '#9e9e9e', fontWeight: 700, width: '14px' }}>{info ? '✓' : '—'}</span>
-                                                <span style={{ flex: 1 }}>{ta.label} <span style={{ fontSize: '10px', color: '#9e9e9e' }}>({ta.vendor})</span></span>
-                                                {info && <span style={{ fontSize: '10px', color: '#6b7280' }}>v{info.version}</span>}
-                                                {!info && <span style={{ fontSize: '10px', color: '#9e9e9e', fontStyle: 'italic' }}>not on this SH</span>}
+                                                <span className={info ? 'scan-m8-ok' : 'scan-m8-faint'} style={{ fontWeight: 700, width: '14px' }}>{info ? '✓' : '—'}</span>
+                                                <span style={{ flex: 1 }}>{ta.label} <span className="scan-m8-faint" style={{ fontSize: '10px' }}>({ta.vendor})</span></span>
+                                                {info && <span className="scan-m8-subtle" style={{ fontSize: '10px' }}>v{info.version}</span>}
+                                                {!info && <span className="scan-m8-faint" style={{ fontSize: '10px', fontStyle: 'italic' }}>not on this SH</span>}
                                             </div>
                                         );
                                     })}
                                 </div>
-                                <div style={{ fontSize: '10px', color: '#9e9e9e', marginTop: '6px', fontStyle: 'italic' }}>Stream Forwarder TA (5238) is installed on forwarders — not checkable from the Search Head.</div>
+                                <div className="scan-m8-faint" style={{ fontSize: '10px', marginTop: '6px', fontStyle: 'italic' }}>Stream Forwarder TA (5238) is installed on forwarders — not checkable from the Search Head.</div>
                             </div>
                         )}
 
@@ -1109,43 +1259,43 @@ function NetFlowInfoModal({ open, onClose, installedApps }) {
                         <table className="csc-sc4s-info-table">
                             <thead>
                                 <tr>
-                                    <th className="csc-sc4s-info-table-label" style={{ width: '28%', background: '#e0f2f1', color: '#00695c' }}>Cisco Platform</th>
-                                    <th className="csc-sc4s-info-table-label" style={{ width: '42%', background: '#e0f2f1', color: '#00695c' }}>3 Splunk Stream Packages</th>
-                                    <th className="csc-sc4s-info-table-label" style={{ width: '30%', background: '#e0f2f1', color: '#00695c' }}>Cisco Enhanced Netflow</th>
+                                    <th className="csc-sc4s-info-table-label scan-nf-th" style={{ width: '28%' }}>Cisco Platform</th>
+                                    <th className="csc-sc4s-info-table-label scan-nf-th" style={{ width: '42%' }}>3 Splunk Stream Packages</th>
+                                    <th className="csc-sc4s-info-table-label scan-nf-th" style={{ width: '30%' }}>Cisco Enhanced Netflow</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 <tr>
-                                    <td className="csc-sc4s-info-table-label" style={{ borderLeft: '3px solid #00897b' }}>IOS-XE Devices</td>
-                                    <td><span style={{ display: 'inline-block', padding: '1px 8px', borderRadius: '4px', fontSize: '11px', fontWeight: 700, background: '#e0f2f1', color: '#00695c', marginRight: '6px' }}>Required</span> core Stream platform</td>
-                                    <td><span style={{ display: 'inline-block', padding: '1px 8px', borderRadius: '4px', fontSize: '11px', fontWeight: 700, background: '#e0f2f1', color: '#00695c', marginRight: '6px' }}>Required</span> decodes Cisco IPFIX templates</td>
+                                    <td className="csc-sc4s-info-table-label scan-nf-td-border">IOS-XE Devices</td>
+                                    <td><span className="scan-nf-badge-req">Required</span> core Stream platform</td>
+                                    <td><span className="scan-nf-badge-req">Required</span> decodes Cisco IPFIX templates</td>
                                 </tr>
                                 <tr style={{ fontSize: '12px' }}>
                                     <td style={{ paddingLeft: '20px', border: 'none', paddingTop: 0, borderLeft: '3px solid transparent' }}></td>
                                     <td colSpan="2" style={{ border: 'none', paddingTop: 0 }}><em>Catalyst SD-WAN, ISR, ASR, WLC, Catalyst Switches</em></td>
                                 </tr>
                                 <tr>
-                                    <td className="csc-sc4s-info-table-label" style={{ borderLeft: '3px solid #00897b' }}>NX-OS &amp; ACI Fabric</td>
-                                    <td><span style={{ display: 'inline-block', padding: '1px 8px', borderRadius: '4px', fontSize: '11px', fontWeight: 700, background: '#e0f2f1', color: '#00695c', marginRight: '6px' }}>Required</span> core Stream platform</td>
-                                    <td><span style={{ display: 'inline-block', padding: '1px 8px', borderRadius: '4px', fontSize: '11px', fontWeight: 700, background: '#eceff1', color: '#607d8b', marginRight: '6px' }}>Not needed</span> standard NetFlow v9</td>
+                                    <td className="csc-sc4s-info-table-label scan-nf-td-border">NX-OS &amp; ACI Fabric</td>
+                                    <td><span className="scan-nf-badge-req">Required</span> core Stream platform</td>
+                                    <td><span className="scan-nf-badge-na">Not needed</span> standard NetFlow v9</td>
                                 </tr>
                                 <tr style={{ fontSize: '12px' }}>
                                     <td style={{ paddingLeft: '20px', border: 'none', paddingTop: 0, borderLeft: '3px solid transparent' }}></td>
                                     <td colSpan="2" style={{ border: 'none', paddingTop: 0 }}><em>Nexus switches (standalone NX-OS) and ACI leaf/spine fabric (NetFlow v9 via APIC policy, ACI 4.1+)</em></td>
                                 </tr>
                                 <tr>
-                                    <td className="csc-sc4s-info-table-label" style={{ borderLeft: '3px solid #1565c0' }}>IOS-XR Devices</td>
-                                    <td><span style={{ display: 'inline-block', padding: '1px 8px', borderRadius: '4px', fontSize: '11px', fontWeight: 700, background: '#e0f2f1', color: '#00695c', marginRight: '6px' }}>Required</span> core Stream platform</td>
-                                    <td><span style={{ display: 'inline-block', padding: '1px 8px', borderRadius: '4px', fontSize: '11px', fontWeight: 700, background: '#e3f2fd', color: '#1565c0', marginRight: '6px' }}>Optional</span> may enhance IPFIX decoding</td>
+                                    <td className="csc-sc4s-info-table-label scan-nf-td-border-xr">IOS-XR Devices</td>
+                                    <td><span className="scan-nf-badge-req">Required</span> core Stream platform</td>
+                                    <td><span className="scan-nf-badge-opt">Optional</span> may enhance IPFIX decoding</td>
                                 </tr>
                                 <tr style={{ fontSize: '12px' }}>
                                     <td style={{ paddingLeft: '20px', border: 'none', paddingTop: 0, borderLeft: '3px solid transparent' }}></td>
                                     <td colSpan="2" style={{ border: 'none', paddingTop: 0 }}><em>CRS carrier routers, ASR 9000 (IPFIX-capable)</em></td>
                                 </tr>
                                 <tr>
-                                    <td className="csc-sc4s-info-table-label" style={{ borderLeft: '3px solid #546e7a' }}>Meraki</td>
-                                    <td><span style={{ display: 'inline-block', padding: '1px 8px', borderRadius: '4px', fontSize: '11px', fontWeight: 700, background: '#e0f2f1', color: '#00695c', marginRight: '6px' }}>Required</span> core Stream platform</td>
-                                    <td><span style={{ display: 'inline-block', padding: '1px 8px', borderRadius: '4px', fontSize: '11px', fontWeight: 700, background: '#eceff1', color: '#607d8b', marginRight: '6px' }}>Not needed</span> standard NetFlow v9</td>
+                                    <td className="csc-sc4s-info-table-label scan-nf-td-border-meraki">Meraki</td>
+                                    <td><span className="scan-nf-badge-req">Required</span> core Stream platform</td>
+                                    <td><span className="scan-nf-badge-na">Not needed</span> standard NetFlow v9</td>
                                 </tr>
                                 <tr style={{ fontSize: '12px' }}>
                                     <td style={{ paddingLeft: '20px', border: 'none', paddingTop: 0, borderLeft: '3px solid transparent' }}></td>
@@ -1254,7 +1404,7 @@ function NetFlowInfoModal({ open, onClose, installedApps }) {
                     </div>
 
                     <div className="csc-sc4s-info-footer">
-                        <a href="https://help.splunk.com/en/splunk-cloud-platform/collect-stream-data/install-and-configure-splunk-stream/8.1/introduction/about-splunk-stream" target="_blank" rel="noopener noreferrer" className="csc-sc4s-info-link">
+                        <a href="https://help.splunk.com/en/splunk-cloud-platform/collect-stream-data/install-and-configure-splunk-stream/8.1/introduction/about-splunk-stream" target="_blank" rel="noopener noreferrer" className="csc-sc4s-info-link csc-sc4s-info-link-gh">
                             Splunk Stream Documentation
                         </a>
                         <a href="https://www.cisco.com/c/en/us/solutions/collateral/enterprise-networks/sd-wan/sd-wan-splunk-integration-ug.html" target="_blank" rel="noopener noreferrer" className="csc-sc4s-info-link csc-sc4s-info-link-gh">
@@ -1267,6 +1417,7 @@ function NetFlowInfoModal({ open, onClose, installedApps }) {
                 </div>
             </Modal.Body>
             <Modal.Footer>
+                <CopyModalButton />
                 <Button appearance="secondary" label="Close" onClick={onClose} />
             </Modal.Footer>
         </Modal>
@@ -1830,13 +1981,13 @@ function MagicEightModal({ open, onClose, sourcetypes, productName, addonApp, ad
                                     <tbody>
                                         {tierRows.map(r => {
                                             const stateStyle = {
-                                                ok: { color: '#3D851C', label: 'Matched' },
-                                                mismatch: { color: '#FF9000', label: 'Version Mismatch' },
-                                                missing: { color: '#c07600', label: 'Not on Indexers' },
-                                                disabled: { color: '#d32f2f', label: 'Disabled on IDX' },
-                                                standalone: { color: '#78909c', label: 'Standalone' },
-                                                loading: { color: '#78909c', label: 'Checking…' },
-                                            }[r.state] || { color: '#999', label: '—' };
+                                                ok: { cls: 'scan-m8-state-ok', label: 'Matched' },
+                                                mismatch: { cls: 'scan-m8-state-mismatch', label: 'Version Mismatch' },
+                                                missing: { cls: 'scan-m8-state-missing', label: 'Not on Indexers' },
+                                                disabled: { cls: 'scan-m8-state-disabled', label: 'Disabled on IDX' },
+                                                standalone: { cls: 'scan-m8-state-standalone', label: 'Standalone' },
+                                                loading: { cls: 'scan-m8-state-standalone', label: 'Checking…' },
+                                            }[r.state] || { cls: 'scan-m8-state-standalone', label: '—' };
                                             return (
                                                 <tr key={r.id} style={{ borderBottom: '1px solid var(--border-light, #E1E6EB)' }}>
                                                     <td style={{ padding: '4px 8px 4px 0', color: 'var(--text-primary, #1a2029)' }}>
@@ -1848,17 +1999,17 @@ function MagicEightModal({ open, onClose, sourcetypes, productName, addonApp, ad
                                                     </td>
                                                     <td style={{ padding: '4px 8px' }}>
                                                         {r.state === 'standalone' ? (
-                                                            <span style={{ color: '#78909c', fontStyle: 'italic' }}>N/A</span>
+                                                            <span className="scan-m8-muted">N/A</span>
                                                         ) : r.state === 'loading' ? (
-                                                            <span style={{ color: '#78909c', fontStyle: 'italic' }}>…</span>
+                                                            <span className="scan-m8-muted">…</span>
                                                         ) : r.state === 'missing' ? (
-                                                            <span style={{ color: '#c07600', fontStyle: 'italic' }}>Not installed</span>
+                                                            <span className="scan-m8-warn">Not installed</span>
                                                         ) : (
-                                                            <code style={{ fontSize: '11px', padding: '1px 6px', background: 'var(--bg-surface, #eef1f4)', borderRadius: '3px', color: r.state === 'mismatch' ? '#FF9000' : undefined }}>{r.idxVer || '—'}</code>
+                                                            <code className={r.state === 'mismatch' ? 'scan-m8-state-mismatch' : ''} style={{ fontSize: '11px', padding: '1px 6px', background: 'var(--bg-surface, #eef1f4)', borderRadius: '3px' }}>{r.idxVer || '—'}</code>
                                                         )}
                                                     </td>
                                                     <td style={{ padding: '4px 8px' }}>
-                                                        <span style={{ fontSize: '11px', fontWeight: 600, color: stateStyle.color }}>{stateStyle.label}</span>
+                                                        <span className={stateStyle.cls} style={{ fontSize: '11px', fontWeight: 600 }}>{stateStyle.label}</span>
                                                     </td>
                                                 </tr>
                                             );
@@ -1984,7 +2135,7 @@ function MagicEightModal({ open, onClose, sourcetypes, productName, addonApp, ad
                                         <div style={{ fontSize: '13px', lineHeight: 1.65 }}>
                                             <p style={{ margin: '0 0 10px' }}>{m.detail}</p>
                                             {m.gotcha && (
-                                                <p style={{ margin: '0 0 8px', padding: '8px 12px', background: 'rgba(255,144,0,0.05)', borderLeft: '2px solid #FF9000', borderRadius: '4px', fontSize: '12px' }}>
+                                                <p className="scan-tooltip-gotcha" style={{ margin: '0 0 8px', padding: '8px 12px', borderRadius: '4px', fontSize: '12px' }}>
                                                     <strong>Gotcha:</strong> {m.gotcha}
                                                 </p>
                                             )}
@@ -2029,7 +2180,7 @@ function MagicEightModal({ open, onClose, sourcetypes, productName, addonApp, ad
                                     The two biggest contributors are SHOULD_LINEMERGE (disabling the aggregator's 4-regex heuristic cycle)
                                     and TIME_FORMAT (eliminating the datetime.xml keyring scan). These savings are cumulative — each
                                     setting you define removes an entire phase of guesswork from the indexing pipeline.</p>
-                                    <p style={{ fontSize: '11px', color: '#6b7280', marginTop: 6 }}>
+                                    <p className="scan-m8-subtle" style={{ fontSize: '11px', marginTop: 6 }}>
                                         Source: <em>"The Importance of Being Earnest/Propped"</em> — Splunk Professional Services
                                     </p>
                                 </div>
@@ -2099,7 +2250,7 @@ function MagicEightModal({ open, onClose, sourcetypes, productName, addonApp, ad
                 </div>
                 </div>
                 {/* Footer */}
-                <div style={{
+                <div className="scan-drm-footer" style={{
                     display: 'flex', alignItems: 'center', justifyContent: 'flex-end', gap: '8px',
                     padding: '12px 20px', borderTop: '1px solid var(--border-light, #E1E6EB)',
                     background: 'var(--bg-surface, #f8f9fb)', borderRadius: '0 0 8px 8px',
@@ -2200,7 +2351,7 @@ function SOARInfoModal({ open, onClose, soarConnectorUids, splunkbaseData, produ
                                                         View on Splunkbase
                                                     </a>
                                                 ) : (
-                                                    <span style={{ color: '#999', fontSize: '12px' }}>—</span>
+                                                    <span className="scan-m8-dash">—</span>
                                                 )}
                                             </td>
                                         </tr>
@@ -2248,6 +2399,7 @@ function SOARInfoModal({ open, onClose, soarConnectorUids, splunkbaseData, produ
                 </div>
             </Modal.Body>
             <Modal.Footer>
+                <CopyModalButton />
                 <Button appearance="secondary" label="Close" onClick={onClose} />
             </Modal.Footer>
         </Modal>
@@ -2412,6 +2564,7 @@ function ITSIInfoModal({ open, onClose, itsiContentPack, productName }) {
                 </div>
             </Modal.Body>
             <Modal.Footer>
+                <CopyModalButton />
                 <Button appearance="secondary" label="Close" onClick={onClose} />
             </Modal.Footer>
         </Modal>
@@ -2598,6 +2751,7 @@ function ESInfoModal({ open, onClose, productName, cimDataModels, escuStories, e
                 </div>
             </Modal.Body>
             <Modal.Footer>
+                <CopyModalButton />
                 <Button appearance="secondary" label="Close" onClick={onClose} />
             </Modal.Footer>
         </Modal>
@@ -2893,7 +3047,7 @@ function FeedbackModal({ open, onClose }) {
                 <Button appearance="secondary" label="Cancel" onClick={onClose} />
                 {submitting
                     ? <WaitSpinner size="medium" />
-                    : <Button appearance="primary" label="Submit Feedback" onClick={handleSubmit} />
+                    : <Button appearance="primary" className="scan-btn-primary" label="Submit Feedback" onClick={handleSubmit} />
                 }
             </Modal.Footer>
         </Modal>
@@ -3019,7 +3173,7 @@ function InfoTooltip({ placement = 'bottom', width = 500, delay = 400, content, 
                                     className="scan-tooltip-drag"
                                     onMouseDown={handleDragStart}
                                     title="Drag to move"
-                                    style={{ cursor: isDragging ? 'grabbing' : 'grab', fontSize: '18px', color: '#b0b0b0', userSelect: 'none' }}
+                                    style={{ cursor: isDragging ? 'grabbing' : 'grab', fontSize: '18px', userSelect: 'none' }}
                                 >
                                     ⠿
                                 </span>
@@ -3045,6 +3199,241 @@ function InfoTooltip({ placement = 'bottom', width = 500, delay = 400, content, 
 }
 
 // CardInfoPopover removed — now using InfoTooltip portal popup instead
+
+// ────────────────────────  CUSTOMER SUMMARY COPY  ────────────
+// Generates a plain-text summary for a product card that an engineer
+// can paste into an email, ticket, or chat for a customer.
+
+function copyRichToClipboard(html, plainText, onSuccess) {
+    if (typeof ClipboardItem !== 'undefined' && navigator.clipboard?.write) {
+        const item = new ClipboardItem({
+            'text/html': new Blob([html], { type: 'text/html' }),
+            'text/plain': new Blob([plainText], { type: 'text/plain' }),
+        });
+        navigator.clipboard.write([item]).then(onSuccess).catch(() => {
+            fallbackCopyHtml(html, onSuccess);
+        });
+    } else {
+        fallbackCopyHtml(html, onSuccess);
+    }
+}
+
+function fallbackCopyHtml(html, onSuccess) {
+    const el = document.createElement('div');
+    el.innerHTML = html;
+    el.style.position = 'fixed';
+    el.style.left = '-9999px';
+    el.style.whiteSpace = 'pre-wrap';
+    document.body.appendChild(el);
+    const range = document.createRange();
+    range.selectNodeContents(el);
+    const sel = window.getSelection();
+    sel.removeAllRanges();
+    sel.addRange(range);
+    try { document.execCommand('copy'); onSuccess(); }
+    catch (_) { /* best-effort */ }
+    sel.removeAllRanges();
+    document.body.removeChild(el);
+}
+
+function esc(s) { return String(s == null ? '' : s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;'); }
+function sbLink(uid, label) {
+    const url = `https://splunkbase.splunk.com/app/${uid}`;
+    return { url, html: `<a href="${url}">${esc(label || uid)}</a>`, text: label || uid };
+}
+
+function generateCustomerSummary(product, splunkbaseData) {
+    const plain = [];
+    const html = [];
+    const divider = '─'.repeat(50);
+    const dn = product.display_name || product.product_id;
+    const CODE_CSS = 'background:#f4f4f4;border:1px solid #ddd;border-radius:3px;padding:1px 5px;font-family:Menlo,Consolas,monospace;font-size:12px;color:#333;';
+
+    html.push(`<div style="font-family:-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;font-size:13px;color:#1a1a1a;line-height:1.5;background:#ffffff;">`);
+    html.push(`<h2 style="margin:0 0 4px;font-size:16px;color:#003366;">${esc(dn)}</h2>`);
+    plain.push(dn);
+    plain.push(divider);
+
+    if (product.tagline) {
+        html.push(`<p style="margin:0 0 6px;font-style:italic;color:#555;">${esc(product.tagline)}</p>`);
+        plain.push(product.tagline);
+    }
+    if (product.description) {
+        html.push(`<p style="margin:0 0 10px;">${esc(product.description)}</p>`);
+        plain.push(product.description);
+    }
+    plain.push('');
+
+    const apps = [];
+    if (product.addon) {
+        apps.push({ label: product.addon_label || product.addon, uid: product.addon_splunkbase_uid, type: 'Add-on' });
+    }
+    if (product.app_viz) {
+        apps.push({ label: product.app_viz_label || product.app_viz, uid: product.app_viz_splunkbase_uid, type: 'App' });
+    }
+    if (product.app_viz_2) {
+        apps.push({ label: product.app_viz_2_label || product.app_viz_2, uid: product.app_viz_2_splunkbase_uid, type: 'App' });
+    }
+    if (product.sc4s_search_head_ta) {
+        apps.push({ label: product.sc4s_search_head_ta_label || product.sc4s_search_head_ta, uid: product.sc4s_search_head_ta_splunkbase_id, type: 'Search Head TA (SC4S)' });
+    }
+
+    if (apps.length > 0) {
+        html.push(`<h3 style="margin:12px 0 4px;font-size:13px;color:#003366;">Required Apps &amp; Add-ons</h3><ul style="margin:0 0 8px;padding-left:20px;">`);
+        plain.push('REQUIRED APPS & ADD-ONS');
+        apps.forEach(a => {
+            if (a.uid) {
+                const sb = sbLink(a.uid, `${a.label} (${a.type})`);
+                html.push(`<li>${sb.html}</li>`);
+                plain.push(`  • ${a.label} (${a.type})\n    ${sb.url}`);
+            } else {
+                html.push(`<li>${esc(a.label)} (${esc(a.type)})</li>`);
+                plain.push(`  • ${a.label} (${a.type})`);
+            }
+        });
+        html.push(`</ul>`);
+        plain.push('');
+    }
+
+    if (product.sc4s_supported) {
+        html.push(`<h3 style="margin:12px 0 4px;font-size:13px;color:#003366;">Syslog Collection (SC4S)</h3>`);
+        html.push(`<p style="margin:0 0 4px;">Splunk Connect for Syslog (SC4S) is supported. <a href="https://splunkbase.splunk.com/app/4740">SC4S on Splunkbase</a></p>`);
+        plain.push('SYSLOG COLLECTION (SC4S)');
+        plain.push('  Splunk Connect for Syslog (SC4S) is supported for this product.');
+        plain.push('  SC4S on Splunkbase: https://splunkbase.splunk.com/app/4740');
+        if (product.sc4s_url) {
+            html.push(`<p style="margin:0 0 4px;"><a href="${esc(product.sc4s_url)}">SC4S Documentation</a></p>`);
+            plain.push(`  SC4S documentation: ${product.sc4s_url}`);
+        }
+        if (product.sc4s_sourcetypes && product.sc4s_sourcetypes.length > 0) {
+            html.push(`<p style="margin:0 0 4px;">Sourcetypes: <code style="${CODE_CSS}">${product.sc4s_sourcetypes.map(esc).join(`</code>, <code style="${CODE_CSS}">`)}</code></p>`);
+            plain.push(`  Sourcetypes: ${product.sc4s_sourcetypes.join(', ')}`);
+        }
+        if (product.sc4s_config_notes) {
+            html.push(`<p style="margin:0 0 8px;color:#666;"><em>Note: ${esc(product.sc4s_config_notes)}</em></p>`);
+            plain.push(`  Note: ${product.sc4s_config_notes}`);
+        }
+        plain.push('');
+    }
+
+    if (product.netflow_supported) {
+        html.push(`<h3 style="margin:12px 0 4px;font-size:13px;color:#003366;">NetFlow / Splunk Stream</h3><ul style="margin:0 0 8px;padding-left:20px;">`);
+        plain.push('NETFLOW / SPLUNK STREAM');
+        if (product.netflow_addon) {
+            const nfUid = product.netflow_addon_splunkbase_id;
+            const nfLabel = product.netflow_addon_label || product.netflow_addon;
+            if (nfUid) {
+                const sb = sbLink(nfUid, nfLabel);
+                html.push(`<li>${sb.html}</li>`);
+                plain.push(`  • ${nfLabel} — ${sb.url}`);
+            } else {
+                html.push(`<li>${esc(nfLabel)}</li>`);
+                plain.push(`  • ${nfLabel}`);
+            }
+        }
+        html.push(`</ul>`);
+        if (product.netflow_sourcetypes && product.netflow_sourcetypes.length > 0) {
+            html.push(`<p style="margin:0 0 4px;">Sourcetypes: <code style="${CODE_CSS}">${product.netflow_sourcetypes.map(esc).join(`</code>, <code style="${CODE_CSS}">`)}</code></p>`);
+            plain.push(`  Sourcetypes: ${product.netflow_sourcetypes.join(', ')}`);
+        }
+        if (product.netflow_config_notes) {
+            html.push(`<p style="margin:0 0 8px;color:#666;"><em>Note: ${esc(product.netflow_config_notes)}</em></p>`);
+            plain.push(`  Note: ${product.netflow_config_notes}`);
+        }
+        plain.push('');
+    }
+
+    if (product.es_compatible) {
+        html.push(`<h3 style="margin:12px 0 4px;font-size:13px;color:#003366;">Splunk Enterprise Security (ES)</h3>`);
+        plain.push('SPLUNK ENTERPRISE SECURITY (ES)');
+        if (product.es_cim_data_models && product.es_cim_data_models.length > 0) {
+            html.push(`<p style="margin:0 0 4px;">CIM Data Models: ${product.es_cim_data_models.map(esc).join(', ')}</p>`);
+            plain.push(`  CIM Data Models: ${product.es_cim_data_models.join(', ')}`);
+        }
+        if (product.escu_analytic_stories && product.escu_analytic_stories.length > 0) {
+            html.push(`<p style="margin:0 0 4px;">ESCU Analytic Stories: ${product.escu_analytic_stories.map(esc).join(', ')}</p>`);
+            plain.push(`  ESCU Analytic Stories: ${product.escu_analytic_stories.join(', ')}`);
+        }
+        if (product.escu_detection_count) {
+            html.push(`<p style="margin:0 0 8px;">ESCU Detections: ${esc(String(product.escu_detection_count))}</p>`);
+            plain.push(`  ESCU Detections: ${product.escu_detection_count}`);
+        }
+        plain.push('');
+    }
+
+    if (product.soar_connector_uids && product.soar_connector_uids.length > 0) {
+        html.push(`<h3 style="margin:12px 0 4px;font-size:13px;color:#003366;">Splunk SOAR</h3><ul style="margin:0 0 8px;padding-left:20px;">`);
+        plain.push('SPLUNK SOAR');
+        plain.push('  SOAR connector(s) available on Splunkbase:');
+        product.soar_connector_uids.forEach(uid => {
+            const sbData = splunkbaseData && splunkbaseData[uid];
+            const name = sbData ? (sbData.title || sbData.appid || `Connector ${uid}`) : `Connector ${uid}`;
+            const sb = sbLink(uid, name);
+            html.push(`<li>${sb.html}</li>`);
+            plain.push(`  • ${name}\n    ${sb.url}`);
+        });
+        html.push(`</ul>`);
+        plain.push('');
+    }
+
+    if (product.itsi_content_pack) {
+        html.push(`<h3 style="margin:12px 0 4px;font-size:13px;color:#003366;">Splunk ITSI</h3>`);
+        html.push(`<p style="margin:0 0 8px;">Content Pack: ${esc(product.itsi_content_pack)}</p>`);
+        plain.push('SPLUNK ITSI');
+        plain.push(`  Content Pack: ${product.itsi_content_pack}`);
+        plain.push('');
+    }
+
+    if (product.sourcetypes && product.sourcetypes.length > 0) {
+        html.push(`<h3 style="margin:12px 0 4px;font-size:13px;color:#003366;">Sourcetypes</h3>`);
+        html.push(`<p style="margin:0 0 8px;"><code style="${CODE_CSS}">${product.sourcetypes.map(esc).join(`</code>, <code style="${CODE_CSS}">`)}</code></p>`);
+        plain.push('SOURCETYPES');
+        product.sourcetypes.forEach(st => plain.push(`  • ${st}`));
+        plain.push('');
+    }
+
+    const docs = [];
+    if (product.learn_more_url) docs.push({ label: 'Product page', url: product.learn_more_url });
+    if (product.addon_docs_url) docs.push({ label: 'Add-on documentation', url: product.addon_docs_url });
+    if (product.addon_troubleshoot_url) docs.push({ label: 'Add-on troubleshooting', url: product.addon_troubleshoot_url });
+    if (product.app_viz_docs_url) docs.push({ label: 'App documentation', url: product.app_viz_docs_url });
+    if (product.app_viz_troubleshoot_url) docs.push({ label: 'App troubleshooting', url: product.app_viz_troubleshoot_url });
+    if (product.sc4s_url) docs.push({ label: 'SC4S documentation', url: product.sc4s_url });
+    if (product.stream_docs_url) docs.push({ label: 'Splunk Stream documentation', url: product.stream_docs_url });
+    if (product.netflow_addon_docs_url) docs.push({ label: 'NetFlow add-on docs', url: product.netflow_addon_docs_url });
+
+    if (docs.length > 0) {
+        html.push(`<h3 style="margin:12px 0 4px;font-size:13px;color:#003366;">Documentation &amp; Links</h3><ul style="margin:0 0 8px;padding-left:20px;">`);
+        plain.push('DOCUMENTATION & LINKS');
+        docs.forEach(d => {
+            html.push(`<li><a href="${esc(d.url)}">${esc(d.label)}</a></li>`);
+            plain.push(`  • ${d.label}: ${d.url}`);
+        });
+        html.push(`</ul>`);
+        plain.push('');
+    }
+
+    const SUPPORT_LABELS = {
+        cisco_supported: 'Cisco Supported',
+        splunk_supported: 'Splunk Supported',
+        developer_supported: 'Developer Supported',
+        community_supported: 'Community Supported',
+        not_supported: 'Not Officially Supported',
+    };
+    if (product.support_level) {
+        const sl = SUPPORT_LABELS[product.support_level] || product.support_level;
+        html.push(`<p style="margin:8px 0 4px;"><strong>Support:</strong> ${esc(sl)}</p>`);
+        plain.push(`Support: ${sl}`);
+    }
+
+    html.push(`<hr style="border:none;border-top:1px solid #ccc;margin:10px 0 6px;" />`);
+    html.push(`<p style="margin:0;font-size:11px;color:#888;">Generated by Splunk Cisco App Navigator (SCAN)</p>`);
+    html.push(`</div>`);
+    plain.push(divider);
+    plain.push('Generated by Splunk Cisco App Navigator (SCAN)');
+
+    return { text: plain.join('\n'), html: html.join('') };
+}
 
 // ────────────────────────  PRODUCT CARD  ─────────────────────
 // Renders one product: icon, name, links, support bar (bottom), install/configure actions.
@@ -3127,6 +3516,7 @@ function ProductCard({ product, installedApps, appStatuses, indexerApps, sourcet
     const [customDashInput, setCustomDashInput] = useState(product.custom_dashboard || '');
     const [customDashSaving, setCustomDashSaving] = useState(false);
     const [customDashMsg, setCustomDashMsg] = useState(null);
+    const [copiedSummary, setCopiedSummary] = useState(false);
     const launchBtnRef = useRef(null);
     const launchMenuRef = useRef(null);
 
@@ -3193,6 +3583,14 @@ function ProductCard({ product, installedApps, appStatuses, indexerApps, sourcet
             setCustomDashSaving(false);
         }
     };
+
+    const handleCopySummary = useCallback(() => {
+        const { text, html } = generateCustomerSummary(product, splunkbaseData);
+        copyRichToClipboard(html, text, () => {
+            setCopiedSummary(true);
+            setTimeout(() => setCopiedSummary(false), 2000);
+        });
+    }, [product, splunkbaseData]);
 
     const isInstalled = appStatus?.installed || vizAppStatus?.installed || vizApp2Status?.installed;
     const hasItsi = !!itsi_content_pack;
@@ -3532,7 +3930,7 @@ function ProductCard({ product, installedApps, appStatuses, indexerApps, sourcet
                                 {sc4s_sourcetypes && sc4s_sourcetypes.length > 0 && (
                                     <div className="scan-sc4s-primary-sts">
                                         <span className="csc-dep-label" style={{ fontSize: '10px' }}>SC4S Sourcetypes</span>
-                                        <span style={{ fontSize: '11px', color: '#6b7280', fontFamily: 'monospace' }}>{sc4s_sourcetypes.join(', ')}</span>
+                                        <span className="scan-sc4s-st-list">{sc4s_sourcetypes.join(', ')}</span>
                                     </div>
                                 )}
                                 </>
@@ -4086,6 +4484,16 @@ function ProductCard({ product, installedApps, appStatuses, indexerApps, sourcet
                         <QuestionCircle size={16} />
                     </button>
                 )}
+                {/* Copy customer summary to clipboard */}
+                {!isComingSoon && (
+                    <button className={`csc-btn csc-btn-icon csc-btn-outline ${copiedSummary ? 'csc-btn-copied' : ''}`}
+                        onClick={handleCopySummary}
+                        title={copiedSummary ? 'Copied to clipboard!' : `Copy ${display_name} summary for customer`}>
+                        {copiedSummary
+                            ? <span style={{ fontSize: '13px', fontWeight: 600 }}>✓</span>
+                            : <Clipboard size={16} />}
+                    </button>
+                )}
                 {/* Remove */}
                 {!isComingSoon && isConfigured && (
                     <button className="csc-btn csc-btn-icon csc-btn-outline" onClick={() => onToggleConfigured(product_id)}
@@ -4146,7 +4554,7 @@ function ProductCard({ product, installedApps, appStatuses, indexerApps, sourcet
                         <Button appearance="secondary" label="Cancel" onClick={() => { setCustomDashModalOpen(false); setCustomDashMsg(null); }} />
                         {customDashSaving
                             ? <WaitSpinner size="medium" />
-                            : <Button appearance="primary" label="Save" onClick={handleSaveCustomDashboard} />
+                            : <Button appearance="primary" className="scan-btn-primary" label="Save" onClick={handleSaveCustomDashboard} />
                         }
                     </Modal.Footer>
                 </Modal>
@@ -4752,7 +5160,7 @@ const KNOWN_LATEST_VERSIONS = {
     'react-dom': '18.3.1',
     'styled-components': '6.1.14',
     // Build tools (from npmjs.com)
-    '@babel/core': '7.26.9',
+    '@babel/core': '7.29.0',
     'babel-loader': '9.2.1',
     'webpack': '5.98.0',
     'webpack-cli': '6.0.1',
@@ -4773,7 +5181,16 @@ const PYTHON_LIBRARY_VERSIONS = {
     'requests': '2.31.0',               // ships with Splunk Python
 };
 
-const LATEST_VERSIONS_CHECKED = '2026-03-05';
+const LATEST_VERSIONS_CHECKED = '2026-03-17';
+
+const HOLD_REASONS = {
+    'styled-components': 'Held at v5 — @splunk/react-ui peer dependency does not support v6 yet',
+    'eslint': 'Held at v7 — upgrading to v9 requires migrating to flat config (eslint.config.js)',
+    'webpack-cli': 'Held at v5 — v6 is a major rewrite with breaking CLI changes',
+    'webpack-merge': 'Held at v5 — v6 drops legacy merge strategies used by @splunk/webpack-configs',
+    'copy-webpack-plugin': 'Held at v11 — v13 requires Webpack 5.88+ API changes not yet validated',
+    'requests': 'Managed by Splunk — bundled with the Splunk Python runtime, not upgradable independently',
+};
 
 /** Compare two semver strings. Returns -1 (behind), 0 (match), 1+ (ahead) */
 function compareSemver(current, latest) {
@@ -4803,6 +5220,7 @@ function TechStackModal({ open, onClose }) {
         const entry = { name, current: version };
         entry.latest = KNOWN_LATEST_VERSIONS[name] || null;
         entry.cmp = entry.latest ? compareSemver(version, entry.latest) : 0;
+        entry.hold = HOLD_REASONS[name] || null;
         if (name.startsWith('@splunk/')) {
             splunkDeps.push(entry);
         } else if (['react', 'react-dom', 'styled-components'].includes(name)) {
@@ -4818,6 +5236,7 @@ function TechStackModal({ open, onClose }) {
         const entry = { name, current: version };
         entry.latest = KNOWN_LATEST_VERSIONS[name] || null;
         entry.cmp = entry.latest ? compareSemver(version, entry.latest) : 0;
+        entry.hold = HOLD_REASONS[name] || null;
         pythonDeps.push(entry);
     });
 
@@ -4839,7 +5258,8 @@ function TechStackModal({ open, onClose }) {
             lines.push(`## ${title}`);
             arr.forEach(d => {
                 const status = d.latest ? (d.cmp < 0 ? 'OUTDATED' : d.cmp > 0 ? 'AHEAD' : 'CURRENT') : '';
-                lines.push(`  ${d.name}: ${d.current}${d.latest ? ` → latest ${d.latest} ${status}` : ''}`);
+                const hold = d.hold ? ` [${d.hold}]` : '';
+                lines.push(`  ${d.name}: ${d.current}${d.latest ? ` → latest ${d.latest} ${status}` : ''}${hold}`);
             });
             lines.push('');
         };
@@ -4868,6 +5288,7 @@ function TechStackModal({ open, onClose }) {
                 <td className="scan-ts-version">{d.current}</td>
                 <td className="scan-ts-latest">{d.latest || '—'}</td>
                 <td className="scan-ts-status">{statusIcon}</td>
+                <td className="scan-ts-note">{d.hold || ''}</td>
             </tr>
         );
     };
@@ -4883,6 +5304,7 @@ function TechStackModal({ open, onClose }) {
                             <th>Current</th>
                             <th>Latest</th>
                             <th>Status</th>
+                            <th>Note</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -4894,7 +5316,7 @@ function TechStackModal({ open, onClose }) {
     );
 
     return (
-        <Modal open returnFocus={returnFocusRef} onRequestClose={onClose} style={{ maxWidth: '720px', width: '90vw' }}>
+        <Modal open returnFocus={returnFocusRef} onRequestClose={onClose} style={{ maxWidth: '860px', width: '92vw' }}>
             <Modal.Header title="Tech Stack — Developer Mode" />
             <Modal.Body>
                 <div className="scan-ts-summary">
@@ -4952,10 +5374,10 @@ function UniversalFinderBar({ onSearch, resultCount, totalCount, products, exter
         if (!q) return 0;
         return (products || []).filter((p) => {
             const kws = (p.keywords || []).map((k) => k.toLowerCase());
-            if (kws.some((k) => k.includes(q) || q.includes(k))) return true;
+            if (kws.some((k) => k === q || k.includes(q))) return true;
             const als = (p.aliases || []).map((a) => a.toLowerCase());
             if (als.some((a) => a.includes(q) || q.includes(a))) return true;
-            return `${p.display_name} ${p.tagline} ${p.description} ${p.vendor} ${p.product_id}`.toLowerCase().includes(q);
+            return `${p.display_name} ${p.tagline} ${p.vendor} ${p.product_id}`.toLowerCase().includes(q);
         }).length;
     }, [products]);
 
@@ -5097,6 +5519,7 @@ function FilterDrawer({
     appidToUidMap,
     onResetAll,
     showVault, onToggleShowVault, vaultCount,
+    showInternalContent, devMode,
 }) {
     const [versionExpanded, setVersionExpanded] = useState(false);
 
@@ -5206,10 +5629,10 @@ function FilterDrawer({
         return sortVersionsDesc([...cardVersions]);
     })();
 
-    /* Addon (Powered By) groups — derived from full product list so the
-       section never vanishes when a category/search filter narrows the view */
+    /* Addon (Powered By) groups — derived from the pre-addon filtered list
+       so counts reflect the current category/search/platform filters */
     const addonGroups = useMemo(() => {
-        const src = products || [];
+        const src = preAddonProducts || [];
         const map = {};
         let standalone = 0;
         let sc4sOnly = 0;
@@ -5226,10 +5649,10 @@ function FilterDrawer({
         if (sc4sOnly > 0) entries.push(['__sc4s__', { label: 'SC4S Only', count: sc4sOnly }]);
         if (standalone > 0) entries.push(['__standalone__', { label: 'Standalone', count: standalone }]);
         return entries;
-    }, [products]);
+    }, [preAddonProducts]);
 
     const isCrossCutting = (cat) => ['soar', 'alert_actions', 'secure_networking', 'ai_powered', 'es', 'itsi', 'sc4s', 'netflow'].includes(cat);
-    const addonTotal = (products || []).length;
+    const addonTotal = (preAddonProducts || []).length;
 
     return (
         <>
@@ -5413,20 +5836,22 @@ function FilterDrawer({
                                 </div>
                                 <span className="scan-drawer-vis-count">{deprecatedCount}</span>
                             </button>
-                            <button
-                                className={`scan-drawer-vis-item ${showComingSoon ? 'scan-drawer-vis-on' : 'scan-drawer-vis-off'}`}
-                                onClick={() => onToggleShowComingSoon(!showComingSoon)}
-                                title={showComingSoon ? 'Coming Soon products are shown — click to hide' : 'Coming Soon products are hidden — click to show'}
-                            >
-                                <div className="scan-drawer-vis-left">
-                                    <div className="scan-drawer-vis-icon" style={{ background: '#dbeafe' }}>
-                                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#2563eb" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M4.5 16.5c-1.5 1.26-2 5-2 5s3.74-.5 5-2c.71-.84.7-2.13-.09-2.91a2.18 2.18 0 00-2.91-.09z"/><path d="M12 15l-3-3a22 22 0 012-3.95A12.88 12.88 0 0122 2c0 2.72-.78 7.5-6 11a22.35 22.35 0 01-4 2z"/></svg>
+                            {showInternalContent && (
+                                <button
+                                    className={`scan-drawer-vis-item ${showComingSoon ? 'scan-drawer-vis-on' : 'scan-drawer-vis-off'}`}
+                                    onClick={() => onToggleShowComingSoon(!showComingSoon)}
+                                    title={showComingSoon ? 'Coming Soon products are shown — click to hide' : 'Coming Soon products are hidden — click to show'}
+                                >
+                                    <div className="scan-drawer-vis-left">
+                                        <div className="scan-drawer-vis-icon" style={{ background: '#dbeafe' }}>
+                                            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#2563eb" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M4.5 16.5c-1.5 1.26-2 5-2 5s3.74-.5 5-2c.71-.84.7-2.13-.09-2.91a2.18 2.18 0 00-2.91-.09z"/><path d="M12 15l-3-3a22 22 0 012-3.95A12.88 12.88 0 0122 2c0 2.72-.78 7.5-6 11a22.35 22.35 0 01-4 2z"/></svg>
+                                        </div>
+                                        <span className="scan-drawer-vis-label">Coming Soon</span>
                                     </div>
-                                    <span className="scan-drawer-vis-label">Coming Soon</span>
-                                </div>
-                                <span className="scan-drawer-vis-count">{comingSoonCount}</span>
-                            </button>
-                            {gtmRoadmapCount > 0 && (
+                                    <span className="scan-drawer-vis-count">{comingSoonCount}</span>
+                                </button>
+                            )}
+                            {showInternalContent && gtmRoadmapCount > 0 && (
                                 <button
                                     className={`scan-drawer-vis-item ${showGtmRoadmap ? 'scan-drawer-vis-on' : 'scan-drawer-vis-off'}`}
                                     onClick={() => onToggleShowGtmRoadmap(!showGtmRoadmap)}
@@ -5441,7 +5866,7 @@ function FilterDrawer({
                                     <span className="scan-drawer-vis-count">{gtmRoadmapCount}</span>
                                 </button>
                             )}
-                            {vaultCount > 0 && (
+                            {devMode && vaultCount > 0 && (
                                 <button
                                     className={`scan-drawer-vis-item ${showVault ? 'scan-drawer-vis-on' : 'scan-drawer-vis-off'}`}
                                     onClick={() => onToggleShowVault(!showVault)}
@@ -5583,7 +6008,7 @@ function FilterDrawer({
                     )}
 
                     {/* ── Powered By (Addon Filter) ── */}
-                    {addonGroups.length > 1 && (
+                    {addonGroups.length > 0 && (
                         <div className="scan-drawer-section">
                             <div className="scan-drawer-section-title">
                                 <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
@@ -6107,9 +6532,9 @@ function SCANProductsPage() {
     const [themeOverride, setThemeOverride] = useState(getThemePreference); // 'auto' | 'light' | 'dark'
     const [splunkTheme, setSplunkTheme] = useState(null);                  // true = dark, false = light, null = unknown
     const [showFullPortfolio, setShowFullPortfolio] = useState(getPortfolioPreference); // false = supported only
-    const [devMode, setDevMode] = useState(() => {
-        try { return localStorage.getItem(DEVMODE_STORAGE_KEY) === 'true'; } catch { return false; }
-    });
+    const [devMode, setDevMode] = useState(false);
+    const [gtmMode, setGtmMode] = useState(false);
+    const showInternalContent = devMode || gtmMode;
     const [devToast, setDevToast] = useState(null);
     const [configViewerOpen, setConfigViewerOpen] = useState(false);
     const [configViewerProductId, setConfigViewerProductId] = useState(null);
@@ -6330,17 +6755,38 @@ function SCANProductsPage() {
         ));
     }, []);
 
-    // ── Developer mode search intercept ──
+    // ── Secret mode search intercepts ──
     const handleSearchInput = useCallback((value) => {
-        if (value.toLowerCase().trim() === 'devmode') {
+        const cmd = value.toLowerCase().trim();
+        if (cmd === 'devmode') {
             setDevMode(prev => {
                 const next = !prev;
-                try { localStorage.setItem(DEVMODE_STORAGE_KEY, String(next)); } catch {}
                 setDevToast(next ? 'Developer Mode ON' : 'Developer Mode OFF');
                 setTimeout(() => setDevToast(null), 2500);
+                if (!next) {
+                    setShowVault(false);
+                }
                 return next;
             });
-            // Clear the search bar and query
+            setSearchQuery('');
+            setSearchBarQuery('');
+            return;
+        }
+        if (cmd === 'gtmmode') {
+            setGtmMode(prev => {
+                const next = !prev;
+                setDevToast(next ? 'GTM Mode ON' : 'GTM Mode OFF');
+                setTimeout(() => setDevToast(null), 2500);
+                if (next) {
+                    setShowComingSoon(true);
+                    setShowGtmRoadmap(true);
+                    setShowFullPortfolio(true);
+                } else {
+                    setShowComingSoon(false);
+                    setShowGtmRoadmap(false);
+                }
+                return next;
+            });
             setSearchQuery('');
             setSearchBarQuery('');
             return;
@@ -6646,14 +7092,14 @@ function SCANProductsPage() {
         if (!showDeprecated) {
             base = base.filter((p) => p.status !== 'deprecated');
         }
-        if (!showComingSoon) {
+        if (!showComingSoon || !showInternalContent) {
             base = base.filter((p) => p.status !== 'under_development');
         }
-        if (!showGtmRoadmap) {
+        if (!showGtmRoadmap || !showInternalContent) {
             base = base.filter((p) => !p.coverage_gap || (p.addon || p.app_viz || p.app_viz_2 || p.sc4s_supported));
         }
         return base;
-    }, [products, supportLevelFilter, showFullPortfolio, showRetired, showDeprecated, showComingSoon, showGtmRoadmap]);
+    }, [products, supportLevelFilter, showFullPortfolio, showRetired, showDeprecated, showComingSoon, showGtmRoadmap, showInternalContent]);
 
     // ── Filtering (two-stage: preAddon for faceted dropdown, then full) ──
     const preAddonProducts = useMemo(() => {
@@ -6692,12 +7138,12 @@ function SCANProductsPage() {
         if (searchQuery) {
             const q = searchQuery.toLowerCase().trim();
             filtered = filtered.filter((p) => {
-                const nameField = `${p.display_name} ${p.tagline} ${p.description} ${p.vendor} ${p.product_id}`.toLowerCase();
+                const nameField = `${p.display_name} ${p.tagline} ${p.vendor} ${p.product_id}`.toLowerCase();
                 if (nameField.includes(q)) return true;
                 const als = (p.aliases || []).map((a) => a.toLowerCase());
                 if (als.some((a) => a.includes(q) || q.includes(a))) return true;
                 const kws = (p.keywords || []).map((k) => k.toLowerCase());
-                if (kws.some((k) => k === q || q.startsWith(k + ' ') || q.endsWith(' ' + k) || q.includes(' ' + k + ' ') || k.includes(q))) return true;
+                if (kws.some((k) => k === q || k.includes(q))) return true;
                 return false;
             });
             filtered.sort((a, b) => {
@@ -6866,12 +7312,12 @@ function SCANProductsPage() {
         if (searchQuery) {
             const q = searchQuery.toLowerCase().trim();
             base = base.filter((p) => {
-                const nameField = `${p.display_name} ${p.tagline} ${p.description} ${p.vendor} ${p.product_id}`.toLowerCase();
+                const nameField = `${p.display_name} ${p.tagline} ${p.vendor} ${p.product_id}`.toLowerCase();
                 if (nameField.includes(q)) return true;
                 const als = (p.aliases || []).map((a) => a.toLowerCase());
                 if (als.some((a) => a.includes(q) || q.includes(a))) return true;
                 const kws = (p.keywords || []).map((k) => k.toLowerCase());
-                if (kws.some((k) => k === q || q.startsWith(k + ' ') || q.endsWith(' ' + k) || q.includes(' ' + k + ' ') || k.includes(q))) return true;
+                if (kws.some((k) => k === q || k.includes(q))) return true;
                 return false;
             });
         }
@@ -6933,6 +7379,14 @@ function SCANProductsPage() {
                 <div className="scan-devmode-banner">
                     <span className="scan-devmode-banner-pulse" />
                     <span className="scan-devmode-banner-text">DEVELOPER MODE</span>
+                    <span className="scan-devmode-banner-pulse" />
+                </div>
+            )}
+            {/* GTM Mode Banner (only when gtmMode is on and devMode is off) */}
+            {gtmMode && !devMode && (
+                <div className="scan-devmode-banner scan-gtmmode-banner">
+                    <span className="scan-devmode-banner-pulse" />
+                    <span className="scan-devmode-banner-text">GTM MODE</span>
                     <span className="scan-devmode-banner-pulse" />
                 </div>
             )}
@@ -7229,6 +7683,8 @@ function SCANProductsPage() {
                 showVault={showVault}
                 onToggleShowVault={setShowVault}
                 vaultCount={vaultProducts.length}
+                showInternalContent={showInternalContent}
+                devMode={devMode}
                 onResetAll={() => {
                     setSelectedCategory(null);
                     setSelectedSubCategory(null);
@@ -7370,8 +7826,8 @@ function SCANProductsPage() {
                 </div>
             )}
 
-            {/* Section 4: Coming Soon */}
-            <div id="coming_soon_products">
+            {/* Section 4: Coming Soon (gated behind gtmMode / devMode) */}
+            {showInternalContent && <div id="coming_soon_products">
             <CollapsiblePanel title={`Coming Soon (${comingSoonProducts.length})`} open={effectivePanelOpen.coming_soon_products} onChange={handlePanelToggle} panelId="coming_soon_products">
                 {comingSoonProducts.length > 0 ? (
                     <div className="csc-card-grid">
@@ -7393,7 +7849,7 @@ function SCANProductsPage() {
                     <div className="empty-section">No upcoming products at this time.</div>
                 )}
             </CollapsiblePanel>
-            </div>
+            </div>}
 
             {/* Section 5: Deprecated Products */}
             {deprecatedProducts.length > 0 && (
@@ -7621,13 +8077,9 @@ function SCANProductsPage() {
                     />
                     <Modal.Body>
                         <div style={{ fontSize: '13px', lineHeight: '1.7' }}>
-                            <div style={{
-                                padding: '12px 16px',
-                                background: '#fff3cd',
-                                border: '1px solid #ffe082',
+                            <div className="scan-warn-banner" style={{
                                 borderRadius: '6px',
                                 marginBottom: '14px',
-                                color: '#6d4c00',
                             }}>
                                 <strong>Warning:</strong> This action will remove <strong>all {configuredProducts.length} product{configuredProducts.length !== 1 ? 's' : ''}</strong> from your configured list.
                             </div>
@@ -7640,7 +8092,7 @@ function SCANProductsPage() {
                     </Modal.Body>
                     <Modal.Footer>
                         <Button appearance="secondary" label="Cancel" onClick={() => setRemoveAllModalOpen(false)} />
-                        <Button appearance="destructive" label="Yes, Remove All" onClick={handleRemoveAllConfigured} />
+                        <Button appearance="destructive" className="scan-btn-destructive" label="Yes, Remove All" onClick={handleRemoveAllConfigured} />
                     </Modal.Footer>
                 </Modal>
             )}

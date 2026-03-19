@@ -2,8 +2,8 @@
 /**
  * AUTO-GENERATED from products.conf — DO NOT EDIT BY HAND.
  * Regenerate:  node bin/generate-catalog.js
- * Generated:   2026-03-16T04:01:14.000Z
- * Products:    83
+ * Generated:   2026-03-19T00:23:13.752Z
+ * Products:    84
  */
 
 export const PRODUCT_CATALOG = [
@@ -99,7 +99,10 @@ export const PRODUCT_CATALOG = [
       "security analytics and logging",
       "sal",
       "encrypted visibility engine",
-      "eve"
+      "eve",
+      "snort",
+      "secure firewall cloud native",
+      "sfcn"
     ],
     "alert_action_uids": [],
     "soar_connector_uids": [
@@ -285,7 +288,10 @@ export const PRODUCT_CATALOG = [
       "eta",
       "netflow analytics",
       "cisco security cloud",
-      "network detection and response"
+      "network detection and response",
+      "flow analytics",
+      "flow collector",
+      "anomaly detection"
     ],
     "alert_action_uids": [],
     "soar_connector_uids": [],
@@ -436,7 +442,7 @@ export const PRODUCT_CATALOG = [
     "cisco_retired": false,
     "coverage_gap": true,
     "gap_type": "new_integration",
-    "gtm_pillar": "",
+    "gtm_pillar": "4",
     "addon_splunkbase_uid": "",
     "addon_docs_url": "",
     "addon_troubleshoot_url": "",
@@ -557,7 +563,9 @@ export const PRODUCT_CATALOG = [
       "hypershield",
       "distributed firewall",
       "autonomous security",
-      "ai firewall"
+      "ai firewall",
+      "ai native security",
+      "self qualifying update"
     ],
     "alert_action_uids": [],
     "soar_connector_uids": [],
@@ -651,7 +659,7 @@ export const PRODUCT_CATALOG = [
     "soar_connector_uids": [],
     "itsi_content_pack": null,
     "is_new": false,
-    "secure_networking_gtm": true,
+    "secure_networking_gtm": false,
     "support_level": "not_supported",
     "sc4s_url": "",
     "sc4s_label": "",
@@ -737,7 +745,7 @@ export const PRODUCT_CATALOG = [
     "soar_connector_uids": [],
     "itsi_content_pack": null,
     "is_new": false,
-    "secure_networking_gtm": true,
+    "secure_networking_gtm": false,
     "support_level": "not_supported",
     "sc4s_url": "",
     "sc4s_label": "",
@@ -835,7 +843,10 @@ export const PRODUCT_CATALOG = [
       "sso",
       "zero trust",
       "cisco security cloud",
-      "user protection suite"
+      "user protection suite",
+      "passwordless",
+      "fido2",
+      "phishing resistant mfa"
     ],
     "alert_action_uids": [],
     "soar_connector_uids": [],
@@ -1138,7 +1149,9 @@ export const PRODUCT_CATALOG = [
       "endpoint detection",
       "threat hunting",
       "cisco security cloud",
-      "xdr endpoint"
+      "xdr endpoint",
+      "orbital",
+      "malware defense"
     ],
     "alert_action_uids": [],
     "soar_connector_uids": [
@@ -1478,7 +1491,10 @@ export const PRODUCT_CATALOG = [
       "soc",
       "threat response",
       "cisco security cloud",
-      "securex"
+      "securex",
+      "ai assistant",
+      "attack path analysis",
+      "automated investigation"
     ],
     "alert_action_uids": [],
     "soar_connector_uids": [],
@@ -2231,7 +2247,10 @@ export const PRODUCT_CATALOG = [
       "sig",
       "secure internet gateway",
       "cisco security cloud",
-      "user protection suite"
+      "user protection suite",
+      "investigate",
+      "roaming security",
+      "roaming client"
     ],
     "alert_action_uids": [
       "5558"
@@ -2651,13 +2670,17 @@ export const PRODUCT_CATALOG = [
       "calisti",
       "cloud native",
       "kubernetes security",
-      "cisco ai defense"
+      "cisco ai defense",
+      "cspm",
+      "cwpp",
+      "cloud posture",
+      "runtime protection"
     ],
     "alert_action_uids": [],
     "soar_connector_uids": [],
     "itsi_content_pack": null,
     "is_new": false,
-    "secure_networking_gtm": true,
+    "secure_networking_gtm": false,
     "support_level": "not_supported",
     "sc4s_url": "",
     "sc4s_label": "",
@@ -2953,8 +2976,6 @@ export const PRODUCT_CATALOG = [
       "microsegmentation",
       "workload protection",
       "zero trust segmentation",
-      "cisco ai defense",
-      "hypershield",
       "ebpf",
       "distributed firewall"
     ],
@@ -3686,7 +3707,11 @@ export const PRODUCT_CATALOG = [
       "ios-xe",
       "campus network",
       "encrypted traffic analytics",
-      "eta"
+      "eta",
+      "stackwise",
+      "poe",
+      "voice vlan",
+      "smartnet"
     ],
     "alert_action_uids": [],
     "soar_connector_uids": [],
@@ -3832,7 +3857,11 @@ export const PRODUCT_CATALOG = [
       "sgacl",
       "guest access",
       "zero trust",
-      "sd-access"
+      "sd-access",
+      "posture",
+      "profiling",
+      "byod",
+      "guest portal"
     ],
     "alert_action_uids": [
       "7548"
@@ -4192,9 +4221,15 @@ export const PRODUCT_CATALOG = [
       "cloud managed networking",
       "meraki dashboard",
       "meraki api",
-      "meraki sd-wan",
+      "meraki sdwan",
       "client analytics",
-      "cisco networking cloud"
+      "cisco networking cloud",
+      "meraki mx",
+      "meraki mr",
+      "meraki ms",
+      "meraki mt",
+      "meraki mv",
+      "wireless lan"
     ],
     "alert_action_uids": [],
     "soar_connector_uids": [
@@ -4435,7 +4470,12 @@ export const PRODUCT_CATALOG = [
       "catalyst sd-wan",
       "wan optimization",
       "sase",
-      "secure access service edge"
+      "secure access service edge",
+      "cedge",
+      "omp",
+      "tloc",
+      "bfd",
+      "cflowd"
     ],
     "alert_action_uids": [],
     "soar_connector_uids": [],
@@ -4613,7 +4653,7 @@ export const PRODUCT_CATALOG = [
     "cisco_retired": false,
     "coverage_gap": true,
     "gap_type": "new_integration",
-    "gtm_pillar": "",
+    "gtm_pillar": "2",
     "addon_splunkbase_uid": "",
     "addon_docs_url": "",
     "addon_troubleshoot_url": "",
@@ -4649,7 +4689,10 @@ export const PRODUCT_CATALOG = [
       "traffic engineering",
       "service health",
       "nso",
-      "network services orchestrator"
+      "network services orchestrator",
+      "wan automation engine",
+      "segment routing",
+      "mpls"
     ],
     "alert_action_uids": [],
     "soar_connector_uids": [],
@@ -4949,7 +4992,7 @@ export const PRODUCT_CATALOG = [
     "soar_connector_uids": [],
     "itsi_content_pack": null,
     "is_new": false,
-    "secure_networking_gtm": true,
+    "secure_networking_gtm": false,
     "support_level": "not_supported",
     "sc4s_url": "",
     "sc4s_label": "",
@@ -5140,7 +5183,7 @@ export const PRODUCT_CATALOG = [
     "soar_connector_uids": [],
     "itsi_content_pack": null,
     "is_new": false,
-    "secure_networking_gtm": true,
+    "secure_networking_gtm": false,
     "support_level": "not_supported",
     "sc4s_url": "",
     "sc4s_label": "",
@@ -5229,7 +5272,7 @@ export const PRODUCT_CATALOG = [
     "soar_connector_uids": [],
     "itsi_content_pack": null,
     "is_new": false,
-    "secure_networking_gtm": true,
+    "secure_networking_gtm": false,
     "support_level": "not_supported",
     "sc4s_url": "",
     "sc4s_label": "",
@@ -5325,7 +5368,11 @@ export const PRODUCT_CATALOG = [
       "micro-segmentation",
       "sdn",
       "software defined networking",
-      "nexus one"
+      "nexus one",
+      "contract",
+      "bridge domain",
+      "tenant",
+      "multi-site orchestrator"
     ],
     "alert_action_uids": [],
     "soar_connector_uids": [],
@@ -5435,7 +5482,11 @@ export const PRODUCT_CATALOG = [
       "spine leaf",
       "vxlan",
       "data center switch",
-      "nexus one"
+      "nexus one",
+      "vpc",
+      "fabric extender",
+      "fex",
+      "fabricpath"
     ],
     "alert_action_uids": [],
     "soar_connector_uids": [],
@@ -5908,7 +5959,7 @@ export const PRODUCT_CATALOG = [
     "soar_connector_uids": [],
     "itsi_content_pack": null,
     "is_new": false,
-    "secure_networking_gtm": true,
+    "secure_networking_gtm": false,
     "support_level": "not_supported",
     "sc4s_url": "",
     "sc4s_label": "",
@@ -5938,6 +5989,101 @@ export const PRODUCT_CATALOG = [
     "escu_detection_count": 0,
     "escu_detections": [],
     "catalog_disabled": true
+  },
+  {
+    "product_id": "cisco_sonic",
+    "display_name": "Cisco SONiC (Software for Open Networking in the Cloud)",
+    "description": "Open-source Network Operating System running on Cisco 8000 Series Silicon One routers — providing disaggregated, Linux-based networking with rsyslogd, SAI (Switch Abstraction Interface), BGP, LLDP, and container-based microservices (orchagent, syncd, teamd) for hyperscale data center and WAN fabrics. NOTE: SONiC is a distinct NOS from IOS XR — the same Cisco 8000 hardware can run either. SC4S currently supports Dell SONiC; Cisco SONiC uses a similar rsyslog format but needs its own sourcetype and CIM-mapped TA for field extractions.",
+    "value_proposition": "A dedicated Splunk TA for Cisco SONiC could ingest rsyslog events from orchagent, syncd, teamd, and BGP subsystems — mapping them to CIM (Network Traffic, Authentication, Change) and giving hyperscale and SP NOCs the same operational visibility they have for IOS XR platforms, but for open NOS deployments.",
+    "vendor": "Cisco",
+    "tagline": "Open NOS for Hyperscale Data Centers",
+    "category": "networking",
+    "version": "1.0.0",
+    "status": "roadmap",
+    "addon": "",
+    "addon_label": "",
+    "addon_family": "default",
+    "subcategory": "data_center_net",
+    "ai_enabled": false,
+    "ai_description": "",
+    "cisco_retired": false,
+    "coverage_gap": true,
+    "gap_type": "new_integration",
+    "gtm_pillar": "2",
+    "addon_splunkbase_uid": "",
+    "addon_docs_url": "",
+    "addon_troubleshoot_url": "",
+    "addon_install_url": "",
+    "app_viz": "",
+    "app_viz_label": "",
+    "app_viz_splunkbase_uid": "",
+    "app_viz_docs_url": "",
+    "app_viz_troubleshoot_url": "",
+    "app_viz_install_url": "",
+    "app_viz_2": "",
+    "app_viz_2_label": "",
+    "app_viz_2_splunkbase_uid": "",
+    "app_viz_2_docs_url": "",
+    "app_viz_2_troubleshoot_url": "",
+    "app_viz_2_install_url": "",
+    "learn_more_url": "https://www.cisco.com/site/us/en/products/networking/sdwan-routers/8000-series/sonic/index.html",
+    "legacy_uids": [],
+    "community_uids": [],
+    "sourcetypes": [],
+    "dashboards": [],
+    "custom_dashboard": "",
+    "icon_emoji": "package",
+    "icon_svg": "cisco_router",
+    "aliases": [],
+    "keywords": [
+      "sonic",
+      "open nos",
+      "disaggregated",
+      "silicon one",
+      "8000 series",
+      "hyperscale",
+      "sai",
+      "switch abstraction interface",
+      "orchagent",
+      "syncd",
+      "rsyslog",
+      "bgp",
+      "lldp"
+    ],
+    "alert_action_uids": [],
+    "soar_connector_uids": [],
+    "itsi_content_pack": null,
+    "is_new": false,
+    "secure_networking_gtm": true,
+    "support_level": "not_supported",
+    "sc4s_url": "https://splunk.github.io/splunk-connect-for-syslog/main/sources/vendor/Dell/sonic/",
+    "sc4s_label": "SC4S: Dell SONiC (reference parser)",
+    "sc4s_supported": false,
+    "sc4s_search_head_ta": "",
+    "sc4s_search_head_ta_label": "",
+    "sc4s_search_head_ta_splunkbase_url": "",
+    "sc4s_search_head_ta_splunkbase_id": "",
+    "sc4s_search_head_ta_install_url": "",
+    "sc4s_sourcetypes": [],
+    "sc4s_config_notes": [],
+    "netflow_supported": false,
+    "netflow_addon": "",
+    "netflow_addon_label": "",
+    "netflow_addon_splunkbase_url": "",
+    "netflow_addon_splunkbase_id": "",
+    "netflow_addon_install_url": "",
+    "netflow_addon_docs_url": "",
+    "stream_docs_url": "",
+    "netflow_sourcetypes": [],
+    "netflow_config_notes": [],
+    "best_practices": [],
+    "sort_order": 127,
+    "es_compatible": false,
+    "es_cim_data_models": [],
+    "escu_analytic_stories": [],
+    "escu_detection_count": 0,
+    "escu_detections": [],
+    "catalog_disabled": false
   },
   {
     "product_id": "cisco_ucs",
@@ -5996,7 +6142,11 @@ export const PRODUCT_CATALOG = [
       "cimc",
       "ucsm",
       "c-series",
-      "b-series"
+      "b-series",
+      "x-series",
+      "x-fabric",
+      "hyperflex",
+      "intersight managed"
     ],
     "alert_action_uids": [],
     "soar_connector_uids": [],
@@ -6295,7 +6445,10 @@ export const PRODUCT_CATALOG = [
       "ir8340",
       "ot networking",
       "din rail",
-      "industrial threat defense"
+      "industrial threat defense",
+      "iot gateway",
+      "iec 62443",
+      "resilient network"
     ],
     "alert_action_uids": [],
     "soar_connector_uids": [],
@@ -6398,7 +6551,11 @@ export const PRODUCT_CATALOG = [
       "scada",
       "operational technology asset discovery",
       "iot security",
-      "industrial threat defense"
+      "industrial threat defense",
+      "purdue model",
+      "modbus",
+      "profinet",
+      "industrial protocol"
     ],
     "alert_action_uids": [],
     "soar_connector_uids": [],
@@ -6504,7 +6661,11 @@ export const PRODUCT_CATALOG = [
       "synthetic monitoring",
       "internet insights",
       "full stack observability",
-      "fso"
+      "fso",
+      "cloud agent",
+      "enterprise agent",
+      "network path",
+      "outage detection"
     ],
     "alert_action_uids": [],
     "soar_connector_uids": [],
@@ -6615,7 +6776,11 @@ export const PRODUCT_CATALOG = [
       "business transactions",
       "full stack observability",
       "fso",
-      "cisco observability platform"
+      "cisco observability platform",
+      "dash",
+      "brum",
+      "dbmon",
+      "infrastructure monitoring"
     ],
     "alert_action_uids": [],
     "soar_connector_uids": [],
@@ -6726,7 +6891,11 @@ export const PRODUCT_CATALOG = [
       "webex calling",
       "webex teams",
       "webex events",
-      "video conferencing"
+      "video conferencing",
+      "webex connect",
+      "messaging",
+      "webex devices",
+      "collaboration"
     ],
     "alert_action_uids": [
       "8358"
@@ -6824,7 +6993,13 @@ export const PRODUCT_CATALOG = [
       "voip",
       "jabber",
       "cdr",
-      "cmr"
+      "cmr",
+      "sip",
+      "h323",
+      "cti",
+      "jtapi",
+      "presence",
+      "cisco phone"
     ],
     "alert_action_uids": [],
     "soar_connector_uids": [],
@@ -7112,7 +7287,6 @@ export const PRODUCT_CATALOG = [
       "vcs",
       "telepresence",
       "video communication server",
-      "expressway",
       "firewall traversal"
     ],
     "alert_action_uids": [],
@@ -7264,7 +7438,7 @@ export const PRODUCT_CATALOG = [
     "cisco_retired": false,
     "coverage_gap": true,
     "gap_type": "new_integration",
-    "gtm_pillar": "",
+    "gtm_pillar": "1",
     "addon_splunkbase_uid": "",
     "addon_docs_url": "",
     "addon_troubleshoot_url": "",
@@ -7288,7 +7462,7 @@ export const PRODUCT_CATALOG = [
     "dashboards": [],
     "custom_dashboard": "",
     "icon_emoji": "headphone",
-    "icon_svg": "cisco_phone",
+    "icon_svg": "cisco_desk_phone",
     "aliases": [
       "Cisco Unified Contact Center Enterprise",
       "Cisco Unified Contact Center Express",
@@ -7310,7 +7484,11 @@ export const PRODUCT_CATALOG = [
       "uccx",
       "ucce",
       "finesse",
-      "cisco contact center"
+      "cisco contact center",
+      "wxcc",
+      "supervisor",
+      "quality management",
+      "recording"
     ],
     "alert_action_uids": [],
     "soar_connector_uids": [],
@@ -7602,7 +7780,7 @@ export const PRODUCT_CATALOG = [
     "soar_connector_uids": [],
     "itsi_content_pack": null,
     "is_new": false,
-    "secure_networking_gtm": true,
+    "secure_networking_gtm": false,
     "support_level": "not_supported",
     "sc4s_url": "",
     "sc4s_label": "",
@@ -7700,7 +7878,7 @@ export const PRODUCT_CATALOG = [
     "soar_connector_uids": [],
     "itsi_content_pack": null,
     "is_new": false,
-    "secure_networking_gtm": true,
+    "secure_networking_gtm": false,
     "support_level": "not_supported",
     "sc4s_url": "",
     "sc4s_label": "",
@@ -7790,7 +7968,7 @@ export const PRODUCT_CATALOG = [
     "soar_connector_uids": [],
     "itsi_content_pack": null,
     "is_new": false,
-    "secure_networking_gtm": true,
+    "secure_networking_gtm": false,
     "support_level": "not_supported",
     "sc4s_url": "",
     "sc4s_label": "",
@@ -7885,7 +8063,7 @@ export const PRODUCT_CATALOG = [
     "soar_connector_uids": [],
     "itsi_content_pack": null,
     "is_new": false,
-    "secure_networking_gtm": true,
+    "secure_networking_gtm": false,
     "support_level": "developer_supported",
     "sc4s_url": "",
     "sc4s_label": "",
@@ -7973,13 +8151,16 @@ export const PRODUCT_CATALOG = [
       "security advisory",
       "cve advisory",
       "patch management",
-      "vulnerability disclosure"
+      "vulnerability disclosure",
+      "openVuln api",
+      "critical advisory",
+      "high advisory"
     ],
     "alert_action_uids": [],
     "soar_connector_uids": [],
     "itsi_content_pack": null,
     "is_new": false,
-    "secure_networking_gtm": true,
+    "secure_networking_gtm": false,
     "support_level": "not_supported",
     "sc4s_url": "",
     "sc4s_label": "",
@@ -8071,7 +8252,7 @@ export const PRODUCT_CATALOG = [
     "soar_connector_uids": [],
     "itsi_content_pack": null,
     "is_new": false,
-    "secure_networking_gtm": true,
+    "secure_networking_gtm": false,
     "support_level": "not_supported",
     "sc4s_url": "https://splunk.github.io/splunk-connect-for-syslog/main/sources/vendor/Cisco/cisco_acs/",
     "sc4s_label": "SC4S: Cisco ACS",
@@ -8165,7 +8346,7 @@ export const PRODUCT_CATALOG = [
     "soar_connector_uids": [],
     "itsi_content_pack": null,
     "is_new": false,
-    "secure_networking_gtm": true,
+    "secure_networking_gtm": false,
     "support_level": "developer_supported",
     "sc4s_url": "",
     "sc4s_label": "",
@@ -8259,7 +8440,7 @@ export const PRODUCT_CATALOG = [
     "soar_connector_uids": [],
     "itsi_content_pack": null,
     "is_new": false,
-    "secure_networking_gtm": true,
+    "secure_networking_gtm": false,
     "support_level": "not_supported",
     "sc4s_url": "",
     "sc4s_label": "",
@@ -8438,7 +8619,11 @@ export const PRODUCT_CATALOG = [
       "bug search tool",
       "bst",
       "cisco defect",
-      "bug analytics"
+      "bug analytics",
+      "field notice",
+      "eox",
+      "end of life",
+      "caveat"
     ],
     "alert_action_uids": [],
     "soar_connector_uids": [],
