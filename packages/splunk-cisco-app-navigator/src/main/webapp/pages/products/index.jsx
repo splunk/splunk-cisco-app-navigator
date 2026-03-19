@@ -885,23 +885,129 @@ function CopyModalButton() {
         const modal = btnRef.current?.closest('[data-test="modal"]');
         const body = modal?.querySelector('.csc-sc4s-info');
         if (!body) return;
+        // Expand any collapsed sections before cloning (e.g. "Show all N detections")
+        body.querySelectorAll('.csc-es-show-all-btn').forEach(btn => btn.click());
+        // Allow React to re-render expanded content, then proceed
+        setTimeout(() => {
+            _doCopy(body);
+        }, 150);
+    }, []);
+    const _doCopy = useCallback((body) => {
         const clone = body.cloneNode(true);
-        clone.querySelectorAll('button, input, select, .scan-modal-resize-handle').forEach(el => el.remove());
-        clone.querySelectorAll('h3, h4').forEach(el => { el.style.cssText = 'margin:12px 0 4px;color:#003366;font-size:14px;'; });
-        clone.querySelectorAll('a').forEach(el => { el.style.color = '#0066cc'; });
-        clone.querySelectorAll('p').forEach(el => { if (!el.style.margin) el.style.margin = '0 0 6px'; });
-        clone.querySelectorAll('ul').forEach(el => { el.style.cssText = 'margin:0 0 8px;padding-left:20px;'; });
+        // Phase 1: structural cleanup (while classes still exist)
+        clone.querySelectorAll('button, input, select, .scan-modal-resize-handle, .csc-sc4s-info-footer, .csc-sc4s-info-card-icon').forEach(el => el.remove());
+        // Remove install status blocks by class before classes are stripped
+        clone.querySelectorAll('[class*="scan-m8-"]').forEach(el => {
+            let target = el.closest('[class*="csc-sc4s-info-section"]') ? el.closest('div[style]') : el.closest('div');
+            if (target && /install\s*status|not on this SH/i.test(target.textContent)) target.remove();
+        });
+        // Convert info-card grids into clean separated blocks
+        clone.querySelectorAll('.csc-sc4s-info-grid').forEach(grid => {
+            const frag = document.createElement('div');
+            grid.querySelectorAll('.csc-sc4s-info-card').forEach(card => {
+                const block = document.createElement('div');
+                block.style.cssText = 'margin:0 0 12px;padding:8px 12px;border-left:3px solid #003366;background:#f8f9fa;';
+                const title = card.querySelector('strong');
+                if (title) {
+                    const h = document.createElement('p');
+                    h.style.cssText = 'margin:0 0 3px;font-weight:700;font-size:13px;color:#003366;';
+                    h.textContent = title.textContent;
+                    block.appendChild(h);
+                }
+                card.querySelectorAll(':scope > span').forEach(sp => {
+                    if (sp.classList.contains('csc-sc4s-info-card-icon')) return;
+                    const p = document.createElement('p');
+                    p.style.cssText = 'margin:0 0 3px;font-size:12px;line-height:1.5;color:#333;';
+                    p.innerHTML = sp.innerHTML;
+                    block.appendChild(p);
+                });
+                frag.appendChild(block);
+            });
+            grid.replaceWith(frag);
+        });
+        // Convert CIM pill badges into a comma-separated paragraph
+        clone.querySelectorAll('.csc-es-cim-pills').forEach(container => {
+            const names = [];
+            container.querySelectorAll('.csc-es-cim-pill').forEach(pill => names.push(pill.textContent.trim()));
+            if (names.length) {
+                const p = document.createElement('p');
+                p.textContent = names.join(', ');
+                container.replaceWith(p);
+            }
+        });
+        // Convert ESCU story items into a bullet list
+        clone.querySelectorAll('.csc-es-stories').forEach(container => {
+            const ul = document.createElement('ul');
+            container.querySelectorAll('.csc-es-story-item').forEach(item => {
+                item.querySelectorAll('.csc-es-story-icon').forEach(ic => ic.remove());
+                const li = document.createElement('li');
+                li.textContent = item.textContent.trim();
+                ul.appendChild(li);
+            });
+            container.replaceWith(ul);
+        });
+        // Convert best-practices items into clean blocks
+        clone.querySelectorAll('.csc-sc4s-info-bp-item').forEach(item => {
+            item.querySelectorAll('.csc-sc4s-info-bp-icon').forEach(ic => ic.remove());
+        });
+        // Expand any <details> elements so their content is visible
+        clone.querySelectorAll('details').forEach(el => el.setAttribute('open', ''));
+        // Strip <summary> click targets (already expanded)
+        clone.querySelectorAll('summary').forEach(el => el.remove());
+        // Strip any remaining hidden/collapsed elements
+        clone.querySelectorAll('[hidden], [aria-hidden="true"]').forEach(el => el.remove());
+        // Remove empty wrapper divs to reduce HTML bulk (helps prevent clipboard truncation)
+        let changed = true;
+        while (changed) {
+            changed = false;
+            clone.querySelectorAll('div, span').forEach(el => {
+                if (!el.children.length && !el.textContent.trim()) {
+                    el.remove(); changed = true;
+                }
+            });
+        }
+        // Unwrap unnecessary single-child wrapper divs/spans to reduce nesting depth
+        let unwrapped = true;
+        while (unwrapped) {
+            unwrapped = false;
+            clone.querySelectorAll('div, span').forEach(el => {
+                const hasOnlyOneChild = el.childNodes.length === 1 && el.firstElementChild;
+                const parent = el.parentNode;
+                if (hasOnlyOneChild && parent && el !== clone) {
+                    parent.replaceChild(el.firstElementChild, el);
+                    unwrapped = true;
+                }
+            });
+        }
+        // Phase 2: nuke ALL inline styles and classes — clean slate
+        clone.querySelectorAll('*').forEach(el => {
+            el.removeAttribute('style');
+            el.removeAttribute('class');
+            el.removeAttribute('data-test');
+            el.removeAttribute('data-reactid');
+            el.removeAttribute('role');
+            el.removeAttribute('tabindex');
+        });
+        // Phase 3: apply clean document-only styles
+        clone.querySelectorAll('h3').forEach(el => { el.style.cssText = 'margin:16px 0 6px;color:#003366;font-size:16px;font-weight:700;border-bottom:1px solid #003366;padding-bottom:4px;'; });
+        clone.querySelectorAll('h4').forEach(el => { el.style.cssText = 'margin:12px 0 4px;color:#003366;font-size:14px;font-weight:700;'; });
+        clone.querySelectorAll('a').forEach(el => { el.style.cssText = 'color:#0066cc;text-decoration:underline;'; });
+        clone.querySelectorAll('p').forEach(el => { if (!el.style.cssText) el.style.cssText = 'margin:0 0 8px;font-size:13px;line-height:1.5;'; });
+        clone.querySelectorAll('ul').forEach(el => { el.style.cssText = 'margin:4px 0 10px;padding-left:24px;'; });
+        clone.querySelectorAll('li').forEach(el => { el.style.cssText = 'margin:0 0 4px;font-size:13px;line-height:1.5;'; });
+        clone.querySelectorAll('strong').forEach(el => { el.style.cssText = 'font-weight:700;color:#1a1a1a;'; });
+        clone.querySelectorAll('em, i').forEach(el => { el.style.cssText = 'font-style:italic;color:#555;'; });
         clone.querySelectorAll('code').forEach(el => { el.style.cssText = 'background:#f4f4f4;border:1px solid #ddd;border-radius:3px;padding:1px 5px;font-family:Menlo,Consolas,monospace;font-size:12px;color:#333;'; });
-        clone.querySelectorAll('table').forEach(el => { el.style.cssText = 'border-collapse:collapse;width:100%;margin:0 0 8px;'; });
-        clone.querySelectorAll('td, th').forEach(el => { el.style.cssText = 'padding:6px 10px;border-bottom:1px solid #e0e0e0;text-align:left;font-size:13px;'; });
-        clone.querySelectorAll('strong').forEach(el => { el.style.color = '#1a1a1a'; });
-        const wrap = `<div style="font-family:-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;font-size:13px;color:#1a1a1a;line-height:1.6;background:#ffffff;">${clone.innerHTML}<hr style="border:none;border-top:1px solid #ccc;margin:12px 0 6px;" /><p style="margin:0;font-size:11px;color:#888;">Generated by Splunk Cisco App Navigator (SCAN)</p></div>`;
+        clone.querySelectorAll('table').forEach(el => { el.style.cssText = 'border-collapse:collapse;width:100%;margin:10px 0;'; });
+        clone.querySelectorAll('th').forEach(el => { el.style.cssText = 'padding:8px 10px;border:1px solid #ccc;text-align:left;font-size:13px;font-weight:700;color:#003366;background:#f0f3f6;'; });
+        clone.querySelectorAll('td').forEach(el => { el.style.cssText = 'padding:6px 10px;border:1px solid #e0e0e0;text-align:left;font-size:13px;vertical-align:top;'; });
+        const wrap = `<div style="font-family:-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;font-size:13px;color:#1a1a1a;line-height:1.6;background:#ffffff;max-width:700px;">${clone.innerHTML}<hr style="border:none;border-top:1px solid #ccc;margin:16px 0 6px;" /><p style="margin:0;font-size:11px;color:#888;">Generated by Splunk Cisco App Navigator (SCAN)</p></div>`;
         const text = (clone.innerText || clone.textContent || '').trim() + '\n\nGenerated by Splunk Cisco App Navigator (SCAN)';
         copyRichToClipboard(wrap, text, () => {
             setCopied(true);
             setTimeout(() => setCopied(false), 2000);
         });
-    }, []);
+    }, []); // end _doCopy
     return (
         <button
             ref={btnRef}
@@ -1298,7 +1404,7 @@ function NetFlowInfoModal({ open, onClose, installedApps }) {
                     </div>
 
                     <div className="csc-sc4s-info-footer">
-                        <a href="https://help.splunk.com/en/splunk-cloud-platform/collect-stream-data/install-and-configure-splunk-stream/8.1/introduction/about-splunk-stream" target="_blank" rel="noopener noreferrer" className="csc-sc4s-info-link">
+                        <a href="https://help.splunk.com/en/splunk-cloud-platform/collect-stream-data/install-and-configure-splunk-stream/8.1/introduction/about-splunk-stream" target="_blank" rel="noopener noreferrer" className="csc-sc4s-info-link csc-sc4s-info-link-gh">
                             Splunk Stream Documentation
                         </a>
                         <a href="https://www.cisco.com/c/en/us/solutions/collateral/enterprise-networks/sd-wan/sd-wan-splunk-integration-ug.html" target="_blank" rel="noopener noreferrer" className="csc-sc4s-info-link csc-sc4s-info-link-gh">
