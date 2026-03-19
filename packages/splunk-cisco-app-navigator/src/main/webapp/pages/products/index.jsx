@@ -636,7 +636,7 @@ async function detectIndexerTierApps() {
     try {
         const spl = [
             '| rest splunk_server=* /servicesNS/-/-/apps/local f=title f=version f=disabled count=0',
-            '| search NOT [| rest splunk_server=local /services/server/info f=splunk_server | fields splunk_server]',
+            '| search [| rest splunk_server=* /services/server/info f=server_roles | where match(server_roles, "indexer") | fields splunk_server]',
             '| eval is_disabled=if(disabled=="1" OR disabled="true", 1, 0)',
             '| stats latest(version) as idx_version max(is_disabled) as any_disabled dc(splunk_server) as idx_count by title',
             '| fields title idx_version any_disabled idx_count',
@@ -1508,6 +1508,7 @@ function HFInfoModal({ open, onClose, isCloud }) {
                 </div>
             </Modal.Body>
             <Modal.Footer>
+                <CopyModalButton />
                 <Button appearance="secondary" label="Close" onClick={onClose} />
             </Modal.Footer>
         </Modal>
@@ -1734,13 +1735,16 @@ function MagicEightModal({ open, onClose, sourcetypes, productName, addonApp, ad
         if (appViz2) apps.push({ id: appViz2, label: appViz2, role: 'App' });
         return apps.map(a => {
             const sh = installedApps[a.id];
-            const idx = indexerApps ? indexerApps[a.id] : undefined;
+            const isAddon = a.role === 'Add-on';
+            const idx = (isAddon && indexerApps) ? indexerApps[a.id] : undefined;
             const shVer = sh ? sh.version : null;
             const idxVer = idx ? idx.version : null;
             const idxDisabled = idx ? idx.disabled : false;
-            let state = 'na'; // na | ok | mismatch | missing | disabled | not_installed
+            let state = 'na';
             if (!sh) {
                 state = 'not_installed';
+            } else if (!isAddon) {
+                state = 'sh_only';
             } else if (!indexerApps) {
                 state = 'loading';
             } else if (Object.keys(indexerApps).length === 0) {
@@ -1800,7 +1804,7 @@ function MagicEightModal({ open, onClose, sourcetypes, productName, addonApp, ad
                     `| fields splunk_server eai:acl.app title ${MAGIC_EIGHT.map(m => m.key).join(' ')}`,
                 ];
                 if (!isStandalone) {
-                    splParts.push('| search NOT [| rest splunk_server=local /services/server/info f=splunk_server | fields splunk_server]');
+                    splParts.push('| search [| rest splunk_server=* /services/server/info f=server_roles | where match(server_roles, "indexer") | fields splunk_server]');
                 }
                 splParts.push('| stats values(*) as * values(eai:acl.app) as defining_apps by title');
                 const spl = splParts.join(' ');
@@ -1986,6 +1990,7 @@ function MagicEightModal({ open, onClose, sourcetypes, productName, addonApp, ad
                                                 missing: { cls: 'scan-m8-state-missing', label: 'Not on Indexers' },
                                                 disabled: { cls: 'scan-m8-state-disabled', label: 'Disabled on IDX' },
                                                 standalone: { cls: 'scan-m8-state-standalone', label: 'Standalone' },
+                                                sh_only: { cls: 'scan-m8-state-ok', label: 'SH Only' },
                                                 loading: { cls: 'scan-m8-state-standalone', label: 'Checking…' },
                                             }[r.state] || { cls: 'scan-m8-state-standalone', label: '—' };
                                             return (
@@ -1998,7 +2003,7 @@ function MagicEightModal({ open, onClose, sourcetypes, productName, addonApp, ad
                                                         <code style={{ fontSize: '11px', padding: '1px 6px', background: 'var(--bg-surface, #eef1f4)', borderRadius: '3px' }}>{r.shVer || '—'}</code>
                                                     </td>
                                                     <td style={{ padding: '4px 8px' }}>
-                                                        {r.state === 'standalone' ? (
+                                                        {r.state === 'standalone' || r.state === 'sh_only' ? (
                                                             <span className="scan-m8-muted">N/A</span>
                                                         ) : r.state === 'loading' ? (
                                                             <span className="scan-m8-muted">…</span>
@@ -2021,6 +2026,23 @@ function MagicEightModal({ open, onClose, sourcetypes, productName, addonApp, ad
                                         Version mismatches between SH and indexer tiers can cause props.conf gaps — the indexer may be running older definitions.
                                     </div>
                                 )}
+                                <div style={{ marginTop: '6px', textAlign: 'right' }}>
+                                    <a
+                                        href={`/app/search/search?q=${encodeURIComponent(
+                                            '| rest splunk_server=* /servicesNS/-/-/apps/local f=title f=version f=disabled count=0'
+                                            + ` | search title IN (${tierRows.map(r => `"${r.id}"`).join(', ')})`
+                                            + ' | eval server_roles=mvjoin(server_roles, ", ")'
+                                            + ' | join splunk_server [| rest splunk_server=* /services/server/info f=server_roles]'
+                                            + ' | table splunk_server server_roles title version disabled'
+                                            + ' | sort server_roles title'
+                                        )}`}
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                        style={{ fontSize: '11px', color: 'var(--text-link, #0066cc)', textDecoration: 'none' }}
+                                    >
+                                        Open in Search ↗
+                                    </a>
+                                </div>
                             </div>
                         );
                     })()}
@@ -2440,6 +2462,7 @@ function AlertActionsInfoModal({ open, onClose, alertActionUids, splunkbaseData,
                 </div>
             </Modal.Body>
             <Modal.Footer>
+                <CopyModalButton />
                 <Button appearance="secondary" label="Close" onClick={onClose} />
             </Modal.Footer>
         </Modal>
@@ -2793,6 +2816,7 @@ function BestPracticesModal({ open, onClose, product, platformType, splunkbaseDa
                 </div>
             </Modal.Body>
             <Modal.Footer>
+                <CopyModalButton />
                 <Button appearance="secondary" label="Close" onClick={onClose} />
             </Modal.Footer>
         </Modal>
@@ -2942,6 +2966,7 @@ function LegacyAuditModal({ open, onClose, legacyUids, installedApps, indexerApp
                 </div>
             </Modal.Body>
             <Modal.Footer>
+                <CopyModalButton />
                 <Button appearance="secondary" label="Close" onClick={onClose} />
             </Modal.Footer>
         </Modal>
