@@ -2015,9 +2015,9 @@
   integrity sha512-5//7NG52+gHtFBHZuVcqqt2F95HeHHlSBlkDjAqFl5gLPQiJX99cED62teAn7ktFrkISIvAGD9wrazMYxly+Bw==
 
 "@splunk/react-icons@^5.8.0":
-  version "5.8.0"
-  resolved "https://repo.splunkdev.net:443/artifactory/api/npm/npm/@splunk/react-icons/-/react-icons-5.8.0.tgz#d9a4ec496690fe76123dc5fcb4cb9218d955e91f"
-  integrity sha512-E0ZNOCnpwrINWtWAWs+UXnw57z7mamesyt5JIMejkwjE67o+NDz4r+9dzN8ii8l4MHZB24xwxMJDfombHjl/Fg==
+  version "5.9.0"
+  resolved "https://repo.splunkdev.net:443/artifactory/api/npm/npm/@splunk/react-icons/-/react-icons-5.9.0.tgz#21367d0baf8213df72645fd1e60d53a47d95110c"
+  integrity sha512-TQATeHiMA/7OksTF+9F6JrL3Pyl9HVlyXp2XM6CfiFVD1QD9ez3NZqCuOmg+3Qoaz9+kakUYDGLE6ynZJS3NcA==
   dependencies:
     "@splunk/ui-utils" "^1.12.0"
     lodash "^4.17.14"
