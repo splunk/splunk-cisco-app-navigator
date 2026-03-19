@@ -180,7 +180,6 @@ const output = [
     '/**',
     ' * AUTO-GENERATED from products.conf — DO NOT EDIT BY HAND.',
     ' * Regenerate:  node bin/generate-catalog.js',
-    ` * Generated:   ${new Date().toISOString()}`,
     ` * Products:    ${products.length}`,
     ' */',
     '',
