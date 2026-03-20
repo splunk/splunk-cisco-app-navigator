@@ -2,7 +2,7 @@
 /**
  * AUTO-GENERATED from products.conf — DO NOT EDIT BY HAND.
  * Regenerate:  node bin/generate-catalog.js
- * Products:    85
+ * Products:    86
  */
 
 export const PRODUCT_CATALOG = [
@@ -219,6 +219,7 @@ export const PRODUCT_CATALOG = [
       "Protocols passing authentication in cleartext",
       "TOR Traffic"
     ],
+    "custom": false,
     "catalog_disabled": false
   },
   {
@@ -331,6 +332,7 @@ export const PRODUCT_CATALOG = [
     "escu_analytic_stories": [],
     "escu_detection_count": 0,
     "escu_detections": [],
+    "custom": false,
     "catalog_disabled": false
   },
   {
@@ -420,6 +422,7 @@ export const PRODUCT_CATALOG = [
     "escu_analytic_stories": [],
     "escu_detection_count": 0,
     "escu_detections": [],
+    "custom": false,
     "catalog_disabled": false
   },
   {
@@ -511,6 +514,7 @@ export const PRODUCT_CATALOG = [
     "escu_analytic_stories": [],
     "escu_detection_count": 0,
     "escu_detections": [],
+    "custom": false,
     "catalog_disabled": false
   },
   {
@@ -599,6 +603,7 @@ export const PRODUCT_CATALOG = [
     "escu_analytic_stories": [],
     "escu_detection_count": 0,
     "escu_detections": [],
+    "custom": false,
     "catalog_disabled": false
   },
   {
@@ -687,6 +692,7 @@ export const PRODUCT_CATALOG = [
     "escu_analytic_stories": [],
     "escu_detection_count": 0,
     "escu_detections": [],
+    "custom": false,
     "catalog_disabled": true
   },
   {
@@ -773,6 +779,7 @@ export const PRODUCT_CATALOG = [
     "escu_analytic_stories": [],
     "escu_detection_count": 0,
     "escu_detections": [],
+    "custom": false,
     "catalog_disabled": true
   },
   {
@@ -899,6 +906,7 @@ export const PRODUCT_CATALOG = [
       "Cisco Duo Policy Skip 2FA for Other Countries",
       "Cisco Duo Set User Status to Bypass 2FA"
     ],
+    "custom": false,
     "catalog_disabled": false
   },
   {
@@ -994,6 +1002,7 @@ export const PRODUCT_CATALOG = [
     "escu_analytic_stories": [],
     "escu_detection_count": 0,
     "escu_detections": [],
+    "custom": false,
     "catalog_disabled": false
   },
   {
@@ -1083,6 +1092,7 @@ export const PRODUCT_CATALOG = [
     "escu_analytic_stories": [],
     "escu_detection_count": 0,
     "escu_detections": [],
+    "custom": false,
     "catalog_disabled": true
   },
   {
@@ -1195,6 +1205,7 @@ export const PRODUCT_CATALOG = [
       "Windows Cisco Secure Endpoint Unblock File Via Sfc",
       "Windows Cisco Secure Endpoint Uninstall Immunet Service Via Sfc"
     ],
+    "custom": false,
     "catalog_disabled": false
   },
   {
@@ -1333,6 +1344,7 @@ export const PRODUCT_CATALOG = [
       "Windows MSIExec Remote Download",
       "Windows PowerShell FakeCAPTCHA Clipboard Execution"
     ],
+    "custom": false,
     "catalog_disabled": false
   },
   {
@@ -1430,6 +1442,7 @@ export const PRODUCT_CATALOG = [
     "escu_analytic_stories": [],
     "escu_detection_count": 0,
     "escu_detections": [],
+    "custom": false,
     "catalog_disabled": false
   },
   {
@@ -1530,6 +1543,7 @@ export const PRODUCT_CATALOG = [
     "escu_analytic_stories": [],
     "escu_detection_count": 0,
     "escu_detections": [],
+    "custom": false,
     "catalog_disabled": false
   },
   {
@@ -1629,6 +1643,7 @@ export const PRODUCT_CATALOG = [
     "escu_analytic_stories": [],
     "escu_detection_count": 0,
     "escu_detections": [],
+    "custom": false,
     "catalog_disabled": false
   },
   {
@@ -1723,6 +1738,7 @@ export const PRODUCT_CATALOG = [
     "escu_analytic_stories": [],
     "escu_detection_count": 0,
     "escu_detections": [],
+    "custom": false,
     "catalog_disabled": false
   },
   {
@@ -1825,6 +1841,7 @@ export const PRODUCT_CATALOG = [
     "escu_analytic_stories": [],
     "escu_detection_count": 0,
     "escu_detections": [],
+    "custom": false,
     "catalog_disabled": false
   },
   {
@@ -1922,6 +1939,7 @@ export const PRODUCT_CATALOG = [
     "escu_analytic_stories": [],
     "escu_detection_count": 0,
     "escu_detections": [],
+    "custom": false,
     "catalog_disabled": false
   },
   {
@@ -2059,6 +2077,7 @@ export const PRODUCT_CATALOG = [
     "escu_analytic_stories": [],
     "escu_detection_count": 0,
     "escu_detections": [],
+    "custom": false,
     "catalog_disabled": false
   },
   {
@@ -2176,6 +2195,7 @@ export const PRODUCT_CATALOG = [
     "escu_analytic_stories": [],
     "escu_detection_count": 0,
     "escu_detections": [],
+    "custom": false,
     "catalog_disabled": false
   },
   {
@@ -2299,6 +2319,7 @@ export const PRODUCT_CATALOG = [
     "escu_analytic_stories": [],
     "escu_detection_count": 0,
     "escu_detections": [],
+    "custom": false,
     "catalog_disabled": false
   },
   {
@@ -2395,6 +2416,7 @@ export const PRODUCT_CATALOG = [
     "escu_analytic_stories": [],
     "escu_detection_count": 0,
     "escu_detections": [],
+    "custom": false,
     "catalog_disabled": false
   },
   {
@@ -2493,6 +2515,7 @@ export const PRODUCT_CATALOG = [
     "escu_analytic_stories": [],
     "escu_detection_count": 0,
     "escu_detections": [],
+    "custom": false,
     "catalog_disabled": false
   },
   {
@@ -2612,6 +2635,7 @@ export const PRODUCT_CATALOG = [
     "escu_analytic_stories": [],
     "escu_detection_count": 0,
     "escu_detections": [],
+    "custom": false,
     "catalog_disabled": false
   },
   {
@@ -2708,6 +2732,7 @@ export const PRODUCT_CATALOG = [
     "escu_analytic_stories": [],
     "escu_detection_count": 0,
     "escu_detections": [],
+    "custom": false,
     "catalog_disabled": false
   },
   {
@@ -2796,6 +2821,7 @@ export const PRODUCT_CATALOG = [
     "escu_analytic_stories": [],
     "escu_detection_count": 0,
     "escu_detections": [],
+    "custom": false,
     "catalog_disabled": false
   },
   {
@@ -2916,6 +2942,7 @@ export const PRODUCT_CATALOG = [
     "escu_analytic_stories": [],
     "escu_detection_count": 0,
     "escu_detections": [],
+    "custom": false,
     "catalog_disabled": false
   },
   {
@@ -3013,6 +3040,7 @@ export const PRODUCT_CATALOG = [
     "escu_analytic_stories": [],
     "escu_detection_count": 0,
     "escu_detections": [],
+    "custom": false,
     "catalog_disabled": false
   },
   {
@@ -3108,6 +3136,7 @@ export const PRODUCT_CATALOG = [
     "escu_detections": [
       "Cisco AI Defense Security Alerts by Application Name"
     ],
+    "custom": false,
     "catalog_disabled": false
   },
   {
@@ -3228,6 +3257,7 @@ export const PRODUCT_CATALOG = [
       "Linux Decode Base64 to Shell",
       "Linux apt-get Privilege Escalation"
     ],
+    "custom": false,
     "catalog_disabled": false
   },
   {
@@ -3324,6 +3354,7 @@ export const PRODUCT_CATALOG = [
     "escu_analytic_stories": [],
     "escu_detection_count": 0,
     "escu_detections": [],
+    "custom": false,
     "catalog_disabled": false
   },
   {
@@ -3415,6 +3446,7 @@ export const PRODUCT_CATALOG = [
     "escu_analytic_stories": [],
     "escu_detection_count": 0,
     "escu_detections": [],
+    "custom": false,
     "catalog_disabled": false
   },
   {
@@ -3503,6 +3535,7 @@ export const PRODUCT_CATALOG = [
     "escu_analytic_stories": [],
     "escu_detection_count": 0,
     "escu_detections": [],
+    "custom": false,
     "catalog_disabled": false
   },
   {
@@ -3636,6 +3669,7 @@ export const PRODUCT_CATALOG = [
     "escu_analytic_stories": [],
     "escu_detection_count": 0,
     "escu_detections": [],
+    "custom": false,
     "catalog_disabled": false
   },
   {
@@ -3778,6 +3812,7 @@ export const PRODUCT_CATALOG = [
       "Detect Rogue DHCP Server",
       "Detect Traffic Mirroring"
     ],
+    "custom": false,
     "catalog_disabled": false
   },
   {
@@ -3910,6 +3945,7 @@ export const PRODUCT_CATALOG = [
     "escu_analytic_stories": [],
     "escu_detection_count": 0,
     "escu_detections": [],
+    "custom": false,
     "catalog_disabled": false
   },
   {
@@ -4008,6 +4044,7 @@ export const PRODUCT_CATALOG = [
     "escu_analytic_stories": [],
     "escu_detection_count": 0,
     "escu_detections": [],
+    "custom": false,
     "catalog_disabled": false
   },
   {
@@ -4114,6 +4151,7 @@ export const PRODUCT_CATALOG = [
     "escu_analytic_stories": [],
     "escu_detection_count": 0,
     "escu_detections": [],
+    "custom": false,
     "catalog_disabled": false
   },
   {
@@ -4288,6 +4326,7 @@ export const PRODUCT_CATALOG = [
     "escu_analytic_stories": [],
     "escu_detection_count": 0,
     "escu_detections": [],
+    "custom": false,
     "catalog_disabled": false
   },
   {
@@ -4379,6 +4418,7 @@ export const PRODUCT_CATALOG = [
     "escu_analytic_stories": [],
     "escu_detection_count": 0,
     "escu_detections": [],
+    "custom": false,
     "catalog_disabled": false
   },
   {
@@ -4527,6 +4567,7 @@ export const PRODUCT_CATALOG = [
       "Cisco SD-WAN - Low Frequency Rogue Peer",
       "Cisco SD-WAN - Peering Activity"
     ],
+    "custom": false,
     "catalog_disabled": false
   },
   {
@@ -4631,6 +4672,7 @@ export const PRODUCT_CATALOG = [
     "escu_analytic_stories": [],
     "escu_detection_count": 0,
     "escu_detections": [],
+    "custom": false,
     "catalog_disabled": false
   },
   {
@@ -4726,6 +4768,7 @@ export const PRODUCT_CATALOG = [
     "escu_analytic_stories": [],
     "escu_detection_count": 0,
     "escu_detections": [],
+    "custom": false,
     "catalog_disabled": false
   },
   {
@@ -4829,6 +4872,7 @@ export const PRODUCT_CATALOG = [
     "escu_analytic_stories": [],
     "escu_detection_count": 0,
     "escu_detections": [],
+    "custom": false,
     "catalog_disabled": false
   },
   {
@@ -4932,6 +4976,7 @@ export const PRODUCT_CATALOG = [
     "escu_analytic_stories": [],
     "escu_detection_count": 0,
     "escu_detections": [],
+    "custom": false,
     "catalog_disabled": false
   },
   {
@@ -5020,6 +5065,7 @@ export const PRODUCT_CATALOG = [
     "escu_analytic_stories": [],
     "escu_detection_count": 0,
     "escu_detections": [],
+    "custom": false,
     "catalog_disabled": true
   },
   {
@@ -5121,6 +5167,7 @@ export const PRODUCT_CATALOG = [
     "escu_analytic_stories": [],
     "escu_detection_count": 0,
     "escu_detections": [],
+    "custom": false,
     "catalog_disabled": false
   },
   {
@@ -5211,6 +5258,7 @@ export const PRODUCT_CATALOG = [
     "escu_analytic_stories": [],
     "escu_detection_count": 0,
     "escu_detections": [],
+    "custom": false,
     "catalog_disabled": true
   },
   {
@@ -5300,6 +5348,7 @@ export const PRODUCT_CATALOG = [
     "escu_analytic_stories": [],
     "escu_detection_count": 0,
     "escu_detections": [],
+    "custom": false,
     "catalog_disabled": true
   },
   {
@@ -5413,6 +5462,7 @@ export const PRODUCT_CATALOG = [
     "escu_analytic_stories": [],
     "escu_detection_count": 0,
     "escu_detections": [],
+    "custom": false,
     "catalog_disabled": false
   },
   {
@@ -5526,6 +5576,7 @@ export const PRODUCT_CATALOG = [
     "escu_analytic_stories": [],
     "escu_detection_count": 0,
     "escu_detections": [],
+    "custom": false,
     "catalog_disabled": false
   },
   {
@@ -5630,6 +5681,7 @@ export const PRODUCT_CATALOG = [
     "escu_analytic_stories": [],
     "escu_detection_count": 0,
     "escu_detections": [],
+    "custom": false,
     "catalog_disabled": false
   },
   {
@@ -5717,6 +5769,7 @@ export const PRODUCT_CATALOG = [
     "escu_analytic_stories": [],
     "escu_detection_count": 0,
     "escu_detections": [],
+    "custom": false,
     "catalog_disabled": false
   },
   {
@@ -5807,6 +5860,7 @@ export const PRODUCT_CATALOG = [
     "escu_analytic_stories": [],
     "escu_detection_count": 0,
     "escu_detections": [],
+    "custom": false,
     "catalog_disabled": false
   },
   {
@@ -5900,6 +5954,7 @@ export const PRODUCT_CATALOG = [
     "escu_analytic_stories": [],
     "escu_detection_count": 0,
     "escu_detections": [],
+    "custom": false,
     "catalog_disabled": false
   },
   {
@@ -5987,6 +6042,7 @@ export const PRODUCT_CATALOG = [
     "escu_analytic_stories": [],
     "escu_detection_count": 0,
     "escu_detections": [],
+    "custom": false,
     "catalog_disabled": true
   },
   {
@@ -6082,6 +6138,7 @@ export const PRODUCT_CATALOG = [
     "escu_analytic_stories": [],
     "escu_detection_count": 0,
     "escu_detections": [],
+    "custom": false,
     "catalog_disabled": false
   },
   {
@@ -6185,6 +6242,7 @@ export const PRODUCT_CATALOG = [
     "escu_analytic_stories": [],
     "escu_detection_count": 0,
     "escu_detections": [],
+    "custom": false,
     "catalog_disabled": false
   },
   {
@@ -6291,6 +6349,7 @@ export const PRODUCT_CATALOG = [
     "escu_analytic_stories": [],
     "escu_detection_count": 0,
     "escu_detections": [],
+    "custom": false,
     "catalog_disabled": false
   },
   {
@@ -6387,6 +6446,7 @@ export const PRODUCT_CATALOG = [
     "escu_analytic_stories": [],
     "escu_detection_count": 0,
     "escu_detections": [],
+    "custom": false,
     "catalog_disabled": false
   },
   {
@@ -6482,6 +6542,7 @@ export const PRODUCT_CATALOG = [
     "escu_analytic_stories": [],
     "escu_detection_count": 0,
     "escu_detections": [],
+    "custom": false,
     "catalog_disabled": false
   },
   {
@@ -6589,6 +6650,7 @@ export const PRODUCT_CATALOG = [
     "escu_analytic_stories": [],
     "escu_detection_count": 0,
     "escu_detections": [],
+    "custom": false,
     "catalog_disabled": false
   },
   {
@@ -6702,6 +6764,7 @@ export const PRODUCT_CATALOG = [
     "escu_analytic_stories": [],
     "escu_detection_count": 0,
     "escu_detections": [],
+    "custom": false,
     "catalog_disabled": false
   },
   {
@@ -6817,6 +6880,7 @@ export const PRODUCT_CATALOG = [
     "escu_analytic_stories": [],
     "escu_detection_count": 0,
     "escu_detections": [],
+    "custom": false,
     "catalog_disabled": false
   },
   {
@@ -6933,6 +6997,7 @@ export const PRODUCT_CATALOG = [
     "escu_analytic_stories": [],
     "escu_detection_count": 0,
     "escu_detections": [],
+    "custom": false,
     "catalog_disabled": false
   },
   {
@@ -7038,6 +7103,102 @@ export const PRODUCT_CATALOG = [
     "escu_analytic_stories": [],
     "escu_detection_count": 0,
     "escu_detections": [],
+    "custom": false,
+    "catalog_disabled": false
+  },
+  {
+    "product_id": "cisco_webex_control_hub",
+    "display_name": "Cisco Webex Control Hub",
+    "description": "Centralized cloud management portal for all Webex services — users, devices, calling, meetings, messaging, and contact center. Provides analytics dashboards, troubleshooting tools, security/compliance settings, and audit logging across the Webex platform.",
+    "value_proposition": "Ingest Control Hub audit logs, device telemetry, and admin events into Splunk for unified Webex governance, compliance monitoring, and operational analytics.",
+    "vendor": "Cisco",
+    "tagline": "Cloud Management for Webex",
+    "category": "collaboration",
+    "version": "1.0.0",
+    "status": "roadmap",
+    "addon": "",
+    "addon_label": "",
+    "addon_family": "default",
+    "subcategory": "meetings_calling",
+    "ai_enabled": false,
+    "ai_description": "",
+    "cisco_retired": false,
+    "coverage_gap": true,
+    "gap_type": "new_integration",
+    "gtm_pillar": "",
+    "addon_splunkbase_uid": "",
+    "addon_docs_url": "",
+    "addon_troubleshoot_url": "",
+    "addon_install_url": "",
+    "app_viz": "",
+    "app_viz_label": "",
+    "app_viz_splunkbase_uid": "",
+    "app_viz_docs_url": "",
+    "app_viz_troubleshoot_url": "",
+    "app_viz_install_url": "",
+    "app_viz_2": "",
+    "app_viz_2_label": "",
+    "app_viz_2_splunkbase_uid": "",
+    "app_viz_2_docs_url": "",
+    "app_viz_2_troubleshoot_url": "",
+    "app_viz_2_install_url": "",
+    "learn_more_url": "https://admin.webex.com",
+    "legacy_uids": [],
+    "community_uids": [],
+    "sourcetypes": [],
+    "dashboards": [],
+    "custom_dashboard": "",
+    "icon_emoji": "gear",
+    "icon_svg": "cisco_video",
+    "aliases": [
+      "Control Hub"
+    ],
+    "keywords": [
+      "control hub",
+      "webex admin",
+      "webex management",
+      "admin portal",
+      "device management",
+      "webex analytics",
+      "webex troubleshooting",
+      "compliance",
+      "audit",
+      "webex provisioning"
+    ],
+    "alert_action_uids": [],
+    "soar_connector_uids": [],
+    "itsi_content_pack": null,
+    "is_new": false,
+    "secure_networking_gtm": false,
+    "support_level": "not_supported",
+    "sc4s_url": "",
+    "sc4s_label": "",
+    "sc4s_supported": false,
+    "sc4s_search_head_ta": "",
+    "sc4s_search_head_ta_label": "",
+    "sc4s_search_head_ta_splunkbase_url": "",
+    "sc4s_search_head_ta_splunkbase_id": "",
+    "sc4s_search_head_ta_install_url": "",
+    "sc4s_sourcetypes": [],
+    "sc4s_config_notes": [],
+    "netflow_supported": false,
+    "netflow_addon": "",
+    "netflow_addon_label": "",
+    "netflow_addon_splunkbase_url": "",
+    "netflow_addon_splunkbase_id": "",
+    "netflow_addon_install_url": "",
+    "netflow_addon_docs_url": "",
+    "stream_docs_url": "",
+    "netflow_sourcetypes": [],
+    "netflow_config_notes": [],
+    "best_practices": [],
+    "sort_order": 301,
+    "es_compatible": false,
+    "es_cim_data_models": [],
+    "escu_analytic_stories": [],
+    "escu_detection_count": 0,
+    "escu_detections": [],
+    "custom": false,
     "catalog_disabled": false
   },
   {
@@ -7134,6 +7295,7 @@ export const PRODUCT_CATALOG = [
     "escu_analytic_stories": [],
     "escu_detection_count": 0,
     "escu_detections": [],
+    "custom": false,
     "catalog_disabled": false
   },
   {
@@ -7230,6 +7392,7 @@ export const PRODUCT_CATALOG = [
     "escu_analytic_stories": [],
     "escu_detection_count": 0,
     "escu_detections": [],
+    "custom": false,
     "catalog_disabled": false
   },
   {
@@ -7326,6 +7489,7 @@ export const PRODUCT_CATALOG = [
     "escu_analytic_stories": [],
     "escu_detection_count": 0,
     "escu_detections": [],
+    "custom": false,
     "catalog_disabled": false
   },
   {
@@ -7416,12 +7580,13 @@ export const PRODUCT_CATALOG = [
     "escu_analytic_stories": [],
     "escu_detection_count": 0,
     "escu_detections": [],
+    "custom": false,
     "catalog_disabled": false
   },
   {
     "product_id": "cisco_webex_contact_center",
     "display_name": "Cisco Webex Contact Center (WxCC)",
-    "description": "Cloud-native Contact Center as a Service (CCaaS) platform providing omnichannel customer engagement (voice, chat, email, social), AI-powered agent assistance, workforce optimization, interaction analytics, and real-time supervisor dashboards. This is Cisco's cloud-based contact center offering, distinct from the on-premises UCCE/UCCX platforms and the Webex collaboration suite (meetings/calling/messaging).",
+    "description": "Cisco's next-generation contact center platform providing omnichannel customer engagement (voice, chat, email, social), AI-powered agent assistance, workforce optimization, interaction analytics, and real-time supervisor dashboards. Available as both a cloud-native SaaS (CCaaS) offering and an on-premises deployment for organizations that cannot send data to the cloud. WxCC is the strategic successor to Cisco UCCE/UCCX.",
     "value_proposition": "Ingest Webex Contact Center CDRs, agent performance metrics, queue analytics, and interaction events into Splunk for contact center operations intelligence, SLA monitoring, and workforce planning.",
     "vendor": "Cisco",
     "tagline": "Cloud Contact Center (CCaaS)",
@@ -7516,6 +7681,7 @@ export const PRODUCT_CATALOG = [
     "escu_analytic_stories": [],
     "escu_detection_count": 0,
     "escu_detections": [],
+    "custom": false,
     "catalog_disabled": false
   },
   {
@@ -7619,12 +7785,13 @@ export const PRODUCT_CATALOG = [
     "escu_analytic_stories": [],
     "escu_detection_count": 0,
     "escu_detections": [],
+    "custom": false,
     "catalog_disabled": false
   },
   {
     "product_id": "cisco_ucce",
     "display_name": "Cisco Unified Contact Center Enterprise (UCCE)",
-    "description": "On-premises enterprise contact center platform providing intelligent call routing, IVR, CTI, agent desktop (Finesse), and comprehensive reporting for large-scale multi-site deployments. Includes Cisco Finesse agent/supervisor desktop and integrates with CUCM for voice infrastructure. A dedicated Splunk add-on is currently in development.",
+    "description": "On-premises enterprise contact center platform providing intelligent call routing, IVR, CTI, agent desktop (Finesse), and comprehensive reporting for large-scale multi-site deployments. Includes Cisco Finesse agent/supervisor desktop and integrates with CUCM for voice infrastructure. Note: Cisco Webex Contact Center (WxCC) is the strategic successor, offering both SaaS and on-prem deployment models. A dedicated Splunk add-on is currently in development.",
     "value_proposition": "Ingest UCCE call detail records, agent state events, IVR logs, CTI events, and Finesse activity into Splunk for contact center performance monitoring, SLA compliance, agent productivity analytics, and capacity planning.",
     "vendor": "Cisco",
     "tagline": "On-Prem Enterprise Contact Center",
@@ -7721,6 +7888,7 @@ export const PRODUCT_CATALOG = [
     "escu_analytic_stories": [],
     "escu_detection_count": 0,
     "escu_detections": [],
+    "custom": false,
     "catalog_disabled": false
   },
   {
@@ -7815,6 +7983,7 @@ export const PRODUCT_CATALOG = [
     "escu_analytic_stories": [],
     "escu_detection_count": 0,
     "escu_detections": [],
+    "custom": false,
     "catalog_disabled": false
   },
   {
@@ -7904,6 +8073,7 @@ export const PRODUCT_CATALOG = [
     "escu_analytic_stories": [],
     "escu_detection_count": 0,
     "escu_detections": [],
+    "custom": false,
     "catalog_disabled": false
   },
   {
@@ -8002,6 +8172,7 @@ export const PRODUCT_CATALOG = [
     "escu_analytic_stories": [],
     "escu_detection_count": 0,
     "escu_detections": [],
+    "custom": false,
     "catalog_disabled": false
   },
   {
@@ -8092,6 +8263,7 @@ export const PRODUCT_CATALOG = [
     "escu_analytic_stories": [],
     "escu_detection_count": 0,
     "escu_detections": [],
+    "custom": false,
     "catalog_disabled": false
   },
   {
@@ -8187,6 +8359,7 @@ export const PRODUCT_CATALOG = [
     "escu_analytic_stories": [],
     "escu_detection_count": 0,
     "escu_detections": [],
+    "custom": false,
     "catalog_disabled": false
   },
   {
@@ -8284,6 +8457,7 @@ export const PRODUCT_CATALOG = [
     "escu_analytic_stories": [],
     "escu_detection_count": 0,
     "escu_detections": [],
+    "custom": false,
     "catalog_disabled": false
   },
   {
@@ -8381,6 +8555,7 @@ export const PRODUCT_CATALOG = [
     "escu_analytic_stories": [],
     "escu_detection_count": 0,
     "escu_detections": [],
+    "custom": false,
     "catalog_disabled": false
   },
   {
@@ -8470,6 +8645,7 @@ export const PRODUCT_CATALOG = [
     "escu_analytic_stories": [],
     "escu_detection_count": 0,
     "escu_detections": [],
+    "custom": false,
     "catalog_disabled": false
   },
   {
@@ -8564,6 +8740,7 @@ export const PRODUCT_CATALOG = [
     "escu_analytic_stories": [],
     "escu_detection_count": 0,
     "escu_detections": [],
+    "custom": false,
     "catalog_disabled": false
   },
   {
@@ -8660,6 +8837,7 @@ export const PRODUCT_CATALOG = [
     "escu_analytic_stories": [],
     "escu_detection_count": 0,
     "escu_detections": [],
+    "custom": false,
     "catalog_disabled": false
   },
   {
@@ -8753,6 +8931,7 @@ export const PRODUCT_CATALOG = [
     "escu_analytic_stories": [],
     "escu_detection_count": 0,
     "escu_detections": [],
+    "custom": false,
     "catalog_disabled": false
   },
   {
@@ -8845,6 +9024,7 @@ export const PRODUCT_CATALOG = [
     "escu_analytic_stories": [],
     "escu_detection_count": 0,
     "escu_detections": [],
+    "custom": false,
     "catalog_disabled": false
   }
 ];

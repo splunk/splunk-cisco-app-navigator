@@ -88,15 +88,20 @@ function postBuildRefresh() {
   const adminPass = process.env.SPLUNK_PASS || 'changeme';
   const splunkPort = process.env.SPLUNK_MGMT_PORT || '8089';
 
-  // 1. Clear UI cache files
+  // 1. Clear UI cache files (i18n and static asset cache)
   try {
     const cachePattern = path.join(cacheDir, 'products*.cache');
     const cacheFiles = glob.sync(cachePattern);
     if (cacheFiles.length > 0) {
       cacheFiles.forEach((f) => fs.unlinkSync(f));
-      console.log(`\x1b[36m[post-build]\x1b[0m Cleared ${cacheFiles.length} cache file(s)`);
+      console.log(`\x1b[36m[post-build]\x1b[0m Cleared ${cacheFiles.length} i18n cache file(s)`);
+    }
+    const staticCacheDir = path.join(splunkHome, 'var/run/splunk/appserver/static');
+    if (fs.existsSync(staticCacheDir)) {
+      fs.rmSync(staticCacheDir, { recursive: true, force: true });
+      console.log(`\x1b[36m[post-build]\x1b[0m Cleared static asset cache`);
     } else {
-      console.log('\x1b[36m[post-build]\x1b[0m No cache files to clear');
+      console.log('\x1b[36m[post-build]\x1b[0m No static cache to clear');
     }
   } catch (err) {
     console.warn(`\x1b[33m[post-build]\x1b[0m Could not clear cache: ${err.message}`);
@@ -141,10 +146,11 @@ if (cmd === 'build') {
     console.error('generate-catalog failed');
     process.exit(genResult.status || 1);
   }
-  // 2. Run webpack
-  const r = spawnSync('npx', ['webpack', '--config', path.join(pkgRoot, 'webpack.config.js')], {
+  // 2. Run webpack (suppress npm config warnings, Babel deopt notice, and verbose asset output)
+  const r = spawnSync('npx', ['--loglevel=error', 'webpack', '--config', path.join(pkgRoot, 'webpack.config.js')], {
     stdio: 'inherit',
     cwd: pkgRoot,
+    env: { ...process.env, NPM_CONFIG_LOGLEVEL: 'error', BABEL_COMPACT: 'true' },
   });
   if (r.status !== 0) {
     process.exit(r.status != null ? r.status : 1);

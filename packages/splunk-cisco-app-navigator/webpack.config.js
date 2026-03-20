@@ -27,12 +27,16 @@ const commonConfig = webpackMerge(baseConfig, {
     path: path.join(__dirname, 'stage', 'appserver', 'static', 'pages'),
     filename: '[name].js',
   },
+  stats: 'errors-warnings',
   module: {
     rules: [
       {
         test: /\.jsx?$/,
         exclude: /node_modules/,
-        use: 'babel-loader',
+        use: {
+          loader: 'babel-loader',
+          options: { compact: true },
+        },
       },
 
     ],

@@ -73,6 +73,7 @@ const DEFAULT_PANEL_STATE = {
     deprecated_products: false,
     retired_products: false,
     gtm_coverage_gaps: false,
+    custom_products: true,
     vault_products: true,
 };
 const SUPPORTED_LEVELS = new Set(['cisco_supported', 'splunk_supported']);
@@ -502,6 +503,7 @@ async function loadProductsFromConf() {
             escu_analytic_stories: csvToArray(c.escu_analytic_stories),
             escu_detection_count: parseInt(c.escu_detection_count || '0', 10),
             escu_detections: csvToArray(c.escu_detections),
+            custom: c.custom === 'true' || c.custom === '1' || c.custom === true,
             catalog_disabled: isDisabled,
         };
     }).sort((a, b) => a.sort_order - b.sort_order || a.display_name.localeCompare(b.display_name))
@@ -723,6 +725,76 @@ async function saveCustomDashboard(productId, value) {
     if (!res.ok) {
         const text = await res.text();
         throw new Error(`Failed to save custom dashboard: ${res.status} ${text}`);
+    }
+    return true;
+}
+
+/**
+ * Slugify a display name into a safe product_id for custom cards.
+ * "Cisco Secure Firewall" → "custom_cisco_secure_firewall"
+ */
+function slugifyProductId(displayName) {
+    const slug = displayName
+        .toLowerCase()
+        .replace(/[^a-z0-9]+/g, '_')
+        .replace(/^_|_$/g, '');
+    return `custom_${slug}`;
+}
+
+/**
+ * Create a new custom product stanza in local/products.conf.
+ */
+async function createCustomProduct(productId, fields) {
+    const url = `/splunkd/__raw/servicesNS/nobody/${APP_ID}/configs/conf-products`;
+    const params = new URLSearchParams({ output_mode: 'json', name: productId });
+    Object.entries(fields).forEach(([k, v]) => {
+        if (v !== undefined && v !== null && v !== '') params.append(k, String(v));
+    });
+    const res = await splunkFetch(url, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        body: params.toString(),
+    });
+    if (!res.ok) {
+        const text = await res.text();
+        throw new Error(`Failed to create custom product: ${res.status} ${text}`);
+    }
+    return true;
+}
+
+/**
+ * Update an existing custom product stanza in local/products.conf.
+ */
+async function updateCustomProduct(productId, fields) {
+    const url = `/splunkd/__raw/servicesNS/nobody/${APP_ID}/configs/conf-products/${encodeURIComponent(productId)}`;
+    const params = new URLSearchParams({ output_mode: 'json' });
+    Object.entries(fields).forEach(([k, v]) => {
+        params.append(k, v !== undefined && v !== null ? String(v) : '');
+    });
+    const res = await splunkFetch(url, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        body: params.toString(),
+    });
+    if (!res.ok) {
+        const text = await res.text();
+        throw new Error(`Failed to update custom product: ${res.status} ${text}`);
+    }
+    return true;
+}
+
+/**
+ * Delete a custom product stanza from local/products.conf.
+ */
+async function deleteCustomProduct(productId) {
+    const url = `/splunkd/__raw/servicesNS/nobody/${APP_ID}/configs/conf-products/${encodeURIComponent(productId)}`;
+    const res = await splunkFetch(url, {
+        method: 'DELETE',
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+    });
+    if (!res.ok) {
+        const text = await res.text();
+        throw new Error(`Failed to delete custom product: ${res.status} ${text}`);
     }
     return true;
 }
@@ -3859,7 +3931,7 @@ function ProductCard({ product, installedApps, appStatuses, indexerApps, sourcet
                 vizAppStatus={vizAppStatus}
                 vizApp2Status={vizApp2Status}
                 sourcetypeInfo={sourcetypeInfo}
-                isRoadmapCard={coverage_gap}
+                isRoadmapCard={coverage_gap || isComingSoon}
                 sourcetypeSearchUrl={sourcetypeSearchUrl}
                 isArchived={!!(!addon_install_url && addon_splunkbase_uid)}
             />
@@ -3867,7 +3939,7 @@ function ProductCard({ product, installedApps, appStatuses, indexerApps, sourcet
 
 
             {/* ── Unified summary + single expandable details panel ── */}
-            {hasDeps && (
+            {hasDeps && !isComingSoon && (
                 <div className="csc-card-dependency">
                     {/* Single collapsed summary line */}
                     <div className="csc-dep-summary" onClick={() => setDepsExpanded((v) => !v)} role="button" tabIndex={0}>
@@ -5398,6 +5470,436 @@ function TechStackModal({ open, onClose }) {
     );
 }
 
+// ─────────────────────  CUSTOM PRODUCT FORM  ─────────────────
+
+const CUSTOM_FORM_CATEGORIES = [
+    { value: 'security', label: 'Security' },
+    { value: 'networking', label: 'Networking' },
+    { value: 'collaboration', label: 'Collaboration' },
+    { value: 'observability', label: 'Observability' },
+];
+
+const FORM_SELECT_STYLE = {
+    WebkitAppearance: 'none', MozAppearance: 'none', appearance: 'none',
+    display: 'block', width: '100%', maxWidth: '100%', boxSizing: 'border-box',
+    padding: '11px 36px 11px 14px', borderRadius: '4px',
+    border: '1.5px solid #d1d5db', backgroundColor: '#fff', color: '#333',
+    fontSize: '14px', fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
+    cursor: 'pointer', margin: 0,
+    backgroundImage: "url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%236b7280' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E\")",
+    backgroundRepeat: 'no-repeat', backgroundPosition: 'right 12px center', backgroundSize: '14px',
+};
+
+function CustomProductFormModal({ open, onClose, onSave, editProduct, cloneProduct, existingIds, allProducts }) {
+    const isEdit = !!editProduct;
+    const returnFocusRef = useRef(null);
+    const [displayName, setDisplayName] = useState('');
+    const [vendor, setVendor] = useState('');
+    const [description, setDescription] = useState('');
+    const [tagline, setTagline] = useState('');
+    const [category, setCategory] = useState('security');
+    const [sourcetypes, setSourcetypes] = useState('');
+    const [keywords, setKeywords] = useState('');
+    const [learnMoreUrl, setLearnMoreUrl] = useState('');
+    const [iconEmoji, setIconEmoji] = useState('');
+    const [addonLabel, setAddonLabel] = useState('');
+    const [addonUid, setAddonUid] = useState('');
+    const [addonDocsUrl, setAddonDocsUrl] = useState('');
+    const [addonAppId, setAddonAppId] = useState('');
+    const [addonInstallUrl, setAddonInstallUrl] = useState('');
+    const [supportLevel, setSupportLevel] = useState('');
+    const [dashboards, setDashboards] = useState('');
+    const [aliases, setAliases] = useState('');
+    const [valueProp, setValueProp] = useState('');
+    const [subcategory, setSubcategory] = useState('');
+    const [version, setVersion] = useState('');
+    const [addonTroubleshootUrl, setAddonTroubleshootUrl] = useState('');
+    const [legacyUids, setLegacyUids] = useState('');
+    const [showAdvanced, setShowAdvanced] = useState(false);
+    const [saving, setSaving] = useState(false);
+    const [formError, setFormError] = useState('');
+    const [cloneSource, setCloneSource] = useState('');
+
+    const populateFromProduct = useCallback((product, isClone) => {
+        setDisplayName(isClone ? `Copy of ${product.display_name || ''}` : (product.display_name || ''));
+        setVendor(product.vendor || '');
+        setDescription(product.description || '');
+        setTagline(product.tagline || '');
+        setCategory(product.category || 'security');
+        setSourcetypes((product.sourcetypes || []).join(', '));
+        setKeywords((product.keywords || []).join(', '));
+        setLearnMoreUrl(product.learn_more_url || '');
+        setIconEmoji(product.icon_emoji || '');
+        setAddonLabel(product.addon_label || '');
+        setAddonUid(product.addon_splunkbase_uid || '');
+        setAddonDocsUrl(product.addon_docs_url || '');
+        setAddonAppId(product.addon || '');
+        setAddonInstallUrl(product.addon_install_url || '');
+        setSupportLevel(product.support_level || '');
+        setDashboards((product.dashboards || []).join(', '));
+        setAliases((product.aliases || []).join(', '));
+        setValueProp(product.value_proposition || '');
+        setSubcategory(product.subcategory || '');
+        setVersion(product.version || '');
+        setAddonTroubleshootUrl(product.addon_troubleshoot_url || '');
+        setLegacyUids((product.legacy_uids || []).join(', '));
+        const hasAdv = !!(product.addon || product.support_level || (product.dashboards && product.dashboards.length) || (product.aliases && product.aliases.length) || product.value_proposition || product.addon_troubleshoot_url || (product.legacy_uids && product.legacy_uids.length));
+        setShowAdvanced(hasAdv);
+    }, []);
+
+    const resetForm = useCallback(() => {
+        setDisplayName(''); setVendor(''); setDescription(''); setTagline('');
+        setCategory('security'); setSubcategory(''); setSourcetypes(''); setKeywords('');
+        setLearnMoreUrl(''); setIconEmoji(''); setAddonLabel('');
+        setAddonUid(''); setAddonDocsUrl(''); setAddonAppId('');
+        setAddonInstallUrl(''); setAddonTroubleshootUrl(''); setSupportLevel('');
+        setDashboards(''); setAliases(''); setValueProp('');
+        setVersion(''); setLegacyUids(''); setShowAdvanced(false);
+    }, []);
+
+    useEffect(() => {
+        if (!open) return;
+        if (editProduct) {
+            populateFromProduct(editProduct, false);
+            setCloneSource('');
+        } else if (cloneProduct) {
+            populateFromProduct(cloneProduct, true);
+            setCloneSource(cloneProduct.product_id);
+        } else {
+            resetForm();
+            setCloneSource('');
+        }
+        setFormError(''); setSaving(false);
+    }, [open, editProduct, cloneProduct, populateFromProduct, resetForm]);
+
+    const handleCloneSelect = useCallback((e) => {
+        const pid = e.target.value;
+        setCloneSource(pid);
+        if (!pid) { resetForm(); return; }
+        const source = (allProducts || []).find(p => p.product_id === pid);
+        if (source) populateFromProduct(source, true);
+    }, [allProducts, populateFromProduct, resetForm]);
+
+    const sortedCloneOptions = useMemo(() =>
+        (allProducts || []).filter(p => p.status === 'active').sort((a, b) => (a.display_name || '').localeCompare(b.display_name || '')),
+    [allProducts]);
+
+    const generatedId = useMemo(() => slugifyProductId(displayName || 'untitled'), [displayName]);
+
+    const handleSubmit = useCallback(async () => {
+        if (!displayName.trim()) { setFormError('Display Name is required.'); return; }
+        if (!description.trim()) { setFormError('Description is required.'); return; }
+        const productId = isEdit ? editProduct.product_id : generatedId;
+        if (!isEdit && (existingIds || []).includes(productId)) {
+            setFormError(`A product with ID "${productId}" already exists. Change the display name.`);
+            return;
+        }
+        setSaving(true); setFormError('');
+        try {
+            const fields = {
+                display_name: displayName.trim(),
+                vendor: vendor.trim(),
+                description: description.trim(),
+                tagline: tagline.trim(),
+                category,
+                subcategory: subcategory,
+                version: version.trim() || '1.0.0',
+                sourcetypes: sourcetypes.trim(),
+                keywords: keywords.trim(),
+                learn_more_url: learnMoreUrl.trim(),
+                icon_emoji: iconEmoji.trim(),
+                addon_label: addonLabel.trim(),
+                addon_uid: addonUid.trim(),
+                addon_docs_url: addonDocsUrl.trim(),
+                addon_troubleshoot_url: addonTroubleshootUrl.trim(),
+                addon: addonAppId.trim(),
+                addon_install_url: addonInstallUrl.trim(),
+                support_level: supportLevel,
+                dashboards: dashboards.trim(),
+                aliases: aliases.trim(),
+                value_proposition: valueProp.trim(),
+                legacy_uids: legacyUids.trim(),
+                custom: 'true',
+                status: 'active',
+            };
+            if (isEdit) {
+                await updateCustomProduct(productId, fields);
+            } else {
+                await createCustomProduct(productId, fields);
+            }
+            onSave();
+            onClose();
+        } catch (e) {
+            setFormError(e.message || 'Save failed');
+        } finally {
+            setSaving(false);
+        }
+    }, [displayName, vendor, description, tagline, category, subcategory, version,
+        sourcetypes, keywords, learnMoreUrl, iconEmoji, addonLabel, addonUid, addonDocsUrl,
+        addonTroubleshootUrl, addonAppId, addonInstallUrl, supportLevel, dashboards,
+        aliases, valueProp, legacyUids,
+        isEdit, editProduct, generatedId, existingIds, onSave, onClose]);
+
+    const categoryIcons = { security: '🛡️', networking: '🌐', collaboration: '🎧', observability: '📊' };
+
+    if (!open) return null;
+    return (
+        <Modal open returnFocus={returnFocusRef} onRequestClose={onClose} style={{ maxWidth: '860px', width: '94vw' }}>
+            <Modal.Header title={isEdit ? 'Edit Custom Product' : 'Add Custom Product'} onRequestClose={onClose} />
+            <Modal.Body>
+                <div className="csc-custom-form">
+                    {formError && <div className="csc-custom-form-error">{formError}</div>}
+
+                    {/* Clone from existing product */}
+                    {!isEdit && (
+                        <div className="csc-custom-form-row">
+                            <label>Clone from existing product</label>
+                            <select value={cloneSource} onChange={handleCloneSelect} style={{ ...FORM_SELECT_STYLE, fontWeight: 600 }}>
+                                <option value="">{'\u2014'} Start from scratch {'\u2014'}</option>
+                                {sortedCloneOptions.map(p => (
+                                    <option key={p.product_id} value={p.product_id}>
+                                        {p.display_name}{p.vendor ? ` (${p.vendor})` : ''}
+                                    </option>
+                                ))}
+                            </select>
+                            <span className="csc-custom-form-hint">Pick an existing product to pre-fill the form, or start with a blank card.</span>
+                        </div>
+                    )}
+
+                    {/* Live Preview */}
+                    {displayName && (
+                        <div className="csc-custom-preview">
+                            <span className="csc-custom-preview-badge">Preview</span>
+                            {iconEmoji && <span className="csc-custom-preview-emoji">{iconEmoji}</span>}
+                            <div className="csc-custom-preview-name">{displayName}</div>
+                            {tagline && <div className="csc-custom-preview-tagline">{tagline}</div>}
+                            {vendor && <div className="csc-custom-preview-vendor">{vendor}</div>}
+                            {description && <div className="csc-custom-preview-desc">{description.length > 120 ? description.slice(0, 120) + '\u2026' : description}</div>}
+                        </div>
+                    )}
+
+                    {/* Section: Identity */}
+                    <div className="csc-custom-form-section">
+                        <div className="csc-custom-form-section-title">Identity — name, vendor, and icon</div>
+                        <div className="csc-custom-form-row">
+                            <label>Display Name <span className="csc-req">*</span></label>
+                            <input type="text" value={displayName} onChange={e => setDisplayName(e.target.value)} placeholder="e.g. Cisco Secure Firewall" maxLength={120} />
+                            <span className="csc-custom-form-hint">The product name shown on the card and in search results.</span>
+                            {!isEdit && displayName && <span className="csc-custom-form-id">ID: {generatedId}</span>}
+                        </div>
+                        <div className="csc-custom-form-cols">
+                            <div className="csc-custom-form-row">
+                                <label>Vendor</label>
+                                <input type="text" value={vendor} onChange={e => setVendor(e.target.value)} placeholder="e.g. Cisco" maxLength={80} />
+                                <span className="csc-custom-form-hint">The company or team that makes this product.</span>
+                            </div>
+                            <div className="csc-custom-form-row">
+                                <label>Icon Emoji</label>
+                                <input type="text" value={iconEmoji} onChange={e => setIconEmoji(e.target.value)} placeholder="🔥" maxLength={4} style={{ textAlign: 'center', fontSize: '18px' }} />
+                                <span className="csc-custom-form-hint">A single emoji displayed as the card icon.</span>
+                            </div>
+                        </div>
+                        <div className="csc-custom-form-cols">
+                            <div className="csc-custom-form-row">
+                                <label>Tagline</label>
+                                <input type="text" value={tagline} onChange={e => setTagline(e.target.value)} placeholder="e.g. Next-generation firewall with advanced threat defense" maxLength={100} />
+                                <span className="csc-custom-form-hint">A short subtitle displayed under the product name.</span>
+                            </div>
+                            <div className="csc-custom-form-row">
+                                <label>Version</label>
+                                <input type="text" value={version} onChange={e => setVersion(e.target.value)} placeholder="e.g. 1.0.0" maxLength={20} />
+                                <span className="csc-custom-form-hint">Product or integration version number.</span>
+                            </div>
+                        </div>
+                        <div className="csc-custom-form-row">
+                            <label>Description <span className="csc-req">*</span></label>
+                            <textarea value={description} onChange={e => setDescription(e.target.value)} placeholder="e.g. Cisco Secure Firewall provides advanced threat defense for your network, with Splunk integration via syslog and eStreamer." maxLength={1000} />
+                            <span className="csc-custom-form-hint">Brief overview of the product and its Splunk integration.</span>
+                        </div>
+                    </div>
+
+                    {/* Section: Category */}
+                    <div className="csc-custom-form-section">
+                        <div className="csc-custom-form-section-title">Category — where the card appears</div>
+                        <div className="csc-custom-cat-pills">
+                            {CUSTOM_FORM_CATEGORIES.map(c => (
+                                <button key={c.value} className={`csc-custom-cat-pill${category === c.value ? ' active' : ''}`} onClick={() => { setCategory(c.value); setSubcategory(''); }}>
+                                    {categoryIcons[c.value] || ''} {c.label}
+                                </button>
+                            ))}
+                        </div>
+                        <span className="csc-custom-form-hint">Determines which section the card appears in on the main page.</span>
+                        {SUB_CATEGORIES[category] && SUB_CATEGORIES[category].length > 0 && (
+                            <div className="csc-custom-form-row" style={{ marginTop: '8px' }}>
+                                <label>Subcategory</label>
+                                <select value={subcategory} onChange={e => setSubcategory(e.target.value)} style={FORM_SELECT_STYLE}>
+                                    <option value="">— None —</option>
+                                    {SUB_CATEGORIES[category].map(s => (
+                                        <option key={s.id} value={s.id}>{s.name}</option>
+                                    ))}
+                                </select>
+                                <span className="csc-custom-form-hint">Optional sub-section within the category (e.g. Network Security, Cloud Security).</span>
+                            </div>
+                        )}
+                    </div>
+
+                    {/* Section: Data */}
+                    <div className="csc-custom-form-section">
+                        <div className="csc-custom-form-section-title">Data — sourcetypes and search keywords</div>
+                        <div className="csc-custom-form-row">
+                            <label>Sourcetypes</label>
+                            <input type="text" value={sourcetypes} onChange={e => setSourcetypes(e.target.value)} placeholder="e.g. cisco:asa, cisco:ftd" />
+                            <span className="csc-custom-form-hint">Comma-separated Splunk sourcetypes ingested by this product. Used for data detection and search.</span>
+                        </div>
+                        <div className="csc-custom-form-row">
+                            <label>Keywords</label>
+                            <input type="text" value={keywords} onChange={e => setKeywords(e.target.value)} placeholder="e.g. firewall, ftd, asa, firepower" />
+                            <span className="csc-custom-form-hint">Comma-separated extra search terms to help users find this card.</span>
+                        </div>
+                    </div>
+
+                    {/* Section: Add-on */}
+                    <div className="csc-custom-form-section">
+                        <div className="csc-custom-form-section-title">Add-on — optional Splunkbase integration</div>
+                        <div className="csc-custom-form-row">
+                            <label>Add-on Label</label>
+                            <input type="text" value={addonLabel} onChange={e => setAddonLabel(e.target.value)} placeholder="e.g. Cisco Secure Firewall Add-on for Splunk" />
+                            <span className="csc-custom-form-hint">Display name of the Splunkbase add-on associated with this product.</span>
+                        </div>
+                        <div className="csc-custom-form-cols">
+                            <div className="csc-custom-form-row">
+                                <label>Splunkbase UID</label>
+                                <input type="text" value={addonUid} onChange={e => setAddonUid(e.target.value)} placeholder="e.g. 1234" maxLength={10} />
+                                <span className="csc-custom-form-hint">Numeric ID from the Splunkbase URL (splunkbase.splunk.com/app/1234).</span>
+                            </div>
+                            <div className="csc-custom-form-row">
+                                <label>Docs URL</label>
+                                <input type="url" value={addonDocsUrl} onChange={e => setAddonDocsUrl(e.target.value)} placeholder="e.g. https://docs.splunk.com/..." />
+                                <span className="csc-custom-form-hint">Link to the add-on's documentation page.</span>
+                            </div>
+                        </div>
+                        <div className="csc-custom-form-row">
+                            <label>Troubleshooting URL</label>
+                            <input type="url" value={addonTroubleshootUrl} onChange={e => setAddonTroubleshootUrl(e.target.value)} placeholder="e.g. https://docs.splunk.com/.../troubleshoot" />
+                            <span className="csc-custom-form-hint">Link to the add-on's troubleshooting guide. Shows as a link on the card.</span>
+                        </div>
+                    </div>
+
+                    {/* Section: Links */}
+                    <div className="csc-custom-form-section">
+                        <div className="csc-custom-form-section-title">Links — external resources</div>
+                        <div className="csc-custom-form-row">
+                            <label>Learn More URL</label>
+                            <input type="url" value={learnMoreUrl} onChange={e => setLearnMoreUrl(e.target.value)} placeholder="e.g. https://www.cisco.com/go/secure-firewall" />
+                            <span className="csc-custom-form-hint">Link to the product's official page or documentation.</span>
+                        </div>
+                    </div>
+
+                    {/* Section: Advanced (collapsible) */}
+                    <div className={`csc-custom-form-section csc-custom-form-advanced${showAdvanced ? ' open' : ''}`}>
+                        <button className="csc-custom-form-advanced-toggle" onClick={() => setShowAdvanced(prev => !prev)}>
+                            <span className={`csc-custom-form-advanced-arrow${showAdvanced ? ' open' : ''}`}>&#9654;</span>
+                            Advanced
+                            <span className="csc-custom-form-hint" style={{ marginTop: 0, marginLeft: '4px' }}>— install detection, support level, dashboards, aliases, legacy apps</span>
+                        </button>
+                        {showAdvanced && (<>
+                            <div className="csc-custom-form-row">
+                                <label>Add-on App ID (folder name)</label>
+                                <input type="text" value={addonAppId} onChange={e => setAddonAppId(e.target.value)} placeholder="e.g. Splunk_TA_cisco-secure-firewall" maxLength={120} />
+                                <span className="csc-custom-form-hint">The Splunk app folder name — enables install status detection on the card.</span>
+                            </div>
+                            <div className="csc-custom-form-row">
+                                <label>Install URL</label>
+                                <input type="text" value={addonInstallUrl} onChange={e => setAddonInstallUrl(e.target.value)} placeholder='e.g. /manager/splunk-cisco-app-navigator/appsremote?query="Cisco+Secure+Firewall"' />
+                                <span className="csc-custom-form-hint">Deep link to install via Browse More Apps (leave blank to use Splunkbase link).</span>
+                            </div>
+                            <div className="csc-custom-form-row">
+                                <label>Support Level</label>
+                                <div className="csc-custom-cat-pills">
+                                    {[
+                                        { v: '', l: 'None' },
+                                        { v: 'cisco_supported', l: 'Cisco' },
+                                        { v: 'splunk_supported', l: 'Splunk' },
+                                        { v: 'developer_supported', l: 'Developer' },
+                                        { v: 'community_supported', l: 'Community' },
+                                    ].map(sl => (
+                                        <button key={sl.v} className={`csc-custom-cat-pill${supportLevel === sl.v ? ' active' : ''}`} onClick={() => setSupportLevel(sl.v)}>
+                                            {sl.l}
+                                        </button>
+                                    ))}
+                                </div>
+                                <span className="csc-custom-form-hint">Shown as a colored badge on the card.</span>
+                            </div>
+                            <div className="csc-custom-form-row">
+                                <label>Dashboards</label>
+                                <input type="text" value={dashboards} onChange={e => setDashboards(e.target.value)} placeholder="e.g. cisco_fw_overview, cisco_fw_threats" />
+                                <span className="csc-custom-form-hint">Comma-separated Splunk view names that enable the Launch button on the card.</span>
+                            </div>
+                            <div className="csc-custom-form-row">
+                                <label>Aliases (former names)</label>
+                                <input type="text" value={aliases} onChange={e => setAliases(e.target.value)} placeholder="e.g. Firepower, ASA" />
+                                <span className="csc-custom-form-hint">Shows "Formerly: ..." on the card and helps with search.</span>
+                            </div>
+                            <div className="csc-custom-form-row">
+                                <label>Legacy App UIDs</label>
+                                <input type="text" value={legacyUids} onChange={e => setLegacyUids(e.target.value)} placeholder="e.g. Splunk_TA_cisco-old, cisco_legacy_ta" />
+                                <span className="csc-custom-form-hint">Comma-separated app folder names of previous/retired add-ons. Enables "Legacy App" detection on the card.</span>
+                            </div>
+                            <div className="csc-custom-form-row">
+                                <label>Value Proposition</label>
+                                <textarea value={valueProp} onChange={e => setValueProp(e.target.value)} placeholder="e.g. Unified visibility into firewall events, threats, and policy changes" maxLength={300} style={{ minHeight: '50px' }} />
+                                <span className="csc-custom-form-hint">One-liner benefit shown in the detail tooltip.</span>
+                            </div>
+                        </>)}
+                    </div>
+                </div>
+            </Modal.Body>
+            <Modal.Footer>
+                <Button appearance="secondary" label="Cancel" onClick={onClose} disabled={saving} />
+                <Button appearance="primary" label={saving ? 'Saving\u2026' : (isEdit ? 'Save Changes' : 'Create Product')} onClick={handleSubmit} disabled={saving} />
+            </Modal.Footer>
+        </Modal>
+    );
+}
+
+function DeleteCustomProductModal({ open, onClose, product, onConfirm }) {
+    const [deleting, setDeleting] = useState(false);
+    if (!open || !product) return null;
+
+    const handleDelete = async () => {
+        setDeleting(true);
+        try {
+            await deleteCustomProduct(product.product_id);
+            onConfirm();
+            onClose();
+        } catch (e) {
+            console.error('Delete failed:', e);
+        } finally {
+            setDeleting(false);
+        }
+    };
+
+    return (
+        <Modal open onRequestClose={onClose} style={{ width: '420px' }}>
+            <Modal.Header title="Delete Custom Product" onRequestClose={onClose} />
+            <Modal.Body>
+                <div className="csc-delete-confirm-body">
+                    <div style={{ fontSize: '32px', marginBottom: '8px' }}>🗑️</div>
+                    <div className="csc-delete-confirm-name">{product.display_name}</div>
+                    <div className="csc-delete-confirm-warn">
+                        This will permanently remove this custom product card.<br />
+                        This action cannot be undone.
+                    </div>
+                </div>
+            </Modal.Body>
+            <Modal.Footer>
+                <Button appearance="secondary" label="Cancel" onClick={onClose} disabled={deleting} />
+                <Button appearance="destructive" label={deleting ? 'Deleting...' : 'Delete'} onClick={handleDelete} disabled={deleting} />
+            </Modal.Footer>
+        </Modal>
+    );
+}
+
 // ─────────────────────  SEARCH BAR  ─────────────────
 
 function UniversalFinderBar({ onSearch, resultCount, totalCount, products, externalQuery }) {
@@ -6558,7 +7060,12 @@ function CategoryFilterBar({
 function SCANProductsPage() {
     const [products, setProducts] = useState(PRODUCT_CATALOG.filter(p => CATEGORY_IDS.has(p.category) && !p.catalog_disabled));
     const [vaultProducts, setVaultProducts] = useState(PRODUCT_CATALOG.filter(p => CATEGORY_IDS.has(p.category) && p.catalog_disabled));
+    const [customProducts, setCustomProducts] = useState([]);
     const [showVault, setShowVault] = useState(false);
+    const [customFormOpen, setCustomFormOpen] = useState(false);
+    const [customEditProduct, setCustomEditProduct] = useState(null);
+    const [customCloneProduct, setCustomCloneProduct] = useState(null);
+    const [customDeleteTarget, setCustomDeleteTarget] = useState(null);
     const [configuredIds, setConfiguredIdsState] = useState(getConfiguredIds);
     const [installedApps, setInstalledApps] = useState({});
     const [appStatuses, setAppStatuses] = useState({});
@@ -6811,6 +7318,34 @@ function SCANProductsPage() {
         ));
     }, []);
 
+    const allProductIds = useMemo(() => {
+        return [...products, ...vaultProducts, ...customProducts].map(p => p.product_id);
+    }, [products, vaultProducts, customProducts]);
+
+    const handleCustomProductSaved = useCallback(() => {
+        loadData();
+    }, [loadData]);
+
+    const handleEditCustomProduct = useCallback((product) => {
+        setCustomEditProduct(product);
+        setCustomFormOpen(true);
+    }, []);
+
+    const handleCloneCustomProduct = useCallback((product) => {
+        setCustomEditProduct(null);
+        setCustomCloneProduct(product);
+        setCustomFormOpen(true);
+    }, []);
+
+    const handleDeleteCustomProduct = useCallback((product) => {
+        setCustomDeleteTarget(product);
+    }, []);
+
+    const handleCustomDeleted = useCallback(() => {
+        setCustomDeleteTarget(null);
+        loadData();
+    }, [loadData]);
+
     // ── Secret mode search intercepts ──
     const handleSearchInput = useCallback((value) => {
         const cmd = value.toLowerCase().trim();
@@ -6892,12 +7427,12 @@ function SCANProductsPage() {
             try {
                 const confProducts = await loadProductsFromConf();
                 if (confProducts.length > 0) {
-                    setProducts(confProducts.filter(p => !p.catalog_disabled));
-                    setVaultProducts(confProducts.filter(p => p.catalog_disabled));
+                    setCustomProducts(confProducts.filter(p => p.custom));
+                    setProducts(confProducts.filter(p => !p.custom && !p.catalog_disabled));
+                    setVaultProducts(confProducts.filter(p => !p.custom && p.catalog_disabled));
                 }
             } catch (e) {
                 console.warn('conf-products unavailable, using static catalog:', e);
-                // If REST fails (e.g. outside Splunk), products stay from PRODUCT_CATALOG (generate-catalog.js)
             }
 
             // 2. Installed apps lookup
@@ -7293,22 +7828,30 @@ function SCANProductsPage() {
     const retiredProducts = filteredProducts.filter((p) => p.status === 'retired');
     const gtmGapProducts = filteredProducts.filter((p) => p.coverage_gap && !(p.addon || p.app_viz || p.app_viz_2 || p.sc4s_supported));
 
+    const filteredCustomProducts = useMemo(() => {
+        if (!searchQuery) return customProducts;
+        const q = searchQuery.toLowerCase().trim();
+        return customProducts.filter((p) => productMatchesSearch(p, q));
+    }, [customProducts, searchQuery]);
+
     // ── Effective panel open state (search overrides collapsed panels) ──
     const effectivePanelOpen = useMemo(() => {
         if (!searchQuery) return panelState;
         const overrides = {};
-        if (configuredProducts.length > 0)  overrides.configured_products = true;
-        if (detectedProducts.length > 0)    overrides.detected_products = true;
-        if (availableProducts.length > 0)   overrides.available_products = true;
-        if (unsupportedProducts.length > 0) overrides.unsupported_products = true;
-        if (comingSoonProducts.length > 0)  overrides.coming_soon_products = true;
-        if (deprecatedProducts.length > 0)  overrides.deprecated_products = true;
-        if (retiredProducts.length > 0)     overrides.retired_products = true;
-        if (gtmGapProducts.length > 0)      overrides.gtm_coverage_gaps = true;
+        if (configuredProducts.length > 0)    overrides.configured_products = true;
+        if (detectedProducts.length > 0)      overrides.detected_products = true;
+        if (availableProducts.length > 0)     overrides.available_products = true;
+        if (unsupportedProducts.length > 0)   overrides.unsupported_products = true;
+        if (comingSoonProducts.length > 0)    overrides.coming_soon_products = true;
+        if (deprecatedProducts.length > 0)    overrides.deprecated_products = true;
+        if (retiredProducts.length > 0)       overrides.retired_products = true;
+        if (gtmGapProducts.length > 0)        overrides.gtm_coverage_gaps = true;
+        if (filteredCustomProducts.length > 0) overrides.custom_products = true;
         return { ...panelState, ...overrides };
     }, [searchQuery, panelState, configuredProducts.length, detectedProducts.length,
         availableProducts.length, unsupportedProducts.length, comingSoonProducts.length,
-        deprecatedProducts.length, retiredProducts.length, gtmGapProducts.length]);
+        deprecatedProducts.length, retiredProducts.length, gtmGapProducts.length,
+        filteredCustomProducts.length]);
 
     // ── Scroll to first matching card when search changes ──
     const prevSearchRef = useRef('');
@@ -7961,7 +8504,7 @@ function SCANProductsPage() {
                                     <ProductCard
                                         key={p.product_id} product={p}
                                         installedApps={installedApps} appStatuses={appStatuses} indexerApps={indexerApps}
-                                        sourcetypeData={sourcetypeData} splunkbaseData={splunkbaseData} appidToUidMap={appidToUidMap} isConfigured={false} isComingSoon={false}
+                                        sourcetypeData={sourcetypeData} splunkbaseData={splunkbaseData} appidToUidMap={appidToUidMap} isConfigured={false} isComingSoon
                                         platformType={effectivePlatformType}
                                         onToggleConfigured={handleToggleConfigured}
                                         onShowBestPractices={handleShowBestPractices}
@@ -7978,7 +8521,62 @@ function SCANProductsPage() {
                 </div>
             )}
 
-            {/* Section 7: Catalog Vault — Disabled Products */}
+            {/* Section: Custom Products */}
+            <div id="custom_products">
+            <CollapsiblePanel
+                title={`Custom Products (${filteredCustomProducts.length})`}
+                open={effectivePanelOpen.custom_products}
+                onChange={handlePanelToggle}
+                panelId="custom_products"
+            >
+                <div className="csc-custom-section-banner">
+                    Products you've added beyond the official Cisco catalog. Custom cards are stored in <code>local/products.conf</code> and survive app upgrades.
+                </div>
+                {filteredCustomProducts.length > 0 ? (
+                    <div className="csc-card-grid">
+                        {filteredCustomProducts.map((p) => (
+                            <div key={p.product_id} style={{ position: 'relative' }}>
+                                <span className="csc-custom-badge">Custom</span>
+                                <ProductCard
+                                    product={p}
+                                    installedApps={installedApps} appStatuses={appStatuses} indexerApps={indexerApps}
+                                    sourcetypeData={sourcetypeData} splunkbaseData={splunkbaseData} appidToUidMap={appidToUidMap}
+                                    isConfigured={configuredIds.includes(p.product_id)} isComingSoon={false}
+                                    platformType={effectivePlatformType}
+                                    onToggleConfigured={handleToggleConfigured}
+                                    onShowBestPractices={handleShowBestPractices}
+                                    onViewLegacy={handleViewLegacy}
+                                    onSetCustomDashboard={handleSetCustomDashboard}
+                                    devMode={devMode} onViewConfig={handleOpenConfigViewer}
+                                />
+                                <div className="csc-custom-card-actions">
+                                    <button className="csc-custom-action-btn" onClick={() => handleEditCustomProduct(p)} title="Edit this custom product">
+                                        ✏️ Edit
+                                    </button>
+                                    <button className="csc-custom-clone-btn" onClick={() => handleCloneCustomProduct(p)} title="Clone this custom product">
+                                        📋 Clone
+                                    </button>
+                                    <button className="csc-custom-action-btn csc-custom-action-btn-danger" onClick={() => handleDeleteCustomProduct(p)} title="Delete this custom product">
+                                        🗑️ Delete
+                                    </button>
+                                </div>
+                            </div>
+                        ))}
+                    </div>
+                ) : (
+                    <div className="empty-section" style={{ textAlign: 'center', padding: '24px' }}>
+                        {searchQuery ? 'No custom products match your search.' : 'No custom products yet.'}
+                    </div>
+                )}
+                <div style={{ marginTop: '12px' }}>
+                    <button className="csc-custom-add-btn" onClick={() => { setCustomEditProduct(null); setCustomCloneProduct(null); setCustomFormOpen(true); }}>
+                        <Plus size={14} /> Add Custom Product
+                    </button>
+                </div>
+            </CollapsiblePanel>
+            </div>
+
+            {/* Section 8: Catalog Vault — Disabled Products */}
             {showVault && vaultProducts.length > 0 && (
                 <div id="vault_products">
                 <CollapsiblePanel title={`Catalog Vault (${vaultProducts.length})`} open={effectivePanelOpen.vault_products} onChange={handlePanelToggle} panelId="vault_products">
@@ -8006,6 +8604,21 @@ function SCANProductsPage() {
 
 
             {/* Modals */}
+            <CustomProductFormModal
+                open={customFormOpen}
+                onClose={() => { setCustomFormOpen(false); setCustomEditProduct(null); setCustomCloneProduct(null); }}
+                onSave={handleCustomProductSaved}
+                editProduct={customEditProduct}
+                cloneProduct={customCloneProduct}
+                existingIds={allProductIds}
+                allProducts={[...products, ...customProducts, ...vaultProducts]}
+            />
+            <DeleteCustomProductModal
+                open={!!customDeleteTarget}
+                onClose={() => setCustomDeleteTarget(null)}
+                product={customDeleteTarget}
+                onConfirm={handleCustomDeleted}
+            />
             <BestPracticesModal
                 open={bpModalOpen}
                 onClose={() => setBpModalOpen(false)}

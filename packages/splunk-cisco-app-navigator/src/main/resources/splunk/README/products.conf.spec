@@ -365,6 +365,13 @@ support_level = cisco_supported | splunk_supported | developer_supported | commu
 *   not_supported       — Archived, deprecated, or no longer maintained.
 * Default: (empty). When empty, no support badge is shown.
 
+custom = true | false
+* Whether this product card was created by the customer (lives in local/products.conf).
+* Custom cards appear in a dedicated "Custom Products" section and can be
+* edited or deleted from the UI.  Official Cisco catalog cards should never
+* have this flag set.
+* Default: false.
+
 sort_order = <integer>
 * Numeric sort weight. Lower values appear first. Default 100.
 

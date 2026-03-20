@@ -153,6 +153,7 @@ function buildProduct(name, c) {
         escu_analytic_stories: csvToArray(c.escu_analytic_stories),
         escu_detection_count: parseInt(c.escu_detection_count || '0', 10),
         escu_detections: csvToArray(c.escu_detections),
+        custom: c.custom === 'true' || c.custom === '1',
     };
 }
 
