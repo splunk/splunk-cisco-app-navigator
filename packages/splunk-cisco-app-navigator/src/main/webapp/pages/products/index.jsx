@@ -264,6 +264,33 @@ function csvToArray(val) {
     return val.split(',').map(s => s.trim()).filter(Boolean);
 }
 
+/**
+ * Word-boundary keyword match: returns true when the query appears as a
+ * complete word (or multi-word phrase) within the keyword string, avoiding
+ * false positives like "enterprise" matching a query of "ise".
+ */
+function keywordMatchesQuery(keyword, query) {
+    if (keyword === query) return true;
+    const re = new RegExp(`(?:^|[\\s,\\-_/])${query.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}(?:$|[\\s,\\-_/])`, 'i');
+    return re.test(keyword);
+}
+
+/**
+ * Universal product search: checks display_name, tagline, vendor, product_id,
+ * aliases, keywords, and sourcetypes against a lowercase query string.
+ */
+function productMatchesSearch(p, q) {
+    const nameField = `${p.display_name} ${p.vendor} ${p.product_id}`.toLowerCase();
+    if (nameField.includes(q)) return true;
+    const als = (p.aliases || []).map(a => a.toLowerCase());
+    if (als.some(a => a.includes(q) || q.includes(a))) return true;
+    const kws = (p.keywords || []).map(k => k.toLowerCase());
+    if (kws.some(k => k === q || keywordMatchesQuery(k, q))) return true;
+    const sts = (p.sourcetypes || []).map(s => s.toLowerCase());
+    if (sts.some(s => s === q || s.includes(q))) return true;
+    return false;
+}
+
 const SC4S_SPLUNKBASE_UID = '4740';
 const CISCO_PRODUCT_DIRECTORY_URL = 'https://www.cisco.com/site/us/en/products/index.html';
 
@@ -636,7 +663,7 @@ async function detectIndexerTierApps() {
     try {
         const spl = [
             '| rest splunk_server=* /servicesNS/-/-/apps/local f=title f=version f=disabled count=0',
-            '| search NOT [| rest splunk_server=local /services/server/info f=splunk_server | fields splunk_server]',
+            '| search [| rest splunk_server=* /services/server/info f=server_roles | where match(server_roles, "indexer") | fields splunk_server]',
             '| eval is_disabled=if(disabled=="1" OR disabled="true", 1, 0)',
             '| stats latest(version) as idx_version max(is_disabled) as any_disabled dc(splunk_server) as idx_count by title',
             '| fields title idx_version any_disabled idx_count',
@@ -1508,6 +1535,7 @@ function HFInfoModal({ open, onClose, isCloud }) {
                 </div>
             </Modal.Body>
             <Modal.Footer>
+                <CopyModalButton />
                 <Button appearance="secondary" label="Close" onClick={onClose} />
             </Modal.Footer>
         </Modal>
@@ -1734,13 +1762,16 @@ function MagicEightModal({ open, onClose, sourcetypes, productName, addonApp, ad
         if (appViz2) apps.push({ id: appViz2, label: appViz2, role: 'App' });
         return apps.map(a => {
             const sh = installedApps[a.id];
-            const idx = indexerApps ? indexerApps[a.id] : undefined;
+            const isAddon = a.role === 'Add-on';
+            const idx = (isAddon && indexerApps) ? indexerApps[a.id] : undefined;
             const shVer = sh ? sh.version : null;
             const idxVer = idx ? idx.version : null;
             const idxDisabled = idx ? idx.disabled : false;
-            let state = 'na'; // na | ok | mismatch | missing | disabled | not_installed
+            let state = 'na';
             if (!sh) {
                 state = 'not_installed';
+            } else if (!isAddon) {
+                state = 'sh_only';
             } else if (!indexerApps) {
                 state = 'loading';
             } else if (Object.keys(indexerApps).length === 0) {
@@ -1768,15 +1799,16 @@ function MagicEightModal({ open, onClose, sourcetypes, productName, addonApp, ad
         (async () => {
             try {
                 // Build the IN() list for sourcetypes (exact names only; wildcards use match())
+                // All comparisons use lowercase to handle case mismatches (e.g. Cisco:ISE:Syslog vs cisco:ise:syslog)
                 const exactSts = sourcetypes.filter(st => !st.includes('*'));
                 const wildcardPatterns = sourcetypes.filter(st => st.includes('*')).map(st => st.replace(/\*/g, '.*'));
 
                 const filterParts = [];
                 if (exactSts.length > 0) {
-                    filterParts.push(`title IN (${exactSts.map(st => `"${st}"`).join(', ')})`);
+                    filterParts.push(`_norm_title IN (${exactSts.map(st => `"${st.toLowerCase()}"`).join(', ')})`);
                 }
                 wildcardPatterns.forEach(p => {
-                    filterParts.push(`match(title, "^${p}$")`);
+                    filterParts.push(`match(_norm_title, "^${p.toLowerCase()}$")`);
                 });
 
                 // System-wide lookup: don't scope to a single app because props.conf
@@ -1792,17 +1824,20 @@ function MagicEightModal({ open, onClose, sourcetypes, productName, addonApp, ad
                 //      Standalone: Query local only (same host is SH + indexer)
                 //   4. | stats values(*) as * by title — dedup across cluster AND apps
                 //   5. values(eai:acl.app) tracks which app(s) define each setting
+                //   6. f=rename + _norm_title handles props.conf rename directives
+                //      (e.g. [Cisco:ISE:Syslog] rename=cisco:ise:syslog) and case mismatches
                 const m6Fields = MAGIC_EIGHT.map(m => `f=${m.key}`).join(' ');
                 const isStandalone = indexerApps !== null && Object.keys(indexerApps).length === 0;
                 const splParts = [
-                    `| rest splunk_server=${isStandalone ? 'local' : '*'} /servicesNS/-/-/configs/conf-props f=eai:* ${m6Fields} count=0`,
+                    `| rest splunk_server=${isStandalone ? 'local' : '*'} /servicesNS/-/-/configs/conf-props f=eai:* f=rename ${m6Fields} count=0`,
+                    '| eval _norm_title=if(isnotnull(rename) AND rename!="", rename, lower(title))',
                     `| search (${titleFilter})`,
-                    `| fields splunk_server eai:acl.app title ${MAGIC_EIGHT.map(m => m.key).join(' ')}`,
+                    `| fields splunk_server eai:acl.app _norm_title ${MAGIC_EIGHT.map(m => m.key).join(' ')}`,
                 ];
                 if (!isStandalone) {
-                    splParts.push('| search NOT [| rest splunk_server=local /services/server/info f=splunk_server | fields splunk_server]');
+                    splParts.push('| search [| rest splunk_server=* /services/server/info f=server_roles | where match(server_roles, "indexer") | fields splunk_server]');
                 }
-                splParts.push('| stats values(*) as * values(eai:acl.app) as defining_apps by title');
+                splParts.push('| stats values(*) as * values(eai:acl.app) as defining_apps by _norm_title | rename _norm_title as title');
                 const spl = splParts.join(' ');
                 setSearchSpl(spl);
 
@@ -1986,6 +2021,7 @@ function MagicEightModal({ open, onClose, sourcetypes, productName, addonApp, ad
                                                 missing: { cls: 'scan-m8-state-missing', label: 'Not on Indexers' },
                                                 disabled: { cls: 'scan-m8-state-disabled', label: 'Disabled on IDX' },
                                                 standalone: { cls: 'scan-m8-state-standalone', label: 'Standalone' },
+                                                sh_only: { cls: 'scan-m8-state-ok', label: 'SH Only' },
                                                 loading: { cls: 'scan-m8-state-standalone', label: 'Checking…' },
                                             }[r.state] || { cls: 'scan-m8-state-standalone', label: '—' };
                                             return (
@@ -1998,7 +2034,7 @@ function MagicEightModal({ open, onClose, sourcetypes, productName, addonApp, ad
                                                         <code style={{ fontSize: '11px', padding: '1px 6px', background: 'var(--bg-surface, #eef1f4)', borderRadius: '3px' }}>{r.shVer || '—'}</code>
                                                     </td>
                                                     <td style={{ padding: '4px 8px' }}>
-                                                        {r.state === 'standalone' ? (
+                                                        {r.state === 'standalone' || r.state === 'sh_only' ? (
                                                             <span className="scan-m8-muted">N/A</span>
                                                         ) : r.state === 'loading' ? (
                                                             <span className="scan-m8-muted">…</span>
@@ -2021,6 +2057,23 @@ function MagicEightModal({ open, onClose, sourcetypes, productName, addonApp, ad
                                         Version mismatches between SH and indexer tiers can cause props.conf gaps — the indexer may be running older definitions.
                                     </div>
                                 )}
+                                <div style={{ marginTop: '6px', textAlign: 'right' }}>
+                                    <a
+                                        href={`/app/search/search?q=${encodeURIComponent(
+                                            '| rest splunk_server=* /servicesNS/-/-/apps/local f=title f=version f=disabled count=0'
+                                            + ` | search title IN (${tierRows.map(r => `"${r.id}"`).join(', ')})`
+                                            + ' | eval server_roles=mvjoin(server_roles, ", ")'
+                                            + ' | join splunk_server [| rest splunk_server=* /services/server/info f=server_roles]'
+                                            + ' | table splunk_server server_roles title version disabled'
+                                            + ' | sort server_roles title'
+                                        )}`}
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                        style={{ fontSize: '11px', color: 'var(--text-link, #0066cc)', textDecoration: 'none' }}
+                                    >
+                                        Open in Search ↗
+                                    </a>
+                                </div>
                             </div>
                         );
                     })()}
@@ -2440,6 +2493,7 @@ function AlertActionsInfoModal({ open, onClose, alertActionUids, splunkbaseData,
                 </div>
             </Modal.Body>
             <Modal.Footer>
+                <CopyModalButton />
                 <Button appearance="secondary" label="Close" onClick={onClose} />
             </Modal.Footer>
         </Modal>
@@ -2793,6 +2847,7 @@ function BestPracticesModal({ open, onClose, product, platformType, splunkbaseDa
                 </div>
             </Modal.Body>
             <Modal.Footer>
+                <CopyModalButton />
                 <Button appearance="secondary" label="Close" onClick={onClose} />
             </Modal.Footer>
         </Modal>
@@ -2942,6 +2997,7 @@ function LegacyAuditModal({ open, onClose, legacyUids, installedApps, indexerApp
                 </div>
             </Modal.Body>
             <Modal.Footer>
+                <CopyModalButton />
                 <Button appearance="secondary" label="Close" onClick={onClose} />
             </Modal.Footer>
         </Modal>
@@ -5365,6 +5421,12 @@ function UniversalFinderBar({ onSearch, resultCount, totalCount, products, exter
                 if (!map[k]) map[k] = [];
                 if (!map[k].includes(p.product_id)) map[k].push(p.product_id);
             });
+            (p.sourcetypes || []).forEach((st) => {
+                const s = st.toLowerCase().trim();
+                if (!s || s.includes('*')) return;
+                if (!map[s]) map[s] = [];
+                if (!map[s].includes(p.product_id)) map[s].push(p.product_id);
+            });
         });
         return map;
     }, [products]);
@@ -5372,13 +5434,7 @@ function UniversalFinderBar({ onSearch, resultCount, totalCount, products, exter
     const broadMatchCount = useCallback((term) => {
         const q = term.toLowerCase().trim();
         if (!q) return 0;
-        return (products || []).filter((p) => {
-            const kws = (p.keywords || []).map((k) => k.toLowerCase());
-            if (kws.some((k) => k === q || k.includes(q))) return true;
-            const als = (p.aliases || []).map((a) => a.toLowerCase());
-            if (als.some((a) => a.includes(q) || q.includes(a))) return true;
-            return `${p.display_name} ${p.tagline} ${p.vendor} ${p.product_id}`.toLowerCase().includes(q);
-        }).length;
+        return (products || []).filter((p) => productMatchesSearch(p, q)).length;
     }, [products]);
 
     const suggestions = useMemo(() => {
@@ -7137,15 +7193,7 @@ function SCANProductsPage() {
         }
         if (searchQuery) {
             const q = searchQuery.toLowerCase().trim();
-            filtered = filtered.filter((p) => {
-                const nameField = `${p.display_name} ${p.tagline} ${p.vendor} ${p.product_id}`.toLowerCase();
-                if (nameField.includes(q)) return true;
-                const als = (p.aliases || []).map((a) => a.toLowerCase());
-                if (als.some((a) => a.includes(q) || q.includes(a))) return true;
-                const kws = (p.keywords || []).map((k) => k.toLowerCase());
-                if (kws.some((k) => k === q || k.includes(q))) return true;
-                return false;
-            });
+            filtered = filtered.filter((p) => productMatchesSearch(p, q));
             filtered.sort((a, b) => {
                 const aExact = a.display_name.toLowerCase().includes(q) ? 0 : 1;
                 const bExact = b.display_name.toLowerCase().includes(q) ? 0 : 1;
@@ -7153,6 +7201,9 @@ function SCANProductsPage() {
                 const aAlias = (a.aliases || []).some(al => al.toLowerCase().includes(q)) ? 0 : 1;
                 const bAlias = (b.aliases || []).some(al => al.toLowerCase().includes(q)) ? 0 : 1;
                 if (aAlias !== bAlias) return aAlias - bAlias;
+                const aSt = (a.sourcetypes || []).some(s => s.toLowerCase().includes(q)) ? 0 : 1;
+                const bSt = (b.sourcetypes || []).some(s => s.toLowerCase().includes(q)) ? 0 : 1;
+                if (aSt !== bSt) return aSt - bSt;
                 return (a.sort_order || 100) - (b.sort_order || 100);
             });
         }
@@ -7311,15 +7362,7 @@ function SCANProductsPage() {
         if (aiFilter) base = base.filter((p) => p.ai_enabled);
         if (searchQuery) {
             const q = searchQuery.toLowerCase().trim();
-            base = base.filter((p) => {
-                const nameField = `${p.display_name} ${p.tagline} ${p.vendor} ${p.product_id}`.toLowerCase();
-                if (nameField.includes(q)) return true;
-                const als = (p.aliases || []).map((a) => a.toLowerCase());
-                if (als.some((a) => a.includes(q) || q.includes(a))) return true;
-                const kws = (p.keywords || []).map((k) => k.toLowerCase());
-                if (kws.some((k) => k === q || k.includes(q))) return true;
-                return false;
-            });
+            base = base.filter((p) => productMatchesSearch(p, q));
         }
         if (platformFilter.length > 0 && splunkbaseData && Object.keys(splunkbaseData).length > 0) {
             base = base.filter((p) => {
