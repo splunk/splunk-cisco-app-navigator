@@ -16,7 +16,9 @@ if [[ -z "$VERSION" ]]; then
   exit 1
 fi
 
-PKG_PATH="${PKG_ROOT}/${APP_NAME}-${VERSION}.tar.gz"
+DIST_DIR="${PKG_ROOT}/../../dist"
+mkdir -p "$DIST_DIR"
+PKG_PATH="${DIST_DIR}/${APP_NAME}-${VERSION}.tar.gz"
 
 if [[ ! -d "$STAGE_DIR" ]]; then
   echo "stage/ not found; running clean:build first..."

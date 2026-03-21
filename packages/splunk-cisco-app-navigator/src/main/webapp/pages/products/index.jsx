@@ -12,13 +12,16 @@
  *   • Whether the expected sourcetypes are already arriving
  *   • Platform-aware best-practice guidance (Cloud vs Enterprise)
  *
- * Five sections:
- *   1. Configured Products    — products the admin has added to their workspace
- *   2. Available Products     — active products ready to configure
- *   3. Unsupported Products   — products with no official support (not_supported)
- *   4. Coming Soon            — products under development
- *   5. Deprecated / Archived  — archived products no longer on Splunkbase
- *   6. GTM Roadmap — Coverage Gaps — Cisco products with zero Splunk integration
+ * Nine sections (some gated behind devMode / gtmMode):
+ *   1. Configured Products       — products the admin has added to their workspace
+ *   2. Available Products        — active products ready to configure
+ *   3. Integration Needed        — not_supported products; no Splunk TA exists (dev/GTM only)
+ *   4. Coming Soon               — status = under_development (dev/GTM only)
+ *   5. Deprecated Products       — add-on sunset or replaced by a newer TA
+ *   6. Retired Products          — Cisco product itself is end-of-life
+ *   7. GTM Roadmap — Coverage Gaps — coverage_gap products without any integration (dev/GTM only)
+ *   8. Custom Products           — customer-created cards from local/products.conf
+ *   9. Catalog Vault             — disabled/archived products (vault toggle in FilterDrawer)
  *
  * All product metadata lives in products.conf.  A static PRODUCT_CATALOG
  * array mirrors that file so cards always render even outside Splunk.
@@ -41,6 +44,9 @@ import External from '@splunk/react-icons/ArrowSquareTopRight';
 import Clipboard from '@splunk/react-icons/Clipboard';
 import Code from '@splunk/react-icons/Script';
 import Search from '@splunk/react-icons/Magnifier';
+import Pencil from '@splunk/react-icons/Pencil';
+import CloneIcon from '@splunk/react-icons/LayersDoubleTransparent';
+import TrashCan from '@splunk/react-icons/TrashCanCross';
 import Button from '@splunk/react-ui/Button';
 import CollapsiblePanel from '@splunk/react-ui/CollapsiblePanel';
 import WaitSpinner from '@splunk/react-ui/WaitSpinner';
@@ -181,6 +187,7 @@ const SUB_CATEGORIES = {
     collaboration: [
         { id: 'meetings_calling', name: 'Meetings & Calling', icon: '' },
         { id: 'voice_telephony', name: 'Voice & Telephony', icon: '' },
+        { id: 'contact_center', name: 'Contact Center', icon: '' },
     ],
 };
 
@@ -3567,10 +3574,10 @@ function generateCustomerSummary(product, splunkbaseData) {
 // Renders one product: icon, name, links, support bar (bottom), install/configure actions.
 // Support indicator: one blue bar at bottom via supportBadgeClass / data-support-level (see products.css).
 
-function ProductCard({ product, installedApps, appStatuses, indexerApps, sourcetypeData, splunkbaseData, appidToUidMap, isConfigured, isComingSoon, platformType, onToggleConfigured, onShowBestPractices, onViewLegacy, onSetCustomDashboard, devMode, onViewConfig, showGtmRibbon = false }) {
+function ProductCard({ product, installedApps, appStatuses, indexerApps, sourcetypeData, splunkbaseData, appidToUidMap, isConfigured, isComingSoon, noIntegration, platformType, onToggleConfigured, onShowBestPractices, onViewLegacy, onSetCustomDashboard, devMode, onViewConfig, showGtmRibbon = false, onEditCustom, onCloneCustom, onDeleteCustom, sharedSourcetypeMap }) {
     const {
         product_id, display_name, version, status, description, value_proposition, vendor, tagline,
-        icon_svg, learn_more_url, addon_docs_url, addon_troubleshoot_url, addon_install_url,
+        icon_svg, icon_emoji, learn_more_url, addon_docs_url, addon_troubleshoot_url, addon_install_url,
         addon, addon_label,
         app_viz, app_viz_label, app_viz_docs_url, app_viz_troubleshoot_url, app_viz_install_url,
         app_viz_2, app_viz_2_label, app_viz_2_docs_url, app_viz_2_troubleshoot_url, app_viz_2_install_url,
@@ -3583,6 +3590,11 @@ function ProductCard({ product, installedApps, appStatuses, indexerApps, sourcet
         stream_docs_url, netflow_sourcetypes, netflow_config_notes,
         es_compatible, es_cim_data_models, escu_analytic_stories, escu_detection_count, escu_detections,
     } = product;
+
+    // Suppress all action buttons for cards with no integration to install/configure.
+    // isComingSoon (under_development only) also shows a "Coming Soon" badge;
+    // noIntegration (roadmap / GTM / Integration Needed) suppresses buttons without a badge.
+    const suppressActions = isComingSoon || noIntegration;
 
     const appStatus = appStatuses[addon] || null;
     const vizAppStatus = app_viz ? (appStatuses[app_viz] || null) : null;
@@ -3763,13 +3775,14 @@ function ProductCard({ product, installedApps, appStatuses, indexerApps, sourcet
         ? buildSourcetypeSearchUrl(product.sourcetypes)
         : null;
 
-    // Support indicator: one blue bar at bottom of card for cisco_supported or splunk_supported
-    // (CSS: .csc-card-cisco-supported / .csc-card-splunk-supported; data-support-level for fallback)
+    // Support indicator: colored bar at bottom of card.
+    // Custom cards get a distinct teal border; catalog cards use Cisco blue / Splunk pink / red.
     const hasWorkingIntegration = !!(addon || app_viz || app_viz_2 || sc4s_supported);
-    const supportBadgeClass = support_level === 'cisco_supported' ? 'csc-card-cisco-supported'
+    const supportBadgeClass = product.custom ? 'csc-card-custom'
+        : support_level === 'cisco_supported' ? 'csc-card-cisco-supported'
         : support_level === 'splunk_supported' ? 'csc-card-splunk-supported'
         : hasWorkingIntegration && (support_level === 'developer_supported' || support_level === 'community_supported' || support_level === 'not_supported') ? 'csc-card-unsupported-tier' : '';
-    const supportLevelAttr = supportBadgeClass ? support_level : undefined;
+    const supportLevelAttr = supportBadgeClass ? (product.custom ? 'custom' : support_level) : undefined;
     return (
         <div
             className={`csc-card ${supportBadgeClass}`.trim()}
@@ -3811,7 +3824,7 @@ function ProductCard({ product, installedApps, appStatuses, indexerApps, sourcet
                             />
                         ) : null}
                         <span className="csc-icon-fallback" style={icon_svg ? {display:'none'} : undefined}>
-                            {(display_name || 'C')[0]}
+                            {icon_emoji || (display_name || 'C')[0]}
                         </span>
                     </span>
                 </div>
@@ -3931,7 +3944,7 @@ function ProductCard({ product, installedApps, appStatuses, indexerApps, sourcet
                 vizAppStatus={vizAppStatus}
                 vizApp2Status={vizApp2Status}
                 sourcetypeInfo={sourcetypeInfo}
-                isRoadmapCard={coverage_gap || isComingSoon}
+                isRoadmapCard={coverage_gap || suppressActions}
                 sourcetypeSearchUrl={sourcetypeSearchUrl}
                 isArchived={!!(!addon_install_url && addon_splunkbase_uid)}
             />
@@ -3939,7 +3952,7 @@ function ProductCard({ product, installedApps, appStatuses, indexerApps, sourcet
 
 
             {/* ── Unified summary + single expandable details panel ── */}
-            {hasDeps && !isComingSoon && (
+            {hasDeps && !suppressActions && (
                 <div className="csc-card-dependency">
                     {/* Single collapsed summary line */}
                     <div className="csc-dep-summary" onClick={() => setDepsExpanded((v) => !v)} role="button" tabIndex={0}>
@@ -4004,7 +4017,7 @@ function ProductCard({ product, installedApps, appStatuses, indexerApps, sourcet
                                     {appStatus?.version && (
                                         <span className="csc-dep-version">v{appStatus.version}</span>
                                     )}
-                                    {!appStatus?.installed && !isComingSoon && (
+                                    {!appStatus?.installed && !suppressActions && (
                                         <span className="csc-dep-status-missing">not installed</span>
                                     )}
                                 </div>
@@ -4096,7 +4109,7 @@ function ProductCard({ product, installedApps, appStatuses, indexerApps, sourcet
                                     {vizAppStatus?.version && (
                                         <span className="csc-dep-version">v{vizAppStatus.version}</span>
                                     )}
-                                    {!vizAppStatus?.installed && !isComingSoon && (
+                                    {!vizAppStatus?.installed && !suppressActions && (
                                         <span className="csc-dep-status-missing">not installed</span>
                                     )}
                                 </div>
@@ -4140,7 +4153,7 @@ function ProductCard({ product, installedApps, appStatuses, indexerApps, sourcet
                                     {vizApp2Status?.version && (
                                         <span className="csc-dep-version">v{vizApp2Status.version}</span>
                                     )}
-                                    {!vizApp2Status?.installed && !isComingSoon && (
+                                    {!vizApp2Status?.installed && !suppressActions && (
                                         <span className="csc-dep-status-missing">not installed</span>
                                     )}
                                 </div>
@@ -4425,14 +4438,38 @@ function ProductCard({ product, installedApps, appStatuses, indexerApps, sourcet
                                     </summary>
                                     <div className="csc-dep-details-body">
                                         <div className="csc-sourcetypes-chips">
-                                            {product.sourcetypes.map(st => (
-                                                <span
-                                                    key={st}
-                                                    className={`csc-st-chip ${sourcetypeInfo?.hasData ? 'csc-st-chip-active' : ''}`}
-                                                    title={st}
-                                                >{st}</span>
-                                            ))}
+                                            {product.sourcetypes.map(st => {
+                                                const peers = sharedSourcetypeMap && sharedSourcetypeMap[st];
+                                                const isShared = peers && peers.length > 1;
+                                                return (
+                                                    <span
+                                                        key={st}
+                                                        className={`csc-st-chip ${sourcetypeInfo?.hasData ? 'csc-st-chip-active' : ''} ${isShared ? 'csc-st-chip-shared' : ''}`}
+                                                        title={isShared ? `${st} — shared with ${peers.filter(x => x.product_id !== product.product_id).map(x => x.display_name).join(', ')}` : st}
+                                                    >{st}{isShared && <span className="csc-st-shared-badge" title="Shared sourcetype">⇄</span>}</span>
+                                                );
+                                            })}
                                         </div>
+                                        {(() => {
+                                            if (!sharedSourcetypeMap) return null;
+                                            const sharedSts = product.sourcetypes.filter(st => sharedSourcetypeMap[st] && sharedSourcetypeMap[st].length > 1);
+                                            if (sharedSts.length === 0) return null;
+                                            const peerNames = new Set();
+                                            for (const st of sharedSts) {
+                                                for (const p of sharedSourcetypeMap[st]) {
+                                                    if (p.product_id !== product.product_id) peerNames.add(p.display_name);
+                                                }
+                                            }
+                                            return (
+                                                <div className="csc-st-shared-note">
+                                                    <span className="csc-st-shared-icon">ℹ</span>
+                                                    {sharedSts.length === product.sourcetypes.length
+                                                        ? 'All sourcetypes are '
+                                                        : `${sharedSts.length} sourcetype${sharedSts.length > 1 ? 's are' : ' is'} `}
+                                                    shared with: {[...peerNames].join(', ')}
+                                                </div>
+                                            );
+                                        })()}
                                     </div>
                                 </details>
                                 </>
@@ -4481,7 +4518,7 @@ function ProductCard({ product, installedApps, appStatuses, indexerApps, sourcet
                     Learn More
                 </a>
                 {/* Disabled TA — link to app manager */}
-                {!isComingSoon && isConfigured && appStatus?.installed && appStatus?.disabled && (
+                {!suppressActions && isConfigured && appStatus?.installed && appStatus?.disabled && (
                     <a href={createURL('/manager/splunk-cisco-app-navigator/apps/local')}
                         target="_blank" rel="noopener noreferrer"
                         className="csc-btn csc-btn-disabled-label"
@@ -4490,7 +4527,7 @@ function ProductCard({ product, installedApps, appStatuses, indexerApps, sourcet
                     </a>
                 )}
                 {/* Disabled Viz App — link to app manager */}
-                {!isComingSoon && isConfigured && vizAppStatus?.installed && vizAppStatus?.disabled && (
+                {!suppressActions && isConfigured && vizAppStatus?.installed && vizAppStatus?.disabled && (
                     <a href={createURL('/manager/splunk-cisco-app-navigator/apps/local')}
                         target="_blank" rel="noopener noreferrer"
                         className="csc-btn csc-btn-disabled-label"
@@ -4499,7 +4536,7 @@ function ProductCard({ product, installedApps, appStatuses, indexerApps, sourcet
                     </a>
                 )}
                 {/* Update TA */}
-                {!isComingSoon && isConfigured && appStatus?.installed && !appStatus?.disabled && appStatus?.updateVersion && (addon_install_url || addon_splunkbase_uid) && (
+                {!suppressActions && isConfigured && appStatus?.installed && !appStatus?.disabled && appStatus?.updateVersion && (addon_install_url || addon_splunkbase_uid) && (
                     <a href={addon_install_url ? createURL(addon_install_url) : generateSplunkbaseUrl(addon_splunkbase_uid)} target="_blank" rel="noopener noreferrer"
                         className="csc-btn csc-btn-upgrade"
                         title={`Update ${addon_label || addon} to v${appStatus.updateVersion}`}>
@@ -4507,7 +4544,7 @@ function ProductCard({ product, installedApps, appStatuses, indexerApps, sourcet
                     </a>
                 )}
                 {/* Update Viz App */}
-                {!isComingSoon && isConfigured && vizAppStatus?.installed && !vizAppStatus?.disabled && vizAppStatus?.updateVersion && (app_viz_install_url || app_viz_splunkbase_uid) && (
+                {!suppressActions && isConfigured && vizAppStatus?.installed && !vizAppStatus?.disabled && vizAppStatus?.updateVersion && (app_viz_install_url || app_viz_splunkbase_uid) && (
                     <a href={app_viz_install_url ? createURL(app_viz_install_url) : generateSplunkbaseUrl(app_viz_splunkbase_uid)} target="_blank" rel="noopener noreferrer"
                         className="csc-btn csc-btn-upgrade"
                         title={`Update ${app_viz_label || app_viz} to v${vizAppStatus.updateVersion}`}>
@@ -4515,7 +4552,7 @@ function ProductCard({ product, installedApps, appStatuses, indexerApps, sourcet
                     </a>
                 )}
                 {/* Update Viz App 2 */}
-                {!isComingSoon && isConfigured && vizApp2Status?.installed && !vizApp2Status?.disabled && vizApp2Status?.updateVersion && app_viz_2_install_url && (
+                {!suppressActions && isConfigured && vizApp2Status?.installed && !vizApp2Status?.disabled && vizApp2Status?.updateVersion && app_viz_2_install_url && (
                     <a href={createURL(app_viz_2_install_url)} target="_blank" rel="noopener noreferrer"
                         className="csc-btn csc-btn-upgrade"
                         title={`Update ${app_viz_2_label || app_viz_2} to v${vizApp2Status.updateVersion}`}>
@@ -4523,7 +4560,7 @@ function ProductCard({ product, installedApps, appStatuses, indexerApps, sourcet
                     </a>
                 )}
                 {/* Install TA */}
-                {!isComingSoon && isConfigured && addon && !appStatus?.installed && (addon_install_url || addon_splunkbase_uid) && (
+                {!suppressActions && isConfigured && addon && !appStatus?.installed && (addon_install_url || addon_splunkbase_uid) && (
                     <a href={addon_install_url ? createURL(addon_install_url) : generateSplunkbaseUrl(addon_splunkbase_uid)}
                         target="_blank" rel="noopener noreferrer"
                         className={`csc-btn ${!addon_install_url ? 'csc-btn-archived' : 'csc-btn-green'}`}
@@ -4534,7 +4571,7 @@ function ProductCard({ product, installedApps, appStatuses, indexerApps, sourcet
                     </a>
                 )}
                 {/* Install Viz App */}
-                {!isComingSoon && isConfigured && app_viz && !vizAppStatus?.installed && (app_viz_install_url || app_viz_splunkbase_uid) && (
+                {!suppressActions && isConfigured && app_viz && !vizAppStatus?.installed && (app_viz_install_url || app_viz_splunkbase_uid) && (
                     <a href={app_viz_install_url ? createURL(app_viz_install_url) : generateSplunkbaseUrl(app_viz_splunkbase_uid)}
                         target="_blank" rel="noopener noreferrer"
                         className={`csc-btn ${!app_viz_install_url ? 'csc-btn-archived' : 'csc-btn-green'}`}
@@ -4545,7 +4582,7 @@ function ProductCard({ product, installedApps, appStatuses, indexerApps, sourcet
                     </a>
                 )}
                 {/* Install Viz App 2 */}
-                {!isComingSoon && isConfigured && app_viz_2 && !vizApp2Status?.installed && (app_viz_2_install_url || app_viz_2_splunkbase_uid) && (
+                {!suppressActions && isConfigured && app_viz_2 && !vizApp2Status?.installed && (app_viz_2_install_url || app_viz_2_splunkbase_uid) && (
                     <a href={app_viz_2_install_url ? createURL(app_viz_2_install_url) : generateSplunkbaseUrl(app_viz_2_splunkbase_uid)}
                         target="_blank" rel="noopener noreferrer"
                         className={`csc-btn ${!app_viz_2_install_url ? 'csc-btn-archived' : 'csc-btn-green'}`}
@@ -4556,7 +4593,7 @@ function ProductCard({ product, installedApps, appStatuses, indexerApps, sourcet
                     </a>
                 )}
                 {/* Launch — only when installed AND not disabled */}
-                {!isComingSoon && isConfigured && isInstalled && !appStatus?.disabled && !vizAppStatus?.disabled && (
+                {!suppressActions && isConfigured && isInstalled && !appStatus?.disabled && !vizAppStatus?.disabled && (
                     <div className="csc-launch-wrap" ref={launchBtnRef}>
                         <button className="csc-btn csc-btn-green" onClick={handleLaunchApp}
                             title={product.custom_dashboard
@@ -4599,21 +4636,21 @@ function ProductCard({ product, installedApps, appStatuses, indexerApps, sourcet
                     </div>
                 )}
                 {/* Add to My Products — allowed for coverage_gap products too (e.g. AppDynamics, Webex) */}
-                {!isComingSoon && !isConfigured && (
+                {!suppressActions && !isConfigured && (
                     <button className="csc-btn csc-btn-green" onClick={() => onToggleConfigured(product_id)}
                         title="Add to My Products">
                         <Plus style={{marginRight: 4}} /> Add
                     </button>
                 )}
                 {/* Best Practices — hidden for roadmap/coverage_gap products (no add-on yet) */}
-                {!isComingSoon && !coverage_gap && (
+                {!suppressActions && !coverage_gap && (
                     <button className="csc-btn csc-btn-icon csc-btn-outline" onClick={() => onShowBestPractices(product)}
                         title="Best Practices">
                         <QuestionCircle size={16} />
                     </button>
                 )}
                 {/* Copy customer summary to clipboard */}
-                {!isComingSoon && (
+                {!suppressActions && (
                     <button className={`csc-btn csc-btn-icon csc-btn-outline ${copiedSummary ? 'csc-btn-copied' : ''}`}
                         onClick={handleCopySummary}
                         title={copiedSummary ? 'Copied to clipboard!' : `Copy ${display_name} summary for customer`}>
@@ -4623,7 +4660,7 @@ function ProductCard({ product, installedApps, appStatuses, indexerApps, sourcet
                     </button>
                 )}
                 {/* Remove */}
-                {!isComingSoon && isConfigured && (
+                {!suppressActions && isConfigured && (
                     <button className="csc-btn csc-btn-icon csc-btn-outline" onClick={() => onToggleConfigured(product_id)}
                         title="Remove from My Products">
                         <Close size={16} />
@@ -4635,6 +4672,25 @@ function ProductCard({ product, installedApps, appStatuses, indexerApps, sourcet
                         onClick={() => onViewConfig(product_id)}
                         title="View product config (Dev Mode)">
                         <Code size={16} />
+                    </button>
+                )}
+                {/* Custom card management — edit, clone, delete (only when callbacks provided) */}
+                {onEditCustom && (
+                    <button className="csc-btn csc-btn-icon csc-btn-outline"
+                        onClick={() => onEditCustom(product)} title="Edit custom product">
+                        <Pencil size={16} />
+                    </button>
+                )}
+                {onCloneCustom && (
+                    <button className="csc-btn csc-btn-icon csc-btn-outline"
+                        onClick={() => onCloneCustom(product)} title="Clone custom product">
+                        <CloneIcon size={16} />
+                    </button>
+                )}
+                {onDeleteCustom && (
+                    <button className="csc-btn csc-btn-icon csc-btn-outline csc-btn-custom-delete"
+                        onClick={() => onDeleteCustom(product)} title="Delete custom product">
+                        <TrashCan size={16} />
                     </button>
                 )}
                 {isComingSoon && (
@@ -5111,13 +5167,19 @@ function ConfigViewerModal({ open, onClose, products, initialProductId, installe
 
     if (!open) return null;
 
+    const INTERNAL_KEYS = new Set(['custom', 'catalog_disabled']);
+
     // Build enriched product data (what the card actually sees)
     const enrichProduct = (p) => {
         const appStatus = appStatuses[p.addon] || null;
         const vizStatus = p.app_viz ? (appStatuses[p.app_viz] || null) : null;
         const stData = sourcetypeData[p.product_id] || null;
+        const clean = {};
+        for (const [k, v] of Object.entries(p)) {
+            if (!INTERNAL_KEYS.has(k)) clean[k] = v;
+        }
         return {
-            ...p,
+            ...clean,
             _runtime: {
                 addon_installed: !!installedApps[p.addon],
                 addon_version: appStatus?.version || null,
@@ -5479,16 +5541,6 @@ const CUSTOM_FORM_CATEGORIES = [
     { value: 'observability', label: 'Observability' },
 ];
 
-const FORM_SELECT_STYLE = {
-    WebkitAppearance: 'none', MozAppearance: 'none', appearance: 'none',
-    display: 'block', width: '100%', maxWidth: '100%', boxSizing: 'border-box',
-    padding: '11px 36px 11px 14px', borderRadius: '4px',
-    border: '1.5px solid #d1d5db', backgroundColor: '#fff', color: '#333',
-    fontSize: '14px', fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
-    cursor: 'pointer', margin: 0,
-    backgroundImage: "url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%236b7280' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E\")",
-    backgroundRepeat: 'no-repeat', backgroundPosition: 'right 12px center', backgroundSize: '14px',
-};
 
 function CustomProductFormModal({ open, onClose, onSave, editProduct, cloneProduct, existingIds, allProducts }) {
     const isEdit = !!editProduct;
@@ -5645,7 +5697,7 @@ function CustomProductFormModal({ open, onClose, onSave, editProduct, cloneProdu
     if (!open) return null;
     return (
         <Modal open returnFocus={returnFocusRef} onRequestClose={onClose} style={{ maxWidth: '860px', width: '94vw' }}>
-            <Modal.Header title={isEdit ? 'Edit Custom Product' : 'Add Custom Product'} onRequestClose={onClose} />
+            <Modal.Header title={isEdit ? 'Edit Custom Product' : 'Add Custom Product'} />
             <Modal.Body>
                 <div className="csc-custom-form">
                     {formError && <div className="csc-custom-form-error">{formError}</div>}
@@ -5654,7 +5706,7 @@ function CustomProductFormModal({ open, onClose, onSave, editProduct, cloneProdu
                     {!isEdit && (
                         <div className="csc-custom-form-row">
                             <label>Clone from existing product</label>
-                            <select value={cloneSource} onChange={handleCloneSelect} style={{ ...FORM_SELECT_STYLE, fontWeight: 600 }}>
+                            <select value={cloneSource} onChange={handleCloneSelect}>
                                 <option value="">{'\u2014'} Start from scratch {'\u2014'}</option>
                                 {sortedCloneOptions.map(p => (
                                     <option key={p.product_id} value={p.product_id}>
@@ -5732,7 +5784,7 @@ function CustomProductFormModal({ open, onClose, onSave, editProduct, cloneProdu
                         {SUB_CATEGORIES[category] && SUB_CATEGORIES[category].length > 0 && (
                             <div className="csc-custom-form-row" style={{ marginTop: '8px' }}>
                                 <label>Subcategory</label>
-                                <select value={subcategory} onChange={e => setSubcategory(e.target.value)} style={FORM_SELECT_STYLE}>
+                                <select value={subcategory} onChange={e => setSubcategory(e.target.value)}>
                                     <option value="">— None —</option>
                                     {SUB_CATEGORIES[category].map(s => (
                                         <option key={s.id} value={s.id}>{s.name}</option>
@@ -5881,7 +5933,7 @@ function DeleteCustomProductModal({ open, onClose, product, onConfirm }) {
 
     return (
         <Modal open onRequestClose={onClose} style={{ width: '420px' }}>
-            <Modal.Header title="Delete Custom Product" onRequestClose={onClose} />
+            <Modal.Header title="Delete Custom Product" />
             <Modal.Body>
                 <div className="csc-delete-confirm-body">
                     <div style={{ fontSize: '32px', marginBottom: '8px' }}>🗑️</div>
@@ -6350,13 +6402,17 @@ function FilterDrawer({
                             >
                                 Developer <span className="scan-drawer-pill-count">{supportCounts.developer_supported}</span>
                             </button>
+                            {/* "No Integration" pill hidden from regular users — these products
+                                only appear in the Integration Needed section which requires devMode/gtmMode */}
+                            {showInternalContent && (
                             <button
                                 className={`scan-drawer-pill ${supportLevelFilter.includes('not_supported') ? 'scan-drawer-pill-unsupported-active' : ''}`}
                                 onClick={() => onSelectSupportLevel('not_supported')}
-                                title="Toggle unsupported products"
+                                title="Toggle products needing integration"
                             >
-                                Unsupported <span className="scan-drawer-pill-count">{supportCounts.not_supported}</span>
+                                No Integration <span className="scan-drawer-pill-count">{supportCounts.not_supported}</span>
                             </button>
+                            )}
                         </div>
                     </div>
                     <div className="scan-drawer-divider" />
@@ -6638,7 +6694,7 @@ function ActiveFilterChips({
         chips.push({ label: crossCutLabels[selectedCategory], onRemove: () => onSelectCategory(null) });
     }
     if (supportLevelFilter.length > 0) {
-        const labels = { cisco_supported: 'Cisco', splunk_supported: 'Splunk', developer_supported: 'Developer', not_supported: 'Unsupported' };
+        const labels = { cisco_supported: 'Cisco', splunk_supported: 'Splunk', developer_supported: 'Developer', not_supported: 'No Integration' };
         supportLevelFilter.forEach(level => {
             chips.push({ label: labels[level] || level, onRemove: () => onSelectSupportLevel(level) });
         });
@@ -7097,6 +7153,9 @@ function SCANProductsPage() {
     const [showFullPortfolio, setShowFullPortfolio] = useState(getPortfolioPreference); // false = supported only
     const [devMode, setDevMode] = useState(false);
     const [gtmMode, setGtmMode] = useState(false);
+    // Internal-only sections (Integration Needed, Coming Soon, GTM Roadmap) are
+    // gated behind devMode or gtmMode.  When false, portfolioProducts also
+    // excludes not_supported products so header/pill counts stay consistent.
     const showInternalContent = devMode || gtmMode;
     const [devToast, setDevToast] = useState(null);
     const [configViewerOpen, setConfigViewerOpen] = useState(false);
@@ -7157,6 +7216,20 @@ function SCANProductsPage() {
             return next;
         });
     }, []);
+
+    const allPanelsExpanded = useMemo(() =>
+        Object.values(panelState).every(Boolean),
+    [panelState]);
+
+    const handleExpandCollapseAll = useCallback(() => {
+        const expand = !allPanelsExpanded;
+        setPanelState(prev => {
+            const next = {};
+            for (const key of Object.keys(prev)) next[key] = expand;
+            savePanelState(next);
+            return next;
+        });
+    }, [allPanelsExpanded]);
 
     /** Toggle a version in/out of the multi-select filter. Pass null to clear all. */
     const handleVersionToggle = (version) => {
@@ -7354,7 +7427,20 @@ function SCANProductsPage() {
                 const next = !prev;
                 setDevToast(next ? 'Developer Mode ON' : 'Developer Mode OFF');
                 setTimeout(() => setDevToast(null), 2500);
-                if (!next) {
+                if (next) {
+                    setShowRetired(true);
+                    setShowDeprecated(true);
+                    setShowComingSoon(true);
+                    setShowGtmRoadmap(true);
+                    setShowFullPortfolio(true);
+                    setShowVault(true);
+                    setPanelState(prev => {
+                        const collapsed = {};
+                        for (const key of Object.keys(prev)) collapsed[key] = false;
+                        savePanelState(collapsed);
+                        return collapsed;
+                    });
+                } else {
                     setShowVault(false);
                 }
                 return next;
@@ -7372,6 +7458,12 @@ function SCANProductsPage() {
                     setShowComingSoon(true);
                     setShowGtmRoadmap(true);
                     setShowFullPortfolio(true);
+                    setPanelState(prev => {
+                        const collapsed = {};
+                        for (const key of Object.keys(prev)) collapsed[key] = false;
+                        savePanelState(collapsed);
+                        return collapsed;
+                    });
                 } else {
                     setShowComingSoon(false);
                     setShowGtmRoadmap(false);
@@ -7670,11 +7762,16 @@ function SCANProductsPage() {
     }, []);
 
     // ── Base product list (support-level + portfolio + status visibility) ──
+    // This is the single source of truth for counts: the header counter,
+    // category pill badges, and search bar all derive from portfolioProducts.
+    // Every visibility toggle must be mirrored here so counts never include
+    // products the user cannot see in any section on the page.
     const portfolioProducts = useMemo(() => {
         let base = products;
         if (supportLevelFilter.length > 0) {
             base = base.filter((p) => supportLevelFilter.includes(p.support_level));
         } else if (!showFullPortfolio) {
+            // "Supported Only" mode: show only cisco/splunk-supported, hide under_development
             base = base.filter((p) => SUPPORTED_LEVELS.has(p.support_level) && p.status !== 'under_development');
         }
         if (!showRetired) {
@@ -7686,8 +7783,14 @@ function SCANProductsPage() {
         if (!showComingSoon || !showInternalContent) {
             base = base.filter((p) => p.status !== 'under_development');
         }
+        // Coverage-gap products without any integration go to GTM Roadmap section
         if (!showGtmRoadmap || !showInternalContent) {
             base = base.filter((p) => !p.coverage_gap || (p.addon || p.app_viz || p.app_viz_2 || p.sc4s_supported));
+        }
+        // not_supported products go to "Integration Needed" which is only visible in dev/GTM mode;
+        // exclude them from counts when that section is hidden to prevent phantom counts
+        if (!showInternalContent) {
+            base = base.filter((p) => p.support_level !== 'not_supported');
         }
         return base;
     }, [products, supportLevelFilter, showFullPortfolio, showRetired, showDeprecated, showComingSoon, showGtmRoadmap, showInternalContent]);
@@ -7817,22 +7920,49 @@ function SCANProductsPage() {
         return match ? (match.addon_label || match.addon) : selectedAddon;
     }, [selectedAddon, preAddonProducts]);
 
+    // ── Section assignment ──
+    // Products are split into mutually exclusive sections in priority order.
+    // coverage_gap products without any integration bypass main sections → gtmGapProducts.
+    // not_supported products bypass Available → unsupportedProducts ("Integration Needed").
+    // Configured/Detected/Available cascade: configured first, then auto-detected, then the rest.
+    // Custom products (from local/products.conf) are merged into the routable pool so
+    // clicking "+ Add" moves them into "Configured Products" alongside catalog cards.
     const includeInMainSections = (p) => !p.coverage_gap || !!(p.addon || p.app_viz || p.app_viz_2 || p.sc4s_supported);
-    const configuredProducts = filteredProducts.filter((p) => p.status !== 'under_development' && p.status !== 'retired' && p.status !== 'deprecated' && includeInMainSections(p) && configuredIds.includes(p.product_id));
-    const detectedProducts = filteredProducts.filter((p) => p.status !== 'under_development' && p.status !== 'retired' && p.status !== 'deprecated' && includeInMainSections(p) && p.support_level !== 'not_supported' && !configuredIds.includes(p.product_id) && sourcetypeData[p.product_id] && sourcetypeData[p.product_id].hasData);
-    const detectedIds = new Set(detectedProducts.map((p) => p.product_id));
-    const availableProducts = filteredProducts.filter((p) => p.status !== 'under_development' && p.status !== 'retired' && p.status !== 'deprecated' && includeInMainSections(p) && p.support_level !== 'not_supported' && !configuredIds.includes(p.product_id) && !detectedIds.has(p.product_id));
-    const unsupportedProducts = filteredProducts.filter((p) => p.status !== 'under_development' && p.status !== 'retired' && p.status !== 'deprecated' && includeInMainSections(p) && p.support_level === 'not_supported' && !configuredIds.includes(p.product_id));
-    const comingSoonProducts = filteredProducts.filter((p) => p.status === 'under_development');
-    const deprecatedProducts = filteredProducts.filter((p) => p.status === 'deprecated');
-    const retiredProducts = filteredProducts.filter((p) => p.status === 'retired');
-    const gtmGapProducts = filteredProducts.filter((p) => p.coverage_gap && !(p.addon || p.app_viz || p.app_viz_2 || p.sc4s_supported));
 
     const filteredCustomProducts = useMemo(() => {
         if (!searchQuery) return customProducts;
         const q = searchQuery.toLowerCase().trim();
         return customProducts.filter((p) => productMatchesSearch(p, q));
     }, [customProducts, searchQuery]);
+
+    const allRoutableProducts = useMemo(() => [...filteredProducts, ...filteredCustomProducts], [filteredProducts, filteredCustomProducts]);
+    const configuredProducts = allRoutableProducts.filter((p) => p.status !== 'under_development' && p.status !== 'retired' && p.status !== 'deprecated' && includeInMainSections(p) && configuredIds.includes(p.product_id));
+    const configuredIdSet = new Set(configuredProducts.map((p) => p.product_id));
+    const detectedProducts = filteredProducts.filter((p) => p.status !== 'under_development' && p.status !== 'retired' && p.status !== 'deprecated' && includeInMainSections(p) && p.support_level !== 'not_supported' && !configuredIdSet.has(p.product_id) && sourcetypeData[p.product_id] && sourcetypeData[p.product_id].hasData);
+    const detectedIds = new Set(detectedProducts.map((p) => p.product_id));
+    const availableProducts = filteredProducts.filter((p) => p.status !== 'under_development' && p.status !== 'retired' && p.status !== 'deprecated' && includeInMainSections(p) && p.support_level !== 'not_supported' && !configuredIdSet.has(p.product_id) && !detectedIds.has(p.product_id));
+    const unsupportedProducts = filteredProducts.filter((p) => p.status !== 'under_development' && p.status !== 'retired' && p.status !== 'deprecated' && includeInMainSections(p) && p.support_level === 'not_supported' && !configuredIdSet.has(p.product_id));
+    const comingSoonProducts = filteredProducts.filter((p) => p.status === 'under_development');
+    const deprecatedProducts = filteredProducts.filter((p) => p.status === 'deprecated');
+    const retiredProducts = filteredProducts.filter((p) => p.status === 'retired');
+    const gtmGapProducts = filteredProducts.filter((p) => p.coverage_gap && !(p.addon || p.app_viz || p.app_viz_2 || p.sc4s_supported));
+    const unconfiguredCustomProducts = filteredCustomProducts.filter((p) => !configuredIdSet.has(p.product_id));
+
+    const sharedSourcetypeMap = useMemo(() => {
+        const stMap = {};
+        for (const p of products) {
+            if (!p.sourcetypes || p.catalog_disabled) continue;
+            for (const st of p.sourcetypes) {
+                if (!stMap[st]) stMap[st] = [];
+                stMap[st].push({ product_id: p.product_id, display_name: p.display_name });
+            }
+        }
+        const shared = {};
+        for (const [st, prods] of Object.entries(stMap)) {
+            if (prods.length > 1) shared[st] = prods;
+        }
+        return shared;
+    }, [products]);
 
     // ── Effective panel open state (search overrides collapsed panels) ──
     const effectivePanelOpen = useMemo(() => {
@@ -7846,12 +7976,12 @@ function SCANProductsPage() {
         if (deprecatedProducts.length > 0)    overrides.deprecated_products = true;
         if (retiredProducts.length > 0)       overrides.retired_products = true;
         if (gtmGapProducts.length > 0)        overrides.gtm_coverage_gaps = true;
-        if (filteredCustomProducts.length > 0) overrides.custom_products = true;
+        if (unconfiguredCustomProducts.length > 0) overrides.custom_products = true;
         return { ...panelState, ...overrides };
     }, [searchQuery, panelState, configuredProducts.length, detectedProducts.length,
         availableProducts.length, unsupportedProducts.length, comingSoonProducts.length,
         deprecatedProducts.length, retiredProducts.length, gtmGapProducts.length,
-        filteredCustomProducts.length]);
+        unconfiguredCustomProducts.length]);
 
     // ── Scroll to first matching card when search changes ──
     const prevSearchRef = useRef('');
@@ -8004,7 +8134,9 @@ function SCANProductsPage() {
                                 <ul>
                                     <li>Click <b>Add to My Products</b> on any card to start tracking it.</li>
                                     <li>Use the <b>Powered-by</b> pills and <b>search bar</b> to filter the catalog.</li>
-                                    <li>Hit the <b>Open Dashboard</b> button to jump straight into analytics.</li>
+                                    <li>Hit the <b>Launch</b> button to jump straight into analytics.</li>
+                                    <li>Open <b>Filters</b> and toggle <b>Visibility</b> checkboxes to show Retired or Deprecated products.</li>
+                                    <li>Use the <b>Expand / Collapse All</b> toggle to manage all sections at once.</li>
                                 </ul>
                             </span>
                         }
@@ -8096,6 +8228,13 @@ function SCANProductsPage() {
                             Sync Catalog
                         </button>
                     </InfoTooltip>
+                    <button
+                        className="scan-util-pill"
+                        onClick={handleExpandCollapseAll}
+                        title={allPanelsExpanded ? 'Collapse all sections' : 'Expand all sections'}
+                    >
+                        {allPanelsExpanded ? 'Collapse All' : 'Expand All'}
+                    </button>
                     <button
                         className="scan-util-pill"
                         ref={guideReturnRef}
@@ -8312,17 +8451,24 @@ function SCANProductsPage() {
                 {configuredProducts.length > 0 ? (
                     <div className="csc-card-grid">
                         {configuredProducts.map((p) => (
-                            <ProductCard
-                                key={p.product_id} product={p}
-                                installedApps={installedApps} appStatuses={appStatuses} indexerApps={indexerApps}
-                                sourcetypeData={sourcetypeData} splunkbaseData={splunkbaseData} appidToUidMap={appidToUidMap} isConfigured isComingSoon={false}
-                                platformType={effectivePlatformType}
-                                onToggleConfigured={handleToggleConfigured}
-                                onShowBestPractices={handleShowBestPractices}
-                                onViewLegacy={handleViewLegacy}
-                                onSetCustomDashboard={handleSetCustomDashboard}
-                                devMode={devMode} onViewConfig={handleOpenConfigViewer}
-                            />
+                            <div key={p.product_id} style={{ position: 'relative' }}>
+                                {p.custom && <span className="csc-custom-badge">Custom</span>}
+                                <ProductCard
+                                    product={p}
+                                    installedApps={installedApps} appStatuses={appStatuses} indexerApps={indexerApps}
+                                    sourcetypeData={sourcetypeData} splunkbaseData={splunkbaseData} appidToUidMap={appidToUidMap} isConfigured isComingSoon={false}
+                                    platformType={effectivePlatformType}
+                                    onToggleConfigured={handleToggleConfigured}
+                                    onShowBestPractices={handleShowBestPractices}
+                                    onViewLegacy={handleViewLegacy}
+                                    onSetCustomDashboard={handleSetCustomDashboard}
+                                    devMode={devMode} onViewConfig={handleOpenConfigViewer}
+                                    onEditCustom={p.custom ? handleEditCustomProduct : undefined}
+                                    onCloneCustom={p.custom ? handleCloneCustomProduct : undefined}
+                                    onDeleteCustom={p.custom ? handleDeleteCustomProduct : undefined}
+                                    sharedSourcetypeMap={sharedSourcetypeMap}
+                                />
+                            </div>
                         ))}
                     </div>
                 ) : (
@@ -8352,6 +8498,7 @@ function SCANProductsPage() {
                                 onViewLegacy={handleViewLegacy}
                                 onSetCustomDashboard={handleSetCustomDashboard}
                                 devMode={devMode} onViewConfig={handleOpenConfigViewer}
+                                sharedSourcetypeMap={sharedSourcetypeMap}
                             />
                         ))}
                     </div>
@@ -8375,6 +8522,7 @@ function SCANProductsPage() {
                                 onViewLegacy={handleViewLegacy}
                                 onSetCustomDashboard={handleSetCustomDashboard}
                                 devMode={devMode} onViewConfig={handleOpenConfigViewer}
+                                sharedSourcetypeMap={sharedSourcetypeMap}
                             />
                         ))}
                     </div>
@@ -8386,25 +8534,30 @@ function SCANProductsPage() {
             </CollapsiblePanel>
             </div>
 
-            {/* Section 3: Unsupported */}
-            {unsupportedProducts.length > 0 && (
+            {/* Section 3: Integration Needed — Cisco products with support_level = not_supported.
+                Gated behind showInternalContent (devMode or gtmMode) so regular users never
+                see products without Splunk integrations. Cards render with noIntegration to
+                suppress all action buttons and sourcetype warnings without showing a badge
+                (unlike isComingSoon which displays "Coming Soon"). */}
+            {showInternalContent && unsupportedProducts.length > 0 && (
                 <div id="unsupported_products">
-                <CollapsiblePanel title={`Unsupported Products (${unsupportedProducts.length})`} open={effectivePanelOpen.unsupported_products} onChange={handlePanelToggle} panelId="unsupported_products">
-                    <div style={{ padding: '8px 12px', marginBottom: '12px', background: 'var(--warning-bg, #fff3e0)', borderLeft: '4px solid #bf360c', borderRadius: '4px', fontSize: '13px', color: 'var(--page-color, #333)' }}>
-                        These products have a <strong>Not Supported</strong> support level — there is no official Cisco or Splunk support commitment. They may still function correctly but use at your own discretion.
+                <CollapsiblePanel title={`Integration Needed (${unsupportedProducts.length})`} open={effectivePanelOpen.unsupported_products} onChange={handlePanelToggle} panelId="unsupported_products">
+                    <div style={{ padding: '8px 12px', marginBottom: '12px', background: 'var(--status-warning-bg)', borderLeft: '4px solid var(--status-warning-border)', borderRadius: '4px', fontSize: '13px', color: 'var(--text-primary, #333)' }}>
+                        These Cisco products do not have a dedicated Splunk add-on or integration yet. They are listed here for awareness and tracking — a Splunk integration may be developed in the future.
                     </div>
                     <div className="csc-card-grid">
                         {unsupportedProducts.map((p) => (
                             <ProductCard
                                 key={p.product_id} product={p}
                                 installedApps={installedApps} appStatuses={appStatuses} indexerApps={indexerApps}
-                                sourcetypeData={sourcetypeData} splunkbaseData={splunkbaseData} appidToUidMap={appidToUidMap} isConfigured={false} isComingSoon={false}
+                                sourcetypeData={sourcetypeData} splunkbaseData={splunkbaseData} appidToUidMap={appidToUidMap} isConfigured={false} noIntegration
                                 platformType={effectivePlatformType}
                                 onToggleConfigured={handleToggleConfigured}
                                 onShowBestPractices={handleShowBestPractices}
                                 onViewLegacy={handleViewLegacy}
                                 onSetCustomDashboard={handleSetCustomDashboard}
                                 devMode={devMode} onViewConfig={handleOpenConfigViewer}
+                                sharedSourcetypeMap={sharedSourcetypeMap}
                             />
                         ))}
                     </div>
@@ -8428,6 +8581,7 @@ function SCANProductsPage() {
                                 onViewLegacy={handleViewLegacy}
                                 onSetCustomDashboard={handleSetCustomDashboard}
                                 devMode={devMode} onViewConfig={handleOpenConfigViewer}
+                                sharedSourcetypeMap={sharedSourcetypeMap}
                             />
                         ))}
                     </div>
@@ -8437,11 +8591,13 @@ function SCANProductsPage() {
             </CollapsiblePanel>
             </div>}
 
-            {/* Section 5: Deprecated Products */}
+            {/* Section 5: Deprecated Products — warning banner uses theme-aware CSS
+                variables (--status-warning-bg, --status-warning-border, --text-primary) for
+                correct rendering in both light and dark modes */}
             {deprecatedProducts.length > 0 && (
                 <div id="deprecated_products">
                 <CollapsiblePanel title={`Deprecated Products (${deprecatedProducts.length})`} open={effectivePanelOpen.deprecated_products} onChange={handlePanelToggle} panelId="deprecated_products">
-                    <div style={{ padding: '8px 12px', marginBottom: '12px', background: 'var(--warning-bg, #fff3e0)', borderLeft: '4px solid #FF9000', borderRadius: '4px', fontSize: '13px', color: 'var(--page-color, #333)' }}>
+                    <div style={{ padding: '8px 12px', marginBottom: '12px', background: 'var(--status-warning-bg)', borderLeft: '4px solid var(--status-warning-border)', borderRadius: '4px', fontSize: '13px', color: 'var(--text-primary, #333)' }}>
                         These Splunk add-ons or apps have been <strong>deprecated</strong> — the Cisco product may still be active but the integration is being sunset or replaced by a newer add-on.
                     </div>
                     <div className="csc-card-grid">
@@ -8456,6 +8612,7 @@ function SCANProductsPage() {
                                 onViewLegacy={handleViewLegacy}
                                 onSetCustomDashboard={handleSetCustomDashboard}
                                 devMode={devMode} onViewConfig={handleOpenConfigViewer}
+                                sharedSourcetypeMap={sharedSourcetypeMap}
                             />
                         ))}
                     </div>
@@ -8482,6 +8639,7 @@ function SCANProductsPage() {
                                 onViewLegacy={handleViewLegacy}
                                 onSetCustomDashboard={handleSetCustomDashboard}
                                 devMode={devMode} onViewConfig={handleOpenConfigViewer}
+                                sharedSourcetypeMap={sharedSourcetypeMap}
                             />
                         ))}
                     </div>
@@ -8492,7 +8650,7 @@ function SCANProductsPage() {
             {/* Section 6: GTM Roadmap — Coverage Gaps (only when user has turned on "GTM Roadmap" in filters) */}
             {showGtmRoadmap && gtmGapProducts.length > 0 && (
                 <div id="gtm_coverage_gaps">
-                <CollapsiblePanel title={`GTM Roadmap — Coming Soon (${gtmGapProducts.length})`} open={effectivePanelOpen.gtm_coverage_gaps} onChange={handlePanelToggle} panelId="gtm_coverage_gaps">
+                <CollapsiblePanel title={`GTM Roadmap — Coverage Gaps (${gtmGapProducts.length})`} open={effectivePanelOpen.gtm_coverage_gaps} onChange={handlePanelToggle} panelId="gtm_coverage_gaps">
                     <div style={{ padding: '8px 12px', marginBottom: '12px', background: 'var(--status-neutral-bg, #eceff1)', borderLeft: '4px solid var(--text-tertiary, #607d8b)', borderRadius: '4px', fontSize: '13px', color: 'var(--page-color, #333)' }}>
                         These Cisco products are on the <strong>Secure Networking GTM roadmap</strong> for Splunk integration. Items are ordered by GTM pillar — <strong>Campus &amp; Branch first</strong>, then WAN Edge, Data Center &amp; Cloud, Visibility &amp; Assurance, and Industrial/OT.
                     </div>
@@ -8504,7 +8662,7 @@ function SCANProductsPage() {
                                     <ProductCard
                                         key={p.product_id} product={p}
                                         installedApps={installedApps} appStatuses={appStatuses} indexerApps={indexerApps}
-                                        sourcetypeData={sourcetypeData} splunkbaseData={splunkbaseData} appidToUidMap={appidToUidMap} isConfigured={false} isComingSoon
+                                        sourcetypeData={sourcetypeData} splunkbaseData={splunkbaseData} appidToUidMap={appidToUidMap} isConfigured={false} noIntegration
                                         platformType={effectivePlatformType}
                                         onToggleConfigured={handleToggleConfigured}
                                         onShowBestPractices={handleShowBestPractices}
@@ -8512,6 +8670,7 @@ function SCANProductsPage() {
                                         onSetCustomDashboard={handleSetCustomDashboard}
                                         devMode={devMode} onViewConfig={handleOpenConfigViewer}
                                         showGtmRibbon
+                                        sharedSourcetypeMap={sharedSourcetypeMap}
                                     />
                                 ))}
                             </div>
@@ -8521,51 +8680,50 @@ function SCANProductsPage() {
                 </div>
             )}
 
-            {/* Section: Custom Products */}
+            {/* Section: Custom Products — shows only unconfigured custom cards;
+                configured custom cards move to the "Configured Products" section above. */}
             <div id="custom_products">
             <CollapsiblePanel
-                title={`Custom Products (${filteredCustomProducts.length})`}
+                title={`Custom Products (${unconfiguredCustomProducts.length})`}
                 open={effectivePanelOpen.custom_products}
                 onChange={handlePanelToggle}
                 panelId="custom_products"
             >
                 <div className="csc-custom-section-banner">
                     Products you've added beyond the official Cisco catalog. Custom cards are stored in <code>local/products.conf</code> and survive app upgrades.
+                    {configuredIdSet.size > 0 && filteredCustomProducts.length !== unconfiguredCustomProducts.length && (
+                        <span style={{ marginLeft: '6px', fontStyle: 'italic', opacity: 0.8 }}>
+                            ({filteredCustomProducts.length - unconfiguredCustomProducts.length} configured — shown above)
+                        </span>
+                    )}
                 </div>
-                {filteredCustomProducts.length > 0 ? (
+                {unconfiguredCustomProducts.length > 0 ? (
                     <div className="csc-card-grid">
-                        {filteredCustomProducts.map((p) => (
+                        {unconfiguredCustomProducts.map((p) => (
                             <div key={p.product_id} style={{ position: 'relative' }}>
                                 <span className="csc-custom-badge">Custom</span>
                                 <ProductCard
                                     product={p}
                                     installedApps={installedApps} appStatuses={appStatuses} indexerApps={indexerApps}
                                     sourcetypeData={sourcetypeData} splunkbaseData={splunkbaseData} appidToUidMap={appidToUidMap}
-                                    isConfigured={configuredIds.includes(p.product_id)} isComingSoon={false}
+                                    isConfigured={false} isComingSoon={false}
                                     platformType={effectivePlatformType}
                                     onToggleConfigured={handleToggleConfigured}
                                     onShowBestPractices={handleShowBestPractices}
                                     onViewLegacy={handleViewLegacy}
                                     onSetCustomDashboard={handleSetCustomDashboard}
                                     devMode={devMode} onViewConfig={handleOpenConfigViewer}
+                                    onEditCustom={handleEditCustomProduct}
+                                    onCloneCustom={handleCloneCustomProduct}
+                                    onDeleteCustom={handleDeleteCustomProduct}
+                                    sharedSourcetypeMap={sharedSourcetypeMap}
                                 />
-                                <div className="csc-custom-card-actions">
-                                    <button className="csc-custom-action-btn" onClick={() => handleEditCustomProduct(p)} title="Edit this custom product">
-                                        ✏️ Edit
-                                    </button>
-                                    <button className="csc-custom-clone-btn" onClick={() => handleCloneCustomProduct(p)} title="Clone this custom product">
-                                        📋 Clone
-                                    </button>
-                                    <button className="csc-custom-action-btn csc-custom-action-btn-danger" onClick={() => handleDeleteCustomProduct(p)} title="Delete this custom product">
-                                        🗑️ Delete
-                                    </button>
-                                </div>
                             </div>
                         ))}
                     </div>
                 ) : (
                     <div className="empty-section" style={{ textAlign: 'center', padding: '24px' }}>
-                        {searchQuery ? 'No custom products match your search.' : 'No custom products yet.'}
+                        {searchQuery ? 'No custom products match your search.' : (filteredCustomProducts.length > 0 ? 'All custom products are configured — see Configured Products above.' : 'No custom products yet.')}
                     </div>
                 )}
                 <div style={{ marginTop: '12px' }}>
@@ -8595,6 +8753,7 @@ function SCANProductsPage() {
                                 onViewLegacy={handleViewLegacy}
                                 onSetCustomDashboard={handleSetCustomDashboard}
                                 devMode={devMode} onViewConfig={handleOpenConfigViewer}
+                                sharedSourcetypeMap={sharedSourcetypeMap}
                             />
                         ))}
                     </div>
@@ -8638,7 +8797,7 @@ function SCANProductsPage() {
                 <ConfigViewerModal
                     open={configViewerOpen}
                     onClose={() => setConfigViewerOpen(false)}
-                    products={products}
+                    products={[...products, ...customProducts, ...vaultProducts]}
                     initialProductId={configViewerProductId}
                     installedApps={installedApps}
                     appStatuses={appStatuses}
@@ -8714,6 +8873,18 @@ function SCANProductsPage() {
                                     <li><strong>Sync Catalog</strong> checks S3 for a newer product catalog (<code>products.conf</code>) and downloads the latest Splunkbase app lookup. Runs nightly, but click for on-demand sync.</li>
                                     <li><strong>Role</strong> picks a persona for a curated quick-start.</li>
                                     <li>Cycle through <strong>Light / Dark / Auto</strong> themes.</li>
+                                    <li>Use <strong>Expand / Collapse All</strong> (next to the search bar) to open or close every section at once.</li>
+                                </ul>
+                            </details>
+
+                            <details className="scan-guide-section">
+                                <summary className="scan-guide-summary">Sections &amp; Visibility</summary>
+                                <ul className="scan-guide-list">
+                                    <li><strong>Configured Products</strong> — cards you've pinned to your workspace.</li>
+                                    <li><strong>Data Detected</strong> — products with active sourcetype data flowing (not yet configured).</li>
+                                    <li><strong>Available Products</strong> — all supported products you haven't added yet.</li>
+                                    <li><strong>Custom Products</strong> — cards you've created beyond the official catalog.</li>
+                                    <li>Toggle visibility in <strong>Filters → Visibility</strong>: Retired and Deprecated products can be shown or hidden.</li>
                                 </ul>
                             </details>
 
@@ -8741,7 +8912,7 @@ function SCANProductsPage() {
                             </div>
                             <p style={{ margin: 0 }}>
                                 All products will be moved back to their original sections
-                                (<em>Available Products</em>, <em>Unsupported Products</em>, or <em>Coming Soon</em>). No data
+                                (<em>Available Products</em>, <em>Integration Needed</em>, or <em>Coming Soon</em>). No data
                                 will be lost — you can re-add products at any time.
                             </p>
                         </div>

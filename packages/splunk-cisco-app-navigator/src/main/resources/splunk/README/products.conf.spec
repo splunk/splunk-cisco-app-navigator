@@ -39,6 +39,16 @@ category = security | networking | collaboration | infrastructure | observabilit
 version = <string>
 * Current version of this product module (e.g. "1.0.0").
 
+date_created = <date>
+* Date the catalog entry was first added (YYYY-MM-DD).
+* Populated from git history; updated manually when creating new stanzas.
+* Example: 2026-02-23
+
+date_updated = <date>
+* Date the catalog entry was last modified (YYYY-MM-DD).
+* Updated whenever any field in the stanza changes.
+* Example: 2026-03-21
+
 status = active | under_development | deprecated | archived | roadmap
 * Product lifecycle status.
 *   active             — Live product shown in the main grid.
@@ -362,7 +372,7 @@ support_level = cisco_supported | splunk_supported | developer_supported | commu
 *   splunk_supported   — Developed or supported by Splunk / Splunkbase.
 *   developer_supported — Developed by a third-party developer on Splunkbase.
 *   community_supported — Community-maintained; no formal support agreement.
-*   not_supported       — Archived, deprecated, or no longer maintained.
+*   not_supported       — No dedicated Splunk integration exists yet, or the add-on is archived/unmaintained.
 * Default: (empty). When empty, no support badge is shown.
 
 custom = true | false

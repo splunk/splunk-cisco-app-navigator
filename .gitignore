@@ -1,6 +1,6 @@
 # === Build outputs ===
 packages/splunk-cisco-app-navigator/stage/
-packages/splunk-cisco-app-navigator/*.tar.gz
+dist/
 
 # === Dependencies ===
 node_modules/

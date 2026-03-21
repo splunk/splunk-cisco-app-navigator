@@ -974,7 +974,11 @@ html.dce-dark [data-view="views/shared/Page"] {
 #available_products,
 #coming_soon_products,
 #unsupported_products,
-#deprecated_products {
+#deprecated_products,
+#retired_products,
+#gtm_coverage_gaps,
+#custom_products,
+#vault_products {
     margin-bottom: 24px;
     border: 1px solid #E5E7EB !important;
     border-left: none !important;
@@ -991,24 +995,40 @@ html.dce-dark [data-view="views/shared/Page"] {
 #coming_soon_products > div,
 #unsupported_products > div,
 #deprecated_products > div,
+#retired_products > div,
+#gtm_coverage_gaps > div,
+#custom_products > div,
+#vault_products > div,
 #configured_products > div > div,
 #detected_products > div > div,
 #available_products > div > div,
 #coming_soon_products > div > div,
 #unsupported_products > div > div,
 #deprecated_products > div > div,
+#retired_products > div > div,
+#gtm_coverage_gaps > div > div,
+#custom_products > div > div,
+#vault_products > div > div,
 #configured_products [data-test='body'],
 #detected_products [data-test='body'],
 #available_products [data-test='body'],
 #coming_soon_products [data-test='body'],
 #unsupported_products [data-test='body'],
 #deprecated_products [data-test='body'],
+#retired_products [data-test='body'],
+#gtm_coverage_gaps [data-test='body'],
+#custom_products [data-test='body'],
+#vault_products [data-test='body'],
 #configured_products [data-test='body'] > div,
 #detected_products [data-test='body'] > div,
 #available_products [data-test='body'] > div,
 #coming_soon_products [data-test='body'] > div,
 #unsupported_products [data-test='body'] > div,
-#deprecated_products [data-test='body'] > div {
+#deprecated_products [data-test='body'] > div,
+#retired_products [data-test='body'] > div,
+#gtm_coverage_gaps [data-test='body'] > div,
+#custom_products [data-test='body'] > div,
+#vault_products [data-test='body'] > div {
     background: var(--section-bg) !important;
 }
 
@@ -1018,7 +1038,11 @@ html.dce-dark [data-view="views/shared/Page"] {
 #available_products button[data-test='toggle'],
 #coming_soon_products button[data-test='toggle'],
 #unsupported_products button[data-test='toggle'],
-#deprecated_products button[data-test='toggle'] {
+#deprecated_products button[data-test='toggle'],
+#retired_products button[data-test='toggle'],
+#gtm_coverage_gaps button[data-test='toggle'],
+#custom_products button[data-test='toggle'],
+#vault_products button[data-test='toggle'] {
     padding: 11px 14px 11px 44px;
     background: var(--bg-primary) !important;
     border: none;
@@ -1032,7 +1056,11 @@ html.dce-dark [data-view="views/shared/Page"] {
 #available_products button[data-test='toggle']:hover,
 #coming_soon_products button[data-test='toggle']:hover,
 #unsupported_products button[data-test='toggle']:hover,
-#deprecated_products button[data-test='toggle']:hover {
+#deprecated_products button[data-test='toggle']:hover,
+#retired_products button[data-test='toggle']:hover,
+#gtm_coverage_gaps button[data-test='toggle']:hover,
+#custom_products button[data-test='toggle']:hover,
+#vault_products button[data-test='toggle']:hover {
     background: var(--bg-secondary) !important;
 }
 
@@ -1041,41 +1069,47 @@ html.dce-dark [data-view="views/shared/Page"] {
 #available_products button[data-test='toggle'] span,
 #coming_soon_products button[data-test='toggle'] span,
 #unsupported_products button[data-test='toggle'] span,
-#deprecated_products button[data-test='toggle'] span {
+#deprecated_products button[data-test='toggle'] span,
+#retired_products button[data-test='toggle'] span,
+#gtm_coverage_gaps button[data-test='toggle'] span,
+#custom_products button[data-test='toggle'] span,
+#vault_products button[data-test='toggle'] span {
     color: var(--heading-color) !important;
     font-weight: 700 !important;
     font-size: 14px !important;
     letter-spacing: -0.1px;
 }
 
-/* Configured: primary accent */
+/* Each section gets a unique accent color */
 #configured_products button[data-test='toggle'] {
-    border-left-color: var(--color-primary);
+    border-left-color: #0A60FF;
 }
-
-/* Available: gray accent */
-#available_products button[data-test='toggle'] {
-    border-left-color: var(--border-medium);
-}
-
-/* Data Detected: Green accent (data is flowing) */
 #detected_products button[data-test='toggle'] {
-    border-left-color: var(--color-success);
+    border-left-color: #16a34a;
 }
-
-/* Coming Soon: Orange accent */
-#coming_soon_products button[data-test='toggle'] {
-    border-left-color: var(--color-warning);
+#available_products button[data-test='toggle'] {
+    border-left-color: #6366f1;
 }
-
-/* Unsupported: muted Orange accent */
 #unsupported_products button[data-test='toggle'] {
-    border-left-color: var(--color-warning);
+    border-left-color: #f59e0b;
 }
-
-/* Deprecated: Error accent */
+#coming_soon_products button[data-test='toggle'] {
+    border-left-color: #8b5cf6;
+}
 #deprecated_products button[data-test='toggle'] {
-    border-left-color: var(--color-error);
+    border-left-color: #ef4444;
+}
+#retired_products button[data-test='toggle'] {
+    border-left-color: #78716c;
+}
+#gtm_coverage_gaps button[data-test='toggle'] {
+    border-left-color: #0891b2;
+}
+#custom_products button[data-test='toggle'] {
+    border-left-color: #ea580c;
+}
+#vault_products button[data-test='toggle'] {
+    border-left-color: #64748b;
 }
 
 /* --- Section cards — clean, no colored bottom border --- */
@@ -1938,13 +1972,32 @@ html.dce-dark [data-view="views/shared/Page"] {
 
 .csc-btn-green-outline {
     background: #ffffff;
-    color: #0A60FF;
-    border: 1px solid #0A60FF;
+    color: #197E25;
+    border: 1px solid #197E25;
 }
 
 .csc-btn-green-outline:hover {
-    background: #0A60FF;
+    background: #197E25;
     color: #ffffff;
+}
+
+/* Modal context: use blue instead of green for consistency with modal chrome */
+.modal .csc-btn-green {
+    background: #0A60FF;
+    border-color: #0A60FF;
+}
+.modal .csc-btn-green:hover {
+    background: #0050D4;
+    border-color: #0050D4;
+}
+.modal .csc-btn-green-outline {
+    color: #0A60FF;
+    border-color: #0A60FF;
+}
+.modal .csc-btn-green-outline:hover {
+    background: #0A60FF;
+    border-color: #0A60FF;
+    color: #fff;
 }
 
 .csc-btn-disabled-label {
@@ -1993,18 +2046,35 @@ html.dce-dark [data-view="views/shared/Page"] {
 
 /* ===== Dark mode — button + badge + link overrides ===== */
 :root.dce-dark .csc-btn-green {
-    background: #197E25;
-    border-color: #197E25;
+    background: #1f9b2c;
+    border-color: #1f9b2c;
 }
 :root.dce-dark .csc-btn-green:hover {
-    background: #126B1C;
-    border-color: #126B1C;
+    background: #27b834;
+    border-color: #27b834;
 }
 :root.dce-dark .csc-btn-green-outline {
+    color: #4ade80;
+    border-color: #4ade80;
+}
+:root.dce-dark .csc-btn-green-outline:hover {
+    background: #1f9b2c;
+    color: #fff;
+    border-color: #1f9b2c;
+}
+:root.dce-dark .modal .csc-btn-green {
+    background: #0A60FF;
+    border-color: #0A60FF;
+}
+:root.dce-dark .modal .csc-btn-green:hover {
+    background: #3380FF;
+    border-color: #3380FF;
+}
+:root.dce-dark .modal .csc-btn-green-outline {
     color: #5B9AFF;
     border-color: #5B9AFF;
 }
-:root.dce-dark .csc-btn-green-outline:hover {
+:root.dce-dark .modal .csc-btn-green-outline:hover {
     background: #0A60FF;
     color: #fff;
     border-color: #0A60FF;
@@ -3771,6 +3841,40 @@ a.csc-dep-name-link:hover {
     border-color: #4caf50;
 }
 
+/* Shared sourcetype indicator on chip */
+.csc-st-chip-shared {
+    border-style: dashed;
+}
+.csc-st-shared-badge {
+    margin-left: 3px;
+    font-size: 9px;
+    opacity: 0.7;
+}
+.csc-st-shared-note {
+    margin-top: 8px;
+    padding: 6px 10px;
+    font-size: 11px;
+    line-height: 1.45;
+    color: var(--text-secondary, #555);
+    background: var(--status-neutral-bg, #f0f4f8);
+    border-left: 3px solid var(--text-tertiary, #90a4ae);
+    border-radius: 3px;
+}
+.csc-st-shared-icon {
+    margin-right: 4px;
+    font-style: normal;
+    font-weight: 600;
+    color: var(--text-tertiary, #607d8b);
+}
+:root.dce-dark .csc-st-shared-note {
+    background: #1e2338;
+    color: #b0bec5;
+    border-left-color: #546e7a;
+}
+:root.dce-dark .csc-st-shared-icon {
+    color: #78909c;
+}
+
 /* ── Sourcetype show/hide toggle ── */
 .csc-st-show-toggle {
     display: inline-block;
@@ -4603,12 +4707,12 @@ body:has(.scan-drawer-open) .scan-feedback-tab {
     font-size: 13px;
     font-weight: 600;
     text-decoration: none;
-    background: #197E25;
+    background: #0A60FF;
     color: #fff;
     transition: all 0.2s ease;
 }
 .csc-sc4s-info-link:hover {
-    background: #126B1C;
+    background: #0050D4;
     transform: translateY(-1px);
 }
 .csc-sc4s-info-link-gh {
@@ -4619,6 +4723,12 @@ body:has(.scan-drawer-open) .scan-feedback-tab {
 .csc-sc4s-info-link-gh:hover {
     background: #F2F5F7;
     box-shadow: none;
+}
+:root.dce-dark .csc-sc4s-info-link {
+    background: #3380FF;
+}
+:root.dce-dark .csc-sc4s-info-link:hover {
+    background: #5B9AFF;
 }
 :root.dce-dark .csc-sc4s-info-link-gh {
     background: transparent;
@@ -6478,6 +6588,12 @@ tr.scan-ts-ahead .scan-ts-name {
 :root.dce-dark .csc-card.csc-card-unsupported-tier {
     border-bottom: 4px solid #ef5350 !important;
 }
+.csc-card.csc-card-custom {
+    border-bottom: 4px solid #f59e0b !important;
+}
+:root.dce-dark .csc-card.csc-card-custom {
+    border-bottom: 4px solid #fbbf24 !important;
+}
 
 /* Fallback: support accent via data attribute if class is missing */
 .csc-card[data-support-level="cisco_supported"] {
@@ -6850,6 +6966,9 @@ tr.scan-ts-ahead .scan-ts-name {
 :root.dce-dark .csc-custom-action-btn { border-color: #555; color: #bbb; }
 :root.dce-dark .csc-custom-action-btn:hover { background: #3a3a3a; border-color: #777; color: #ddd; }
 :root.dce-dark .csc-custom-action-btn-danger:hover { background: rgba(198, 40, 40, 0.15); border-color: #ef5350; color: #ef5350; }
+/* Inline delete button on ProductCard for custom cards */
+.csc-btn-custom-delete:hover { color: #c62828; border-color: #ef5350; background: #fce4ec; }
+:root.dce-dark .csc-btn-custom-delete:hover { color: #ef5350; border-color: #ef5350; background: rgba(198, 40, 40, 0.15); }
 
 .csc-custom-add-btn {
     display: inline-flex; align-items: center; gap: 5px;
@@ -6894,8 +7013,7 @@ tr.scan-ts-ahead .scan-ts-name {
 .csc-custom-form-row label .csc-req { color: #d32f2f; margin-left: 2px; }
 :root.dce-dark .csc-custom-form-row label { color: #e8eaf6; }
 .csc-custom-form-row input,
-.csc-custom-form-row textarea,
-.csc-custom-form-row select {
+.csc-custom-form-row textarea {
     display: block !important;
     width: 100% !important; max-width: 100% !important;
     box-sizing: border-box !important;
@@ -6908,12 +7026,17 @@ tr.scan-ts-ahead .scan-ts-name {
     margin: 0 !important;
 }
 .csc-custom-form-row select {
-    -webkit-appearance: none !important; -moz-appearance: none !important; appearance: none !important;
-    padding-right: 36px !important;
-    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%236b7280' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E") !important;
-    background-repeat: no-repeat !important;
-    background-position: right 12px center !important;
-    background-size: 14px !important;
+    display: block !important;
+    width: 100% !important; max-width: 100% !important;
+    box-sizing: border-box !important;
+    height: 42px !important; min-height: 42px !important;
+    padding: 0 14px !important; border-radius: 6px !important;
+    border: 1px solid #d1d5db !important;
+    background-color: #fff !important; color: #333 !important;
+    font-size: 14px !important; line-height: 42px !important;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif !important;
+    transition: border-color 0.15s, box-shadow 0.15s;
+    margin: 0 !important;
     cursor: pointer !important;
 }
 .csc-custom-form-row input:hover,
@@ -6935,9 +7058,6 @@ tr.scan-ts-ahead .scan-ts-name {
 :root.dce-dark .csc-custom-form-row textarea,
 :root.dce-dark .csc-custom-form-row select {
     background-color: #1a1d2e !important; border-color: #374151 !important; color: #e5e7eb !important;
-}
-:root.dce-dark .csc-custom-form-row select {
-    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%239ca3af' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E") !important;
 }
 :root.dce-dark .csc-custom-form-row input:hover,
 :root.dce-dark .csc-custom-form-row textarea:hover,
