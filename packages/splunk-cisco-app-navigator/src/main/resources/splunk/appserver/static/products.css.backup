@@ -460,38 +460,40 @@ html.dce-dark [data-view="views/shared/Page"] {
     transition: background 0.2s, border-color 0.2s, opacity 0.2s;
 }
 
-/* Dev mode info pill — platform + Splunk version + SCAN version + build */
-.scan-util-devinfo {
+/* Platform pill */
+.scan-util-platform {
     color: #07182D !important;
     background: #f2f5f7 !important;
     border-color: #CED4DB !important;
     cursor: default;
-    font-size: 11px;
-    font-variant-numeric: tabular-nums;
 }
-:root.dce-dark .scan-util-devinfo {
+.scan-util-icon {
+    width: 16px;
+    height: 16px;
+    opacity: 0.75;
+    flex-shrink: 0;
+}
+:root.dce-dark .scan-util-icon {
+    filter: invert(0.85) hue-rotate(180deg);
+    opacity: 0.6;
+}
+:root.dce-dark .scan-util-platform {
     background: rgba(255,255,255,0.06) !important;
     border-color: #444e56 !important;
     color: #d4d4d4 !important;
 }
-.scan-util-devinfo-sep {
-    margin: 0 5px;
-    color: #CED4DB;
-    font-weight: 300;
+
+/* Version pill */
+.scan-util-version {
+    color: #07182D !important;
+    background: #E8EBEE !important;
 }
-:root.dce-dark .scan-util-devinfo-sep {
-    color: #555;
+:root.dce-dark .scan-util-version {
+    background: rgba(255,255,255,0.08) !important;
+    color: #d4d4d4 !important;
 }
-.scan-util-devinfo-build {
-    margin-left: 3px;
-    font-family: 'SF Mono', 'Menlo', 'Consolas', monospace;
-    font-size: 10px;
-    color: #667180;
-    opacity: 0.8;
-}
-:root.dce-dark .scan-util-devinfo-build {
-    color: #999;
-}
+
+/* Splunk version label (inline within platform pill) */
 .scan-util-splunk-ver {
     font-weight: 400;
     font-size: 11px;
@@ -531,7 +533,7 @@ html.dce-dark [data-view="views/shared/Page"] {
     box-shadow: 0 2px 8px rgba(10,96,255,0.4);
     opacity: 0.95;
 }
-/* Cloud simulation indicator on dev info pill */
+/* Cloud simulation indicator on platform pill */
 .scan-util-cloud-sim {
     background: linear-gradient(135deg, #e3f2fd, #bbdefb) !important;
     border-color: #64b5f6 !important;
@@ -7227,461 +7229,4 @@ tr.scan-ts-ahead .scan-ts-name {
     background: #3a3a3a;
     border-color: #777;
     color: #ddd;
-}
-
-/* ═══════════════════════════════════════════════════════════════════════════
-   ECOSYSTEM HEALTH STATS BAR
-   ═══════════════════════════════════════════════════════════════════════════ */
-
-.csc-stats-bar {
-    display: flex;
-    gap: 8px;
-    margin: 14px 0 18px;
-    padding: 0;
-    flex-wrap: wrap;
-    justify-content: center;
-}
-.csc-stat-card {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    padding: 10px 14px 8px;
-    min-width: 85px;
-    border-radius: 8px;
-    background: var(--bg-primary, #f8f9fb);
-    border: 1px solid var(--border-light, #E1E6EB);
-    border-top: 3px solid var(--stat-accent, #5B6ABF);
-    transition: transform 0.15s ease, box-shadow 0.15s ease;
-    cursor: default;
-    position: relative;
-}
-.csc-stat-card:hover {
-    transform: translateY(-1px);
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
-}
-.csc-stat-card::after {
-    content: attr(data-tooltip);
-    position: absolute;
-    bottom: calc(100% + 6px);
-    left: 50%;
-    transform: translateX(-50%);
-    background: rgba(23, 30, 38, 0.92);
-    color: #fff;
-    font-size: 11px;
-    font-weight: 500;
-    line-height: 1.3;
-    padding: 5px 10px;
-    border-radius: 4px;
-    white-space: nowrap;
-    pointer-events: none;
-    opacity: 0;
-    transition: opacity 0.15s ease;
-    z-index: 100;
-}
-.csc-stat-card:hover::after {
-    opacity: 1;
-}
-.csc-stat-value {
-    font-size: 24px;
-    font-weight: 700;
-    line-height: 1.1;
-    color: var(--page-color, #1a1a2e);
-    display: inline-flex;
-    align-items: center;
-    gap: 6px;
-}
-.csc-stat-label {
-    font-size: 10px;
-    font-weight: 600;
-    text-transform: uppercase;
-    letter-spacing: 0.6px;
-    color: var(--faint-color, #888);
-    margin-top: 3px;
-}
-
-/* Animated pulse dot */
-.csc-pulse-dot {
-    width: 7px;
-    height: 7px;
-    background: #22C55E;
-    border-radius: 50%;
-    display: inline-block;
-    animation: csc-pulse 2s ease-in-out infinite;
-}
-@keyframes csc-pulse {
-    0%, 100% { box-shadow: 0 0 0 0 rgba(34, 197, 94, 0.4); }
-    50% { box-shadow: 0 0 0 5px rgba(34, 197, 94, 0); }
-}
-
-/* Dark mode stats */
-:root.dce-dark .csc-stat-card {
-    background: rgba(255, 255, 255, 0.03);
-    border-color: rgba(255, 255, 255, 0.08);
-}
-:root.dce-dark .csc-stat-card:hover {
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
-}
-:root.dce-dark .csc-stat-value {
-    color: #f0f0f0;
-}
-:root.dce-dark .csc-stat-label {
-    color: #888;
-}
-
-/* ═══════════════════════════════════════════════════════════════════════════
-   WELCOME / GETTING STARTED CARD
-   ═══════════════════════════════════════════════════════════════════════════ */
-
-.csc-welcome-card {
-    margin: 0 0 18px;
-    padding: 20px 24px;
-    border-radius: 8px;
-    background: var(--bg-primary, #f8f9fb);
-    border: 1px solid var(--border-light, #E1E6EB);
-    border-left: 4px solid #0A60FF;
-    animation: csc-welcome-in 0.4s ease-out;
-}
-@keyframes csc-welcome-in {
-    from { opacity: 0; transform: translateY(8px); }
-    to { opacity: 1; transform: translateY(0); }
-}
-.csc-welcome-header {
-    display: flex;
-    align-items: flex-start;
-    gap: 12px;
-    margin-bottom: 16px;
-}
-.csc-welcome-title {
-    font-size: 15px;
-    font-weight: 700;
-    color: var(--page-color, #1a1a2e);
-}
-.csc-welcome-subtitle {
-    font-size: 12px;
-    color: var(--faint-color, #666);
-    margin-top: 2px;
-}
-.csc-welcome-steps {
-    display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    gap: 12px;
-}
-@media (max-width: 900px) {
-    .csc-welcome-steps { grid-template-columns: repeat(2, 1fr); }
-}
-.csc-welcome-step {
-    display: flex;
-    flex-direction: column;
-    padding: 14px;
-    border-radius: 8px;
-    background: var(--card-bg, #fff);
-    border: 1px solid var(--border-light, #E1E6EB);
-    transition: box-shadow 0.15s ease;
-}
-.csc-welcome-step:hover {
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
-}
-.csc-welcome-step-num {
-    width: 24px;
-    height: 24px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    border-radius: 50%;
-    background: #0A60FF;
-    color: #fff;
-    font-size: 12px;
-    font-weight: 700;
-    margin-bottom: 10px;
-    flex-shrink: 0;
-}
-.csc-welcome-step-title {
-    font-size: 13px;
-    font-weight: 600;
-    color: var(--page-color, #1a1a2e);
-    margin-bottom: 4px;
-}
-.csc-welcome-step-desc {
-    font-size: 11.5px;
-    color: var(--faint-color, #666);
-    line-height: 1.5;
-}
-
-/* Dark mode welcome */
-:root.dce-dark .csc-welcome-card {
-    background: rgba(255, 255, 255, 0.03);
-    border-color: rgba(255, 255, 255, 0.08);
-}
-:root.dce-dark .csc-welcome-step {
-    background: rgba(255, 255, 255, 0.04);
-    border-color: rgba(255, 255, 255, 0.08);
-}
-:root.dce-dark .csc-welcome-step:hover {
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
-}
-:root.dce-dark .csc-welcome-step-num {
-    background: #3380FF;
-}
-
-/* ═══════════════════════════════════════════════════════════════════════════
-   SECTION TITLE — PEEK STRIP & PULSE
-   ═══════════════════════════════════════════════════════════════════════════ */
-
-.csc-section-title-row {
-    display: inline-flex;
-    align-items: center;
-    gap: 12px;
-}
-.csc-section-peek {
-    display: inline-flex;
-    align-items: center;
-    gap: 3px;
-    margin-left: 4px;
-    opacity: 0.75;
-    transition: opacity 0.2s ease;
-}
-.csc-section-peek:hover {
-    opacity: 1;
-}
-.csc-peek-icon {
-    width: 22px;
-    height: 22px;
-    border-radius: 5px;
-    background: var(--bg-primary, #f2f5f7);
-    border: 1px solid var(--border-light, #E1E6EB);
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 11px;
-    color: var(--faint-color, #888);
-    transition: transform 0.15s ease;
-    position: relative;
-    cursor: default;
-}
-.csc-peek-icon:hover {
-    transform: scale(1.2);
-    z-index: 10;
-}
-.csc-peek-icon::after {
-    content: attr(data-tooltip);
-    position: absolute;
-    bottom: calc(100% + 6px);
-    left: 50%;
-    transform: translateX(-50%);
-    background: rgba(23, 30, 38, 0.92);
-    color: #fff;
-    font-size: 11px;
-    font-weight: 500;
-    line-height: 1.3;
-    padding: 4px 8px;
-    border-radius: 4px;
-    white-space: nowrap;
-    pointer-events: none;
-    opacity: 0;
-    transition: opacity 0.15s ease;
-    z-index: 100;
-}
-.csc-peek-icon:hover::after {
-    opacity: 1;
-}
-.csc-peek-svg {
-    width: 14px;
-    height: 14px;
-    object-fit: contain;
-}
-.csc-peek-more {
-    font-size: 10px;
-    font-weight: 600;
-    color: var(--faint-color, #999);
-    margin-left: 2px;
-}
-
-/* Section pulse indicator for Data Detected */
-.csc-section-pulse {
-    width: 6px;
-    height: 6px;
-    background: #22C55E;
-    border-radius: 50%;
-    display: inline-block;
-    margin-left: 4px;
-    animation: csc-pulse 2.5s ease-in-out infinite;
-}
-
-/* Dark mode peek */
-:root.dce-dark .csc-peek-icon {
-    background: rgba(255, 255, 255, 0.06);
-    border-color: rgba(255, 255, 255, 0.12);
-    color: #bbb;
-}
-
-/* ═══════════════════════════════════════════════════════════════════════════
-   GRADIENT SECTION HEADERS
-   ═══════════════════════════════════════════════════════════════════════════ */
-
-/* Subtle gradient wash on section toggle buttons */
-#configured_products button[data-test='toggle'] {
-    background: linear-gradient(90deg, rgba(10, 96, 255, 0.06) 0%, transparent 60%) !important;
-}
-#detected_products button[data-test='toggle'] {
-    background: linear-gradient(90deg, rgba(34, 197, 94, 0.06) 0%, transparent 60%) !important;
-}
-#available_products button[data-test='toggle'] {
-    background: linear-gradient(90deg, rgba(91, 106, 191, 0.06) 0%, transparent 60%) !important;
-}
-#unsupported_products button[data-test='toggle'] {
-    background: linear-gradient(90deg, rgba(245, 158, 11, 0.06) 0%, transparent 60%) !important;
-}
-#coming_soon_products button[data-test='toggle'] {
-    background: linear-gradient(90deg, rgba(124, 58, 237, 0.06) 0%, transparent 60%) !important;
-}
-#deprecated_products button[data-test='toggle'] {
-    background: linear-gradient(90deg, rgba(239, 68, 68, 0.06) 0%, transparent 60%) !important;
-}
-#retired_products button[data-test='toggle'] {
-    background: linear-gradient(90deg, rgba(141, 110, 122, 0.06) 0%, transparent 60%) !important;
-}
-#gtm_coverage_gaps button[data-test='toggle'] {
-    background: linear-gradient(90deg, rgba(4, 159, 217, 0.06) 0%, transparent 60%) !important;
-}
-#custom_products button[data-test='toggle'] {
-    background: linear-gradient(90deg, rgba(249, 115, 22, 0.06) 0%, transparent 60%) !important;
-}
-#vault_products button[data-test='toggle'] {
-    background: linear-gradient(90deg, rgba(84, 110, 122, 0.06) 0%, transparent 60%) !important;
-}
-
-/* Section header hover lift effect */
-#configured_products button[data-test='toggle'],
-#detected_products button[data-test='toggle'],
-#available_products button[data-test='toggle'],
-#unsupported_products button[data-test='toggle'],
-#coming_soon_products button[data-test='toggle'],
-#deprecated_products button[data-test='toggle'],
-#retired_products button[data-test='toggle'],
-#gtm_coverage_gaps button[data-test='toggle'],
-#custom_products button[data-test='toggle'],
-#vault_products button[data-test='toggle'] {
-    transition: transform 0.15s ease, box-shadow 0.15s ease !important;
-    border-radius: 6px !important;
-}
-#configured_products button[data-test='toggle']:hover,
-#detected_products button[data-test='toggle']:hover,
-#available_products button[data-test='toggle']:hover,
-#unsupported_products button[data-test='toggle']:hover,
-#coming_soon_products button[data-test='toggle']:hover,
-#deprecated_products button[data-test='toggle']:hover,
-#retired_products button[data-test='toggle']:hover,
-#gtm_coverage_gaps button[data-test='toggle']:hover,
-#custom_products button[data-test='toggle']:hover,
-#vault_products button[data-test='toggle']:hover {
-    transform: translateX(2px);
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
-}
-
-/* Dark mode gradient headers */
-:root.dce-dark #configured_products button[data-test='toggle'] {
-    background: linear-gradient(90deg, rgba(10, 96, 255, 0.12) 0%, transparent 60%) !important;
-}
-:root.dce-dark #detected_products button[data-test='toggle'] {
-    background: linear-gradient(90deg, rgba(34, 197, 94, 0.12) 0%, transparent 60%) !important;
-}
-:root.dce-dark #available_products button[data-test='toggle'] {
-    background: linear-gradient(90deg, rgba(91, 106, 191, 0.12) 0%, transparent 60%) !important;
-}
-:root.dce-dark #unsupported_products button[data-test='toggle'] {
-    background: linear-gradient(90deg, rgba(245, 158, 11, 0.12) 0%, transparent 60%) !important;
-}
-:root.dce-dark #coming_soon_products button[data-test='toggle'] {
-    background: linear-gradient(90deg, rgba(124, 58, 237, 0.12) 0%, transparent 60%) !important;
-}
-:root.dce-dark #deprecated_products button[data-test='toggle'] {
-    background: linear-gradient(90deg, rgba(239, 68, 68, 0.12) 0%, transparent 60%) !important;
-}
-:root.dce-dark #retired_products button[data-test='toggle'] {
-    background: linear-gradient(90deg, rgba(141, 110, 122, 0.12) 0%, transparent 60%) !important;
-}
-:root.dce-dark #gtm_coverage_gaps button[data-test='toggle'] {
-    background: linear-gradient(90deg, rgba(4, 159, 217, 0.12) 0%, transparent 60%) !important;
-}
-:root.dce-dark #custom_products button[data-test='toggle'] {
-    background: linear-gradient(90deg, rgba(249, 115, 22, 0.12) 0%, transparent 60%) !important;
-}
-:root.dce-dark #vault_products button[data-test='toggle'] {
-    background: linear-gradient(90deg, rgba(84, 110, 122, 0.12) 0%, transparent 60%) !important;
-}
-:root.dce-dark #configured_products button[data-test='toggle']:hover,
-:root.dce-dark #detected_products button[data-test='toggle']:hover,
-:root.dce-dark #available_products button[data-test='toggle']:hover,
-:root.dce-dark #unsupported_products button[data-test='toggle']:hover,
-:root.dce-dark #coming_soon_products button[data-test='toggle']:hover,
-:root.dce-dark #deprecated_products button[data-test='toggle']:hover,
-:root.dce-dark #retired_products button[data-test='toggle']:hover,
-:root.dce-dark #gtm_coverage_gaps button[data-test='toggle']:hover,
-:root.dce-dark #custom_products button[data-test='toggle']:hover,
-:root.dce-dark #vault_products button[data-test='toggle']:hover {
-    box-shadow: 0 2px 12px rgba(4, 159, 217, 0.15);
-}
-
-/* ═══════════════════════════════════════════════════════════════════════════
-   FOOTER POLISH
-   ═══════════════════════════════════════════════════════════════════════════ */
-
-/* ═══════════════════════════════════════════════════════════════════════════
-   HEADER BRANDING — SCAN LOGO
-   ═══════════════════════════════════════════════════════════════════════════ */
-
-.scan-logo-mark {
-    font-weight: 800;
-    letter-spacing: 1.5px;
-    color: var(--heading-color, #1a1a2e);
-    font-size: 22px;
-    margin-right: 8px;
-}
-.scan-logo-full {
-    font-size: 13px;
-    font-weight: 500;
-    letter-spacing: 0.2px;
-    color: var(--faint-color, #667180);
-    vertical-align: middle;
-}
-
-:root.dce-dark .scan-logo-mark {
-    color: #f0f0f0;
-}
-:root.dce-dark .scan-logo-full {
-    color: #888;
-}
-
-/* ═══════════════════════════════════════════════════════════════════════════
-   WELCOME CARD — DISMISS BUTTON
-   ═══════════════════════════════════════════════════════════════════════════ */
-
-.csc-welcome-dismiss {
-    background: none;
-    border: none;
-    font-size: 18px;
-    color: var(--faint-color, #999);
-    cursor: pointer;
-    padding: 4px 8px;
-    border-radius: 6px;
-    transition: background 0.15s ease, color 0.15s ease;
-    line-height: 1;
-    align-self: flex-start;
-}
-.csc-welcome-dismiss:hover {
-    background: rgba(0, 0, 0, 0.06);
-    color: var(--page-color, #333);
-}
-:root.dce-dark .csc-welcome-dismiss:hover {
-    background: rgba(255, 255, 255, 0.08);
-    color: #eee;
-}
-
-/* Entrance animation for card grid sections */
-.csc-card-grid {
-    animation: csc-grid-in 0.35s ease-out;
-}
-@keyframes csc-grid-in {
-    from { opacity: 0; transform: translateY(8px); }
-    to { opacity: 1; transform: translateY(0); }
 }
