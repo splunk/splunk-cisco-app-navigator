@@ -1858,7 +1858,8 @@ html.dce-dark [data-view="views/shared/Page"] {
     to   { opacity: 1; transform: translateY(0); }
 }
 .csc-launch-menu-item {
-    display: block;
+    display: flex;
+    align-items: center;
     width: 100%;
     padding: 8px 14px;
     font-size: 12px;
@@ -1873,6 +1874,11 @@ html.dce-dark [data-view="views/shared/Page"] {
 }
 .csc-launch-menu-item:hover {
     background: var(--card-footer-bg, #f9fafb);
+}
+.csc-launch-menu-divider {
+    height: 1px;
+    background: var(--card-border, #d1d5db);
+    margin: 4px 10px;
 }
 .csc-launch-menu-edit {
     border-top: 1px solid var(--card-border, #d1d5db);
@@ -1967,6 +1973,18 @@ html.dce-dark [data-view="views/shared/Page"] {
     color: #ffffff;
 }
 
+.csc-btn-explore {
+    background: #197E25;
+    color: #ffffff;
+    border: 1px solid #197E25;
+}
+
+.csc-btn-explore:hover {
+    background: #126B1C;
+    border-color: #126B1C;
+    color: #ffffff;
+}
+
 .csc-btn-green-outline {
     background: #ffffff;
     color: #197E25;
@@ -2050,6 +2068,14 @@ html.dce-dark [data-view="views/shared/Page"] {
     background: #27b834;
     border-color: #27b834;
 }
+:root.dce-dark .csc-btn-explore {
+    background: #1f9b2c;
+    border-color: #1f9b2c;
+}
+:root.dce-dark .csc-btn-explore:hover {
+    background: #27b834;
+    border-color: #27b834;
+}
 :root.dce-dark .csc-btn-green-outline {
     color: #4ade80;
     border-color: #4ade80;
@@ -2124,6 +2150,9 @@ html.dce-dark [data-view="views/shared/Page"] {
 }
 :root.dce-dark .csc-launch-menu-item:hover {
     background: var(--card-footer-bg);
+}
+:root.dce-dark .csc-launch-menu-divider {
+    background: var(--card-border);
 }
 :root.dce-dark .csc-launch-menu-edit {
     border-top-color: var(--card-border);
@@ -5210,6 +5239,27 @@ body:has(.scan-drawer-open) .scan-feedback-tab {
 }
 .scan-gtmmode-banner::before {
     background: linear-gradient(90deg, transparent, rgba(245, 158, 11, 0.08), transparent);
+}
+.scan-devmode-bump {
+    position: absolute;
+    right: 16px;
+    top: 50%;
+    transform: translateY(-50%);
+    font-family: 'SF Mono', 'Fira Code', 'Consolas', monospace;
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+    color: rgba(255, 255, 255, 0.5);
+    text-decoration: none;
+    padding: 3px 10px;
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    border-radius: 4px;
+    transition: all 0.2s;
+}
+.scan-devmode-bump:hover {
+    color: #fff;
+    background: rgba(255, 255, 255, 0.1);
+    border-color: rgba(255, 255, 255, 0.35);
 }
 
 /* Page background effects when dev mode is active */

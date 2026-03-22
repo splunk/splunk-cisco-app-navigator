@@ -153,3 +153,22 @@ or "O11y".
 is a broader concept that includes APM, RUM, and infrastructure monitoring —
 none of which are in scope for these badges. "ITOps" is precise and matches
 how Splunk positions ITSI.
+
+## 12. Contextual Launch dropdown for TA-only products (2025-03-21)
+
+**Decision:** When a product has an installed add-on but no companion app with
+visible UI (e.g. `Splunk_TA_cisco-wsa`, `Splunk_TA_cisco-esa`), replace the
+green "Launch" button with a blue "Explore" button. The dropdown offers
+"Explore Data in Search" (pre-filled sourcetype metadata query) and "Create
+Dashboard" (opens Dashboard Studio). The "Set Custom" option lets users
+point the button at their own Dashboard Studio creation. Detection is
+runtime: `checkAppStatus` now returns `visible` from the Splunk REST API.
+
+**Rationale:** TA-only products (add-on for data ingest + CIM normalization,
+no built-in dashboards) previously led to a 404 when users clicked "Launch"
+because the TA's `is_visible = false`. Rather than hiding the button entirely,
+we guide users toward the next productive step: exploring their data or
+creating their first dashboard. Option C (contextual dropdown) was chosen
+over Options A (single Explore button) and B (single Create Dashboard button)
+because it serves both the "I just want to see my data" and "I want to build
+something" use cases without forcing a choice.
