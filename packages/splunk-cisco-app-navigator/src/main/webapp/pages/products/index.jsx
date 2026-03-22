@@ -49,6 +49,7 @@ import CloneIcon from '@splunk/react-icons/LayersDoubleTransparent';
 import TrashCan from '@splunk/react-icons/TrashCanCross';
 import ShieldIcon from '@splunk/react-icons/Shield';
 import PulseIcon from '@splunk/react-icons/Pulse';
+import LayoutIcon from '@splunk/react-icons/Layout';
 import Button from '@splunk/react-ui/Button';
 import CollapsiblePanel from '@splunk/react-ui/CollapsiblePanel';
 import WaitSpinner from '@splunk/react-ui/WaitSpinner';
@@ -530,10 +531,10 @@ async function loadProductsFromConf() {
  * Check a single Splunk app: installed? version? update available?
  */
 async function checkAppStatus(appId) {
-    if (!appId) return { installed: false, version: null, updateVersion: null, disabled: false };
+    if (!appId) return { installed: false, version: null, updateVersion: null, disabled: false, visible: false };
     try {
         const res = await splunkFetch(`${APPS_LOCAL_ENDPOINT}/${encodeURIComponent(appId)}?output_mode=json`);
-        if (!res.ok) return { installed: false, version: null, updateVersion: null, disabled: false };
+        if (!res.ok) return { installed: false, version: null, updateVersion: null, disabled: false, visible: false };
         const data = await res.json();
         const c = data.entry?.[0]?.content || {};
         return {
@@ -541,9 +542,10 @@ async function checkAppStatus(appId) {
             version: c.version || null,
             updateVersion: c['update.version'] || null,
             disabled: c.disabled === true || c.disabled === 'true',
+            visible: c.visible === true || c.visible === 'true',
         };
     } catch (e) {
-        return { installed: false, version: null, updateVersion: null, disabled: false };
+        return { installed: false, version: null, updateVersion: null, disabled: false, visible: false };
     }
 }
 
@@ -714,9 +716,13 @@ async function detectIndexerTierApps() {
     const csrf = getCSRFToken();
     if (!csrf) return null;
     try {
+        // The subsearch filters to servers that are BOTH "indexer" AND "search_peer".
+        // On standalone the local server has "indexer" but NOT "search_peer", so the
+        // subsearch returns nothing → the outer query returns nothing → {} (standalone).
+        // On distributed, indexers have both roles → full detection runs correctly.
         const spl = [
             '| rest splunk_server=* /servicesNS/-/-/apps/local f=title f=version f=disabled count=0',
-            '| search [| rest splunk_server=* /services/server/info f=server_roles | where match(server_roles, "indexer") | fields splunk_server]',
+            '| search [| rest splunk_server=* /services/server/info f=server_roles | where match(server_roles, "indexer") AND match(server_roles, "search_peer") | fields splunk_server]',
             '| eval is_disabled=if(disabled=="1" OR disabled="true", 1, 0)',
             '| stats latest(version) as idx_version max(is_disabled) as any_disabled dc(splunk_server) as idx_count by title',
             '| fields title idx_version any_disabled idx_count',
@@ -3153,42 +3159,68 @@ function LegacyAuditModal({ open, onClose, legacyUids, installedApps, indexerApp
 }
 
 // ────────────────────  FEEDBACK MODAL  ─────────────────────
-function FeedbackModal({ open, onClose }) {
+function feedbackFallbackCopy(text, onSuccess, onFail) {
+    const ta = document.createElement('textarea');
+    ta.value = text;
+    ta.style.position = 'fixed';
+    ta.style.left = '-9999px';
+    ta.style.opacity = '0';
+    document.body.appendChild(ta);
+    ta.select();
+    try { document.execCommand('copy'); onSuccess(); }
+    catch (_) { onFail(); }
+    document.body.removeChild(ta);
+}
+const FEEDBACK_EMAIL = 'scan-feedback@cisco.com';
+const FEEDBACK_TYPES = [
+    { id: 'feature', label: 'Feature Request' },
+    { id: 'bug', label: 'Bug Report' },
+    { id: 'improvement', label: 'Improvement' },
+    { id: 'general', label: 'General' },
+];
+
+function FeedbackModal({ open, onClose, platformType, appVersion }) {
     const returnFocusRef = useRef(null);
     const [feedbackType, setFeedbackType] = useState('feature');
-    const [rating, setRating] = useState('3');
-    const [title, setTitle] = useState('');
     const [description, setDescription] = useState('');
-    const [submitting, setSubmitting] = useState(false);
-    const [submitMsg, setSubmitMsg] = useState(null);
-    const [submitErr, setSubmitErr] = useState(null);
+    const [actionMsg, setActionMsg] = useState(null);
 
     if (!open) return null;
 
-    const handleSubmit = async () => {
-        if (!title.trim()) { setSubmitErr('Please provide a title.'); return; }
-        if (!description.trim()) { setSubmitErr('Please provide a description.'); return; }
-        setSubmitting(true);
-        setSubmitErr(null);
-        setSubmitMsg(null);
-        try {
-            const ts = Math.floor(Date.now() / 1000);
-            const esc = s => s.replace(/"/g, '\\"');
-            const spl = `| makeresults | eval _time=${ts} | eval feedback_type="${esc(feedbackType)}", rating="${rating}", title="${esc(title)}", description="${esc(description)}", app="${APP_ID}", sourcetype="scan:feedback" | collect index=summary source="scan:feedback" sourcetype="stash"`;
-            await splunkFetch(SEARCH_ENDPOINT, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-                body: `search=${encodeURIComponent(spl)}&output_mode=json&exec_mode=oneshot`,
+    const typeLabel = FEEDBACK_TYPES.find(t => t.id === feedbackType)?.label || feedbackType;
+
+    const buildBody = () => [
+        `Type: ${typeLabel}`,
+        `Platform: ${platformType || 'unknown'}`,
+        `SCAN Version: ${appVersion || 'unknown'}`,
+        `Browser: ${navigator.userAgent}`,
+        '',
+        'Feedback:',
+        description || '(please describe your feedback here)',
+    ].join('\n');
+
+    const handleSendEmail = () => {
+        if (!description.trim()) { setActionMsg({ type: 'error', text: 'Please write your feedback first.' }); return; }
+        const subject = `[SCAN Feedback] ${typeLabel}`;
+        const body = buildBody();
+        window.location.href = `mailto:${FEEDBACK_EMAIL}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+        setActionMsg({ type: 'success', text: 'Email client opened! Send the email to complete.' });
+    };
+
+    const handleCopyToClipboard = () => {
+        if (!description.trim()) { setActionMsg({ type: 'error', text: 'Please write your feedback first.' }); return; }
+        const text = `To: ${FEEDBACK_EMAIL}\nSubject: [SCAN Feedback] ${typeLabel}\n\n${buildBody()}`;
+        const onSuccess = () => {
+            setActionMsg({ type: 'success', text: 'Copied to clipboard! Paste into your preferred email or messaging app.' });
+            setTimeout(() => setActionMsg(null), 4000);
+        };
+        const onFail = () => setActionMsg({ type: 'error', text: 'Could not copy — please select and copy manually.' });
+        if (navigator.clipboard && window.isSecureContext) {
+            navigator.clipboard.writeText(text).then(onSuccess).catch(() => {
+                feedbackFallbackCopy(text, onSuccess, onFail);
             });
-            setSubmitMsg('Thank you! Your feedback has been submitted.');
-            setTimeout(() => {
-                setFeedbackType('feature'); setRating('3'); setTitle(''); setDescription(''); setSubmitMsg(null);
-            }, 3000);
-        } catch (e) {
-            console.error('Feedback submit error:', e);
-            setSubmitErr('Failed to submit feedback. Please try again.');
-        } finally {
-            setSubmitting(false);
+        } else {
+            feedbackFallbackCopy(text, onSuccess, onFail);
         }
     };
 
@@ -3205,54 +3237,37 @@ function FeedbackModal({ open, onClose }) {
             <Modal.Body>
                 <div className="csc-sc4s-info" style={{ fontSize: '13px', lineHeight: '1.6' }}>
                     <p style={{ color: 'var(--muted-color, #666)', marginBottom: '20px' }}>
-                        We value your feedback! Share thoughts, report issues, or suggest features.
+                        Share thoughts, report issues, or suggest features.
+                        Clicking <b>Send via Email</b> will open your email client with the details pre-filled.
                     </p>
                     <div style={{ marginBottom: '18px' }}>
                         <label style={{ fontWeight: 600, display: 'block', marginBottom: '6px' }}>Feedback Type</label>
                         <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
-                            {['feature', 'bug', 'improvement', 'general'].map(t => (
-                                <span key={t} style={radioStyle(feedbackType === t)} onClick={() => setFeedbackType(t)}>
-                                    {t === 'feature' ? 'Feature Request' : t === 'bug' ? 'Bug Report' : t.charAt(0).toUpperCase() + t.slice(1)}
+                            {FEEDBACK_TYPES.map(t => (
+                                <span key={t.id} style={radioStyle(feedbackType === t.id)} onClick={() => setFeedbackType(t.id)}>
+                                    {t.label}
                                 </span>
                             ))}
                         </div>
                     </div>
                     <div style={{ marginBottom: '18px' }}>
-                        <label style={{ fontWeight: 600, display: 'block', marginBottom: '6px' }}>Overall Rating</label>
-                        <div style={{ display: 'flex', gap: '6px' }}>
-                            {['1','2','3','4','5'].map(r => (
-                                <span key={r} style={{ ...radioStyle(rating === r), minWidth: '36px', textAlign: 'center' }} onClick={() => setRating(r)}>
-                                    {'⭐'.repeat(Number(r))}
-                                </span>
-                            ))}
-                        </div>
-                    </div>
-                    <div style={{ marginBottom: '18px' }}>
-                        <label style={{ fontWeight: 600, display: 'block', marginBottom: '6px' }}>Title</label>
-                        <input type="text" value={title}
-                            onChange={e => { setTitle(e.target.value); setSubmitErr(null); }}
-                            placeholder="e.g., Dashboard loading issue"
-                            style={{ width: '100%', padding: '8px 12px', fontSize: '13px', border: '1px solid var(--input-border, #ccc)', borderRadius: '6px', boxSizing: 'border-box', background: 'var(--input-bg, #fff)', color: 'var(--page-color, #333)' }}
-                        />
-                    </div>
-                    <div style={{ marginBottom: '18px' }}>
-                        <label style={{ fontWeight: 600, display: 'block', marginBottom: '6px' }}>Description</label>
+                        <label style={{ fontWeight: 600, display: 'block', marginBottom: '6px' }}>Your Feedback</label>
                         <textarea value={description}
-                            onChange={e => { setDescription(e.target.value); setSubmitErr(null); }}
+                            onChange={e => { setDescription(e.target.value); setActionMsg(null); }}
                             rows={5} placeholder="Please provide as much detail as possible..."
                             style={{ width: '100%', padding: '8px 12px', fontSize: '13px', border: '1px solid var(--input-border, #ccc)', borderRadius: '6px', boxSizing: 'border-box', resize: 'vertical', background: 'var(--input-bg, #fff)', color: 'var(--page-color, #333)' }}
                         />
                     </div>
-                    {submitMsg && <Message type="success">{submitMsg}</Message>}
-                    {submitErr && <Message type="error">{submitErr}</Message>}
+                    <div style={{ padding: '10px 14px', marginBottom: '14px', background: 'var(--card-footer-bg, #f9fafb)', borderRadius: '6px', fontSize: '11px', color: 'var(--muted-color, #888)', lineHeight: '1.5' }}>
+                        The following context will be included automatically: feedback type, platform ({platformType || 'unknown'}), SCAN version ({appVersion || 'unknown'}), and browser info.
+                    </div>
+                    {actionMsg && <Message type={actionMsg.type}>{actionMsg.text}</Message>}
                 </div>
             </Modal.Body>
             <Modal.Footer>
                 <Button appearance="secondary" label="Cancel" onClick={onClose} />
-                {submitting
-                    ? <WaitSpinner size="medium" />
-                    : <Button appearance="primary" className="scan-btn-primary" label="Submit Feedback" onClick={handleSubmit} />
-                }
+                <Button appearance="secondary" label="Copy to Clipboard" onClick={handleCopyToClipboard} />
+                <Button appearance="primary" className="scan-btn-primary" label="Send via Email" onClick={handleSendEmail} />
             </Modal.Footer>
         </Modal>
     );
@@ -3802,6 +3817,29 @@ function ProductCard({ product, installedApps, appStatuses, indexerApps, sourcet
     const handleLaunchApp = () => {
         if (product.custom_dashboard) { handleLaunchCustom(); } else { handleLaunchDefault(); }
     };
+
+    // TA-only: addon is installed but has no visible UI (no app_viz, addon is_visible=false)
+    const isAddonOnly = !app_viz && addon && appStatus?.installed && !appStatus?.visible;
+
+    // SC4S-only: no addon/app at all — data arrives via SC4S, user needs Explore to see it
+    const isSc4sOnly = !addon && !app_viz && sc4s_supported && (product.sourcetypes || []).length > 0;
+
+    const handleExploreData = () => {
+        const sts = product.sourcetypes || [];
+        if (sts.length > 0) {
+            const escaped = sts.map(s => s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'));
+            const pattern = '^(' + escaped.join('|') + ')$';
+            const spl = `| metadata type=sourcetypes index=* | where match(sourcetype, "${pattern}") | table sourcetype totalCount lastTime | sort -totalCount`;
+            window.open(createURL(`/app/search/search?q=${encodeURIComponent(spl)}`), '_blank');
+        } else {
+            window.open(createURL('/app/search/search'), '_blank');
+        }
+    };
+
+    const handleCreateDashboard = () => {
+        window.open(createURL('/app/search/dashboards'), '_blank');
+    };
+
     const handleSaveCustomDashboard = async () => {
         setCustomDashSaving(true);
         setCustomDashMsg(null);
@@ -4085,10 +4123,10 @@ function ProductCard({ product, installedApps, appStatuses, indexerApps, sourcet
                             {addon && (
                                 <>
                                 <div className="csc-dep-detail">
-                                    {appStatus?.installed ? (
+                                    {appStatus?.installed && appStatus?.visible ? (
                                         <a href={createURL(`/app/${addon}/`)} target="_blank" rel="noopener noreferrer" className="csc-dep-name csc-dep-name-link" title={`${addon} — Click to open`}>{addon_label || addon}</a>
                                     ) : (
-                                        <span className="csc-dep-name" title={addon}>{addon_label || addon}</span>
+                                        <span className="csc-dep-name" title={appStatus?.installed ? `${addon} — TA only (no UI)` : addon}>{addon_label || addon}</span>
                                     )}
                                     {(addon_splunkbase_uid || addon_docs_url || addon_troubleshoot_url) && (
                                         <span className="csc-split-pill">
@@ -4177,7 +4215,7 @@ function ProductCard({ product, installedApps, appStatuses, indexerApps, sourcet
                                 <>
                                 <hr className="csc-dep-divider" />
                                 <div className="csc-dep-detail">
-                                    {vizAppStatus?.installed ? (
+                                    {vizAppStatus?.installed && vizAppStatus?.visible ? (
                                         <a href={createURL(`/app/${app_viz}/`)} target="_blank" rel="noopener noreferrer" className="csc-dep-name csc-dep-name-link" title={`${app_viz} — Click to open`}>{app_viz_label || app_viz}</a>
                                     ) : (
                                         <span className="csc-dep-name" title={app_viz}>{app_viz_label || app_viz}</span>
@@ -4221,7 +4259,7 @@ function ProductCard({ product, installedApps, appStatuses, indexerApps, sourcet
                                 <>
                                 <hr className="csc-dep-divider" />
                                 <div className="csc-dep-detail">
-                                    {vizApp2Status?.installed ? (
+                                    {vizApp2Status?.installed && vizApp2Status?.visible ? (
                                         <a href={createURL(`/app/${app_viz_2}/`)} target="_blank" rel="noopener noreferrer" className="csc-dep-name csc-dep-name-link" title={`${app_viz_2} — Click to open`}>{app_viz_2_label || app_viz_2}</a>
                                     ) : (
                                         <span className="csc-dep-name" title={app_viz_2}>{app_viz_2_label || app_viz_2}</span>
@@ -4689,34 +4727,117 @@ function ProductCard({ product, installedApps, appStatuses, indexerApps, sourcet
                 )}
                 {/* Launch — only when installed AND not disabled */}
                 {!suppressActions && isConfigured && isInstalled && !appStatus?.disabled && !vizAppStatus?.disabled && (
+                    isAddonOnly ? (
+                        /* ── TA-only: contextual Explore dropdown ── */
+                        <div className="csc-launch-wrap" ref={launchBtnRef}>
+                            <button className="csc-btn csc-btn-explore" onClick={product.custom_dashboard ? handleLaunchCustom : handleExploreData}
+                                title={product.custom_dashboard
+                                    ? `Open custom dashboard: ${product.custom_dashboard}`
+                                    : `Explore ${display_name} data in Splunk Search`}>
+                                <Search size={14} style={{ marginRight: 4 }} />
+                                {product.custom_dashboard ? 'Launch' : 'Explore'}
+                            </button>
+                            <button
+                                className="csc-btn csc-btn-explore csc-launch-caret"
+                                onClick={toggleLaunchMenu}
+                                title="More options"
+                            ><ChevronDown size={14} /></button>
+                            {launchMenuOpen && ReactDOM.createPortal(
+                                <div className="csc-launch-menu" ref={launchMenuRef}
+                                    style={{ top: launchMenuPos.top, left: launchMenuPos.left }}>
+                                    <button className="csc-launch-menu-item" onClick={() => { handleExploreData(); setLaunchMenuOpen(false); }}>
+                                        <Search size={13} style={{ marginRight: 6, opacity: 0.7 }} />Explore Data in Search
+                                    </button>
+                                    <button className="csc-launch-menu-item" onClick={() => { handleCreateDashboard(); setLaunchMenuOpen(false); }}>
+                                        <LayoutIcon size={13} style={{ marginRight: 6, opacity: 0.7 }} />Create Dashboard
+                                    </button>
+                                    {product.custom_dashboard && (
+                                        <button className="csc-launch-menu-item" onClick={() => { handleLaunchCustom(); setLaunchMenuOpen(false); }}>
+                                            Custom: {product.custom_dashboard.split('/').pop()}
+                                        </button>
+                                    )}
+                                    <button className="csc-launch-menu-item csc-launch-menu-edit" onClick={() => { setLaunchMenuOpen(false); setCustomDashModalOpen(true); setCustomDashInput(product.custom_dashboard || ''); }}>
+                                        {product.custom_dashboard ? 'Edit Custom…' : 'Set Custom…'}
+                                    </button>
+                                </div>,
+                                document.body
+                            )}
+                        </div>
+                    ) : (
+                        /* ── Normal launch: app has visible UI ── */
+                        <div className="csc-launch-wrap" ref={launchBtnRef}>
+                            <button className="csc-btn csc-btn-green" onClick={handleLaunchApp}
+                                title={product.custom_dashboard
+                                    ? `Launch custom: ${product.custom_dashboard}`
+                                    : `Launch ${app_viz_label || addon_label || addon}`}>
+                                Launch
+                            </button>
+                            <button
+                                className="csc-btn csc-btn-green csc-launch-caret"
+                                onClick={toggleLaunchMenu}
+                                title="Launch options"
+                            ><ChevronDown size={14} /></button>
+                            {launchMenuOpen && ReactDOM.createPortal(
+                                <div className="csc-launch-menu" ref={launchMenuRef}
+                                    style={{ top: launchMenuPos.top, left: launchMenuPos.left }}>
+                                    {productDashboards.length > 1 ? (
+                                        productDashboards.map((dash, i) => (
+                                            <button key={dash} className="csc-launch-menu-item" onClick={() => { handleLaunchDashboard(dash); setLaunchMenuOpen(false); }}>
+                                                {dash.replace(/_/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase())}
+                                            </button>
+                                        ))
+                                    ) : (
+                                        <button className="csc-launch-menu-item" onClick={() => { handleLaunchDefault(); setLaunchMenuOpen(false); }}>
+                                            {productDashboards[0]
+                                                ? productDashboards[0].replace(/_/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase())
+                                                : (app_viz_label || addon_label || 'Default Dashboard')}
+                                        </button>
+                                    )}
+                                    <div className="csc-launch-menu-divider" />
+                                    <button className="csc-launch-menu-item" onClick={() => { handleExploreData(); setLaunchMenuOpen(false); }}>
+                                        <Search size={13} style={{ marginRight: 6, opacity: 0.7 }} />Explore Data in Search
+                                    </button>
+                                    <button className="csc-launch-menu-item" onClick={() => { handleCreateDashboard(); setLaunchMenuOpen(false); }}>
+                                        <LayoutIcon size={13} style={{ marginRight: 6, opacity: 0.7 }} />Create Dashboard
+                                    </button>
+                                    {product.custom_dashboard && (
+                                        <button className="csc-launch-menu-item" onClick={() => { handleLaunchCustom(); setLaunchMenuOpen(false); }}>
+                                            Custom: {product.custom_dashboard.split('/').pop()}
+                                        </button>
+                                    )}
+                                    <button className="csc-launch-menu-item csc-launch-menu-edit" onClick={() => { setLaunchMenuOpen(false); setCustomDashModalOpen(true); setCustomDashInput(product.custom_dashboard || ''); }}>
+                                        {product.custom_dashboard ? 'Edit Custom…' : 'Set Custom…'}
+                                    </button>
+                                </div>,
+                                document.body
+                            )}
+                        </div>
+                    )
+                )}
+                {/* SC4S-only: Explore button when configured (no addon/app to install) */}
+                {!suppressActions && isConfigured && isSc4sOnly && !isInstalled && (
                     <div className="csc-launch-wrap" ref={launchBtnRef}>
-                        <button className="csc-btn csc-btn-green" onClick={handleLaunchApp}
+                        <button className="csc-btn csc-btn-explore" onClick={product.custom_dashboard ? handleLaunchCustom : handleExploreData}
                             title={product.custom_dashboard
-                                ? `Launch custom: ${product.custom_dashboard}`
-                                : `Launch ${app_viz_label || addon_label || addon}`}>
-                            Launch
+                                ? `Open custom dashboard: ${product.custom_dashboard}`
+                                : `Explore ${display_name} data in Splunk Search`}>
+                            <Search size={14} style={{ marginRight: 4 }} />
+                            {product.custom_dashboard ? 'Launch' : 'Explore'}
                         </button>
                         <button
-                            className="csc-btn csc-btn-green csc-launch-caret"
+                            className="csc-btn csc-btn-explore csc-launch-caret"
                             onClick={toggleLaunchMenu}
-                            title="Launch options"
+                            title="More options"
                         ><ChevronDown size={14} /></button>
                         {launchMenuOpen && ReactDOM.createPortal(
                             <div className="csc-launch-menu" ref={launchMenuRef}
                                 style={{ top: launchMenuPos.top, left: launchMenuPos.left }}>
-                                {productDashboards.length > 1 ? (
-                                    productDashboards.map((dash, i) => (
-                                        <button key={dash} className="csc-launch-menu-item" onClick={() => { handleLaunchDashboard(dash); setLaunchMenuOpen(false); }}>
-                                            {dash.replace(/_/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase())}
-                                        </button>
-                                    ))
-                                ) : (
-                                    <button className="csc-launch-menu-item" onClick={() => { handleLaunchDefault(); setLaunchMenuOpen(false); }}>
-                                        {productDashboards[0]
-                                            ? productDashboards[0].replace(/_/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase())
-                                            : (app_viz_label || addon_label || 'Default Dashboard')}
-                                    </button>
-                                )}
+                                <button className="csc-launch-menu-item" onClick={() => { handleExploreData(); setLaunchMenuOpen(false); }}>
+                                    <Search size={13} style={{ marginRight: 6, opacity: 0.7 }} />Explore Data in Search
+                                </button>
+                                <button className="csc-launch-menu-item" onClick={() => { handleCreateDashboard(); setLaunchMenuOpen(false); }}>
+                                    <LayoutIcon size={13} style={{ marginRight: 6, opacity: 0.7 }} />Create Dashboard
+                                </button>
                                 {product.custom_dashboard && (
                                     <button className="csc-launch-menu-item" onClick={() => { handleLaunchCustom(); setLaunchMenuOpen(false); }}>
                                         Custom: {product.custom_dashboard.split('/').pop()}
@@ -4800,8 +4921,10 @@ function ProductCard({ product, installedApps, appStatuses, indexerApps, sourcet
                     <Modal.Body>
                         <div style={{ padding: '8px 0' }}>
                             <p style={{ fontSize: '13px', color: 'var(--muted-color, #666)', marginBottom: '14px', lineHeight: '1.6' }}>
-                                Set a custom dashboard to launch for this product. When set, the Launch button will open your custom dashboard by default.
-                                Use the dropdown arrow to switch between the Cisco default and your custom dashboard at any time.
+                                {isAddonOnly
+                                    ? <>Set a custom dashboard for this product. This is a <strong>TA-only integration</strong> — the add-on ingests and normalises data but has no built-in dashboards. Create one with Dashboard Studio, then paste the path here. When set, the main button will open your dashboard directly.</>
+                                    : <>Set a custom dashboard to launch for this product. When set, the Launch button will open your custom dashboard by default. Use the dropdown arrow to switch between the Cisco default and your custom dashboard at any time.</>
+                                }
                             </p>
                             <label style={{ fontWeight: 600, fontSize: '13px', display: 'block', marginBottom: '6px' }}>
                                 Dashboard path
@@ -7663,7 +7786,8 @@ function SCANProductsPage() {
                 const vEntry = vData.entry?.[0] || {};
                 const vContent = vEntry.content || {};
                 setAppVersion(vContent.version || '');
-                setAppBuild(vContent.build || vEntry.build || '');
+                const restBuild = String(vContent.build || vEntry.build || '').replace(/^0$/, '');
+                if (restBuild) setAppBuild(restBuild);
                 setAppUpdateVersion(vContent['update.version'] || '');
             } catch (e) { /* ok */ }
         } catch (err) {
@@ -7694,7 +7818,7 @@ function SCANProductsPage() {
             products.forEach((p) => {
                 [p.addon, p.app_viz, p.app_viz_2, p.sc4s_search_head_ta, p.netflow_addon].forEach((aid) => {
                     if (aid && !appIds.has(aid) && !statuses[aid]) {
-                        statuses[aid] = { installed: false, version: null, updateVersion: null, disabled: false };
+                        statuses[aid] = { installed: false, version: null, updateVersion: null, disabled: false, visible: false };
                     }
                 });
             });
@@ -7719,12 +7843,13 @@ function SCANProductsPage() {
     }, [products, loading]);
 
     // ── Indexer tier detection — check add-on deployment across peer indexers ──
-    // Skipped on Splunk Cloud: apps installed on the SHC are automatically deployed
-    // to the indexer tier by the platform, so SH and indexers are always in sync.
-    // Querying indexers would be redundant. indexerApps stays {} and downstream
-    // logic (Magic Eight, version checks) falls back to local (SH) gracefully.
+    // Skipped on Splunk Cloud: the platform auto-deploys SHC apps to the indexer
+    // tier, so querying indexers is redundant and REST may be blocked.
+    // Set indexerApps to {} ("no separate tier") so downstream logic shows only
+    // the Search Head chip instead of a perpetual "loading" state.
     useEffect(() => {
-        if (loading || platformType === 'cloud') return;
+        if (loading) return;
+        if (platformType === 'cloud') { setIndexerApps({}); return; }
         const detect = async () => {
             const result = await detectIndexerTierApps();
             if (result !== null) setIndexerApps(result);
@@ -8222,6 +8347,7 @@ function SCANProductsPage() {
                     <span className="scan-devmode-banner-pulse" />
                     <span className="scan-devmode-banner-text">DEVELOPER MODE</span>
                     <span className="scan-devmode-banner-pulse" />
+                    <a href={createURL('/_bump')} target="_blank" rel="noopener noreferrer" className="scan-devmode-bump" title="Bump Splunk static asset cache (CSS/JS)">Bump Cache</a>
                 </div>
             )}
             {/* GTM Mode Banner (only when gtmMode is on and devMode is off) */}
@@ -8263,7 +8389,7 @@ function SCANProductsPage() {
                                 <ul>
                                     <li>Click <b>Add to My Products</b> on any card to start tracking it.</li>
                                     <li>Use the <b>Powered-by</b> pills and <b>search bar</b> to filter the catalog.</li>
-                                    <li>Hit the <b>Launch</b> button to jump straight into analytics.</li>
+                                    <li>Hit <b>Launch</b> or <b>Explore</b> to jump straight into dashboards or search your data.</li>
                                     <li>Open <b>Filters</b> and toggle <b>Visibility</b> checkboxes to show Retired or Deprecated products.</li>
                                     <li>Use the <b>Expand / Collapse All</b> toggle to manage all sections at once.</li>
                                 </ul>
@@ -9030,7 +9156,7 @@ function SCANProductsPage() {
                 onSelectPersona={handleSelectPersona}
                 products={products}
             />
-            <FeedbackModal open={feedbackOpen} onClose={() => setFeedbackOpen(false)} />
+            <FeedbackModal open={feedbackOpen} onClose={() => setFeedbackOpen(false)} platformType={effectivePlatformType} appVersion={appVersion} />
 
             {/* Usage Guide Modal */}
             {cardLegendOpen && (
@@ -9081,7 +9207,7 @@ function SCANProductsPage() {
                             <details className="scan-guide-section">
                                 <summary className="scan-guide-summary">Actions &amp; Personalization</summary>
                                 <ul className="scan-guide-list">
-                                    <li>Click <strong>Launch ▾</strong> to open an installed app's dashboard directly.</li>
+                                    <li>Click <strong>Launch ▾</strong> to open an installed app's dashboard directly. For TA-only products (no built-in UI), the button changes to <strong>Explore ▾</strong> with options to search your data or create a dashboard.</li>
                                     <li><strong>? Best Practices</strong> provides platform-specific tips and SC4S links.</li>
                                     <li><strong>Sync Catalog</strong> checks S3 for a newer product catalog (<code>products.conf</code>) and downloads the latest Splunkbase app lookup. Runs nightly, but click for on-demand sync.</li>
                                     <li><strong>Role</strong> picks a persona for a curated quick-start.</li>
