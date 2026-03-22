@@ -59,6 +59,33 @@ The script considers an app "Cisco-related" if any of these are true:
 - `title` contains "Cisco"
 - The app's UID is referenced by any product card
 
+## Visual Consistency Sweep
+
+When changing any visual element (color, badge, icon, label, filter name),
+search for **ALL occurrences** across the entire codebase. The same element
+can appear on card badges, the Help/Guide modal, filter drawer pills, category
+bar buttons, stats bar tiles, customer summary export (HTML + plain text),
+CSS classes (light + dark), and inline JSX styles. A visual change is not done
+until every surface is updated.
+
+## Dark Mode
+
+Every UI change **must** account for dark mode. The app uses `:root.dce-dark` as the
+dark-mode selector. When adding or modifying:
+
+- **Badge colors / CSS classes** — always provide both a light-mode rule and a
+  `:root.dce-dark` override with appropriate translucent backgrounds and lighter
+  text colors.
+- **Inline styles in JSX** — use CSS custom properties (`var(--card-border, #ddd)`,
+  `var(--page-color, #333)`, etc.) instead of hardcoded hex where possible.
+- **New stat tiles / accent colors** — verify they remain readable on the dark
+  background (`#101418`).
+- **Modal content** — test that links, borders, and section backgrounds render
+  correctly in both themes.
+
+After any visual change, toggle dark mode in the Splunk UI and visually verify
+before considering the task complete.
+
 ## Example Output
 
 ```
