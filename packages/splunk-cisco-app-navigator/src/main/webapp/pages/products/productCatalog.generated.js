@@ -6348,6 +6348,7 @@ export const PRODUCT_CATALOG = [
       "cisco:dc:aci:syslog"
     ],
     "dashboards": [
+      "home_page",
       "fabric_dashboard",
       "tenant_dashboard"
     ],
