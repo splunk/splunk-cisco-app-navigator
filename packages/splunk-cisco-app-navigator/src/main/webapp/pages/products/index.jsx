@@ -47,6 +47,8 @@ import Search from '@splunk/react-icons/Magnifier';
 import Pencil from '@splunk/react-icons/Pencil';
 import CloneIcon from '@splunk/react-icons/LayersDoubleTransparent';
 import TrashCan from '@splunk/react-icons/TrashCanCross';
+import ShieldIcon from '@splunk/react-icons/Shield';
+import PulseIcon from '@splunk/react-icons/Pulse';
 import Button from '@splunk/react-ui/Button';
 import CollapsiblePanel from '@splunk/react-ui/CollapsiblePanel';
 import WaitSpinner from '@splunk/react-ui/WaitSpinner';
@@ -510,6 +512,13 @@ async function loadProductsFromConf() {
             escu_analytic_stories: csvToArray(c.escu_analytic_stories),
             escu_detection_count: parseInt(c.escu_detection_count || '0', 10),
             escu_detections: csvToArray(c.escu_detections),
+            sse_content: c.sse_content === 'true' || c.sse_content === '1' || c.sse_content === true,
+            sse_use_cases: csvToArray(c.sse_use_cases),
+            sse_use_case_count: parseInt(c.sse_use_case_count || '0', 10),
+            sse_data_sources: csvToArray(c.sse_data_sources),
+            ite_learn_content: c.ite_learn_content === 'true' || c.ite_learn_content === '1' || c.ite_learn_content === true,
+            ite_learn_procedures: csvToArray(c.ite_learn_procedures),
+            ite_learn_procedure_count: parseInt(c.ite_learn_procedure_count || '0', 10),
             custom: c.custom === 'true' || c.custom === '1' || c.custom === true,
             catalog_disabled: isDisabled,
         };
@@ -2639,57 +2648,48 @@ function AlertActionsInfoModal({ open, onClose, alertActionUids, splunkbaseData,
 
 // ────────────────────  ITSI INFO MODAL  ─────────────────────────────
 
-function ITSIInfoModal({ open, onClose, itsiContentPack, productName }) {
+function ITOpsContentModal({ open, onClose, itsiContentPack, iteLearnContent, iteLearnProcedures, iteLearnProcedureCount, productName, installedApps }) {
     const returnFocusRef = useRef(null);
+    const [showProcedures, setShowProcedures] = useState(false);
     if (!open) return null;
     const pack = itsiContentPack || {};
+    const hasItsi = !!pack.label;
+    const procedures = iteLearnProcedures || [];
+    const procCount = iteLearnProcedureCount || 0;
+    const hasIteLearn = iteLearnContent && procCount > 0;
+    const itsiInstalled = installedApps?.['itsi'];
+    const iteInstalled = installedApps?.['it_essentials_learn'];
+
     return (
-        <Modal open returnFocus={returnFocusRef} onRequestClose={onClose} style={{ maxWidth: '820px', width: '92vw' }}>
-            <Modal.Header title="ITSI Content Pack" />
+        <Modal open returnFocus={returnFocusRef} onRequestClose={onClose} style={{ maxWidth: '860px', width: '92vw' }}>
+            <Modal.Header title="ITOps Content" />
             <Modal.Body>
                 <div className="csc-sc4s-info" style={{ '--info-accent': '#2e7d32' }}>
                     <div className="csc-sc4s-info-hero">
                         <div className="csc-sc4s-info-hero-icon"></div>
                         <div className="csc-sc4s-info-hero-text">
-                            <h3>IT Service Intelligence Content Pack</h3>
-                            <p>Splunk ITSI Content Packs provide <strong>pre-built service templates, KPIs, glass tables, and deep dives</strong> that accelerate time-to-value for monitoring Cisco infrastructure. The content pack for {productName ? <strong>{productName}</strong> : 'this product'} delivers curated KPI definitions and service trees aligned to Cisco best practices.</p>
+                            <h3>IT Operations</h3>
+                            <p>
+                                {productName ? <strong>{productName}</strong> : 'This product'} has ITOps content available
+                                across Splunk's operations ecosystem.
+                                {hasItsi && <>{' '}An <strong>ITSI Content Pack</strong> provides pre-built service templates and KPIs.</>}
+                                {hasIteLearn && <>{' '}<strong>{procCount} IT Essentials Learn</strong> procedures are available.</>}
+                            </p>
                         </div>
                     </div>
 
-                    <div className="csc-sc4s-info-section">
-                        <h4>What is ITSI?</h4>
-                        <p>Splunk IT Service Intelligence (ITSI) is a monitoring and analytics solution that provides end-to-end visibility into the health and performance of critical IT services. ITSI uses <strong>machine learning</strong> to detect anomalies, predict outages, and correlate events across your entire infrastructure — from network devices to applications to cloud services.</p>
-                    </div>
+                    {/* ── Tier 1: IT Service Intelligence (Premium) ── */}
+                    {hasItsi && (
+                        <div className="csc-sc4s-info-section" style={{ borderLeft: '3px solid #7C3AED', paddingLeft: '16px' }}>
+                            <h4 style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                                Splunk IT Service Intelligence
+                                <span style={{ fontSize: '11px', padding: '2px 8px', borderRadius: '4px', background: '#EDE9FE', color: '#5B21B6', fontWeight: 600 }}>Premium</span>
+                                {itsiInstalled && <span style={{ fontSize: '11px', padding: '2px 8px', borderRadius: '4px', background: '#D1FAE5', color: '#065F46', fontWeight: 600 }}>Installed</span>}
+                            </h4>
+                            <p style={{ marginBottom: '10px', fontSize: '13px' }}>
+                                ITSI Content Packs provide <strong>pre-built service templates, KPIs, glass tables, and deep dives</strong> for monitoring Cisco infrastructure.
+                            </p>
 
-                    <div className="csc-sc4s-info-section">
-                        <h4>Key Capabilities</h4>
-                        <div className="csc-sc4s-info-grid">
-                            <div className="csc-sc4s-info-card">
-                                <span className="csc-sc4s-info-card-icon"></span>
-                                <strong>Service Trees</strong>
-                                <span>Hierarchical service dependency maps showing how Cisco infrastructure components relate to business services, enabling root cause analysis.</span>
-                            </div>
-                            <div className="csc-sc4s-info-card">
-                                <span className="csc-sc4s-info-card-icon"></span>
-                                <strong>Pre-Built KPIs</strong>
-                                <span>Curated Key Performance Indicators tuned for Cisco devices — including availability, latency, throughput, error rates, and protocol-specific health metrics.</span>
-                            </div>
-                            <div className="csc-sc4s-info-card">
-                                <span className="csc-sc4s-info-card-icon"></span>
-                                <strong>Glass Tables</strong>
-                                <span>Visual, real-time dashboards showing service health at a glance. Content Packs include pre-configured glass tables for common Cisco monitoring scenarios.</span>
-                            </div>
-                            <div className="csc-sc4s-info-card">
-                                <span className="csc-sc4s-info-card-icon"></span>
-                                <strong>ML-Powered Alerting</strong>
-                                <span>Adaptive thresholds powered by machine learning — ITSI learns normal behavior and alerts on deviations, reducing false positives and alert fatigue.</span>
-                            </div>
-                        </div>
-                    </div>
-
-                    {pack.label && (
-                        <div className="csc-sc4s-info-section">
-                            <h4>{productName ? `${productName} — ` : ''}Content Pack</h4>
                             <table className="csc-sc4s-info-table">
                                 <tbody>
                                     <tr>
@@ -2715,40 +2715,55 @@ function ITSIInfoModal({ open, onClose, itsiContentPack, productName }) {
                         </div>
                     )}
 
-                    <div className="csc-sc4s-info-section">
-                        <h4>Best Practices</h4>
-                        <div className="csc-sc4s-info-bp">
-                            <div className="csc-sc4s-info-bp-item csc-sc4s-info-bp-good">
-                                <span className="csc-sc4s-info-bp-marker"></span>
-                                <div>
-                                    <strong>Install the TA First</strong>
-                                    <p>Content Packs depend on the Technology Add-on (TA) for data collection and CIM-compliant field extractions. Ensure the TA is installed and data is flowing before importing the content pack.</p>
-                                </div>
-                            </div>
-                            <div className="csc-sc4s-info-bp-item csc-sc4s-info-bp-good">
-                                <span className="csc-sc4s-info-bp-marker"></span>
-                                <div>
-                                    <strong>Use the Content Library</strong>
-                                    <p>Import content packs via ITSI's Content Library (Configuration → Content Library), not by installing them as Splunk apps. This ensures proper service template creation.</p>
-                                </div>
-                            </div>
-                            <div className="csc-sc4s-info-bp-item csc-sc4s-info-bp-good">
-                                <span className="csc-sc4s-info-bp-marker"></span>
-                                <div>
-                                    <strong>Customize Thresholds</strong>
-                                    <p>Content Pack KPIs come with default thresholds. After initial deployment, tune thresholds to match your environment's baseline using ITSI's adaptive thresholding capabilities.</p>
+                    {/* ── Tier 2: IT Essentials Learn (Free) ── */}
+                    {hasIteLearn && (
+                        <div className="csc-sc4s-info-section" style={{ borderLeft: '3px solid #22C55E', paddingLeft: '16px' }}>
+                            <h4 style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                                IT Essentials Learn
+                                <span style={{ fontSize: '11px', padding: '2px 8px', borderRadius: '4px', background: '#D1FAE5', color: '#065F46', fontWeight: 600 }}>Free</span>
+                                {iteInstalled && <span style={{ fontSize: '11px', padding: '2px 8px', borderRadius: '4px', background: '#D1FAE5', color: '#065F46', fontWeight: 600 }}>Installed</span>}
+                            </h4>
+                            <p style={{ marginBottom: '10px', fontSize: '13px' }}>
+                                IT Essentials Learn provides guided operational procedures and analytics
+                                {' '}— <strong>no ITSI license required</strong>.
+                            </p>
+
+                            <div>
+                                <strong style={{ fontSize: '12px', textTransform: 'uppercase', letterSpacing: '0.5px', color: 'var(--text-secondary, #667180)' }}>Procedures ({procCount})</strong>
+                                <div style={{ marginTop: '6px' }}>
+                                    {procedures.length > 5 && !showProcedures ? (
+                                        <>
+                                            <ul className="csc-es-detection-list">
+                                                {procedures.slice(0, 5).map(p => <li key={p}>{p}</li>)}
+                                            </ul>
+                                            <button className="csc-es-show-all-btn" onClick={() => setShowProcedures(true)}>
+                                                Show all {procCount} procedures ▾
+                                            </button>
+                                        </>
+                                    ) : (
+                                        <ul className="csc-es-detection-list">
+                                            {procedures.map(p => <li key={p}>{p}</li>)}
+                                        </ul>
+                                    )}
                                 </div>
                             </div>
                         </div>
-                    </div>
+                    )}
 
                     <div className="csc-sc4s-info-footer">
-                        <a href="https://docs.splunk.com/Documentation/ITSI/latest/Configure/ContentPackOverview" target="_blank" rel="noopener noreferrer" className="csc-sc4s-info-link" style={{ color: '#0A60FF' }}>
-                             ITSI Content Pack Documentation
-                        </a>
-                        {pack.docs_url && (
+                        {hasItsi && (
+                            <a href="https://docs.splunk.com/Documentation/ITSI/latest/Configure/ContentPackOverview" target="_blank" rel="noopener noreferrer" className="csc-sc4s-info-link" style={{ color: '#0A60FF' }}>
+                                 ITSI Documentation
+                            </a>
+                        )}
+                        {hasItsi && pack.docs_url && (
                             <a href={pack.docs_url} target="_blank" rel="noopener noreferrer" className="csc-sc4s-info-link" style={{ color: '#0A60FF' }}>
-                                 {pack.label || 'Content Pack'} Documentation
+                                 {pack.label} Docs
+                            </a>
+                        )}
+                        {hasIteLearn && (
+                            <a href="https://splunkbase.splunk.com/app/5390" target="_blank" rel="noopener noreferrer" className="csc-sc4s-info-link" style={{ color: '#0A60FF' }}>
+                                 IT Essentials Learn on Splunkbase
                             </a>
                         )}
                     </div>
@@ -2782,157 +2797,153 @@ const CIM_MODEL_LABELS = {
     Web: 'Web',
 };
 
-function ESInfoModal({ open, onClose, productName, cimDataModels, escuStories, escuDetectionCount, escuDetections }) {
+function SecOpsContentModal({ open, onClose, productName, esCompatible, cimDataModels, escuStories, escuDetectionCount, escuDetections, sseContent, sseUseCases, sseUseCaseCount, installedApps }) {
     const returnFocusRef = useRef(null);
     const [showDetections, setShowDetections] = useState(false);
+    const [showSseUseCases, setShowSseUseCases] = useState(false);
     if (!open) return null;
     const models = cimDataModels || [];
     const stories = escuStories || [];
     const detections = escuDetections || [];
     const detCount = escuDetectionCount || 0;
     const hasEscu = detCount > 0;
+    const sseList = sseUseCases || [];
+    const sseCount = sseUseCaseCount || 0;
+    const hasSse = sseContent && sseCount > 0;
+    const esInstalled = installedApps?.['SplunkEnterpriseSecuritySuite'];
+    const sseInstalled = installedApps?.['Splunk_Security_Essentials'];
 
     return (
-        <Modal open returnFocus={returnFocusRef} onRequestClose={onClose} style={{ maxWidth: '860px', width: '92vw' }}>
-            <Modal.Header title="Enterprise Security Compatibility" />
+        <Modal open returnFocus={returnFocusRef} onRequestClose={onClose} style={{ maxWidth: '900px', width: '92vw' }}>
+            <Modal.Header title="SecOps Content" />
             <Modal.Body>
                 <div className="csc-sc4s-info" style={{ '--info-accent': '#455a64' }}>
                     <div className="csc-sc4s-info-hero">
                         <div className="csc-sc4s-info-hero-icon"></div>
                         <div className="csc-sc4s-info-hero-text">
-                            <h3>Splunk Enterprise Security</h3>
+                            <h3>Security Operations</h3>
                             <p>
-                                {productName ? <strong>{productName}</strong> : 'This product'} maps its data to the
-                                {' '}<strong>Splunk Common Information Model (CIM)</strong> via the add-on's
-                                {' '}<code>tags.conf</code> and <code>eventtypes.conf</code>, enabling seamless
-                                integration with ES correlation searches, dashboards, and adaptive response actions.
-                                {hasEscu && <>{' '}Additionally, <strong>{detCount} pre-built ESCU detections</strong> are available for this product.</>}
+                                {productName ? <strong>{productName}</strong> : 'This product'} has security content available
+                                across Splunk's SecOps ecosystem.
+                                {esCompatible && <>{' '}Data is <strong>CIM-compliant</strong> for Enterprise Security.</>}
+                                {hasSse && <>{' '}<strong>{sseCount} Security Essentials</strong> use cases are available.</>}
                             </p>
                         </div>
                     </div>
 
-                    {/* CIM Data Models */}
-                    {models.length > 0 && (
-                        <div className="csc-sc4s-info-section">
-                            <h4>CIM Data Models</h4>
-                            <p style={{ marginBottom: '10px', fontSize: '13px' }}>
-                                The add-on tags events into these CIM data models, making them immediately usable by ES:
-                            </p>
-                            <div className="csc-es-cim-pills">
-                                {models.map(m => (
-                                    <span key={m} className="csc-es-cim-pill">{CIM_MODEL_LABELS[m] || m}</span>
-                                ))}
-                            </div>
-                        </div>
-                    )}
+                    {/* ── Tier 1: Enterprise Security (Premium) ── */}
+                    {esCompatible && (
+                        <>
+                            <div className="csc-sc4s-info-section" style={{ borderLeft: '3px solid #F59E0B', paddingLeft: '16px' }}>
+                                <h4 style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                                    Splunk Enterprise Security
+                                    <span style={{ fontSize: '11px', padding: '2px 8px', borderRadius: '4px', background: '#FEF3C7', color: '#92400E', fontWeight: 600 }}>Premium</span>
+                                    {esInstalled && <span style={{ fontSize: '11px', padding: '2px 8px', borderRadius: '4px', background: '#D1FAE5', color: '#065F46', fontWeight: 600 }}>Installed</span>}
+                                </h4>
+                                <p style={{ marginBottom: '10px', fontSize: '13px' }}>
+                                    The add-on maps data to the <strong>Common Information Model (CIM)</strong> via
+                                    {' '}<code>tags.conf</code> and <code>eventtypes.conf</code>, enabling ES correlation searches, dashboards, and adaptive response.
+                                </p>
 
-                    {/* ESCU Analytic Stories */}
-                    {stories.length > 0 && (
-                        <div className="csc-sc4s-info-section">
-                            <h4>ESCU Analytic Stories</h4>
-                            <p style={{ marginBottom: '10px', fontSize: '13px' }}>
-                                Enterprise Security Content Update ships these analytic stories with curated detection rules:
-                            </p>
-                            <div className="csc-es-stories">
-                                {stories.map(s => (
-                                    <div key={s} className="csc-es-story-item">
-                                        <span className="csc-es-story-icon"></span>
-                                        <span>{s}</span>
+                                {models.length > 0 && (
+                                    <div style={{ marginBottom: '14px' }}>
+                                        <strong style={{ fontSize: '12px', textTransform: 'uppercase', letterSpacing: '0.5px', color: 'var(--text-secondary, #667180)' }}>CIM Data Models</strong>
+                                        <div className="csc-es-cim-pills" style={{ marginTop: '6px' }}>
+                                            {models.map(m => (
+                                                <span key={m} className="csc-es-cim-pill">{CIM_MODEL_LABELS[m] || m}</span>
+                                            ))}
+                                        </div>
                                     </div>
-                                ))}
-                            </div>
-                        </div>
-                    )}
+                                )}
 
-                    {/* Detection Count + Expandable List */}
-                    {hasEscu && (
-                        <div className="csc-sc4s-info-section">
-                            <h4>ESCU Detections ({detCount})</h4>
-                            <p style={{ marginBottom: '10px', fontSize: '13px' }}>
-                                Pre-built detection searches that run as correlation searches in ES:
-                            </p>
-                            {detections.length > 5 && !showDetections ? (
-                                <>
-                                    <ul className="csc-es-detection-list">
-                                        {detections.slice(0, 5).map(d => <li key={d}>{d}</li>)}
-                                    </ul>
-                                    <button className="csc-es-show-all-btn" onClick={() => setShowDetections(true)}>
-                                        Show all {detCount} detections ▾
-                                    </button>
-                                </>
-                            ) : (
-                                <ul className="csc-es-detection-list">
-                                    {detections.map(d => <li key={d}>{d}</li>)}
-                                </ul>
-                            )}
-                        </div>
-                    )}
-
-                    {/* How it works */}
-                    <div className="csc-sc4s-info-section">
-                        <h4>How It Works</h4>
-                        <div className="csc-sc4s-info-grid">
-                            <div className="csc-sc4s-info-card">
-                                <span className="csc-sc4s-info-card-icon"></span>
-                                <strong>CIM Compliance</strong>
-                                <span>The add-on's <code>tags.conf</code> maps sourcetypes to CIM data models. ES accelerates these models for real-time search.</span>
-                            </div>
-                            <div className="csc-sc4s-info-card">
-                                <span className="csc-sc4s-info-card-icon"></span>
-                                <strong>Correlation Searches</strong>
-                                <span>ES correlation searches query CIM-accelerated data models. CIM-compliant data is automatically included — no custom SPL needed.</span>
-                            </div>
-                            {hasEscu && (
-                                <div className="csc-sc4s-info-card">
-                                    <span className="csc-sc4s-info-card-icon"></span>
-                                    <strong>ESCU Detections</strong>
-                                    <span>Install the Enterprise Security Content Update (ESCU) app from Splunkbase to get {detCount} pre-built detections for this product.</span>
-                                </div>
-                            )}
-                            <div className="csc-sc4s-info-card">
-                                <span className="csc-sc4s-info-card-icon"></span>
-                                <strong>Notable Events</strong>
-                                <span>When detections fire, they create Notable Events in the ES Incident Review dashboard for analyst triage and response.</span>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div className="csc-sc4s-info-section">
-                        <h4>Best Practices</h4>
-                        <div className="csc-sc4s-info-bp">
-                            <div className="csc-sc4s-info-bp-item csc-sc4s-info-bp-good">
-                                <span className="csc-sc4s-info-bp-marker"></span>
-                                <div>
-                                    <strong>Accelerate CIM Data Models</strong>
-                                    <p>In ES, go to Settings → Data Models and ensure the relevant CIM models are accelerated. ES relies on accelerated data models for performant correlation searches.</p>
-                                </div>
-                            </div>
-                            <div className="csc-sc4s-info-bp-item csc-sc4s-info-bp-good">
-                                <span className="csc-sc4s-info-bp-marker"></span>
-                                <div>
-                                    <strong>Install the Add-on First</strong>
-                                    <p>The Technology Add-on (TA) provides the CIM field extractions and tag mappings. Install it on search heads (and indexers if needed) before configuring ES.</p>
-                                </div>
-                            </div>
-                            {hasEscu && (
-                                <div className="csc-sc4s-info-bp-item csc-sc4s-info-bp-good">
-                                    <span className="csc-sc4s-info-bp-marker"></span>
-                                    <div>
-                                        <strong>Keep ESCU Updated</strong>
-                                        <p>Splunk releases monthly ESCU updates with new detections. Keep the Enterprise Security Content Update app current to get the latest Cisco-specific detection rules.</p>
+                                {stories.length > 0 && (
+                                    <div style={{ marginBottom: '14px' }}>
+                                        <strong style={{ fontSize: '12px', textTransform: 'uppercase', letterSpacing: '0.5px', color: 'var(--text-secondary, #667180)' }}>ESCU Analytic Stories</strong>
+                                        <div className="csc-es-stories" style={{ marginTop: '6px' }}>
+                                            {stories.map(s => (
+                                                <div key={s} className="csc-es-story-item">
+                                                    <span className="csc-es-story-icon"></span>
+                                                    <span>{s}</span>
+                                                </div>
+                                            ))}
+                                        </div>
                                     </div>
+                                )}
+
+                                {hasEscu && (
+                                    <div style={{ marginBottom: '6px' }}>
+                                        <strong style={{ fontSize: '12px', textTransform: 'uppercase', letterSpacing: '0.5px', color: 'var(--text-secondary, #667180)' }}>ESCU Detections ({detCount})</strong>
+                                        <div style={{ marginTop: '6px' }}>
+                                            {detections.length > 5 && !showDetections ? (
+                                                <>
+                                                    <ul className="csc-es-detection-list">
+                                                        {detections.slice(0, 5).map(d => <li key={d}>{d}</li>)}
+                                                    </ul>
+                                                    <button className="csc-es-show-all-btn" onClick={() => setShowDetections(true)}>
+                                                        Show all {detCount} detections ▾
+                                                    </button>
+                                                </>
+                                            ) : (
+                                                <ul className="csc-es-detection-list">
+                                                    {detections.map(d => <li key={d}>{d}</li>)}
+                                                </ul>
+                                            )}
+                                        </div>
+                                    </div>
+                                )}
+                            </div>
+                        </>
+                    )}
+
+                    {/* ── Tier 2: Security Essentials (Free) ── */}
+                    {hasSse && (
+                        <div className="csc-sc4s-info-section" style={{ borderLeft: '3px solid #22C55E', paddingLeft: '16px' }}>
+                            <h4 style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                                Splunk Security Essentials
+                                <span style={{ fontSize: '11px', padding: '2px 8px', borderRadius: '4px', background: '#D1FAE5', color: '#065F46', fontWeight: 600 }}>Free</span>
+                                {sseInstalled && <span style={{ fontSize: '11px', padding: '2px 8px', borderRadius: '4px', background: '#D1FAE5', color: '#065F46', fontWeight: 600 }}>Installed</span>}
+                            </h4>
+                            <p style={{ marginBottom: '10px', fontSize: '13px' }}>
+                                Security Essentials provides detection guidance, analytics stories, and security use cases
+                                {' '}— <strong>no Enterprise Security license required</strong>.
+                            </p>
+
+                            <div>
+                                <strong style={{ fontSize: '12px', textTransform: 'uppercase', letterSpacing: '0.5px', color: 'var(--text-secondary, #667180)' }}>Use Cases ({sseCount})</strong>
+                                <div style={{ marginTop: '6px' }}>
+                                    {sseList.length > 5 && !showSseUseCases ? (
+                                        <>
+                                            <ul className="csc-es-detection-list">
+                                                {sseList.slice(0, 5).map(u => <li key={u}>{u}</li>)}
+                                            </ul>
+                                            <button className="csc-es-show-all-btn" onClick={() => setShowSseUseCases(true)}>
+                                                Show all {sseCount} use cases ▾
+                                            </button>
+                                        </>
+                                    ) : (
+                                        <ul className="csc-es-detection-list">
+                                            {sseList.map(u => <li key={u}>{u}</li>)}
+                                        </ul>
+                                    )}
                                 </div>
-                            )}
+                            </div>
                         </div>
-                    </div>
+                    )}
 
                     <div className="csc-sc4s-info-footer">
-                        <a href="https://docs.splunk.com/Documentation/ES/latest" target="_blank" rel="noopener noreferrer" className="csc-sc4s-info-link" style={{ color: '#0A60FF' }}>
-                             ES Documentation
-                        </a>
+                        {esCompatible && (
+                            <a href="https://docs.splunk.com/Documentation/ES/latest" target="_blank" rel="noopener noreferrer" className="csc-sc4s-info-link" style={{ color: '#0A60FF' }}>
+                                 ES Documentation
+                            </a>
+                        )}
                         {hasEscu && (
                             <a href="https://splunkbase.splunk.com/app/3449" target="_blank" rel="noopener noreferrer" className="csc-sc4s-info-link" style={{ color: '#0A60FF' }}>
                                  ESCU on Splunkbase
+                            </a>
+                        )}
+                        {hasSse && (
+                            <a href="https://splunkbase.splunk.com/app/3435" target="_blank" rel="noopener noreferrer" className="csc-sc4s-info-link" style={{ color: '#0A60FF' }}>
+                                 Security Essentials on Splunkbase
                             </a>
                         )}
                         <a href="https://docs.splunk.com/Documentation/CIM/latest/User/Overview" target="_blank" rel="noopener noreferrer" className="csc-sc4s-info-link" style={{ color: '#0A60FF' }}>
@@ -3536,9 +3547,13 @@ function generateCustomerSummary(product, splunkbaseData) {
         plain.push('');
     }
 
+    if (product.es_compatible || product.sse_content) {
+        html.push(`<h3 style="margin:12px 0 4px;font-size:13px;color:#003366;">SecOps Content</h3>`);
+        plain.push('SECOPS CONTENT');
+    }
     if (product.es_compatible) {
-        html.push(`<h3 style="margin:12px 0 4px;font-size:13px;color:#003366;">Splunk Enterprise Security (ES)</h3>`);
-        plain.push('SPLUNK ENTERPRISE SECURITY (ES)');
+        html.push(`<p style="margin:0 0 4px;font-weight:600;">Enterprise Security (Premium)</p>`);
+        plain.push('  Enterprise Security (Premium)');
         if (product.es_cim_data_models && product.es_cim_data_models.length > 0) {
             html.push(`<p style="margin:0 0 4px;">CIM Data Models: ${product.es_cim_data_models.map(esc).join(', ')}</p>`);
             plain.push(`  CIM Data Models: ${product.es_cim_data_models.join(', ')}`);
@@ -3551,6 +3566,14 @@ function generateCustomerSummary(product, splunkbaseData) {
             html.push(`<p style="margin:0 0 8px;">ESCU Detections: ${esc(String(product.escu_detection_count))}</p>`);
             plain.push(`  ESCU Detections: ${product.escu_detection_count}`);
         }
+    }
+    if (product.sse_content && product.sse_use_case_count) {
+        html.push(`<p style="margin:0 0 4px;font-weight:600;">Security Essentials (Free)</p>`);
+        plain.push('  Security Essentials (Free)');
+        html.push(`<p style="margin:0 0 8px;">SSE Use Cases: ${esc(String(product.sse_use_case_count))}</p>`);
+        plain.push(`  SSE Use Cases: ${product.sse_use_case_count}`);
+    }
+    if (product.es_compatible || product.sse_content) {
         plain.push('');
     }
 
@@ -3569,11 +3592,23 @@ function generateCustomerSummary(product, splunkbaseData) {
         plain.push('');
     }
 
+    if (product.itsi_content_pack || product.ite_learn_content) {
+        html.push(`<h3 style="margin:12px 0 4px;font-size:13px;color:#003366;">ITOps Content</h3>`);
+        plain.push('ITOPS CONTENT');
+    }
     if (product.itsi_content_pack) {
-        html.push(`<h3 style="margin:12px 0 4px;font-size:13px;color:#003366;">Splunk ITSI</h3>`);
-        html.push(`<p style="margin:0 0 8px;">Content Pack: ${esc(product.itsi_content_pack)}</p>`);
-        plain.push('SPLUNK ITSI');
-        plain.push(`  Content Pack: ${product.itsi_content_pack}`);
+        html.push(`<p style="margin:0 0 4px;font-weight:600;">IT Service Intelligence (Premium)</p>`);
+        html.push(`<p style="margin:0 0 8px;">Content Pack: ${esc(product.itsi_content_pack.label || '')}</p>`);
+        plain.push('  IT Service Intelligence (Premium)');
+        plain.push(`  Content Pack: ${product.itsi_content_pack.label || ''}`);
+    }
+    if (product.ite_learn_content && product.ite_learn_procedure_count) {
+        html.push(`<p style="margin:0 0 4px;font-weight:600;">IT Essentials Learn (Free)</p>`);
+        html.push(`<p style="margin:0 0 8px;">Procedures: ${esc(String(product.ite_learn_procedure_count))}</p>`);
+        plain.push('  IT Essentials Learn (Free)');
+        plain.push(`  Procedures: ${product.ite_learn_procedure_count}`);
+    }
+    if (product.itsi_content_pack || product.ite_learn_content) {
         plain.push('');
     }
 
@@ -3792,12 +3827,14 @@ function ProductCard({ product, installedApps, appStatuses, indexerApps, sourcet
 
     const isInstalled = appStatus?.installed || vizAppStatus?.installed || vizApp2Status?.installed;
     const hasItsi = !!itsi_content_pack;
+    const hasItops = !!itsi_content_pack || !!product.ite_learn_content;
     const hasSoar = soar_connector_uids && soar_connector_uids.length > 0;
     const hasEs = !!es_compatible;
+    const hasSecops = !!es_compatible || !!product.sse_content;
     const [soarInfoOpen, setSoarInfoOpen] = useState(false);
     const [alertActionsInfoOpen, setAlertActionsInfoOpen] = useState(false);
-    const [itsiInfoOpen, setItsiInfoOpen] = useState(false);
-    const [esInfoOpen, setEsInfoOpen] = useState(false);
+    const [itopsInfoOpen, setItopsInfoOpen] = useState(false);
+    const [secopsInfoOpen, setSecopsInfoOpen] = useState(false);
     const addonFamily = product.addon_family || 'default';
 
     // Derive Splunkbase UIDs at runtime from appidToUidMap (CSV lookup) or static catalog fields
@@ -3946,11 +3983,11 @@ function ProductCard({ product, installedApps, appStatuses, indexerApps, sourcet
                             {hasSoar && (
                                 <button className="csc-badge-btn csc-badge-soar" title={`${soar_connector_uids.length} SOAR Connector${soar_connector_uids.length !== 1 ? 's' : ''} — Click for Info`} onClick={(e) => { e.stopPropagation(); e.preventDefault(); setSoarInfoOpen(true); }}>SOAR</button>
                             )}
-                            {hasItsi && (
-                                <button className="csc-badge-btn csc-badge-itsi" title="ITSI Content Pack available — Click for Info" onClick={(e) => { e.stopPropagation(); e.preventDefault(); setItsiInfoOpen(true); }}>ITSI</button>
+                            {hasItops && (
+                                <button className="csc-badge-btn csc-badge-itops" title="ITOps content available — Click for Info" onClick={(e) => { e.stopPropagation(); e.preventDefault(); setItopsInfoOpen(true); }}><PulseIcon size="0.85em" style={{ verticalAlign: '-0.1em', marginRight: '3px' }} />ITOps</button>
                             )}
-                            {hasEs && (
-                                <button className="csc-badge-btn csc-badge-es" title={`ES Compatible${escu_detection_count ? ` — ${escu_detection_count} ESCU Detections` : ''} — Click for Info`} onClick={(e) => { e.stopPropagation(); e.preventDefault(); setEsInfoOpen(true); }}>ES</button>
+                            {hasSecops && (
+                                <button className="csc-badge-btn csc-badge-secops" title={`SecOps content${escu_detection_count ? ` — ${escu_detection_count} ESCU Detections` : ''}${product.sse_use_case_count ? ` · ${product.sse_use_case_count} SSE Use Cases` : ''} — Click for Info`} onClick={(e) => { e.stopPropagation(); e.preventDefault(); setSecopsInfoOpen(true); }}><ShieldIcon size="0.85em" style={{ verticalAlign: '-0.1em', marginRight: '3px' }} />SecOps</button>
                             )}
                             {alert_action_uids && alert_action_uids.length > 0 && (
                                 <button className="csc-badge-btn csc-badge-alert" title={`${alert_action_uids.length} custom Alert Action${alert_action_uids.length !== 1 ? 's' : ''} — Click for Info`} onClick={(e) => { e.stopPropagation(); e.preventDefault(); setAlertActionsInfoOpen(true); }}>Alert Actions</button>
@@ -4808,8 +4845,8 @@ function ProductCard({ product, installedApps, appStatuses, indexerApps, sourcet
             <HFInfoModal open={hfInfoOpen} onClose={() => setHfInfoOpen(false)} isCloud={platformType === 'cloud'} />
             <MagicEightModal open={magicEightOpen} onClose={() => setMagicEightOpen(false)} sourcetypes={product.sourcetypes} productName={display_name} addonApp={addon} addonLabel={addon_label} appViz={app_viz} appViz2={app_viz_2} installedApps={installedApps} indexerApps={indexerApps} />
             {hasSoar && <SOARInfoModal open={soarInfoOpen} onClose={() => setSoarInfoOpen(false)} soarConnectorUids={soar_connector_uids} splunkbaseData={splunkbaseData} productName={display_name} />}
-            {hasItsi && <ITSIInfoModal open={itsiInfoOpen} onClose={() => setItsiInfoOpen(false)} itsiContentPack={itsi_content_pack} productName={display_name} />}
-            {hasEs && <ESInfoModal open={esInfoOpen} onClose={() => setEsInfoOpen(false)} productName={display_name} cimDataModels={es_cim_data_models} escuStories={escu_analytic_stories} escuDetectionCount={escu_detection_count} escuDetections={escu_detections} />}
+            {hasItops && <ITOpsContentModal open={itopsInfoOpen} onClose={() => setItopsInfoOpen(false)} itsiContentPack={itsi_content_pack} iteLearnContent={product.ite_learn_content} iteLearnProcedures={product.ite_learn_procedures} iteLearnProcedureCount={product.ite_learn_procedure_count} productName={display_name} installedApps={installedApps} />}
+            {hasSecops && <SecOpsContentModal open={secopsInfoOpen} onClose={() => setSecopsInfoOpen(false)} productName={display_name} esCompatible={es_compatible} cimDataModels={es_cim_data_models} escuStories={escu_analytic_stories} escuDetectionCount={escu_detection_count} escuDetections={escu_detections} sseContent={product.sse_content} sseUseCases={product.sse_use_cases} sseUseCaseCount={product.sse_use_case_count} installedApps={installedApps} />}
             {alert_action_uids && alert_action_uids.length > 0 && (
                 <AlertActionsInfoModal open={alertActionsInfoOpen} onClose={() => setAlertActionsInfoOpen(false)} alertActionUids={alert_action_uids} splunkbaseData={splunkbaseData} productName={display_name} />
             )}
@@ -4879,10 +4916,23 @@ function toSplunkConf(data) {
         if (p.alert_action_uids && p.alert_action_uids.length) {
             lines.push(`alert_action_uids = ${p.alert_action_uids.join(',')}`);
         }
+        // SSE
+        if (p.sse_content) {
+            lines.push(`sse_content = true`);
+            if (p.sse_use_case_count) lines.push(`sse_use_case_count = ${p.sse_use_case_count}`);
+            if (p.sse_use_cases && p.sse_use_cases.length) lines.push(`sse_use_cases = ${p.sse_use_cases.join(',')}`);
+            if (p.sse_data_sources && p.sse_data_sources.length) lines.push(`sse_data_sources = ${p.sse_data_sources.join(',')}`);
+        }
         // ITSI
         if (p.itsi_content_pack) {
             lines.push(`itsi_content_pack_label = ${p.itsi_content_pack.label}`);
             if (p.itsi_content_pack.docs_url) lines.push(`itsi_content_pack_docs_url = ${p.itsi_content_pack.docs_url}`);
+        }
+        // ITE Learn
+        if (p.ite_learn_content) {
+            lines.push(`ite_learn_content = true`);
+            if (p.ite_learn_procedure_count) lines.push(`ite_learn_procedure_count = ${p.ite_learn_procedure_count}`);
+            if (p.ite_learn_procedures && p.ite_learn_procedures.length) lines.push(`ite_learn_procedures = ${p.ite_learn_procedures.join(',')}`);
         }
         // SC4S config notes / best practices (pipe-delimited)
         if (p.sc4s_config_notes && p.sc4s_config_notes.length) lines.push(`sc4s_config_notes = ${p.sc4s_config_notes.join('|')}`);
@@ -6242,9 +6292,8 @@ function FilterDrawer({
     if (selectedCategory === 'soar') catBase = catBase.filter(p => p.soar_connector_uids && p.soar_connector_uids.length > 0);
     else if (selectedCategory === 'alert_actions') catBase = catBase.filter(p => p.alert_action_uids && p.alert_action_uids.length > 0);
     else if (selectedCategory === 'secure_networking') catBase = catBase.filter(p => p.secure_networking_gtm);
-    else if (selectedCategory === 'ai_powered') catBase = catBase.filter(p => p.ai_enabled);
-    else if (selectedCategory === 'es') catBase = catBase.filter(p => p.es_compatible);
-    else if (selectedCategory === 'itsi') catBase = catBase.filter(p => p.itsi_content_pack);
+    else if (selectedCategory === 'secops') catBase = catBase.filter(p => p.es_compatible || p.sse_content);
+    else if (selectedCategory === 'itops') catBase = catBase.filter(p => p.itsi_content_pack || p.ite_learn_content);
     else if (selectedCategory === 'sc4s') catBase = catBase.filter(p => p.sc4s_supported);
     else if (selectedCategory === 'netflow') catBase = catBase.filter(p => p.netflow_supported);
     else if (selectedCategory) catBase = catBase.filter(p => p.category === selectedCategory);
@@ -6275,8 +6324,6 @@ function FilterDrawer({
     const soarCount = categoryCounts?.soar || 0;
     const alertCount = categoryCounts?.alert_actions || 0;
     const secNetCount = categoryCounts?.secure_networking || 0;
-    const aiPoweredCount = categoryCounts?.ai_powered || 0;
-
     /* Compatibility version list */
     const versionList = (() => {
         if (!splunkbaseData || Object.keys(splunkbaseData).length === 0) return [];
@@ -6319,7 +6366,7 @@ function FilterDrawer({
         return entries;
     }, [preAddonProducts]);
 
-    const isCrossCutting = (cat) => ['soar', 'alert_actions', 'secure_networking', 'ai_powered', 'es', 'itsi', 'sc4s', 'netflow'].includes(cat);
+    const isCrossCutting = (cat) => ['soar', 'alert_actions', 'secure_networking', 'secops', 'itops', 'sc4s', 'netflow'].includes(cat);
     const addonTotal = (preAddonProducts || []).length;
 
     return (
@@ -6372,34 +6419,24 @@ function FilterDrawer({
                                     <span className="scan-drawer-pill-count">{alertCount}</span>
                                 </button>
                             )}
-                            {aiPoweredCount > 0 && (
+                            {(categoryCounts?.secops || 0) > 0 && (
                                 <button
-                                    className={`scan-drawer-pill ${selectedCategory === 'ai_powered' ? 'scan-drawer-pill-ai-active' : ''}`}
-                                    onClick={() => { onSelectCategory(selectedCategory === 'ai_powered' ? null : 'ai_powered'); }}
-                                    title="Products leveraging AI/ML technologies"
+                                    className={`scan-drawer-pill ${selectedCategory === 'secops' ? 'scan-drawer-pill-cisco-active' : ''}`}
+                                    onClick={() => { onSelectCategory(selectedCategory === 'secops' ? null : 'secops'); }}
+                                    title="SecOps — products with ES and/or Security Essentials content"
                                 >
-                                    AI-Powered
-                                    <span className="scan-drawer-pill-count">{aiPoweredCount}</span>
+                                    SecOps
+                                    <span className="scan-drawer-pill-count">{categoryCounts.secops}</span>
                                 </button>
                             )}
-                            {(categoryCounts?.es || 0) > 0 && (
+                            {(categoryCounts?.itops || 0) > 0 && (
                                 <button
-                                    className={`scan-drawer-pill ${selectedCategory === 'es' ? 'scan-drawer-pill-cisco-active' : ''}`}
-                                    onClick={() => { onSelectCategory(selectedCategory === 'es' ? null : 'es'); }}
-                                    title="ES (Enterprise Security) compatible products"
+                                    className={`scan-drawer-pill ${selectedCategory === 'itops' ? 'scan-drawer-pill-cisco-active' : ''}`}
+                                    onClick={() => { onSelectCategory(selectedCategory === 'itops' ? null : 'itops'); }}
+                                    title="ITOps — products with ITSI and/or IT Essentials Learn content"
                                 >
-                                    ES
-                                    <span className="scan-drawer-pill-count">{categoryCounts.es}</span>
-                                </button>
-                            )}
-                            {(categoryCounts?.itsi || 0) > 0 && (
-                                <button
-                                    className={`scan-drawer-pill ${selectedCategory === 'itsi' ? 'scan-drawer-pill-cisco-active' : ''}`}
-                                    onClick={() => { onSelectCategory(selectedCategory === 'itsi' ? null : 'itsi'); }}
-                                    title="Products with ITSI Content Pack"
-                                >
-                                    ITSI
-                                    <span className="scan-drawer-pill-count">{categoryCounts.itsi}</span>
+                                    ITOps
+                                    <span className="scan-drawer-pill-count">{categoryCounts.itops}</span>
                                 </button>
                             )}
                             {(categoryCounts?.sc4s || 0) > 0 && (
@@ -6747,7 +6784,7 @@ function ActiveFilterChips({
     const chips = [];
 
     // Cross-cutting category filters
-    const crossCutLabels = { soar: 'SOAR', alert_actions: 'Alert Actions', secure_networking: 'Secure Networking GTM', ai_powered: 'AI-Powered', es: 'ES', itsi: 'ITSI', sc4s: 'SC4S', netflow: 'NetFlow' };
+    const crossCutLabels = { soar: 'SOAR', alert_actions: 'Alert Actions', secure_networking: 'Secure Networking GTM', secops: 'SecOps', itops: 'ITOps', sc4s: 'SC4S', netflow: 'NetFlow' };
     if (selectedCategory && crossCutLabels[selectedCategory]) {
         chips.push({ label: crossCutLabels[selectedCategory], onRemove: () => onSelectCategory(null) });
     }
@@ -6953,7 +6990,6 @@ function PersonaModal({ open, onClose, onSelectPersona, products }) {
 function CategoryFilterBar({
     selectedCategory, onSelectCategory,
     selectedSubCategory, onSelectSubCategory,
-    aiFilter, onToggleAiFilter,
     categoryCounts, products,
     onOpenFilterDrawer, activeFilterCount,
     platformFilter, versionFilter, splunkbaseData, versionFilterMode, platformFilterMode,
@@ -7037,8 +7073,8 @@ function CategoryFilterBar({
         };
     };
 
-    const isCrossCutting = ['soar', 'alert_actions', 'secure_networking', 'ai_powered', 'es', 'itsi', 'sc4s', 'netflow'].includes(selectedCategory);
-    const CROSS_CUT_IDS = ['soar', 'alert_actions', 'secure_networking', 'ai_powered', 'es', 'itsi', 'sc4s', 'netflow'];
+    const isCrossCutting = ['soar', 'alert_actions', 'secure_networking', 'secops', 'itops', 'sc4s', 'netflow'].includes(selectedCategory);
+    const CROSS_CUT_IDS = ['soar', 'alert_actions', 'secure_networking', 'secops', 'itops', 'sc4s', 'netflow'];
     const totalCount = categoryCounts ? Object.keys(categoryCounts).reduce((sum, k) => (CROSS_CUT_IDS.includes(k)) ? sum : sum + categoryCounts[k], 0) : null;
 
     return (<>
@@ -7089,12 +7125,11 @@ function CategoryFilterBar({
             const subs = SUB_CATEGORIES[selectedCategory];
             const base = applyCompatFilters(products || []);
             const catProducts = base.filter(p => p.category === selectedCategory);
-            // Faceted counts: subcategory counts respect AI filter, AI count respects subcategory
-            const countBase = aiFilter ? catProducts.filter(p => p.ai_enabled) : catProducts;
+            const countBase = catProducts;
             const subCounts = {};
             subs.forEach(s => { subCounts[s.id] = countBase.filter(p => p.subcategory === s.id).length; });
             const unassigned = countBase.filter(p => !p.subcategory || !subs.some(s => s.id === p.subcategory)).length;
-            const hasAnySubs = subs.some(s => subCounts[s.id] > 0) || (!aiFilter && subs.some(s => catProducts.filter(p => p.subcategory === s.id).length > 0));
+            const hasAnySubs = subs.some(s => subCounts[s.id] > 0);
             if (!hasAnySubs) return null;
             return (
                 <div className="csc-subcategory-bar" style={{ display: 'flex', gap: '6px', marginTop: '8px', paddingLeft: '8px', flexWrap: 'wrap', alignItems: 'center' }}>
@@ -7120,46 +7155,6 @@ function CategoryFilterBar({
                             Other <span className="csc-subcategory-count">{unassigned}</span>
                         </button>
                     )}
-                    {/* ── AI filter pill ── */}
-                    {(() => {
-                        let aiBase = catProducts;
-                        if (selectedSubCategory) {
-                            if (selectedSubCategory === '__other__') {
-                                const knownSubcats = new Set(subs.map(s => s.id));
-                                aiBase = catProducts.filter(p => !p.subcategory || !knownSubcats.has(p.subcategory));
-                            } else {
-                                aiBase = catProducts.filter(p => p.subcategory === selectedSubCategory);
-                            }
-                        }
-                        const aiCount = aiBase.filter(p => p.ai_enabled).length;
-                        if (aiCount === 0) return null;
-                        return (
-                            <>
-                                <span style={{ borderLeft: '1.5px solid var(--card-border, #ddd)', height: '18px', margin: '0 4px' }} />
-                                <button onClick={() => onToggleAiFilter(!aiFilter)}
-                                    className={`csc-subcategory-pill csc-ai-pill ${aiFilter ? 'csc-ai-pill-active' : ''}`}
-                                    title="Filter products that leverage AI technologies">
-                                    <img src={createURL(`/static/app/${APP_ID}/icons/cat-ai.svg`)} alt="" style={{ width: '14px', height: '14px', verticalAlign: '-2px' }} /> AI-Powered <span className="csc-subcategory-count">{aiCount}</span>
-                                </button>
-                            </>
-                        );
-                    })()}
-                </div>
-            );
-        })()}
-        {/* ── AI pill for categories without sub-categories ── */}
-        {selectedCategory && !isCrossCutting && !SUB_CATEGORIES[selectedCategory] && (() => {
-            const base = applyCompatFilters(products || []);
-            const catProducts = base.filter(p => p.category === selectedCategory);
-            const aiCount = catProducts.filter(p => p.ai_enabled).length;
-            if (aiCount === 0) return null;
-            return (
-                <div className="csc-subcategory-bar" style={{ display: 'flex', gap: '6px', marginTop: '8px', paddingLeft: '8px', flexWrap: 'wrap', alignItems: 'center' }}>
-                    <button onClick={() => onToggleAiFilter(!aiFilter)}
-                        className={`csc-subcategory-pill csc-ai-pill ${aiFilter ? 'csc-ai-pill-active' : ''}`}
-                        title="Filter products that leverage AI technologies">
-                        <img src={createURL(`/static/app/${APP_ID}/icons/cat-ai.svg`)} alt="" style={{ width: '14px', height: '14px', verticalAlign: '-2px' }} /> AI-Powered <span className="csc-subcategory-count">{aiCount}</span>
-                    </button>
                 </div>
             );
         })()}
@@ -7190,7 +7185,6 @@ function SCANProductsPage() {
     const [searchQuery, setSearchQuery] = useState('');
     const [selectedCategory, setSelectedCategory] = useState(_savedFilters.selectedCategory ?? null);
     const [selectedSubCategory, setSelectedSubCategory] = useState(_savedFilters.selectedSubCategory ?? null);
-    const [aiFilter, setAiFilter] = useState(_savedFilters.aiFilter || false);
     const [selectedAddon, setSelectedAddon] = useState(_savedFilters.selectedAddon ?? null);
     const [legacyModalOpen, setLegacyModalOpen] = useState(false);
     const [legacyModalApps, setLegacyModalApps] = useState([]);
@@ -7262,12 +7256,12 @@ function SCANProductsPage() {
 
     useEffect(() => {
         saveFilters({
-            selectedCategory, selectedSubCategory, aiFilter,
+            selectedCategory, selectedSubCategory,
             selectedAddon, supportLevelFilter, showRetired, showDeprecated,
             showComingSoon, showGtmRoadmap, platformFilter, platformFilterMode,
             versionFilter, versionFilterMode,
         });
-    }, [selectedCategory, selectedSubCategory, aiFilter,
+    }, [selectedCategory, selectedSubCategory,
         selectedAddon, supportLevelFilter, showRetired, showDeprecated,
         showComingSoon, showGtmRoadmap, platformFilter, platformFilterMode,
         versionFilter, versionFilterMode]);
@@ -7510,7 +7504,6 @@ function SCANProductsPage() {
                 } else {
                     setSelectedCategory(null);
                     setSelectedSubCategory(null);
-                    setAiFilter(false);
                     setSelectedAddon(null);
                     setSupportLevelFilter([]);
                     setShowRetired(false);
@@ -7553,7 +7546,6 @@ function SCANProductsPage() {
                 } else {
                     setSelectedCategory(null);
                     setSelectedSubCategory(null);
-                    setAiFilter(false);
                     setSelectedAddon(null);
                     setSupportLevelFilter([]);
                     setShowRetired(false);
@@ -7912,12 +7904,10 @@ function SCANProductsPage() {
             filtered = filtered.filter((p) => p.alert_action_uids && p.alert_action_uids.length > 0);
         } else if (selectedCategory === 'secure_networking') {
             filtered = filtered.filter((p) => p.secure_networking_gtm);
-        } else if (selectedCategory === 'ai_powered') {
-            filtered = filtered.filter((p) => p.ai_enabled);
-        } else if (selectedCategory === 'es') {
-            filtered = filtered.filter((p) => p.es_compatible);
-        } else if (selectedCategory === 'itsi') {
-            filtered = filtered.filter((p) => p.itsi_content_pack);
+        } else if (selectedCategory === 'secops') {
+            filtered = filtered.filter((p) => p.es_compatible || p.sse_content);
+        } else if (selectedCategory === 'itops') {
+            filtered = filtered.filter((p) => p.itsi_content_pack || p.ite_learn_content);
         } else if (selectedCategory === 'sc4s') {
             filtered = filtered.filter((p) => p.sc4s_supported);
         } else if (selectedCategory === 'netflow') {
@@ -7933,9 +7923,6 @@ function SCANProductsPage() {
             } else {
                 filtered = filtered.filter((p) => p.subcategory === selectedSubCategory);
             }
-        }
-        if (aiFilter) {
-            filtered = filtered.filter((p) => p.ai_enabled);
         }
         if (searchQuery) {
             const q = searchQuery.toLowerCase().trim();
@@ -7990,7 +7977,7 @@ function SCANProductsPage() {
             }
         }
         return filtered;
-    }, [portfolioProducts, selectedCategory, selectedSubCategory, aiFilter, searchQuery, platformFilter, versionFilter, splunkbaseData, appidToUidMap, versionFilterMode, platformFilterMode]);
+    }, [portfolioProducts, selectedCategory, selectedSubCategory, searchQuery, platformFilter, versionFilter, splunkbaseData, appidToUidMap, versionFilterMode, platformFilterMode]);
 
     const filteredProducts = useMemo(() => {
         if (!selectedAddon) return preAddonProducts;
@@ -8003,7 +7990,7 @@ function SCANProductsPage() {
     }, [preAddonProducts, selectedAddon]);
 
     /* Active filter count for the "Filters" button badge */
-    const crossCutLabels = { soar: 1, alert_actions: 1, secure_networking: 1, ai_powered: 1, es: 1, itsi: 1, sc4s: 1, netflow: 1 };
+    const crossCutLabels = { soar: 1, alert_actions: 1, secure_networking: 1, secops: 1, itops: 1, sc4s: 1, netflow: 1 };
     const activeFilterCount = useMemo(() => {
         let count = 0;
         if (selectedCategory && crossCutLabels[selectedCategory]) count++;
@@ -8173,8 +8160,6 @@ function SCANProductsPage() {
 
     const categoryCounts = useMemo(() => {
         let base = portfolioProducts;
-        // Apply cross-cutting filters so category counts reflect the active filter state
-        if (aiFilter) base = base.filter((p) => p.ai_enabled);
         if (searchQuery) {
             const q = searchQuery.toLowerCase().trim();
             base = base.filter((p) => productMatchesSearch(p, q));
@@ -8210,13 +8195,12 @@ function SCANProductsPage() {
         counts.soar = base.filter((p) => p.soar_connector_uids && p.soar_connector_uids.length > 0).length;
         counts.alert_actions = base.filter((p) => p.alert_action_uids && p.alert_action_uids.length > 0).length;
         counts.secure_networking = base.filter((p) => p.secure_networking_gtm).length;
-        counts.ai_powered = base.filter((p) => p.ai_enabled).length;
-        counts.es = base.filter((p) => p.es_compatible).length;
-        counts.itsi = base.filter((p) => p.itsi_content_pack).length;
+        counts.secops = base.filter((p) => p.es_compatible || p.sse_content).length;
+        counts.itops = base.filter((p) => p.itsi_content_pack || p.ite_learn_content).length;
         counts.sc4s = base.filter((p) => p.sc4s_supported).length;
         counts.netflow = base.filter((p) => p.netflow_supported).length;
         return counts;
-    }, [portfolioProducts, aiFilter, searchQuery, platformFilter, versionFilter, splunkbaseData, selectedAddon, appidToUidMap]);
+    }, [portfolioProducts, searchQuery, platformFilter, versionFilter, splunkbaseData, selectedAddon, appidToUidMap]);
 
     // ── Render ──
     if (loading) {
@@ -8478,7 +8462,6 @@ function SCANProductsPage() {
                     onSelectCategory={(cat) => {
                         setSelectedCategory(cat);
                         setSelectedSubCategory(null);
-                        setAiFilter(false);
                         if (!cat) {
                             setSelectedAddon(null);
                             setSearchQuery('');
@@ -8487,8 +8470,6 @@ function SCANProductsPage() {
                     }}
                     selectedSubCategory={selectedSubCategory}
                     onSelectSubCategory={setSelectedSubCategory}
-                    aiFilter={aiFilter}
-                    onToggleAiFilter={setAiFilter}
                     categoryCounts={categoryCounts}
                     products={portfolioProducts}
                     onOpenFilterDrawer={() => setFilterDrawerOpen(true)}
@@ -8504,7 +8485,6 @@ function SCANProductsPage() {
                     onSelectCategory={(cat) => {
                         setSelectedCategory(cat);
                         setSelectedSubCategory(null);
-                        setAiFilter(false);
                     }}
                     supportLevelFilter={supportLevelFilter}
                     onSelectSupportLevel={handleSupportLevelToggle}
@@ -8535,7 +8515,6 @@ function SCANProductsPage() {
                 onSelectCategory={(cat) => {
                     setSelectedCategory(cat);
                     setSelectedSubCategory(null);
-                    setAiFilter(false);
                 }}
                 supportLevelFilter={supportLevelFilter}
                 onSelectSupportLevel={(level) => {
@@ -8580,7 +8559,6 @@ function SCANProductsPage() {
                 onResetAll={() => {
                     setSelectedCategory(null);
                     setSelectedSubCategory(null);
-                    setAiFilter(false);
                     setSelectedAddon(null);
                     setSupportLevelFilter([]);
                     setShowRetired(false);
@@ -8609,7 +8587,8 @@ function SCANProductsPage() {
                 const addonsInstalled = [...referencedAddons].filter(a => installedApps[a]).length;
                 const sc4sReady = visibleProducts.filter(p => p.sc4s_supported).length;
                 const netflowReady = visibleProducts.filter(p => p.netflow_supported).length;
-                const esCompatible = visibleProducts.filter(p => p.es_compatible).length;
+                const secopsCount = visibleProducts.filter(p => p.es_compatible || p.sse_content).length;
+                const itopsCount = visibleProducts.filter(p => p.itsi_content_pack || p.ite_learn_content).length;
                 const dataFlowing = detectedProducts.length + configuredProducts.filter(p => sourcetypeData[p.product_id] && sourcetypeData[p.product_id].hasData).length;
                 const stats = [
                     { label: 'Products', value: visibleProducts.length, accent: '#5B6ABF', tip: 'Total Cisco products in your catalog' },
@@ -8619,7 +8598,8 @@ function SCANProductsPage() {
                     { label: 'Add-ons', value: `${addonsInstalled}/${referencedAddons.size}`, accent: '#7C3AED', tip: 'Installed / total referenced add-ons' },
                     { label: 'SC4S Ready', value: sc4sReady, accent: '#049FD9', tip: 'Ready-to-go SC4S configurations — deploy the container, point syslog' },
                     { label: 'NetFlow', value: netflowReady, accent: '#14B8A6', tip: 'Products with ready-to-go NetFlow/IPFIX collection support' },
-                    { label: 'ES Ready', value: esCompatible, accent: '#F59E0B', tip: 'CIM-compliant products ready for Enterprise Security \u2014 includes OOB detections where available' },
+                    { label: 'SecOps', value: secopsCount, accent: '#475569', tip: 'Products with SecOps content \u2014 ES (CIM-compliant) and/or Security Essentials use cases' },
+                    { label: 'ITOps', value: itopsCount, accent: '#4F46E5', tip: 'Products with ITOps content \u2014 ITSI content packs and/or IT Essentials Learn procedures' },
                 ];
                 return (
                     <div className="csc-stats-bar">
@@ -9074,7 +9054,7 @@ function SCANProductsPage() {
                                 <summary className="scan-guide-summary">Product Cards</summary>
                                 <ul className="scan-guide-list">
                                     <li>Intelligence badges show <strong>install status</strong>, <strong>updates</strong>, <strong>data flowing</strong> (7d), and <strong>legacy apps</strong>.</li>
-                                    <li>Header badges (<span className="csc-badge-btn csc-badge-sc4s" style={{ fontSize: '12px', padding: '3px 8px' }}>SC4S</span> <span className="csc-badge-btn csc-badge-netflow" style={{ fontSize: '12px', padding: '3px 8px' }}>NetFlow</span> <span className="csc-badge-btn csc-badge-soar" style={{ fontSize: '12px', padding: '3px 8px' }}>SOAR</span> <span className="csc-badge-btn csc-badge-itsi" style={{ fontSize: '12px', padding: '3px 8px' }}>ITSI</span> <span className="csc-badge-btn csc-badge-es" style={{ fontSize: '12px', padding: '3px 8px' }}>ES</span> <span className="csc-badge-btn csc-badge-alert" style={{ fontSize: '12px', padding: '3px 8px' }}>Alert Actions</span>) open info panels.</li>
+                                    <li>Header badges (<span className="csc-badge-btn csc-badge-sc4s" style={{ fontSize: '12px', padding: '3px 8px' }}>SC4S</span> <span className="csc-badge-btn csc-badge-netflow" style={{ fontSize: '12px', padding: '3px 8px' }}>NetFlow</span> <span className="csc-badge-btn csc-badge-soar" style={{ fontSize: '12px', padding: '3px 8px' }}>SOAR</span> <span className="csc-badge-btn csc-badge-itops" style={{ fontSize: '12px', padding: '3px 8px' }}><PulseIcon size="0.85em" style={{ verticalAlign: '-0.1em', marginRight: '3px' }} />ITOps</span> <span className="csc-badge-btn csc-badge-secops" style={{ fontSize: '12px', padding: '3px 8px' }}><ShieldIcon size="0.85em" style={{ verticalAlign: '-0.1em', marginRight: '3px' }} />SecOps</span> <span className="csc-badge-btn csc-badge-alert" style={{ fontSize: '12px', padding: '3px 8px' }}>Alert Actions</span>) open info panels.</li>
                                     <li>Hover <strong>ⓘ</strong> for description, value proposition, and former names.</li>
                                 </ul>
                             </details>

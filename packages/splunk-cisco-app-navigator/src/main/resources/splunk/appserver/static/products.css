@@ -1460,26 +1460,26 @@ html.dce-dark [data-view="views/shared/Page"] {
 }
 .csc-badge-soar:hover { background: #dce6ff; }
 
-.csc-badge-itsi {
-    background: #ecf7ed;
-    color: #3a8a3f;
-    border: 1px solid rgba(58, 138, 63, 0.15);
+.csc-badge-itops {
+    background: #EEF2FF;
+    color: #4F46E5;
+    border: 1px solid rgba(99, 102, 241, 0.18);
 }
-.csc-badge-itsi:hover { background: #d8eeda; }
+.csc-badge-itops:hover { background: #E0E7FF; }
 
-.csc-badge-es {
-    background: #edf2ff;
-    color: #0A60FF;
-    border: 1px solid rgba(10, 96, 255, 0.2);
+.csc-badge-secops {
+    background: #F1F5F9;
+    color: #334155;
+    border: 1px solid rgba(71, 85, 105, 0.18);
 }
-.csc-badge-es:hover { background: #dce6ff; }
+.csc-badge-secops:hover { background: #E2E8F0; }
 
 .csc-badge-alert {
-    background: #fff4e6;
-    color: #e65100;
-    border: 1px solid rgba(230, 81, 0, 0.25);
+    background: #FDF2F8;
+    color: #BE185D;
+    border: 1px solid rgba(190, 24, 93, 0.15);
 }
-.csc-badge-alert:hover { background: #ffe0b2; }
+.csc-badge-alert:hover { background: #FCE7F3; }
 
 /* Dark mode badge tints */
 :root.dce-dark .csc-badge-sc4s { background: rgba(4, 158, 143, 0.12); color: #5ec5b9; border-color: rgba(4, 158, 143, 0.25); }
@@ -1488,12 +1488,12 @@ html.dce-dark [data-view="views/shared/Page"] {
 :root.dce-dark .csc-badge-netflow:hover { background: rgba(2, 200, 255, 0.18); }
 :root.dce-dark .csc-badge-soar { background: rgba(10, 96, 255, 0.1); color: #6ea0ff; border-color: rgba(10, 96, 255, 0.2); }
 :root.dce-dark .csc-badge-soar:hover { background: rgba(10, 96, 255, 0.18); }
-:root.dce-dark .csc-badge-itsi { background: rgba(58, 138, 63, 0.12); color: #81c784; border-color: rgba(58, 138, 63, 0.2); }
-:root.dce-dark .csc-badge-itsi:hover { background: rgba(58, 138, 63, 0.2); }
-:root.dce-dark .csc-badge-es { background: rgba(10, 96, 255, 0.12); color: #6ea0ff; border-color: rgba(10, 96, 255, 0.2); }
-:root.dce-dark .csc-badge-es:hover { background: rgba(10, 96, 255, 0.18); }
-:root.dce-dark .csc-badge-alert { background: rgba(230, 81, 0, 0.15); color: #ffab91; border-color: rgba(230, 81, 0, 0.25); }
-:root.dce-dark .csc-badge-alert:hover { background: rgba(230, 81, 0, 0.22); }
+:root.dce-dark .csc-badge-itops { background: rgba(99, 102, 241, 0.12); color: #A5B4FC; border-color: rgba(99, 102, 241, 0.22); }
+:root.dce-dark .csc-badge-itops:hover { background: rgba(99, 102, 241, 0.2); }
+:root.dce-dark .csc-badge-secops { background: rgba(71, 85, 105, 0.15); color: #CBD5E1; border-color: rgba(71, 85, 105, 0.25); }
+:root.dce-dark .csc-badge-secops:hover { background: rgba(71, 85, 105, 0.25); }
+:root.dce-dark .csc-badge-alert { background: rgba(190, 24, 93, 0.12); color: #F9A8D4; border-color: rgba(190, 24, 93, 0.22); }
+:root.dce-dark .csc-badge-alert:hover { background: rgba(190, 24, 93, 0.2); }
 
 /* ── Guide Modal (cheat sheet + expandable) ── */
 .scan-guide-quick {
@@ -3044,44 +3044,6 @@ html.dce-dark [data-view="views/shared/Page"] {
 }
 :root.dce-dark .csc-ai-badge .csc-ai-tooltip::after {
     border-top-color: #312e81;
-}
-
-/* ── AI filter pill — purple accent at end of sub-category pills ── */
-.csc-ai-pill {
-    border-color: #93c5fd !important;
-    color: #0A60FF !important;
-    background: #eff6ff !important;
-}
-.csc-ai-pill:hover {
-    border-color: #60a5fa !important;
-    background: #dbeafe !important;
-}
-.csc-ai-pill-active {
-    background: var(--color-primary, #0A60FF) !important;
-    border-color: var(--color-primary, #0A60FF) !important;
-    color: #fff !important;
-}
-.csc-ai-pill-active .csc-subcategory-count {
-    background: rgba(255, 255, 255, 0.22) !important;
-    color: #fff !important;
-}
-:root.dce-dark .csc-ai-pill {
-    border-color: rgba(10, 96, 255, 0.4) !important;
-    color: #60a5fa !important;
-    background: rgba(10, 96, 255, 0.10) !important;
-}
-:root.dce-dark .csc-ai-pill:hover {
-    border-color: #60a5fa !important;
-    background: rgba(10, 96, 255, 0.18) !important;
-}
-:root.dce-dark .csc-ai-pill-active {
-    background: var(--color-primary, #0A60FF) !important;
-    border-color: var(--color-primary, #0A60FF) !important;
-    color: #fff !important;
-}
-:root.dce-dark .csc-ai-pill-active .csc-subcategory-count {
-    background: rgba(255, 255, 255, 0.22) !important;
-    color: #fff !important;
 }
 
 /* ── Advanced Filters ── */
@@ -5833,7 +5795,6 @@ tr.scan-ts-ahead .scan-ts-name {
 .scan-drawer-pill-secnet-active { border-color: #00897b; background: #e0f2f1; color: #004d40; }
 .scan-drawer-pill-soar-active { border-color: #f59e0b; background: #fef3c7; color: #92400e; }
 .scan-drawer-pill-alert-active { border-color: #3b82f6; background: #dbeafe; color: #1e40af; }
-.scan-drawer-pill-ai-active { border-color: #7c3aed; background: #ede9fe; color: #5b21b6; }
 .scan-drawer-pill-cisco-active { border-color: #0A60FF; background: rgba(10,96,255,0.06); color: #0A60FF; }
 .scan-drawer-pill-splunk-active { border-color: #1565c0; background: #e3f2fd; color: #0d47a1; }
 .scan-drawer-pill-dev-active { border-color: #FF9000; background: rgba(255,144,0,0.06); color: #FF9000; }
@@ -6521,7 +6482,6 @@ tr.scan-ts-ahead .scan-ts-name {
 :root.dce-dark .scan-drawer-pill-secnet-active { border-color: #26a69a; background: rgba(38,166,154,0.18); color: #80cbc4; }
 :root.dce-dark .scan-drawer-pill-soar-active { border-color: #ffa726; background: rgba(255,167,38,0.15); color: #ffcc80; }
 :root.dce-dark .scan-drawer-pill-alert-active { border-color: #42a5f5; background: rgba(66,165,245,0.15); color: #90caf9; }
-:root.dce-dark .scan-drawer-pill-ai-active { border-color: #7e57c2; background: rgba(126,87,194,0.18); color: #b39ddb; }
 :root.dce-dark .scan-drawer-pill-cisco-active { border-color: #02C8FF; background: rgba(102,187,106,0.15); color: #a5d6a7; }
 :root.dce-dark .scan-drawer-pill-splunk-active { border-color: #42a5f5; background: rgba(66,165,245,0.15); color: #90caf9; }
 :root.dce-dark .scan-drawer-pill-dev-active { border-color: #ff7043; background: rgba(255,112,67,0.15); color: #FF9000; }
@@ -6619,13 +6579,6 @@ tr.scan-ts-ahead .scan-ts-name {
     color: #fff !important;
 }
 
-/* AI-Powered pill — Midnight Blue when active */
-.csc-ai-pill-active {
-    background: #07182D !important;
-    border-color: #07182D !important;
-    color: #fff !important;
-}
-
 :root.dce-dark .csc-subcategory-pill {
     background: #1e262c !important;
     border-color: rgba(10, 96, 255, 0.3) !important;
@@ -6640,11 +6593,6 @@ tr.scan-ts-ahead .scan-ts-name {
     background: #0A60FF !important;
     border-color: #0A60FF !important;
     color: #ffffff !important;
-}
-:root.dce-dark .csc-ai-pill-active {
-    background: #02C8FF !important;
-    border-color: #02C8FF !important;
-    color: #07182D !important;
 }
 :root.dce-dark .csc-subcategory-count {
     background: rgba(255, 255, 255, 0.15) !important;
