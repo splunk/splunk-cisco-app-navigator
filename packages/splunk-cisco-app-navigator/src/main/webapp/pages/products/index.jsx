@@ -65,7 +65,7 @@ const SEARCH_ENDPOINT = '/splunkd/__raw/services/search/jobs';
 const CONFIGURED_STORAGE_KEY = 'scan_configured_products';
 const THEME_STORAGE_KEY = 'scan_theme_preference'; // 'light' | 'dark' | 'auto'
 const PORTFOLIO_STORAGE_KEY = 'scan_show_full_portfolio'; // 'true' | 'false'
-// devMode and gtmMode are session-only (no localStorage) — hard refresh resets to normal
+const DEVMODE_STORAGE_KEY = 'scan_devmode'; // 'true' | absent
 const PERSONA_STORAGE_KEY = 'scan_persona_shown'; // 'true' once persona modal dismissed
 const FILTERS_STORAGE_KEY = 'scan_filter_state';
 const PANELS_STORAGE_KEY = 'scan_panel_state';
@@ -1319,13 +1319,13 @@ function SC4SInfoModal({ open, onClose }) {
                     </div>
 
                     <div className="csc-sc4s-info-footer">
-                        <a href="https://splunkbase.splunk.com/app/4740" target="_blank" rel="noopener noreferrer" className="csc-sc4s-info-link">
+                        <a href="https://splunkbase.splunk.com/app/4740" target="_blank" rel="noopener noreferrer" className="csc-sc4s-info-link" style={{ color: '#0A60FF' }}>
                              Splunkbase
                         </a>
-                        <a href="https://splunk.github.io/splunk-connect-for-syslog/main/" target="_blank" rel="noopener noreferrer" className="csc-sc4s-info-link">
+                        <a href="https://splunk.github.io/splunk-connect-for-syslog/main/" target="_blank" rel="noopener noreferrer" className="csc-sc4s-info-link" style={{ color: '#0A60FF' }}>
                              SC4S Official Documentation
                         </a>
-                        <a href="https://github.com/splunk/splunk-connect-for-syslog" target="_blank" rel="noopener noreferrer" className="csc-sc4s-info-link csc-sc4s-info-link-gh">
+                        <a href="https://github.com/splunk/splunk-connect-for-syslog" target="_blank" rel="noopener noreferrer" className="csc-sc4s-info-link" style={{ color: '#0A60FF' }}>
                              GitHub Repository
                         </a>
                     </div>
@@ -1568,13 +1568,13 @@ function NetFlowInfoModal({ open, onClose, installedApps }) {
                     </div>
 
                     <div className="csc-sc4s-info-footer">
-                        <a href="https://help.splunk.com/en/splunk-cloud-platform/collect-stream-data/install-and-configure-splunk-stream/8.1/introduction/about-splunk-stream" target="_blank" rel="noopener noreferrer" className="csc-sc4s-info-link csc-sc4s-info-link-gh">
+                        <a href="https://help.splunk.com/en/splunk-cloud-platform/collect-stream-data/install-and-configure-splunk-stream/8.1/introduction/about-splunk-stream" target="_blank" rel="noopener noreferrer" className="csc-sc4s-info-link" style={{ color: '#0A60FF' }}>
                             Splunk Stream Documentation
                         </a>
-                        <a href="https://www.cisco.com/c/en/us/solutions/collateral/enterprise-networks/sd-wan/sd-wan-splunk-integration-ug.html" target="_blank" rel="noopener noreferrer" className="csc-sc4s-info-link csc-sc4s-info-link-gh">
+                        <a href="https://www.cisco.com/c/en/us/solutions/collateral/enterprise-networks/sd-wan/sd-wan-splunk-integration-ug.html" target="_blank" rel="noopener noreferrer" className="csc-sc4s-info-link" style={{ color: '#0A60FF' }}>
                             Cisco Enhanced Netflow Guide
                         </a>
-                        <a href="https://splunkbase.splunk.com/app/6872" target="_blank" rel="noopener noreferrer" className="csc-sc4s-info-link csc-sc4s-info-link-gh">
+                        <a href="https://splunkbase.splunk.com/app/6872" target="_blank" rel="noopener noreferrer" className="csc-sc4s-info-link" style={{ color: '#0A60FF' }}>
                             Enhanced Netflow on Splunkbase
                         </a>
                     </div>
@@ -1662,10 +1662,10 @@ function HFInfoModal({ open, onClose, isCloud }) {
                     </div>
 
                     <div className="csc-sc4s-info-footer">
-                        <a href="https://docs.splunk.com/Documentation/SplunkCloud/latest/Forwarding/Deployaheavyforwarder" target="_blank" rel="noopener noreferrer" className="csc-sc4s-info-link">
+                        <a href="https://docs.splunk.com/Documentation/SplunkCloud/latest/Forwarding/Deployaheavyforwarder" target="_blank" rel="noopener noreferrer" className="csc-sc4s-info-link" style={{ color: '#0A60FF' }}>
                             Deploy a Heavy Forwarder — Splunk Docs
                         </a>
-                        <a href="https://help.splunk.com/en/data-management/transform-and-route-data/perform-basic-data-processing/process-data-with-forwarders/types-of-forwarders" target="_blank" rel="noopener noreferrer" className="csc-sc4s-info-link csc-sc4s-info-link-gh">
+                        <a href="https://help.splunk.com/en/data-management/transform-and-route-data/perform-basic-data-processing/process-data-with-forwarders/types-of-forwarders" target="_blank" rel="noopener noreferrer" className="csc-sc4s-info-link" style={{ color: '#0A60FF' }}>
                             Types of Forwarders — Splunk Docs
                         </a>
                     </div>
@@ -1968,7 +1968,7 @@ function MagicEightModal({ open, onClose, sourcetypes, productName, addonApp, ad
                 const splParts = [
                     `| rest splunk_server=${isStandalone ? 'local' : '*'} /servicesNS/-/-/configs/conf-props f=eai:* f=rename ${m6Fields} count=0`,
                     '| eval _norm_title=if(isnotnull(rename) AND rename!="", rename, lower(title))',
-                    `| search (${titleFilter})`,
+                    `| search (${titleFilter}) NOT eai:acl.app IN (system, learned, _cluster_manager_app, splunk_ingest_actions, SplunkUniversalForwarder, SplunkForwarder, SplunkDeploymentServerConfig, Splunk_SA_CIM, python_upgrade_readiness_app, splunk_instrumentation, splunk_internal_metrics, splunk_monitoring_console, splunk_secure_gateway)`,
                     `| fields splunk_server eai:acl.app _norm_title ${MAGIC_EIGHT.map(m => m.key).join(' ')}`,
                 ];
                 if (!isStandalone) {
@@ -2427,13 +2427,13 @@ function MagicEightModal({ open, onClose, sourcetypes, productName, addonApp, ad
                     </div>
 
                     <div className="csc-sc4s-info-footer">
-                        <a href="https://docs.splunk.com/Documentation/Splunk/latest/Admin/Propsconf" target="_blank" rel="noopener noreferrer" className="csc-sc4s-info-link">
+                        <a href="https://docs.splunk.com/Documentation/Splunk/latest/Admin/Propsconf" target="_blank" rel="noopener noreferrer" className="csc-sc4s-info-link" style={{ color: '#0A60FF' }}>
                             props.conf Reference — Splunk Docs
                         </a>
-                        <a href="https://lantern.splunk.com/Platform_Data_Management/Optimize_Data/Configuring_new_source_types" target="_blank" rel="noopener noreferrer" className="csc-sc4s-info-link csc-sc4s-info-link-gh">
+                        <a href="https://lantern.splunk.com/Platform_Data_Management/Optimize_Data/Configuring_new_source_types" target="_blank" rel="noopener noreferrer" className="csc-sc4s-info-link" style={{ color: '#0A60FF' }}>
                             Configuring New Sourcetypes — Splunk Lantern
                         </a>
-                        <a href="https://help.splunk.com/en/splunk-enterprise/get-data-in/get-started-with-getting-data-in/10.2/configure-timestamps/configure-timestamp-recognition" target="_blank" rel="noopener noreferrer" className="csc-sc4s-info-link csc-sc4s-info-link-gh">
+                        <a href="https://help.splunk.com/en/splunk-enterprise/get-data-in/get-started-with-getting-data-in/10.2/configure-timestamps/configure-timestamp-recognition" target="_blank" rel="noopener noreferrer" className="csc-sc4s-info-link" style={{ color: '#0A60FF' }}>
                             Configure Timestamp Recognition
                         </a>
                     </div>
@@ -2579,10 +2579,10 @@ function SOARInfoModal({ open, onClose, soarConnectorUids, splunkbaseData, produ
                     </div>
 
                     <div className="csc-sc4s-info-footer">
-                        <a href="https://docs.splunk.com/Documentation/SOARonprem/latest/User/Overview" target="_blank" rel="noopener noreferrer" className="csc-sc4s-info-link">
+                        <a href="https://docs.splunk.com/Documentation/SOARonprem/latest/User/Overview" target="_blank" rel="noopener noreferrer" className="csc-sc4s-info-link" style={{ color: '#0A60FF' }}>
                              Splunk SOAR Documentation
                         </a>
-                        <a href="https://splunkbase.splunk.com/apps?page=1&keyword=cisco&built_by=splunk&built_by=cisco&product=soar" target="_blank" rel="noopener noreferrer" className="csc-sc4s-info-link csc-sc4s-info-link-gh">
+                        <a href="https://splunkbase.splunk.com/apps?page=1&keyword=cisco&built_by=splunk&built_by=cisco&product=soar" target="_blank" rel="noopener noreferrer" className="csc-sc4s-info-link" style={{ color: '#0A60FF' }}>
                              Browse All SOAR Connectors
                         </a>
                     </div>
@@ -2743,11 +2743,11 @@ function ITSIInfoModal({ open, onClose, itsiContentPack, productName }) {
                     </div>
 
                     <div className="csc-sc4s-info-footer">
-                        <a href="https://docs.splunk.com/Documentation/ITSI/latest/Configure/ContentPackOverview" target="_blank" rel="noopener noreferrer" className="csc-sc4s-info-link">
+                        <a href="https://docs.splunk.com/Documentation/ITSI/latest/Configure/ContentPackOverview" target="_blank" rel="noopener noreferrer" className="csc-sc4s-info-link" style={{ color: '#0A60FF' }}>
                              ITSI Content Pack Documentation
                         </a>
                         {pack.docs_url && (
-                            <a href={pack.docs_url} target="_blank" rel="noopener noreferrer" className="csc-sc4s-info-link csc-sc4s-info-link-gh">
+                            <a href={pack.docs_url} target="_blank" rel="noopener noreferrer" className="csc-sc4s-info-link" style={{ color: '#0A60FF' }}>
                                  {pack.label || 'Content Pack'} Documentation
                             </a>
                         )}
@@ -2927,15 +2927,15 @@ function ESInfoModal({ open, onClose, productName, cimDataModels, escuStories, e
                     </div>
 
                     <div className="csc-sc4s-info-footer">
-                        <a href="https://docs.splunk.com/Documentation/ES/latest" target="_blank" rel="noopener noreferrer" className="csc-sc4s-info-link">
+                        <a href="https://docs.splunk.com/Documentation/ES/latest" target="_blank" rel="noopener noreferrer" className="csc-sc4s-info-link" style={{ color: '#0A60FF' }}>
                              ES Documentation
                         </a>
                         {hasEscu && (
-                            <a href="https://splunkbase.splunk.com/app/3449" target="_blank" rel="noopener noreferrer" className="csc-sc4s-info-link csc-sc4s-info-link-gh">
+                            <a href="https://splunkbase.splunk.com/app/3449" target="_blank" rel="noopener noreferrer" className="csc-sc4s-info-link" style={{ color: '#0A60FF' }}>
                                  ESCU on Splunkbase
                             </a>
                         )}
-                        <a href="https://docs.splunk.com/Documentation/CIM/latest/User/Overview" target="_blank" rel="noopener noreferrer" className="csc-sc4s-info-link csc-sc4s-info-link-gh">
+                        <a href="https://docs.splunk.com/Documentation/CIM/latest/User/Overview" target="_blank" rel="noopener noreferrer" className="csc-sc4s-info-link" style={{ color: '#0A60FF' }}>
                              CIM Reference
                         </a>
                     </div>
@@ -7205,7 +7205,9 @@ function SCANProductsPage() {
     });
     const guideReturnRef = useRef(null);
     const [appVersion, setAppVersion] = useState('');
-    const [appBuild, setAppBuild] = useState('');
+    const [appBuild, setAppBuild] = useState(() =>
+        typeof SCAN_BUILD_HASH !== 'undefined' ? SCAN_BUILD_HASH : ''
+    );
     const [appUpdateVersion, setAppUpdateVersion] = useState('');
     const [platformType, setPlatformType] = useState('');
     const [splunkVersion, setSplunkVersion] = useState('');          // e.g. '9.3.2' or '10.2.2510.6'
@@ -7213,7 +7215,9 @@ function SCANProductsPage() {
     const [themeOverride, setThemeOverride] = useState(getThemePreference); // 'auto' | 'light' | 'dark'
     const [splunkTheme, setSplunkTheme] = useState(null);                  // true = dark, false = light, null = unknown
     const [showFullPortfolio, setShowFullPortfolio] = useState(getPortfolioPreference); // false = supported only
-    const [devMode, setDevMode] = useState(false);
+    const [devMode, setDevMode] = useState(() => {
+        try { return localStorage.getItem(DEVMODE_STORAGE_KEY) === 'true'; } catch { return false; }
+    });
     const [gtmMode, setGtmMode] = useState(false);
     // Internal-only sections (Integration Needed, Coming Soon, GTM Roadmap) are
     // gated behind devMode or gtmMode.  When false, portfolioProducts also
@@ -7279,19 +7283,19 @@ function SCANProductsPage() {
         });
     }, []);
 
-    const allPanelsExpanded = useMemo(() =>
-        Object.values(panelState).every(Boolean),
+    const allPanelsCollapsed = useMemo(() =>
+        Object.values(panelState).every(v => !v),
     [panelState]);
 
     const handleExpandCollapseAll = useCallback(() => {
-        const expand = !allPanelsExpanded;
+        const expand = allPanelsCollapsed;
         setPanelState(prev => {
             const next = {};
             for (const key of Object.keys(prev)) next[key] = expand;
             savePanelState(next);
             return next;
         });
-    }, [allPanelsExpanded]);
+    }, [allPanelsCollapsed]);
 
     /** Toggle a version in/out of the multi-select filter. Pass null to clear all. */
     const handleVersionToggle = (version) => {
@@ -7487,6 +7491,7 @@ function SCANProductsPage() {
         if (cmd === 'devmode') {
             setDevMode(prev => {
                 const next = !prev;
+                try { if (next) localStorage.setItem(DEVMODE_STORAGE_KEY, 'true'); else localStorage.removeItem(DEVMODE_STORAGE_KEY); } catch {}
                 setDevToast(next ? 'Developer Mode ON' : 'Developer Mode OFF');
                 setTimeout(() => setDevToast(null), 2500);
                 if (next) {
@@ -7503,7 +7508,26 @@ function SCANProductsPage() {
                         return collapsed;
                     });
                 } else {
+                    setSelectedCategory(null);
+                    setSelectedSubCategory(null);
+                    setAiFilter(false);
+                    setSelectedAddon(null);
+                    setSupportLevelFilter([]);
+                    setShowRetired(false);
+                    setShowDeprecated(false);
+                    setShowComingSoon(false);
+                    setShowGtmRoadmap(false);
                     setShowVault(false);
+                    setPlatformFilter([]);
+                    setVersionFilter([]);
+                    setVersionFilterMode('include');
+                    setPlatformFilterMode('include');
+                    setShowFullPortfolio(false);
+                    savePortfolioPreference(false);
+                    setPanelState({ ...DEFAULT_PANEL_STATE });
+                    savePanelState({ ...DEFAULT_PANEL_STATE });
+                    setCloudSimulation(false);
+                    setAppUpdateVersion('');
                 }
                 return next;
             });
@@ -7527,8 +7551,23 @@ function SCANProductsPage() {
                         return collapsed;
                     });
                 } else {
+                    setSelectedCategory(null);
+                    setSelectedSubCategory(null);
+                    setAiFilter(false);
+                    setSelectedAddon(null);
+                    setSupportLevelFilter([]);
+                    setShowRetired(false);
+                    setShowDeprecated(false);
                     setShowComingSoon(false);
                     setShowGtmRoadmap(false);
+                    setPlatformFilter([]);
+                    setVersionFilter([]);
+                    setVersionFilterMode('include');
+                    setPlatformFilterMode('include');
+                    setShowFullPortfolio(false);
+                    savePortfolioPreference(false);
+                    setPanelState({ ...DEFAULT_PANEL_STATE });
+                    savePanelState({ ...DEFAULT_PANEL_STATE });
                 }
                 return next;
             });
@@ -7629,9 +7668,10 @@ function SCANProductsPage() {
             try {
                 const vRes = await splunkFetch(`${APPS_LOCAL_ENDPOINT}/${APP_ID}?output_mode=json`);
                 const vData = await vRes.json();
-                const vContent = vData.entry?.[0]?.content || {};
+                const vEntry = vData.entry?.[0] || {};
+                const vContent = vEntry.content || {};
                 setAppVersion(vContent.version || '');
-                setAppBuild(vContent.build || '');
+                setAppBuild(vContent.build || vEntry.build || '');
                 setAppUpdateVersion(vContent['update.version'] || '');
             } catch (e) { /* ok */ }
         } catch (err) {
@@ -7687,9 +7727,10 @@ function SCANProductsPage() {
     }, [products, loading]);
 
     // ── Indexer tier detection — check add-on deployment across peer indexers ──
-    // Skipped on Splunk Cloud: | rest splunk_server=* cannot reach Cloud indexers
-    // and blocks foreground search dispatch. On Cloud, indexerApps stays {} which
-    // causes downstream logic (Magic Eight, version checks) to fall back gracefully.
+    // Skipped on Splunk Cloud: apps installed on the SHC are automatically deployed
+    // to the indexer tier by the platform, so SH and indexers are always in sync.
+    // Querying indexers would be redundant. indexerApps stays {} and downstream
+    // logic (Magic Eight, version checks) falls back to local (SH) gracefully.
     useEffect(() => {
         if (loading || platformType === 'cloud') return;
         const detect = async () => {
@@ -8041,7 +8082,7 @@ function SCANProductsPage() {
                 {count > 0 && (
                     <span className="csc-section-peek">
                         {icons.map(p => (
-                            <span key={p.product_id} className="csc-peek-icon" data-tooltip={p.display_name}>
+                            <span key={p.product_id} className="csc-peek-icon">
                                 {p.icon_svg
                                     ? React.createElement('img', {
                                         src: createURL(`/static/app/${APP_ID}/icons/${p.icon_svg}${document.documentElement.classList.contains('dce-dark') ? '_white' : ''}.svg`),
@@ -8273,17 +8314,17 @@ function SCANProductsPage() {
                             {effectivePlatformType === 'cloud' ? 'Cloud' : 'Enterprise'}
                             {effectiveSplunkVersion && <span className="scan-util-splunk-ver">{effectiveSplunkVersion}</span>}
                             {appVersion && <><span className="scan-util-devinfo-sep">|</span>SCAN {appVersion}</>}
-                            {appBuild && <span className="scan-util-devinfo-build">{appBuild.substring(0, 8)}</span>}
+                            {appBuild && <><span className="scan-util-devinfo-sep">|</span><span className="scan-util-devinfo-build">build {appBuild.substring(0, 8)}</span></>}
                         </span>
                     )}
                     {/* ── Update badge (always visible when update available) ── */}
                     {appUpdateVersion && (
                         <a
-                            href={createURL('/manager/splunk-cisco-app-navigator/appsremote?order=relevance&query=%22Splunk+Cisco+App+Navigator%22&offset=0&support=splunk&support=cisco&type=app')}
+                            href={createURL(`/manager/appinstall/${APP_ID}`)}
                             target="_blank"
                             rel="noopener noreferrer"
                             className="scan-util-pill scan-util-update"
-                            title={`Upgrade from v${appVersion} to v${appUpdateVersion} — click to open Splunkbase`}
+                            title={`Upgrade from v${appVersion} to v${appUpdateVersion} — click to update`}
                         >
                             ⬆ v{appUpdateVersion}
                         </a>
@@ -8327,9 +8368,9 @@ function SCANProductsPage() {
                     <button
                         className="scan-util-pill"
                         onClick={handleExpandCollapseAll}
-                        title={allPanelsExpanded ? 'Collapse all sections' : 'Expand all sections'}
+                        title={allPanelsCollapsed ? 'Expand all sections' : 'Collapse all sections'}
                     >
-                        {allPanelsExpanded ? 'Collapse All' : 'Expand All'}
+                        {allPanelsCollapsed ? 'Expand All' : 'Collapse All'}
                     </button>
                     <button
                         className="scan-util-pill"
@@ -8372,6 +8413,27 @@ function SCANProductsPage() {
                             title={cloudSimulation ? `Cloud Simulation ON — Simulating Splunk Cloud v${SIMULATED_CLOUD_VERSION} — click to disable` : 'Simulate Splunk Cloud environment — click to enable'}
                         >
                             {cloudSimulation ? 'Cloud' : 'Cloud'}
+                        </button>
+                        <button
+                            className={`scan-util-pill scan-util-devmode ${appUpdateVersion ? 'scan-util-cloud-active' : ''}`}
+                            onClick={() => {
+                                setAppUpdateVersion(prev => {
+                                    if (prev) {
+                                        setDevToast('Update Simulation OFF');
+                                        setTimeout(() => setDevToast(null), 2500);
+                                        return '';
+                                    }
+                                    const parts = (appVersion || '1.0.0').split('.');
+                                    parts[parts.length - 1] = String(Number(parts[parts.length - 1] || 0) + 1);
+                                    const fakeVersion = parts.join('.');
+                                    setDevToast(`Update Simulation ON — faking v${fakeVersion}`);
+                                    setTimeout(() => setDevToast(null), 2500);
+                                    return fakeVersion;
+                                });
+                            }}
+                            title={appUpdateVersion ? `Update Simulation ON — faking v${appUpdateVersion} — click to disable` : 'Simulate an available app update — click to enable'}
+                        >
+                            Update
                         </button>
                         <button
                             className="scan-util-pill scan-util-devmode"
@@ -8557,7 +8619,7 @@ function SCANProductsPage() {
                     { label: 'Add-ons', value: `${addonsInstalled}/${referencedAddons.size}`, accent: '#7C3AED', tip: 'Installed / total referenced add-ons' },
                     { label: 'SC4S Ready', value: sc4sReady, accent: '#049FD9', tip: 'Ready-to-go SC4S configurations — deploy the container, point syslog' },
                     { label: 'NetFlow', value: netflowReady, accent: '#14B8A6', tip: 'Products with ready-to-go NetFlow/IPFIX collection support' },
-                    { label: 'ES Ready', value: esCompatible, accent: '#F59E0B', tip: 'Products with ready-to-go Splunk Enterprise Security detections' },
+                    { label: 'ES Ready', value: esCompatible, accent: '#F59E0B', tip: 'CIM-compliant products ready for Enterprise Security \u2014 includes OOB detections where available' },
                 ];
                 return (
                     <div className="csc-stats-bar">

@@ -41,27 +41,15 @@ function stampProductsConf() {
   console.log(`\x1b[36m[build-stamp]\x1b[0m products.conf: version = ${versionStamp}, min_app_version = ${appVersion}`);
 }
 
-// --- Pre-build: stamp build hash in app.conf (only when version changes) ---
+// --- Pre-build: stamp build hash in app.conf (git short hash or date fallback) ---
 function stampBuildHash() {
   const appConfPath = path.join(pkgRoot, 'src/main/resources/splunk/default/app.conf');
   if (!fs.existsSync(appConfPath)) return;
 
   let conf = fs.readFileSync(appConfPath, 'utf8');
 
-  // Read current version from [id] section
-  const versionMatch = conf.match(/\[id\][\s\S]*?version\s*=\s*(\S+)/m);
-  const currentVersion = versionMatch ? versionMatch[1].trim() : null;
-
-  // Read stored version from build field comment (we embed it as "hash # version")
-  const buildMatch = conf.match(/^build\s*=\s*(\S+)(?:\s*#\s*v(.+))?$/m);
+  const buildMatch = conf.match(/^build\s*=\s*(\S+)/m);
   const oldHash = buildMatch ? buildMatch[1].trim() : null;
-  const stampedVersion = buildMatch && buildMatch[2] ? buildMatch[2].trim() : null;
-
-  // Only re-stamp if the version changed (i.e. a release build)
-  if (stampedVersion === currentVersion) {
-    console.log(`\x1b[36m[build-stamp]\x1b[0m build = ${oldHash} (version ${currentVersion} unchanged, skipping)`);
-    return;
-  }
 
   let buildHash;
   try {
@@ -75,9 +63,14 @@ function stampBuildHash() {
     buildHash = parseInt(stamp, 10).toString(16).slice(0, 8);
   }
 
-  conf = conf.replace(/^build\s*=\s*.+$/m, `build = ${buildHash} # v${currentVersion}`);
+  if (buildHash === oldHash) {
+    console.log(`\x1b[36m[build-stamp]\x1b[0m build = ${oldHash} (unchanged, skipping)`);
+    return;
+  }
+
+  conf = conf.replace(/^build\s*=\s*.+$/m, `build = ${buildHash}`);
   fs.writeFileSync(appConfPath, conf, 'utf8');
-  console.log(`\x1b[36m[build-stamp]\x1b[0m build = ${buildHash} (version bumped to ${currentVersion})`);
+  console.log(`\x1b[36m[build-stamp]\x1b[0m build = ${buildHash}`);
 }
 
 // --- Post-build: clear Splunk cache & refresh UI ---
