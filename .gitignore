@@ -26,7 +26,7 @@ __pycache__/
 
 # === Backups & docs (local reference, not tracked) ===
 backups/
-docs/
+/docs/
 
 # === Cisco brand assets (large binaries, reference only) ===
 /cisco
