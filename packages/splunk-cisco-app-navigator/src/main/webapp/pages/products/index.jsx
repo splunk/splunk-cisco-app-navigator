@@ -7842,17 +7842,17 @@ function SCANProductsPage() {
         detect();
     }, [products, loading]);
 
-    // ── Indexer tier detection — check add-on deployment across peer indexers ──
-    // Skipped on Splunk Cloud: the platform auto-deploys SHC apps to the indexer
-    // tier, so querying indexers is redundant and REST may be blocked.
-    // Set indexerApps to {} ("no separate tier") so downstream logic shows only
-    // the Search Head chip instead of a perpetual "loading" state.
+    // ── Indexer tier detection — unified across all platforms ──
+    // Runs on Enterprise standalone, distributed, AND Splunk Cloud.
+    // The subsearch requires both "indexer" AND "search_peer" server roles:
+    //   Standalone → local server lacks search_peer → {} → SH-only chip
+    //   Distributed → indexers have search_peer → full detection → SH + IDX chips
+    //   Cloud → if peers visible, shows indexer status; if REST blocked, null → {} fallback
     useEffect(() => {
         if (loading) return;
-        if (platformType === 'cloud') { setIndexerApps({}); return; }
         const detect = async () => {
             const result = await detectIndexerTierApps();
-            if (result !== null) setIndexerApps(result);
+            setIndexerApps(result !== null ? result : {});
         };
         detect();
     }, [loading, platformType]);

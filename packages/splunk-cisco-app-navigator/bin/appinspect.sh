@@ -57,18 +57,31 @@ if ! command -v splunk-appinspect &>/dev/null; then
   exit 1
 fi
 
+JSON_REPORT="${DIST_DIR}/${APP_NAME}-${VERSION}-appinspect.json"
+HTML_REPORT="${DIST_DIR}/${APP_NAME}-${VERSION}-appinspect.html"
+
+set +e
 splunk-appinspect inspect "$PKG_PATH" \
   --mode precert \
   --included-tags cloud \
-  --output-file "${DIST_DIR}/${APP_NAME}-${VERSION}-appinspect.json" \
+  --output-file "$JSON_REPORT" \
   2>&1
-
 EXIT_CODE=$?
+set -e
+
+# ── Generate HTML report from JSON ──
+if [[ -f "$JSON_REPORT" ]]; then
+  echo "── Generating HTML report..."
+  python3 "${SCRIPT_DIR}/appinspect_html_report.py" "$JSON_REPORT" "$HTML_REPORT"
+  echo "  HTML: ${HTML_REPORT}"
+fi
+
 echo ""
 if [[ $EXIT_CODE -eq 0 ]]; then
   echo "✓ AppInspect passed"
 else
   echo "✗ AppInspect found issues (exit code ${EXIT_CODE})"
-  echo "  Report: ${DIST_DIR}/${APP_NAME}-${VERSION}-appinspect.json"
 fi
+echo "  JSON: ${JSON_REPORT}"
+echo "  HTML: ${HTML_REPORT}"
 exit $EXIT_CODE
