@@ -41,37 +41,36 @@ function stampProductsConf() {
   console.log(`\x1b[36m[build-stamp]\x1b[0m products.conf: version = ${versionStamp}, min_app_version = ${appVersion}`);
 }
 
-// --- Pre-build: stamp build hash in app.conf ---
+// --- Pre-build: stamp build hash in app.conf (git short hash or date fallback) ---
 function stampBuildHash() {
   const appConfPath = path.join(pkgRoot, 'src/main/resources/splunk/default/app.conf');
   if (!fs.existsSync(appConfPath)) return;
 
-  // Try git short hash first (matches existing format like 0689691d)
+  let conf = fs.readFileSync(appConfPath, 'utf8');
+
+  const buildMatch = conf.match(/^build\s*=\s*(\S+)/m);
+  const oldHash = buildMatch ? buildMatch[1].trim() : null;
+
   let buildHash;
   try {
     buildHash = execSync('git rev-parse --short=8 HEAD', { cwd: pkgRoot, stdio: 'pipe' })
       .toString()
       .trim();
   } catch (_) {
-    // Fallback: date-based hex stamp (YYYYMMDD as hex-like 8 chars)
     const now = new Date();
     const pad = (n) => String(n).padStart(2, '0');
     const stamp = `${now.getFullYear()}${pad(now.getMonth() + 1)}${pad(now.getDate())}`;
     buildHash = parseInt(stamp, 10).toString(16).slice(0, 8);
   }
 
-  let conf = fs.readFileSync(appConfPath, 'utf8');
-  const oldMatch = conf.match(/^build\s*=\s*(.+)$/m);
-  const oldHash = oldMatch ? oldMatch[1].trim() : null;
-
-  if (oldHash === buildHash) {
-    console.log(`\x1b[36m[build-stamp]\x1b[0m build = ${buildHash} (unchanged)`);
+  if (buildHash === oldHash) {
+    console.log(`\x1b[36m[build-stamp]\x1b[0m build = ${oldHash} (unchanged, skipping)`);
     return;
   }
 
   conf = conf.replace(/^build\s*=\s*.+$/m, `build = ${buildHash}`);
   fs.writeFileSync(appConfPath, conf, 'utf8');
-  console.log(`\x1b[36m[build-stamp]\x1b[0m build = ${buildHash}` + (oldHash ? ` (was ${oldHash})` : ''));
+  console.log(`\x1b[36m[build-stamp]\x1b[0m build = ${buildHash}`);
 }
 
 // --- Post-build: clear Splunk cache & refresh UI ---
@@ -82,15 +81,20 @@ function postBuildRefresh() {
   const adminPass = process.env.SPLUNK_PASS || 'changeme';
   const splunkPort = process.env.SPLUNK_MGMT_PORT || '8089';
 
-  // 1. Clear UI cache files
+  // 1. Clear UI cache files (i18n and static asset cache)
   try {
     const cachePattern = path.join(cacheDir, 'products*.cache');
     const cacheFiles = glob.sync(cachePattern);
     if (cacheFiles.length > 0) {
       cacheFiles.forEach((f) => fs.unlinkSync(f));
-      console.log(`\x1b[36m[post-build]\x1b[0m Cleared ${cacheFiles.length} cache file(s)`);
+      console.log(`\x1b[36m[post-build]\x1b[0m Cleared ${cacheFiles.length} i18n cache file(s)`);
+    }
+    const staticCacheDir = path.join(splunkHome, 'var/run/splunk/appserver/static');
+    if (fs.existsSync(staticCacheDir)) {
+      fs.rmSync(staticCacheDir, { recursive: true, force: true });
+      console.log(`\x1b[36m[post-build]\x1b[0m Cleared static asset cache`);
     } else {
-      console.log('\x1b[36m[post-build]\x1b[0m No cache files to clear');
+      console.log('\x1b[36m[post-build]\x1b[0m No static cache to clear');
     }
   } catch (err) {
     console.warn(`\x1b[33m[post-build]\x1b[0m Could not clear cache: ${err.message}`);
@@ -135,10 +139,11 @@ if (cmd === 'build') {
     console.error('generate-catalog failed');
     process.exit(genResult.status || 1);
   }
-  // 2. Run webpack
-  const r = spawnSync('npx', ['webpack', '--config', path.join(pkgRoot, 'webpack.config.js')], {
+  // 2. Run webpack (suppress npm config warnings, Babel deopt notice, and verbose asset output)
+  const r = spawnSync('npx', ['--loglevel=error', 'webpack', '--config', path.join(pkgRoot, 'webpack.config.js')], {
     stdio: 'inherit',
     cwd: pkgRoot,
+    env: { ...process.env, NPM_CONFIG_LOGLEVEL: 'error', BABEL_COMPACT: 'true' },
   });
   if (r.status !== 0) {
     process.exit(r.status != null ? r.status : 1);

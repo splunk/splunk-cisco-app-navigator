@@ -1,5 +1,39 @@
 # Change Log
 
+1.0.5 — March 21, 2026
+-------
+
+### Product Catalog Expansion (79 → 93)
+* **93 total products** — Added 7 new product cards: Cisco Secure Client (AnyConnect), Cisco Secure Cloud Analytics, Cisco Attack Surface Management, Cisco BroadWorks, Cisco UCCX, Cisco Crosswork NSO, Cisco HyperFlex.
+* **Security:** 43 products (was 39). **Networking:** 35 (was 31). **Collaboration:** 12 (was 6). **Observability:** 3.
+* **19 subcategories** — Added `meetings_calling`, `voice_telephony`, `contact_center`, `threat_intelligence`, `digital_experience`, `application_monitoring`.
+* **725+ search keywords** — Expanded from 408 across all 93 products.
+
+### Splunkbase Sourcetype Audit & Fixes
+* **Meraki card** — `[cisco_meraki]` was pointing to Catalyst TA (7538) which has zero Meraki sourcetypes. Swapped to `Splunk_TA_cisco_meraki` (5580); removed 5580 from `legacy_uids`; added 2 missing sourcetypes (`devicesavailabilities`, `devicesuplinkslossandlatency`).
+* **ThousandEyes card** — Removed self-referencing `addon_uid` 7719 from `legacy_uids`; added `app_viz` pointing to Enterprise Networking App (7539) which has ThousandEyes dashboards.
+* **Isovalent cards** — Fixed sourcetype casing: `processConnect` → `processconnect`, `processExec` → `processexec` (both `[cisco_isovalent]` and `[cisco_isovalent_edge_processor]`).
+* **Intersight card** — Added 5 missing sourcetypes from TA: `contract`, `fabric`, `license`, `network`, `target`.
+* **Full cross-validation** — Validated all 93 products' sourcetypes against Splunkbase CSV and on-disk TA configs. Identified and documented Secure Access ecosystem split (Q5), Splunkbase metadata gaps (transforms/inputs not registered), and 8 unreferenced Cisco apps.
+
+### "Integration Needed" Section
+* **Renamed** "Unsupported Products" → "Integration Needed" for clarity.
+* **Coming Soon treatment** — Cards in Integration Needed render identically to GTM Roadmap cards: no "+ Add" button, no sourcetype warnings, "Coming Soon" badge displayed.
+* **Gated behind devMode/gtmMode** — Section only visible when internal content is enabled.
+* **Counter fix** — Products with `support_level = not_supported` are excluded from the header counter and category pill counts when the Integration Needed section is hidden, preventing phantom product counts (e.g., "53 products" shown but only 47 visible).
+* **"No Integration" filter pill** — Gated behind `showInternalContent` in the FilterDrawer so non-dev users cannot filter for invisible products.
+
+### Dark Mode Fixes
+* **Warning banner styling** — Fixed dark mode styling for "Integration Needed" and "Deprecated Products" warning banners. Replaced hardcoded colors with theme-aware CSS variables (`--status-warning-bg`, `--status-warning-border`, `--text-primary`).
+
+### Catalog Metadata
+* **`date_created` / `date_updated`** — New fields added to all 93 product stanzas, populated from git history.
+* **products.conf.spec** — Updated with `date_created` and `date_updated` field documentation.
+
+### Documentation
+* **`docs/OPEN_QUESTIONS.md`** — Created structured question tracker for pending decisions (Colin, Alec, Salah). Expanded with Q5 (Secure Access split), Q6 (Catalyst TA ThousandEyes claims), Q7 (Spaces Add-on), and full audit summary.
+* Updated CHANGELOG.md, all README.md files, copilot-instructions.md with current v1.0.5 stats (93 products, 8772 LOC index.jsx, 7165 LOC CSS, 42 saved searches).
+
 1.0.4 — March 2, 2026
 -------
 
