@@ -9,11 +9,11 @@ Product Catalog UI — the single entry point for all Cisco-Splunk integrations.
 It catalogs **93 Cisco products**, maps each to the correct Splunk add-on,
 validates data flow, detects legacy debt, and provides one-click install and
 launch actions. Each product card displays Cisco brand SVG icons (97 icons),
-AI/SOAR/ITSI/Alert/ES badges, SC4S documentation links, Splunkbase compatibility
-filters, platform-aware best practices, and a **Props.conf Audit (Magic Eight)**
-for ingestion health. The app also includes an **Ecosystem Intelligence**
-dashboard for portfolio analytics, **Indexer Tier detection** for deployment
-validation, and a **Catalog Vault** for disabled products.
+SOAR/SecOps/ITOps/Alert/ES badges, SC4S documentation links, Splunkbase
+compatibility filters, platform-aware best practices, and a **Props.conf Audit
+(Magic Eight)** for ingestion health. The app also includes an **Ecosystem
+Intelligence** dashboard for portfolio analytics, **Indexer Tier detection** for
+deployment validation, and a **Catalog Vault** for disabled products.
 
 ---
 
@@ -24,26 +24,30 @@ splunk-cisco-app-navigator/
 ├── lerna.json
 ├── package.json
 ├── README.md
-├── docs/                              # Documentation & presentations
-│   ├── SCAN_Architecture_Guide.md     # Comprehensive A-Z guide
+├── docs/                              # Local-only docs (gitignored)
+│   ├── OPEN_QUESTIONS.md              # Pending decisions tracker
 │   ├── The_Magic_Eight.md             # Props.conf ingestion health guide
-│   └── OPEN_QUESTIONS.md              # Pending decisions tracker
-├── scripts/                           # Utility Python scripts
-├── backups/                           # Organized backup archive
+│   └── slides/                        # Presentation decks
 └── packages/
     └── splunk-cisco-app-navigator/    # Main Splunk app package
         ├── bin/                       # Build & packaging scripts
         │   ├── build.js               # Build orchestrator
         │   ├── generate-catalog.js    # products.conf → JS module
         │   ├── clean_build.sh         # Clean build script
-        │   └── package_app.sh         # Splunkbase packager
+        │   ├── package_app.sh         # Splunkbase packager
+        │   ├── appinspect.sh          # AppInspect automation
+        │   └── appinspect_html_report.py  # HTML report generator
+        ├── docs/                      # Tracked documentation
+        │   ├── SCAN_Architecture_Guide.md  # Comprehensive A-Z guide
+        │   ├── SCAN_User_Manual.md    # End-user manual
+        │   └── DECISIONS.md           # Design decisions log
         ├── webpack.config.js
         ├── CHANGELOG.md
         ├── src/main/
         │   ├── resources/splunk/
         │   │   ├── default/
         │   │   │   ├── app.conf       # Version 1.0.21
-        │   │   │   ├── products.conf  # 93 products (~3250 lines)
+        │   │   │   ├── products.conf  # 93 products (~3378 lines)
         │   │   │   ├── savedsearches.conf  # 42 saved searches
         │   │   │   ├── props.conf     # Sourcetype + field extractions
         │   │   │   ├── transforms.conf    # Lookup definitions
@@ -53,13 +57,13 @@ splunk-cisco-app-navigator/
         │   │   │   ├── download_splunkbase_csv.py  # Custom command
         │   │   │   └── splunklib/     # Bundled splunklib 2.1.1
         │   │   ├── appserver/static/
-        │   │   │   ├── products.css   # ~7165 lines (incl. dark mode)
+        │   │   │   ├── products.css   # ~7652 lines (incl. dark mode)
         │   │   │   ├── icons/         # 97 Cisco brand icons
         │   │   │   └── fonts/         # CiscoSansTT
         │   │   ├── lookups/           # Splunkbase CSV catalog
         │   │   └── README/products.conf.spec
         │   └── webapp/pages/products/
-        │       ├── index.jsx          # ~8772 lines (React UI)
+        │       ├── index.jsx          # ~9280 lines (React UI)
         │       └── productCatalog.generated.js
         └── stage/                     # Build output
 ```
@@ -89,14 +93,13 @@ curl -sk -u admin:changeme \
 | Feature | Description |
 |---|---|
 | **93 Product Cards** | Security (43), Networking (35), Observability (3), Collaboration (12) |
-| **Product Status** | 47 active, 30 roadmap, 3 deprecated, 2 under development, 11 retired |
-| **Support Levels** | 36 Cisco, 9 Splunk, 5 Developer, 1 Community, 42 Not Supported |
+| **Product Status** | 48 active, 22 roadmap, 3 deprecated, 2 under development, 11 retired, 7 archived |
+| **Support Levels** | 36 Cisco, 9 Splunk, 6 Developer, 1 Community, 41 Not Supported |
 | **97 Cisco Brand Icons** | SVGs with light/dark variants |
-| **Cross-Cutting Badges** | SOAR (12), ITSI (6), Alert Actions (4), AI-Powered (17), ES (25) |
-| **SC4S Integration** | 18 products with SC4S documentation links |
-| **293+ Unique Sourcetypes** | Data flow detection via `metadata` search |
+| **Cross-Cutting Badges** | SOAR (11), SecOps (ES) (34), ITOps (5), Alert Actions (8), SC4S (17) |
+| **SC4S Integration** | 17 products with SC4S documentation links |
+| **303 Unique Sourcetypes** | Data flow detection via `metadata` search |
 | **19 Subcategories** | Granular filtering within Security, Networking, Collaboration, Observability |
-| **Secure Networking GTM** | 71 products tagged for go-to-market strategy |
 | **Dark/Light/Auto Theme** | Three-state toggle with frosted glass card icons and theme-aware banners |
 | **Props.conf Audit (Magic Eight)** | Per-product ingestion health check with tier version audit |
 | **Indexer Tier Detection** | Validates add-on deployment across SH and indexer tiers |
@@ -119,11 +122,11 @@ curl -sk -u admin:changeme \
 
 | Component | Version |
 |---|---|
-| React | 16.14.0 |
+| React | 18.3.1 |
 | @splunk/react-ui | 5.8.0 |
 | @splunk/themes | 1.5.0 |
 | @splunk/splunk-utils | 3.4.0 |
-| Webpack | 5.105.2 |
+| Webpack | 5.105.4 |
 | Simple XML | 1.1 |
 
 ## Cisco Brand Assets
@@ -142,9 +145,8 @@ The icons actually used in the app are already committed in
 
 ## Documentation
 
-- [Architecture Guide](docs/SCAN_Architecture_Guide.md) — comprehensive A-Z documentation
-- [The Magic Eight](docs/The_Magic_Eight.md) — props.conf ingestion health check guide
-- [Open Questions](docs/OPEN_QUESTIONS.md) — pending decisions tracker
-- [Package README](packages/splunk-cisco-app-navigator/README.md)
+- [Architecture Guide](packages/splunk-cisco-app-navigator/docs/SCAN_Architecture_Guide.md) — comprehensive A-Z documentation
+- [User Manual](packages/splunk-cisco-app-navigator/docs/SCAN_User_Manual.md) — end-user guide
+- [Design Decisions](packages/splunk-cisco-app-navigator/docs/DECISIONS.md) — design decisions log
 - [Changelog](packages/splunk-cisco-app-navigator/CHANGELOG.md)
 - [Copilot Instructions](.github/copilot-instructions.md) — full technical context
