@@ -1,8 +1,8 @@
 # Splunk Cisco App Navigator (SCAN)
 
 **Codename:** "The Front Door"
-**Version:** 1.0.19
-**Author:** Cisco Systems / Splunk
+**Version:** 1.0.21
+**Author:** Amir (AK) Khamis
 
 The **Splunk Cisco App Navigator** is a Splunkbase app that provides a unified
 Product Catalog UI — the single entry point for all Cisco-Splunk integrations.
@@ -42,7 +42,7 @@ splunk-cisco-app-navigator/
         ├── src/main/
         │   ├── resources/splunk/
         │   │   ├── default/
-        │   │   │   ├── app.conf       # Version 1.0.19
+        │   │   │   ├── app.conf       # Version 1.0.21
         │   │   │   ├── products.conf  # 93 products (~3250 lines)
         │   │   │   ├── savedsearches.conf  # 42 saved searches
         │   │   │   ├── props.conf     # Sourcetype + field extractions
