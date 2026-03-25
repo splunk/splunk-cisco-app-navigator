@@ -2,7 +2,7 @@
 
 **Codename:** "The Front Door"
 **Version:** 1.0.21
-**Author:** Amir (AK) Khamis
+**Author:** Amir (AK) Khamis & Alec Chamberlain
 
 The **Splunk Cisco App Navigator** is a Splunkbase app that provides a unified
 Product Catalog UI — the single entry point for all Cisco-Splunk integrations.
