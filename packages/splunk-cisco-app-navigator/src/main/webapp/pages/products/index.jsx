@@ -6189,6 +6189,7 @@ function UniversalFinderBar({ onSearch, resultCount, totalCount, products, exter
     const [query, setQuery] = useState('');
     const [focused, setFocused] = useState(false);
     const [selectedIdx, setSelectedIdx] = useState(-1);
+    const debounceRef = useRef(null);
 
     // Allow parent to clear the query (e.g. after devmode intercept)
     useEffect(() => {
@@ -6196,6 +6197,9 @@ function UniversalFinderBar({ onSearch, resultCount, totalCount, products, exter
             setQuery(externalQuery);
         }
     }, [externalQuery]);
+
+    // Cleanup debounce timer on unmount
+    useEffect(() => () => { if (debounceRef.current) clearTimeout(debounceRef.current); }, []);
 
     const keywordMap = useMemo(() => {
         const map = {};
@@ -6233,9 +6237,25 @@ function UniversalFinderBar({ onSearch, resultCount, totalCount, products, exter
     // Reset selected index when suggestions change
     useEffect(() => { setSelectedIdx(-1); }, [suggestions.length, query]);
 
-    const handleChange = (e) => { const v = e.target.value; setQuery(v); onSearch(v); };
-    const handleSuggestionClick = (kw) => { setQuery(kw); onSearch(kw); setFocused(false); setSelectedIdx(-1); };
-    const handleClear = () => { setQuery(''); onSearch(''); setSelectedIdx(-1); };
+    const handleChange = (e) => {
+        const v = e.target.value;
+        setQuery(v);
+        if (debounceRef.current) clearTimeout(debounceRef.current);
+        debounceRef.current = setTimeout(() => onSearch(v), 250);
+    };
+    const handleSuggestionClick = (kw) => {
+        setQuery(kw);
+        if (debounceRef.current) clearTimeout(debounceRef.current);
+        onSearch(kw);
+        setFocused(false);
+        setSelectedIdx(-1);
+    };
+    const handleClear = () => {
+        setQuery('');
+        if (debounceRef.current) clearTimeout(debounceRef.current);
+        onSearch('');
+        setSelectedIdx(-1);
+    };
     const handleKeyDown = (e) => {
         if (!focused || suggestions.length === 0) return;
         if (e.key === 'ArrowDown') {
