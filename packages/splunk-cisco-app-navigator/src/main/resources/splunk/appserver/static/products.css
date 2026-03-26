@@ -3818,6 +3818,9 @@ a.csc-dep-name-link:hover {
     color: var(--color-success, #3D851C);
     border-color: #a5d6a7;
 }
+.csc-st-chip-inactive {
+    opacity: 0.55;
+}
 :root.dce-dark .csc-st-chip {
     background: var(--section-bg, #2a2a2a);
     color: var(--muted-color, #999);
@@ -3827,6 +3830,9 @@ a.csc-dep-name-link:hover {
     background: #1b3a1f;
     color: #86efac;
     border-color: #4caf50;
+}
+:root.dce-dark .csc-st-chip-inactive {
+    opacity: 0.45;
 }
 
 /* Shared sourcetype indicator on chip */

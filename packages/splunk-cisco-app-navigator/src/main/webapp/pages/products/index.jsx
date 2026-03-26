@@ -682,8 +682,8 @@ async function detectAllSourcetypeData(products) {
                 // console.log(`[SCAN] ${p.product_id}: ${stCount} sourcetype(s) matched — ${matchedSTs.join(', ')}`);
             }
             results[p.product_id] = stCount > 0
-                ? { hasData: true, eventCount, detail: `${stCount} sourcetype${stCount !== 1 ? 's' : ''} active · ${formatCount(eventCount)} events` }
-                : { hasData: false, eventCount: 0, detail: 'No data in the last 7 days' };
+                ? { hasData: true, eventCount, matchedSTs, detail: `${stCount} sourcetype${stCount !== 1 ? 's' : ''} · ~${formatCount(eventCount)} events · last 7d` }
+                : { hasData: false, eventCount: 0, matchedSTs: [], detail: 'No data in the last 7 days' };
         });
 
         const detected = Object.values(results).filter(r => r.hasData).length;
@@ -787,7 +787,7 @@ function buildSourcetypeSearchUrl(sourcetypes) {
     // Anchor regex to exact-match each sourcetype (no substring/prefix matching)
     const escaped = filtered.map(s => s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'));
     const pattern = '^(' + escaped.join('|') + ')$';
-    const spl = `| metadata type=sourcetypes index=* | where match(sourcetype, "${pattern}")`;
+    const spl = `| metadata type=sourcetypes index=* | where match(sourcetype, "${pattern}") | convert ctime(*Time) | table sourcetype recentTime firstTime lastTime totalCount | eventstats sum(totalCount) as GrandTotal | sort - totalCount`;
     return createURL(`/app/search/search?q=${encodeURIComponent(spl)}`);
 }
 
@@ -1028,10 +1028,11 @@ function IntelligenceBadges({ appStatus, vizAppStatus, vizApp2Status, sourcetype
     }
 
     if (sourcetypeInfo) {
+        const dataTooltip = 'Approximate count based on index metadata from the last 7 days. Click to open in Search for exact figures.';
         if (sourcetypeInfo.hasData && appStatus?.installed) {
-            items.push({ cls: 'data-ok', label: `✓ Data flowing (${sourcetypeInfo.detail})`, key: 'data-ok', url: sourcetypeSearchUrl });
+            items.push({ cls: 'data-ok', label: `✓ Data flowing (${sourcetypeInfo.detail})`, key: 'data-ok', url: sourcetypeSearchUrl, tooltip: dataTooltip });
         } else if (sourcetypeInfo.hasData && !appStatus?.installed) {
-            items.push({ cls: 'data-ok', label: `Data found (${sourcetypeInfo.detail})`, key: 'data-no-ta', url: sourcetypeSearchUrl });
+            items.push({ cls: 'data-ok', label: `Data found (${sourcetypeInfo.detail})`, key: 'data-no-ta', url: sourcetypeSearchUrl, tooltip: dataTooltip });
         } else if (!sourcetypeInfo.hasData && !isRoadmapCard) {
             // Roadmap/coverage_gap products have no add-on yet — don't show "No sourcetypes defined"
             items.push({ cls: 'data-none', label: sourcetypeInfo.detail || 'No data (7d)', key: 'data-none', url: sourcetypeSearchUrl });
@@ -1042,7 +1043,7 @@ function IntelligenceBadges({ appStatus, vizAppStatus, vizApp2Status, sourcetype
     return (
         <div className="csc-intelligence-badges">
             {items.map(b => (
-                <span key={b.key} className={`csc-badge-item csc-badge-${b.cls}`}>
+                <span key={b.key} className={`csc-badge-item csc-badge-${b.cls}`} title={b.tooltip || ''}>
                     {b.url ? (
                         <a href={b.url} target="_blank" rel="noopener noreferrer" className="csc-badge-link" onClick={e => e.stopPropagation()}>
                             {b.label}
@@ -2214,8 +2215,8 @@ function MagicEightModal({ open, onClose, sourcetypes, productName, addonApp, ad
                                         href={`/app/search/search?q=${encodeURIComponent(
                                             '| rest splunk_server=* /servicesNS/-/-/apps/local f=title f=version f=disabled count=0'
                                             + ` | search title IN (${tierRows.map(r => `"${r.id}"`).join(', ')})`
+                                            + ' | join splunk_server [| rest splunk_server=* /services/server/info f=server_roles | where match(server_roles, "search_head|indexer") | fields splunk_server server_roles]'
                                             + ' | eval server_roles=mvjoin(server_roles, ", ")'
-                                            + ' | join splunk_server [| rest splunk_server=* /services/server/info f=server_roles]'
                                             + ' | fields splunk_server server_roles title version disabled'
                                             + ' | sort server_roles title'
                                         )}`}
@@ -2229,6 +2230,16 @@ function MagicEightModal({ open, onClose, sourcetypes, productName, addonApp, ad
                             </div>
                         );
                     })()}
+                    {tierRows.length === 0 && addonApp && (
+                        <div style={{ marginBottom: '14px', padding: '10px 14px', borderLeft: '3px solid var(--color-warning, #FF9000)', borderRadius: '6px', background: 'var(--bg-primary, #f8f9fb)', fontSize: '12px' }}>
+                            <div style={{ fontWeight: 700, fontSize: '12px', marginBottom: '4px', color: 'var(--text-primary, #1a2029)' }}>
+                                Add-on not installed
+                            </div>
+                            <div style={{ color: 'var(--text-secondary, #536070)', lineHeight: 1.5 }}>
+                                <strong>{addonLabel || addonApp}</strong> is not installed on this search head. Install it to enable index-time parsing (props.conf, transforms.conf) and search-time field extractions for this product's sourcetypes.
+                            </div>
+                        </div>
+                    )}
 
                     <div className="csc-sc4s-info-hero">
                         <div className="csc-sc4s-info-hero-text">
@@ -2465,7 +2476,13 @@ function MagicEightModal({ open, onClose, sourcetypes, productName, addonApp, ad
                         <Button
                             appearance="secondary"
                             label="Open in Search"
-                            onClick={() => window.open(createURL(`/app/${APP_ID}/search?q=${encodeURIComponent(searchSpl)}`), '_blank')}
+                            onClick={() => {
+                                const stFilter = sourcetypes && sourcetypes.length > 0
+                                    ? sourcetypes.map(s => `"${s}"`).join(', ')
+                                    : null;
+                                const savedSearchSpl = `| savedsearch "SCAN - Magic Eight Audit" scope="environment"${stFilter ? ` | search Sourcetype IN (${stFilter})` : ''}`;
+                                window.open(createURL(`/app/${APP_ID}/search?q=${encodeURIComponent(savedSearchSpl)}`), '_blank');
+                            }}
                             style={{ marginRight: 'auto' }}
                         />
                     )}
@@ -3829,7 +3846,7 @@ function ProductCard({ product, installedApps, appStatuses, indexerApps, sourcet
         if (sts.length > 0) {
             const escaped = sts.map(s => s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'));
             const pattern = '^(' + escaped.join('|') + ')$';
-            const spl = `| metadata type=sourcetypes index=* | where match(sourcetype, "${pattern}") | table sourcetype totalCount lastTime | sort -totalCount`;
+            const spl = `| metadata type=sourcetypes index=* | where match(sourcetype, "${pattern}") | convert ctime(*Time) | table sourcetype recentTime firstTime lastTime totalCount | eventstats sum(totalCount) as GrandTotal | sort - totalCount`;
             window.open(createURL(`/app/search/search?q=${encodeURIComponent(spl)}`), '_blank');
         } else {
             window.open(createURL('/app/search/search'), '_blank');
@@ -4103,7 +4120,7 @@ function ProductCard({ product, installedApps, appStatuses, indexerApps, sourcet
                                     {depItems.length > 1 && <span className="csc-card-meta-sep"> · </span>}
                                     <span className={sourcetypeInfo?.hasData ? 'csc-dep-inline-ok' : 'csc-dep-inline-miss'}>
                                         {sourcetypeInfo?.hasData
-                                            ? `${product.sourcetypes.length} sourcetype${product.sourcetypes.length !== 1 ? 's' : ''} active`
+                                            ? `${sourcetypeInfo.matchedSTs?.length || 0} of ${product.sourcetypes.length} sourcetype${product.sourcetypes.length !== 1 ? 's' : ''} active`
                                             : `${product.sourcetypes.length} sourcetype${product.sourcetypes.length !== 1 ? 's' : ''}`}
                                     </span>
                                 </>
@@ -4574,11 +4591,12 @@ function ProductCard({ product, installedApps, appStatuses, indexerApps, sourcet
                                             {product.sourcetypes.map(st => {
                                                 const peers = sharedSourcetypeMap && sharedSourcetypeMap[st];
                                                 const isShared = peers && peers.length > 1;
+                                                const hasFlow = sourcetypeInfo?.matchedSTs?.includes(st);
                                                 return (
                                                     <span
                                                         key={st}
-                                                        className={`csc-st-chip ${sourcetypeInfo?.hasData ? 'csc-st-chip-active' : ''} ${isShared ? 'csc-st-chip-shared' : ''}`}
-                                                        title={isShared ? `${st} — shared with ${peers.filter(x => x.product_id !== product.product_id).map(x => x.display_name).join(', ')}` : st}
+                                                        className={`csc-st-chip ${hasFlow ? 'csc-st-chip-active' : 'csc-st-chip-inactive'} ${isShared ? 'csc-st-chip-shared' : ''}`}
+                                                        title={`${st}${hasFlow ? '' : ' — no data in last 7d'}${isShared ? ` — shared with ${peers.filter(x => x.product_id !== product.product_id).map(x => x.display_name).join(', ')}` : ''}`}
                                                     >{st}{isShared && <span className="csc-st-shared-badge" title="Shared sourcetype">⇄</span>}</span>
                                                 );
                                             })}
