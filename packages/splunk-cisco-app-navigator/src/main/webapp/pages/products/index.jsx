@@ -12,13 +12,16 @@
  *   • Whether the expected sourcetypes are already arriving
  *   • Platform-aware best-practice guidance (Cloud vs Enterprise)
  *
- * Five sections:
- *   1. Configured Products    — products the admin has added to their workspace
- *   2. Available Products     — active products ready to configure
- *   3. Unsupported Products   — products with no official support (not_supported)
- *   4. Coming Soon            — products under development
- *   5. Deprecated / Archived  — archived products no longer on Splunkbase
- *   6. GTM Roadmap — Coverage Gaps — Cisco products with zero Splunk integration
+ * Nine sections (some gated behind devMode / gtmMode):
+ *   1. Configured Products       — products the admin has added to their workspace
+ *   2. Available Products        — active products ready to configure
+ *   3. Integration Needed        — not_supported products; no Splunk TA exists (dev/GTM only)
+ *   4. Coming Soon               — status = under_development (dev/GTM only)
+ *   5. Deprecated Products       — add-on sunset or replaced by a newer TA
+ *   6. Retired Products          — Cisco product itself is end-of-life
+ *   7. GTM Roadmap — Coverage Gaps — coverage_gap products without any integration (dev/GTM only)
+ *   8. Custom Products           — customer-created cards from local/products.conf
+ *   9. Catalog Vault             — disabled/archived products (vault toggle in FilterDrawer)
  *
  * All product metadata lives in products.conf.  A static PRODUCT_CATALOG
  * array mirrors that file so cards always render even outside Splunk.
@@ -41,6 +44,12 @@ import External from '@splunk/react-icons/ArrowSquareTopRight';
 import Clipboard from '@splunk/react-icons/Clipboard';
 import Code from '@splunk/react-icons/Script';
 import Search from '@splunk/react-icons/Magnifier';
+import Pencil from '@splunk/react-icons/Pencil';
+import CloneIcon from '@splunk/react-icons/LayersDoubleTransparent';
+import TrashCan from '@splunk/react-icons/TrashCanCross';
+import ShieldIcon from '@splunk/react-icons/Shield';
+import PulseIcon from '@splunk/react-icons/Pulse';
+import LayoutIcon from '@splunk/react-icons/Layout';
 import Button from '@splunk/react-ui/Button';
 import CollapsiblePanel from '@splunk/react-ui/CollapsiblePanel';
 import WaitSpinner from '@splunk/react-ui/WaitSpinner';
@@ -59,7 +68,7 @@ const SEARCH_ENDPOINT = '/splunkd/__raw/services/search/jobs';
 const CONFIGURED_STORAGE_KEY = 'scan_configured_products';
 const THEME_STORAGE_KEY = 'scan_theme_preference'; // 'light' | 'dark' | 'auto'
 const PORTFOLIO_STORAGE_KEY = 'scan_show_full_portfolio'; // 'true' | 'false'
-// devMode and gtmMode are session-only (no localStorage) — hard refresh resets to normal
+const DEVMODE_STORAGE_KEY = 'scan_devmode'; // 'true' | absent
 const PERSONA_STORAGE_KEY = 'scan_persona_shown'; // 'true' once persona modal dismissed
 const FILTERS_STORAGE_KEY = 'scan_filter_state';
 const PANELS_STORAGE_KEY = 'scan_panel_state';
@@ -73,6 +82,7 @@ const DEFAULT_PANEL_STATE = {
     deprecated_products: false,
     retired_products: false,
     gtm_coverage_gaps: false,
+    custom_products: true,
     vault_products: true,
 };
 const SUPPORTED_LEVELS = new Set(['cisco_supported', 'splunk_supported']);
@@ -180,6 +190,7 @@ const SUB_CATEGORIES = {
     collaboration: [
         { id: 'meetings_calling', name: 'Meetings & Calling', icon: '' },
         { id: 'voice_telephony', name: 'Voice & Telephony', icon: '' },
+        { id: 'contact_center', name: 'Contact Center', icon: '' },
     ],
 };
 
@@ -231,11 +242,11 @@ function getSavedFilters() {
     try {
         const raw = localStorage.getItem(FILTERS_STORAGE_KEY);
         return raw ? JSON.parse(raw) : {};
-    } catch { return {}; }
+    } catch (_e) { return {}; }
 }
 function saveFilters(state) {
     try { localStorage.setItem(FILTERS_STORAGE_KEY, JSON.stringify(state)); }
-    catch { /* quota */ }
+    catch (_e) { /* quota */ }
 }
 const _savedFilters = getSavedFilters();
 
@@ -243,11 +254,11 @@ function getSavedPanelState() {
     try {
         const raw = localStorage.getItem(PANELS_STORAGE_KEY);
         return raw ? JSON.parse(raw) : {};
-    } catch { return {}; }
+    } catch (_e) { return {}; }
 }
 function savePanelState(state) {
     try { localStorage.setItem(PANELS_STORAGE_KEY, JSON.stringify(state)); }
-    catch { /* quota */ }
+    catch (_e) { /* quota */ }
 }
 
 function splunkFetch(url, options = {}) {
@@ -502,6 +513,14 @@ async function loadProductsFromConf() {
             escu_analytic_stories: csvToArray(c.escu_analytic_stories),
             escu_detection_count: parseInt(c.escu_detection_count || '0', 10),
             escu_detections: csvToArray(c.escu_detections),
+            sse_content: c.sse_content === 'true' || c.sse_content === '1' || c.sse_content === true,
+            sse_use_cases: csvToArray(c.sse_use_cases),
+            sse_use_case_count: parseInt(c.sse_use_case_count || '0', 10),
+            sse_data_sources: csvToArray(c.sse_data_sources),
+            ite_learn_content: c.ite_learn_content === 'true' || c.ite_learn_content === '1' || c.ite_learn_content === true,
+            ite_learn_procedures: csvToArray(c.ite_learn_procedures),
+            ite_learn_procedure_count: parseInt(c.ite_learn_procedure_count || '0', 10),
+            custom: c.custom === 'true' || c.custom === '1' || c.custom === true,
             catalog_disabled: isDisabled,
         };
     }).sort((a, b) => a.sort_order - b.sort_order || a.display_name.localeCompare(b.display_name))
@@ -512,10 +531,10 @@ async function loadProductsFromConf() {
  * Check a single Splunk app: installed? version? update available?
  */
 async function checkAppStatus(appId) {
-    if (!appId) return { installed: false, version: null, updateVersion: null, disabled: false };
+    if (!appId) return { installed: false, version: null, updateVersion: null, disabled: false, visible: false };
     try {
         const res = await splunkFetch(`${APPS_LOCAL_ENDPOINT}/${encodeURIComponent(appId)}?output_mode=json`);
-        if (!res.ok) return { installed: false, version: null, updateVersion: null, disabled: false };
+        if (!res.ok) return { installed: false, version: null, updateVersion: null, disabled: false, visible: false };
         const data = await res.json();
         const c = data.entry?.[0]?.content || {};
         return {
@@ -523,9 +542,10 @@ async function checkAppStatus(appId) {
             version: c.version || null,
             updateVersion: c['update.version'] || null,
             disabled: c.disabled === true || c.disabled === 'true',
+            visible: c.visible === true || c.visible === 'true',
         };
     } catch (e) {
-        return { installed: false, version: null, updateVersion: null, disabled: false };
+        return { installed: false, version: null, updateVersion: null, disabled: false, visible: false };
     }
 }
 
@@ -538,6 +558,41 @@ function formatCount(n) {
     if (n >= 1e6) return (n / 1e6).toFixed(1).replace(/\.0$/, '') + 'M';
     if (n >= 1e3) return (n / 1e3).toFixed(1).replace(/\.0$/, '') + 'K';
     return String(n);
+}
+
+/**
+ * Collect every Splunkbase UID referenced by any product in the catalog.
+ * Returns a de-duplicated sorted array of UID strings suitable for an
+ * | inputlookup ... | search uid IN (...) filter.
+ */
+function collectReferencedUids(productList) {
+    const uids = new Set();
+    for (const p of productList) {
+        if (p.addon_splunkbase_uid) uids.add(String(p.addon_splunkbase_uid));
+        if (p.app_viz_splunkbase_uid) uids.add(String(p.app_viz_splunkbase_uid));
+        if (p.app_viz_2_splunkbase_uid) uids.add(String(p.app_viz_2_splunkbase_uid));
+        if (p.sc4s_search_head_ta_splunkbase_id) uids.add(String(p.sc4s_search_head_ta_splunkbase_id));
+        if (p.netflow_addon_splunkbase_id) uids.add(String(p.netflow_addon_splunkbase_id));
+        (p.legacy_uids || []).forEach(u => { if (u) uids.add(String(u)); });
+        (p.community_uids || []).forEach(u => { if (u) uids.add(String(u)); });
+        (p.alert_action_uids || []).forEach(u => { if (u) uids.add(String(u)); });
+        (p.soar_connector_uids || []).forEach(u => { if (u) uids.add(String(u)); });
+    }
+    uids.delete('');
+    return [...uids].sort();
+}
+
+/**
+ * Build a scoped inputlookup SPL string that only returns rows matching
+ * the UIDs referenced by the current product catalog.  Uses the where
+ * clause so filtering happens during the CSV read — rows that don't
+ * match never enter the search pipeline.
+ */
+function buildSplunkbaseLookupSPL(productList) {
+    const uids = collectReferencedUids(productList);
+    if (uids.length === 0) return null;
+    const whereClause = uids.map(u => `uid=${u}`).join(' OR ');
+    return `| inputlookup scan_splunkbase_apps where ${whereClause} | fields uid appid version_compatibility product_compatibility app_version title archive_status`;
 }
 
 /**
@@ -556,7 +611,7 @@ function buildSourcetypePatterns(sourcetypes) {
  * Runs ONE search:
  *   | metadata type=sourcetypes
  *   | where lastTime > relative_time(now(), "-7d")
- *   | table sourcetype totalCount
+ *   | fields sourcetype totalCount
  *
  * No index= filter so it covers ALL indexes (including restricted ones).
  * Then matches each product's sourcetype patterns client-side.
@@ -575,7 +630,7 @@ async function detectAllSourcetypeData(products) {
     }
     // console.log(`[SCAN] Starting sourcetype detection for ${withST.length} products with sourcetypes...`);
     try {
-        const searchStr = '| metadata type=sourcetypes index=* | where lastTime > relative_time(now(), "-7d") | table sourcetype totalCount';
+        const searchStr = '| metadata type=sourcetypes index=* | where lastTime > relative_time(now(), "-7d") | fields sourcetype totalCount';
         // console.log(`[SCAN] Search: ${searchStr}`);
         const res = await splunkFetch(SEARCH_ENDPOINT, {
             method: 'POST',
@@ -627,8 +682,8 @@ async function detectAllSourcetypeData(products) {
                 // console.log(`[SCAN] ${p.product_id}: ${stCount} sourcetype(s) matched — ${matchedSTs.join(', ')}`);
             }
             results[p.product_id] = stCount > 0
-                ? { hasData: true, eventCount, detail: `${stCount} sourcetype${stCount !== 1 ? 's' : ''} active · ${formatCount(eventCount)} events` }
-                : { hasData: false, eventCount: 0, detail: 'No data in the last 7 days' };
+                ? { hasData: true, eventCount, matchedSTs, detail: `${stCount} sourcetype${stCount !== 1 ? 's' : ''} · ~${formatCount(eventCount)} events · last 7d` }
+                : { hasData: false, eventCount: 0, matchedSTs: [], detail: 'No data in the last 7 days' };
         });
 
         const detected = Object.values(results).filter(r => r.hasData).length;
@@ -659,27 +714,54 @@ async function detectAllSourcetypeData(products) {
  */
 async function detectIndexerTierApps() {
     const csrf = getCSRFToken();
-    if (!csrf) return null; // can't run without CSRF
+    if (!csrf) return null;
     try {
+        // The subsearch filters to servers that are BOTH "indexer" AND "search_peer".
+        // On standalone the local server has "indexer" but NOT "search_peer", so the
+        // subsearch returns nothing → the outer query returns nothing → {} (standalone).
+        // On distributed, indexers have both roles → full detection runs correctly.
         const spl = [
             '| rest splunk_server=* /servicesNS/-/-/apps/local f=title f=version f=disabled count=0',
-            '| search [| rest splunk_server=* /services/server/info f=server_roles | where match(server_roles, "indexer") | fields splunk_server]',
+            '| search [| rest splunk_server=* /services/server/info f=server_roles | where match(server_roles, "indexer") AND match(server_roles, "search_peer") | fields splunk_server]',
             '| eval is_disabled=if(disabled=="1" OR disabled="true", 1, 0)',
             '| stats latest(version) as idx_version max(is_disabled) as any_disabled dc(splunk_server) as idx_count by title',
             '| fields title idx_version any_disabled idx_count',
         ].join(' ');
-        const res = await splunkFetch(SEARCH_ENDPOINT, {
+
+        // Dispatch as background (normal) search — splunk_server=* should not block the foreground
+        const dispatchRes = await splunkFetch(SEARCH_ENDPOINT, {
             method: 'POST',
             headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-            body: `search=${encodeURIComponent(spl)}&output_mode=json&exec_mode=oneshot&count=0&timeout=120`,
+            body: `search=${encodeURIComponent(spl)}&output_mode=json&exec_mode=normal&count=0&timeout=120`,
         });
-        if (!res.ok) {
-            console.warn('[SCAN] Indexer tier detection failed (HTTP ' + res.status + ')');
+        if (!dispatchRes.ok) {
+            console.warn('[SCAN] Indexer tier detection dispatch failed (HTTP ' + dispatchRes.status + ')');
             return null;
         }
+        const dispatchData = await dispatchRes.json();
+        const sid = dispatchData.sid;
+        if (!sid) { console.warn('[SCAN] Indexer tier detection: no SID returned'); return null; }
+
+        // Poll for completion
+        const statusUrl = `${SEARCH_ENDPOINT}/${encodeURIComponent(sid)}?output_mode=json`;
+        const resultsUrl = `${SEARCH_ENDPOINT}/${encodeURIComponent(sid)}/results?output_mode=json&count=0`;
+        const maxWait = 120000;
+        const start = Date.now();
+        while (Date.now() - start < maxWait) {
+            await new Promise(r => setTimeout(r, 2000));
+            const statusRes = await splunkFetch(statusUrl);
+            if (!statusRes.ok) break;
+            const statusData = await statusRes.json();
+            const state = statusData.entry?.[0]?.content?.dispatchState;
+            if (state === 'DONE' || state === 'FINALIZED') break;
+            if (state === 'FAILED') { console.warn('[SCAN] Indexer tier detection search failed'); return null; }
+        }
+
+        const res = await splunkFetch(resultsUrl);
+        if (!res.ok) { console.warn('[SCAN] Indexer tier detection results failed (HTTP ' + res.status + ')'); return null; }
         const data = await res.json();
         const rows = data.results || [];
-        if (rows.length === 0) return {}; // no peer indexers found — standalone
+        if (rows.length === 0) return {};
         const lookup = {};
         rows.forEach(r => {
             lookup[r.title] = {
@@ -705,7 +787,7 @@ function buildSourcetypeSearchUrl(sourcetypes) {
     // Anchor regex to exact-match each sourcetype (no substring/prefix matching)
     const escaped = filtered.map(s => s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'));
     const pattern = '^(' + escaped.join('|') + ')$';
-    const spl = `| metadata type=sourcetypes index=* | where match(sourcetype, "${pattern}")`;
+    const spl = `| metadata type=sourcetypes index=* | where match(sourcetype, "${pattern}") | convert ctime(*Time) | table sourcetype recentTime firstTime lastTime totalCount | eventstats sum(totalCount) as GrandTotal | sort - totalCount`;
     return createURL(`/app/search/search?q=${encodeURIComponent(spl)}`);
 }
 
@@ -723,6 +805,76 @@ async function saveCustomDashboard(productId, value) {
     if (!res.ok) {
         const text = await res.text();
         throw new Error(`Failed to save custom dashboard: ${res.status} ${text}`);
+    }
+    return true;
+}
+
+/**
+ * Slugify a display name into a safe product_id for custom cards.
+ * "Cisco Secure Firewall" → "custom_cisco_secure_firewall"
+ */
+function slugifyProductId(displayName) {
+    const slug = displayName
+        .toLowerCase()
+        .replace(/[^a-z0-9]+/g, '_')
+        .replace(/^_|_$/g, '');
+    return `custom_${slug}`;
+}
+
+/**
+ * Create a new custom product stanza in local/products.conf.
+ */
+async function createCustomProduct(productId, fields) {
+    const url = `/splunkd/__raw/servicesNS/nobody/${APP_ID}/configs/conf-products`;
+    const params = new URLSearchParams({ output_mode: 'json', name: productId });
+    Object.entries(fields).forEach(([k, v]) => {
+        if (v !== undefined && v !== null && v !== '') params.append(k, String(v));
+    });
+    const res = await splunkFetch(url, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        body: params.toString(),
+    });
+    if (!res.ok) {
+        const text = await res.text();
+        throw new Error(`Failed to create custom product: ${res.status} ${text}`);
+    }
+    return true;
+}
+
+/**
+ * Update an existing custom product stanza in local/products.conf.
+ */
+async function updateCustomProduct(productId, fields) {
+    const url = `/splunkd/__raw/servicesNS/nobody/${APP_ID}/configs/conf-products/${encodeURIComponent(productId)}`;
+    const params = new URLSearchParams({ output_mode: 'json' });
+    Object.entries(fields).forEach(([k, v]) => {
+        params.append(k, v !== undefined && v !== null ? String(v) : '');
+    });
+    const res = await splunkFetch(url, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        body: params.toString(),
+    });
+    if (!res.ok) {
+        const text = await res.text();
+        throw new Error(`Failed to update custom product: ${res.status} ${text}`);
+    }
+    return true;
+}
+
+/**
+ * Delete a custom product stanza from local/products.conf.
+ */
+async function deleteCustomProduct(productId) {
+    const url = `/splunkd/__raw/servicesNS/nobody/${APP_ID}/configs/conf-products/${encodeURIComponent(productId)}`;
+    const res = await splunkFetch(url, {
+        method: 'DELETE',
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+    });
+    if (!res.ok) {
+        const text = await res.text();
+        throw new Error(`Failed to delete custom product: ${res.status} ${text}`);
     }
     return true;
 }
@@ -876,10 +1028,11 @@ function IntelligenceBadges({ appStatus, vizAppStatus, vizApp2Status, sourcetype
     }
 
     if (sourcetypeInfo) {
+        const dataTooltip = 'Approximate count based on index metadata from the last 7 days. Click to open in Search for exact figures.';
         if (sourcetypeInfo.hasData && appStatus?.installed) {
-            items.push({ cls: 'data-ok', label: `✓ Data flowing (${sourcetypeInfo.detail})`, key: 'data-ok', url: sourcetypeSearchUrl });
+            items.push({ cls: 'data-ok', label: `✓ Data flowing (${sourcetypeInfo.detail})`, key: 'data-ok', url: sourcetypeSearchUrl, tooltip: dataTooltip });
         } else if (sourcetypeInfo.hasData && !appStatus?.installed) {
-            items.push({ cls: 'data-ok', label: `Data found (${sourcetypeInfo.detail})`, key: 'data-no-ta', url: sourcetypeSearchUrl });
+            items.push({ cls: 'data-ok', label: `Data found (${sourcetypeInfo.detail})`, key: 'data-no-ta', url: sourcetypeSearchUrl, tooltip: dataTooltip });
         } else if (!sourcetypeInfo.hasData && !isRoadmapCard) {
             // Roadmap/coverage_gap products have no add-on yet — don't show "No sourcetypes defined"
             items.push({ cls: 'data-none', label: sourcetypeInfo.detail || 'No data (7d)', key: 'data-none', url: sourcetypeSearchUrl });
@@ -890,7 +1043,7 @@ function IntelligenceBadges({ appStatus, vizAppStatus, vizApp2Status, sourcetype
     return (
         <div className="csc-intelligence-badges">
             {items.map(b => (
-                <span key={b.key} className={`csc-badge-item csc-badge-${b.cls}`}>
+                <span key={b.key} className={`csc-badge-item csc-badge-${b.cls}`} title={b.tooltip || ''}>
                     {b.url ? (
                         <a href={b.url} target="_blank" rel="noopener noreferrer" className="csc-badge-link" onClick={e => e.stopPropagation()}>
                             {b.label}
@@ -1182,13 +1335,13 @@ function SC4SInfoModal({ open, onClose }) {
                     </div>
 
                     <div className="csc-sc4s-info-footer">
-                        <a href="https://splunkbase.splunk.com/app/4740" target="_blank" rel="noopener noreferrer" className="csc-sc4s-info-link">
+                        <a href="https://splunkbase.splunk.com/app/4740" target="_blank" rel="noopener noreferrer" className="csc-sc4s-info-link" style={{ color: '#0A60FF' }}>
                              Splunkbase
                         </a>
-                        <a href="https://splunk.github.io/splunk-connect-for-syslog/main/" target="_blank" rel="noopener noreferrer" className="csc-sc4s-info-link">
+                        <a href="https://splunk.github.io/splunk-connect-for-syslog/main/" target="_blank" rel="noopener noreferrer" className="csc-sc4s-info-link" style={{ color: '#0A60FF' }}>
                              SC4S Official Documentation
                         </a>
-                        <a href="https://github.com/splunk/splunk-connect-for-syslog" target="_blank" rel="noopener noreferrer" className="csc-sc4s-info-link csc-sc4s-info-link-gh">
+                        <a href="https://github.com/splunk/splunk-connect-for-syslog" target="_blank" rel="noopener noreferrer" className="csc-sc4s-info-link" style={{ color: '#0A60FF' }}>
                              GitHub Repository
                         </a>
                     </div>
@@ -1431,13 +1584,13 @@ function NetFlowInfoModal({ open, onClose, installedApps }) {
                     </div>
 
                     <div className="csc-sc4s-info-footer">
-                        <a href="https://help.splunk.com/en/splunk-cloud-platform/collect-stream-data/install-and-configure-splunk-stream/8.1/introduction/about-splunk-stream" target="_blank" rel="noopener noreferrer" className="csc-sc4s-info-link csc-sc4s-info-link-gh">
+                        <a href="https://help.splunk.com/en/splunk-cloud-platform/collect-stream-data/install-and-configure-splunk-stream/8.1/introduction/about-splunk-stream" target="_blank" rel="noopener noreferrer" className="csc-sc4s-info-link" style={{ color: '#0A60FF' }}>
                             Splunk Stream Documentation
                         </a>
-                        <a href="https://www.cisco.com/c/en/us/solutions/collateral/enterprise-networks/sd-wan/sd-wan-splunk-integration-ug.html" target="_blank" rel="noopener noreferrer" className="csc-sc4s-info-link csc-sc4s-info-link-gh">
+                        <a href="https://www.cisco.com/c/en/us/solutions/collateral/enterprise-networks/sd-wan/sd-wan-splunk-integration-ug.html" target="_blank" rel="noopener noreferrer" className="csc-sc4s-info-link" style={{ color: '#0A60FF' }}>
                             Cisco Enhanced Netflow Guide
                         </a>
-                        <a href="https://splunkbase.splunk.com/app/6872" target="_blank" rel="noopener noreferrer" className="csc-sc4s-info-link csc-sc4s-info-link-gh">
+                        <a href="https://splunkbase.splunk.com/app/6872" target="_blank" rel="noopener noreferrer" className="csc-sc4s-info-link" style={{ color: '#0A60FF' }}>
                             Enhanced Netflow on Splunkbase
                         </a>
                     </div>
@@ -1525,10 +1678,10 @@ function HFInfoModal({ open, onClose, isCloud }) {
                     </div>
 
                     <div className="csc-sc4s-info-footer">
-                        <a href="https://docs.splunk.com/Documentation/SplunkCloud/latest/Forwarding/Deployaheavyforwarder" target="_blank" rel="noopener noreferrer" className="csc-sc4s-info-link">
+                        <a href="https://docs.splunk.com/Documentation/SplunkCloud/latest/Forwarding/Deployaheavyforwarder" target="_blank" rel="noopener noreferrer" className="csc-sc4s-info-link" style={{ color: '#0A60FF' }}>
                             Deploy a Heavy Forwarder — Splunk Docs
                         </a>
-                        <a href="https://help.splunk.com/en/data-management/transform-and-route-data/perform-basic-data-processing/process-data-with-forwarders/types-of-forwarders" target="_blank" rel="noopener noreferrer" className="csc-sc4s-info-link csc-sc4s-info-link-gh">
+                        <a href="https://help.splunk.com/en/data-management/transform-and-route-data/perform-basic-data-processing/process-data-with-forwarders/types-of-forwarders" target="_blank" rel="noopener noreferrer" className="csc-sc4s-info-link" style={{ color: '#0A60FF' }}>
                             Types of Forwarders — Splunk Docs
                         </a>
                     </div>
@@ -1831,7 +1984,7 @@ function MagicEightModal({ open, onClose, sourcetypes, productName, addonApp, ad
                 const splParts = [
                     `| rest splunk_server=${isStandalone ? 'local' : '*'} /servicesNS/-/-/configs/conf-props f=eai:* f=rename ${m6Fields} count=0`,
                     '| eval _norm_title=if(isnotnull(rename) AND rename!="", rename, lower(title))',
-                    `| search (${titleFilter})`,
+                    `| search (${titleFilter}) NOT eai:acl.app IN (system, learned, _cluster_manager_app, splunk_ingest_actions, SplunkUniversalForwarder, SplunkForwarder, SplunkDeploymentServerConfig, Splunk_SA_CIM, python_upgrade_readiness_app, splunk_instrumentation, splunk_internal_metrics, splunk_monitoring_console, splunk_secure_gateway)`,
                     `| fields splunk_server eai:acl.app _norm_title ${MAGIC_EIGHT.map(m => m.key).join(' ')}`,
                 ];
                 if (!isStandalone) {
@@ -2062,9 +2215,9 @@ function MagicEightModal({ open, onClose, sourcetypes, productName, addonApp, ad
                                         href={`/app/search/search?q=${encodeURIComponent(
                                             '| rest splunk_server=* /servicesNS/-/-/apps/local f=title f=version f=disabled count=0'
                                             + ` | search title IN (${tierRows.map(r => `"${r.id}"`).join(', ')})`
+                                            + ' | join splunk_server [| rest splunk_server=* /services/server/info f=server_roles | where match(server_roles, "search_head|indexer") | fields splunk_server server_roles]'
                                             + ' | eval server_roles=mvjoin(server_roles, ", ")'
-                                            + ' | join splunk_server [| rest splunk_server=* /services/server/info f=server_roles]'
-                                            + ' | table splunk_server server_roles title version disabled'
+                                            + ' | fields splunk_server server_roles title version disabled'
                                             + ' | sort server_roles title'
                                         )}`}
                                         target="_blank"
@@ -2077,6 +2230,16 @@ function MagicEightModal({ open, onClose, sourcetypes, productName, addonApp, ad
                             </div>
                         );
                     })()}
+                    {tierRows.length === 0 && addonApp && (
+                        <div style={{ marginBottom: '14px', padding: '10px 14px', borderLeft: '3px solid var(--color-warning, #FF9000)', borderRadius: '6px', background: 'var(--bg-primary, #f8f9fb)', fontSize: '12px' }}>
+                            <div style={{ fontWeight: 700, fontSize: '12px', marginBottom: '4px', color: 'var(--text-primary, #1a2029)' }}>
+                                Add-on not installed
+                            </div>
+                            <div style={{ color: 'var(--text-secondary, #536070)', lineHeight: 1.5 }}>
+                                <strong>{addonLabel || addonApp}</strong> is not installed on this search head. Install it to enable index-time parsing (props.conf, transforms.conf) and search-time field extractions for this product's sourcetypes.
+                            </div>
+                        </div>
+                    )}
 
                     <div className="csc-sc4s-info-hero">
                         <div className="csc-sc4s-info-hero-text">
@@ -2290,13 +2453,13 @@ function MagicEightModal({ open, onClose, sourcetypes, productName, addonApp, ad
                     </div>
 
                     <div className="csc-sc4s-info-footer">
-                        <a href="https://docs.splunk.com/Documentation/Splunk/latest/Admin/Propsconf" target="_blank" rel="noopener noreferrer" className="csc-sc4s-info-link">
+                        <a href="https://docs.splunk.com/Documentation/Splunk/latest/Admin/Propsconf" target="_blank" rel="noopener noreferrer" className="csc-sc4s-info-link" style={{ color: '#0A60FF' }}>
                             props.conf Reference — Splunk Docs
                         </a>
-                        <a href="https://lantern.splunk.com/Platform_Data_Management/Optimize_Data/Configuring_new_source_types" target="_blank" rel="noopener noreferrer" className="csc-sc4s-info-link csc-sc4s-info-link-gh">
+                        <a href="https://lantern.splunk.com/Platform_Data_Management/Optimize_Data/Configuring_new_source_types" target="_blank" rel="noopener noreferrer" className="csc-sc4s-info-link" style={{ color: '#0A60FF' }}>
                             Configuring New Sourcetypes — Splunk Lantern
                         </a>
-                        <a href="https://help.splunk.com/en/splunk-enterprise/get-data-in/get-started-with-getting-data-in/10.2/configure-timestamps/configure-timestamp-recognition" target="_blank" rel="noopener noreferrer" className="csc-sc4s-info-link csc-sc4s-info-link-gh">
+                        <a href="https://help.splunk.com/en/splunk-enterprise/get-data-in/get-started-with-getting-data-in/10.2/configure-timestamps/configure-timestamp-recognition" target="_blank" rel="noopener noreferrer" className="csc-sc4s-info-link" style={{ color: '#0A60FF' }}>
                             Configure Timestamp Recognition
                         </a>
                     </div>
@@ -2313,7 +2476,13 @@ function MagicEightModal({ open, onClose, sourcetypes, productName, addonApp, ad
                         <Button
                             appearance="secondary"
                             label="Open in Search"
-                            onClick={() => window.open(createURL(`/app/${APP_ID}/search?q=${encodeURIComponent(searchSpl)}`), '_blank')}
+                            onClick={() => {
+                                const stFilter = sourcetypes && sourcetypes.length > 0
+                                    ? sourcetypes.map(s => `"${s}"`).join(', ')
+                                    : null;
+                                const savedSearchSpl = `| savedsearch "SCAN - Magic Eight Audit" scope="environment"${stFilter ? ` | search Sourcetype IN (${stFilter})` : ''}`;
+                                window.open(createURL(`/app/${APP_ID}/search?q=${encodeURIComponent(savedSearchSpl)}`), '_blank');
+                            }}
                             style={{ marginRight: 'auto' }}
                         />
                     )}
@@ -2442,10 +2611,10 @@ function SOARInfoModal({ open, onClose, soarConnectorUids, splunkbaseData, produ
                     </div>
 
                     <div className="csc-sc4s-info-footer">
-                        <a href="https://docs.splunk.com/Documentation/SOARonprem/latest/User/Overview" target="_blank" rel="noopener noreferrer" className="csc-sc4s-info-link">
+                        <a href="https://docs.splunk.com/Documentation/SOARonprem/latest/User/Overview" target="_blank" rel="noopener noreferrer" className="csc-sc4s-info-link" style={{ color: '#0A60FF' }}>
                              Splunk SOAR Documentation
                         </a>
-                        <a href="https://splunkbase.splunk.com/apps?page=1&keyword=cisco&built_by=splunk&built_by=cisco&product=soar" target="_blank" rel="noopener noreferrer" className="csc-sc4s-info-link csc-sc4s-info-link-gh">
+                        <a href="https://splunkbase.splunk.com/apps?page=1&keyword=cisco&built_by=splunk&built_by=cisco&product=soar" target="_blank" rel="noopener noreferrer" className="csc-sc4s-info-link" style={{ color: '#0A60FF' }}>
                              Browse All SOAR Connectors
                         </a>
                     </div>
@@ -2502,57 +2671,48 @@ function AlertActionsInfoModal({ open, onClose, alertActionUids, splunkbaseData,
 
 // ────────────────────  ITSI INFO MODAL  ─────────────────────────────
 
-function ITSIInfoModal({ open, onClose, itsiContentPack, productName }) {
+function ITOpsContentModal({ open, onClose, itsiContentPack, iteLearnContent, iteLearnProcedures, iteLearnProcedureCount, productName, installedApps }) {
     const returnFocusRef = useRef(null);
+    const [showProcedures, setShowProcedures] = useState(false);
     if (!open) return null;
     const pack = itsiContentPack || {};
+    const hasItsi = !!pack.label;
+    const procedures = iteLearnProcedures || [];
+    const procCount = iteLearnProcedureCount || 0;
+    const hasIteLearn = iteLearnContent && procCount > 0;
+    const itsiInstalled = installedApps?.['itsi'];
+    const iteInstalled = installedApps?.['it_essentials_learn'];
+
     return (
-        <Modal open returnFocus={returnFocusRef} onRequestClose={onClose} style={{ maxWidth: '820px', width: '92vw' }}>
-            <Modal.Header title="ITSI Content Pack" />
+        <Modal open returnFocus={returnFocusRef} onRequestClose={onClose} style={{ maxWidth: '860px', width: '92vw' }}>
+            <Modal.Header title="ITOps Content" />
             <Modal.Body>
                 <div className="csc-sc4s-info" style={{ '--info-accent': '#2e7d32' }}>
                     <div className="csc-sc4s-info-hero">
                         <div className="csc-sc4s-info-hero-icon"></div>
                         <div className="csc-sc4s-info-hero-text">
-                            <h3>IT Service Intelligence Content Pack</h3>
-                            <p>Splunk ITSI Content Packs provide <strong>pre-built service templates, KPIs, glass tables, and deep dives</strong> that accelerate time-to-value for monitoring Cisco infrastructure. The content pack for {productName ? <strong>{productName}</strong> : 'this product'} delivers curated KPI definitions and service trees aligned to Cisco best practices.</p>
+                            <h3>IT Operations</h3>
+                            <p>
+                                {productName ? <strong>{productName}</strong> : 'This product'} has ITOps content available
+                                across Splunk's operations ecosystem.
+                                {hasItsi && <>{' '}An <strong>ITSI Content Pack</strong> provides pre-built service templates and KPIs.</>}
+                                {hasIteLearn && <>{' '}<strong>{procCount} IT Essentials Learn</strong> procedures are available.</>}
+                            </p>
                         </div>
                     </div>
 
-                    <div className="csc-sc4s-info-section">
-                        <h4>What is ITSI?</h4>
-                        <p>Splunk IT Service Intelligence (ITSI) is a monitoring and analytics solution that provides end-to-end visibility into the health and performance of critical IT services. ITSI uses <strong>machine learning</strong> to detect anomalies, predict outages, and correlate events across your entire infrastructure — from network devices to applications to cloud services.</p>
-                    </div>
+                    {/* ── Tier 1: IT Service Intelligence (Premium) ── */}
+                    {hasItsi && (
+                        <div className="csc-sc4s-info-section" style={{ borderLeft: '3px solid #7C3AED', paddingLeft: '16px' }}>
+                            <h4 style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                                Splunk IT Service Intelligence
+                                <span style={{ fontSize: '11px', padding: '2px 8px', borderRadius: '4px', background: '#EDE9FE', color: '#5B21B6', fontWeight: 600 }}>Premium</span>
+                                {itsiInstalled && <span style={{ fontSize: '11px', padding: '2px 8px', borderRadius: '4px', background: '#D1FAE5', color: '#065F46', fontWeight: 600 }}>Installed</span>}
+                            </h4>
+                            <p style={{ marginBottom: '10px', fontSize: '13px' }}>
+                                ITSI Content Packs provide <strong>pre-built service templates, KPIs, glass tables, and deep dives</strong> for monitoring Cisco infrastructure.
+                            </p>
 
-                    <div className="csc-sc4s-info-section">
-                        <h4>Key Capabilities</h4>
-                        <div className="csc-sc4s-info-grid">
-                            <div className="csc-sc4s-info-card">
-                                <span className="csc-sc4s-info-card-icon"></span>
-                                <strong>Service Trees</strong>
-                                <span>Hierarchical service dependency maps showing how Cisco infrastructure components relate to business services, enabling root cause analysis.</span>
-                            </div>
-                            <div className="csc-sc4s-info-card">
-                                <span className="csc-sc4s-info-card-icon"></span>
-                                <strong>Pre-Built KPIs</strong>
-                                <span>Curated Key Performance Indicators tuned for Cisco devices — including availability, latency, throughput, error rates, and protocol-specific health metrics.</span>
-                            </div>
-                            <div className="csc-sc4s-info-card">
-                                <span className="csc-sc4s-info-card-icon"></span>
-                                <strong>Glass Tables</strong>
-                                <span>Visual, real-time dashboards showing service health at a glance. Content Packs include pre-configured glass tables for common Cisco monitoring scenarios.</span>
-                            </div>
-                            <div className="csc-sc4s-info-card">
-                                <span className="csc-sc4s-info-card-icon"></span>
-                                <strong>ML-Powered Alerting</strong>
-                                <span>Adaptive thresholds powered by machine learning — ITSI learns normal behavior and alerts on deviations, reducing false positives and alert fatigue.</span>
-                            </div>
-                        </div>
-                    </div>
-
-                    {pack.label && (
-                        <div className="csc-sc4s-info-section">
-                            <h4>{productName ? `${productName} — ` : ''}Content Pack</h4>
                             <table className="csc-sc4s-info-table">
                                 <tbody>
                                     <tr>
@@ -2578,40 +2738,55 @@ function ITSIInfoModal({ open, onClose, itsiContentPack, productName }) {
                         </div>
                     )}
 
-                    <div className="csc-sc4s-info-section">
-                        <h4>Best Practices</h4>
-                        <div className="csc-sc4s-info-bp">
-                            <div className="csc-sc4s-info-bp-item csc-sc4s-info-bp-good">
-                                <span className="csc-sc4s-info-bp-marker"></span>
-                                <div>
-                                    <strong>Install the TA First</strong>
-                                    <p>Content Packs depend on the Technology Add-on (TA) for data collection and CIM-compliant field extractions. Ensure the TA is installed and data is flowing before importing the content pack.</p>
-                                </div>
-                            </div>
-                            <div className="csc-sc4s-info-bp-item csc-sc4s-info-bp-good">
-                                <span className="csc-sc4s-info-bp-marker"></span>
-                                <div>
-                                    <strong>Use the Content Library</strong>
-                                    <p>Import content packs via ITSI's Content Library (Configuration → Content Library), not by installing them as Splunk apps. This ensures proper service template creation.</p>
-                                </div>
-                            </div>
-                            <div className="csc-sc4s-info-bp-item csc-sc4s-info-bp-good">
-                                <span className="csc-sc4s-info-bp-marker"></span>
-                                <div>
-                                    <strong>Customize Thresholds</strong>
-                                    <p>Content Pack KPIs come with default thresholds. After initial deployment, tune thresholds to match your environment's baseline using ITSI's adaptive thresholding capabilities.</p>
+                    {/* ── Tier 2: IT Essentials Learn (Free) ── */}
+                    {hasIteLearn && (
+                        <div className="csc-sc4s-info-section" style={{ borderLeft: '3px solid #22C55E', paddingLeft: '16px' }}>
+                            <h4 style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                                IT Essentials Learn
+                                <span style={{ fontSize: '11px', padding: '2px 8px', borderRadius: '4px', background: '#D1FAE5', color: '#065F46', fontWeight: 600 }}>Free</span>
+                                {iteInstalled && <span style={{ fontSize: '11px', padding: '2px 8px', borderRadius: '4px', background: '#D1FAE5', color: '#065F46', fontWeight: 600 }}>Installed</span>}
+                            </h4>
+                            <p style={{ marginBottom: '10px', fontSize: '13px' }}>
+                                IT Essentials Learn provides guided operational procedures and analytics
+                                {' '}— <strong>no ITSI license required</strong>.
+                            </p>
+
+                            <div>
+                                <strong style={{ fontSize: '12px', textTransform: 'uppercase', letterSpacing: '0.5px', color: 'var(--text-secondary, #667180)' }}>Procedures ({procCount})</strong>
+                                <div style={{ marginTop: '6px' }}>
+                                    {procedures.length > 5 && !showProcedures ? (
+                                        <>
+                                            <ul className="csc-es-detection-list">
+                                                {procedures.slice(0, 5).map(p => <li key={p}>{p}</li>)}
+                                            </ul>
+                                            <button className="csc-es-show-all-btn" onClick={() => setShowProcedures(true)}>
+                                                Show all {procCount} procedures ▾
+                                            </button>
+                                        </>
+                                    ) : (
+                                        <ul className="csc-es-detection-list">
+                                            {procedures.map(p => <li key={p}>{p}</li>)}
+                                        </ul>
+                                    )}
                                 </div>
                             </div>
                         </div>
-                    </div>
+                    )}
 
                     <div className="csc-sc4s-info-footer">
-                        <a href="https://docs.splunk.com/Documentation/ITSI/latest/Configure/ContentPackOverview" target="_blank" rel="noopener noreferrer" className="csc-sc4s-info-link">
-                             ITSI Content Pack Documentation
-                        </a>
-                        {pack.docs_url && (
-                            <a href={pack.docs_url} target="_blank" rel="noopener noreferrer" className="csc-sc4s-info-link csc-sc4s-info-link-gh">
-                                 {pack.label || 'Content Pack'} Documentation
+                        {hasItsi && (
+                            <a href="https://docs.splunk.com/Documentation/ITSI/latest/Configure/ContentPackOverview" target="_blank" rel="noopener noreferrer" className="csc-sc4s-info-link" style={{ color: '#0A60FF' }}>
+                                 ITSI Documentation
+                            </a>
+                        )}
+                        {hasItsi && pack.docs_url && (
+                            <a href={pack.docs_url} target="_blank" rel="noopener noreferrer" className="csc-sc4s-info-link" style={{ color: '#0A60FF' }}>
+                                 {pack.label} Docs
+                            </a>
+                        )}
+                        {hasIteLearn && (
+                            <a href="https://splunkbase.splunk.com/app/5390" target="_blank" rel="noopener noreferrer" className="csc-sc4s-info-link" style={{ color: '#0A60FF' }}>
+                                 IT Essentials Learn on Splunkbase
                             </a>
                         )}
                     </div>
@@ -2645,160 +2820,156 @@ const CIM_MODEL_LABELS = {
     Web: 'Web',
 };
 
-function ESInfoModal({ open, onClose, productName, cimDataModels, escuStories, escuDetectionCount, escuDetections }) {
+function SecOpsContentModal({ open, onClose, productName, esCompatible, cimDataModels, escuStories, escuDetectionCount, escuDetections, sseContent, sseUseCases, sseUseCaseCount, installedApps }) {
     const returnFocusRef = useRef(null);
     const [showDetections, setShowDetections] = useState(false);
+    const [showSseUseCases, setShowSseUseCases] = useState(false);
     if (!open) return null;
     const models = cimDataModels || [];
     const stories = escuStories || [];
     const detections = escuDetections || [];
     const detCount = escuDetectionCount || 0;
     const hasEscu = detCount > 0;
+    const sseList = sseUseCases || [];
+    const sseCount = sseUseCaseCount || 0;
+    const hasSse = sseContent && sseCount > 0;
+    const esInstalled = installedApps?.['SplunkEnterpriseSecuritySuite'];
+    const sseInstalled = installedApps?.['Splunk_Security_Essentials'];
 
     return (
-        <Modal open returnFocus={returnFocusRef} onRequestClose={onClose} style={{ maxWidth: '860px', width: '92vw' }}>
-            <Modal.Header title="Enterprise Security Compatibility" />
+        <Modal open returnFocus={returnFocusRef} onRequestClose={onClose} style={{ maxWidth: '900px', width: '92vw' }}>
+            <Modal.Header title="SecOps Content" />
             <Modal.Body>
                 <div className="csc-sc4s-info" style={{ '--info-accent': '#455a64' }}>
                     <div className="csc-sc4s-info-hero">
                         <div className="csc-sc4s-info-hero-icon"></div>
                         <div className="csc-sc4s-info-hero-text">
-                            <h3>Splunk Enterprise Security</h3>
+                            <h3>Security Operations</h3>
                             <p>
-                                {productName ? <strong>{productName}</strong> : 'This product'} maps its data to the
-                                {' '}<strong>Splunk Common Information Model (CIM)</strong> via the add-on's
-                                {' '}<code>tags.conf</code> and <code>eventtypes.conf</code>, enabling seamless
-                                integration with ES correlation searches, dashboards, and adaptive response actions.
-                                {hasEscu && <>{' '}Additionally, <strong>{detCount} pre-built ESCU detections</strong> are available for this product.</>}
+                                {productName ? <strong>{productName}</strong> : 'This product'} has security content available
+                                across Splunk's SecOps ecosystem.
+                                {esCompatible && <>{' '}Data is <strong>CIM-compliant</strong> for Enterprise Security.</>}
+                                {hasSse && <>{' '}<strong>{sseCount} Security Essentials</strong> use cases are available.</>}
                             </p>
                         </div>
                     </div>
 
-                    {/* CIM Data Models */}
-                    {models.length > 0 && (
-                        <div className="csc-sc4s-info-section">
-                            <h4>CIM Data Models</h4>
-                            <p style={{ marginBottom: '10px', fontSize: '13px' }}>
-                                The add-on tags events into these CIM data models, making them immediately usable by ES:
-                            </p>
-                            <div className="csc-es-cim-pills">
-                                {models.map(m => (
-                                    <span key={m} className="csc-es-cim-pill">{CIM_MODEL_LABELS[m] || m}</span>
-                                ))}
-                            </div>
-                        </div>
-                    )}
+                    {/* ── Tier 1: Enterprise Security (Premium) ── */}
+                    {esCompatible && (
+                        <>
+                            <div className="csc-sc4s-info-section" style={{ borderLeft: '3px solid #F59E0B', paddingLeft: '16px' }}>
+                                <h4 style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                                    Splunk Enterprise Security
+                                    <span style={{ fontSize: '11px', padding: '2px 8px', borderRadius: '4px', background: '#FEF3C7', color: '#92400E', fontWeight: 600 }}>Premium</span>
+                                    {esInstalled && <span style={{ fontSize: '11px', padding: '2px 8px', borderRadius: '4px', background: '#D1FAE5', color: '#065F46', fontWeight: 600 }}>Installed</span>}
+                                </h4>
+                                <p style={{ marginBottom: '10px', fontSize: '13px' }}>
+                                    The add-on maps data to the <strong>Common Information Model (CIM)</strong> via
+                                    {' '}<code>tags.conf</code> and <code>eventtypes.conf</code>, enabling ES correlation searches, dashboards, and adaptive response.
+                                </p>
 
-                    {/* ESCU Analytic Stories */}
-                    {stories.length > 0 && (
-                        <div className="csc-sc4s-info-section">
-                            <h4>ESCU Analytic Stories</h4>
-                            <p style={{ marginBottom: '10px', fontSize: '13px' }}>
-                                Enterprise Security Content Update ships these analytic stories with curated detection rules:
-                            </p>
-                            <div className="csc-es-stories">
-                                {stories.map(s => (
-                                    <div key={s} className="csc-es-story-item">
-                                        <span className="csc-es-story-icon"></span>
-                                        <span>{s}</span>
+                                {models.length > 0 && (
+                                    <div style={{ marginBottom: '14px' }}>
+                                        <strong style={{ fontSize: '12px', textTransform: 'uppercase', letterSpacing: '0.5px', color: 'var(--text-secondary, #667180)' }}>CIM Data Models</strong>
+                                        <div className="csc-es-cim-pills" style={{ marginTop: '6px' }}>
+                                            {models.map(m => (
+                                                <span key={m} className="csc-es-cim-pill">{CIM_MODEL_LABELS[m] || m}</span>
+                                            ))}
+                                        </div>
                                     </div>
-                                ))}
-                            </div>
-                        </div>
-                    )}
+                                )}
 
-                    {/* Detection Count + Expandable List */}
-                    {hasEscu && (
-                        <div className="csc-sc4s-info-section">
-                            <h4>ESCU Detections ({detCount})</h4>
-                            <p style={{ marginBottom: '10px', fontSize: '13px' }}>
-                                Pre-built detection searches that run as correlation searches in ES:
-                            </p>
-                            {detections.length > 5 && !showDetections ? (
-                                <>
-                                    <ul className="csc-es-detection-list">
-                                        {detections.slice(0, 5).map(d => <li key={d}>{d}</li>)}
-                                    </ul>
-                                    <button className="csc-es-show-all-btn" onClick={() => setShowDetections(true)}>
-                                        Show all {detCount} detections ▾
-                                    </button>
-                                </>
-                            ) : (
-                                <ul className="csc-es-detection-list">
-                                    {detections.map(d => <li key={d}>{d}</li>)}
-                                </ul>
-                            )}
-                        </div>
-                    )}
-
-                    {/* How it works */}
-                    <div className="csc-sc4s-info-section">
-                        <h4>How It Works</h4>
-                        <div className="csc-sc4s-info-grid">
-                            <div className="csc-sc4s-info-card">
-                                <span className="csc-sc4s-info-card-icon"></span>
-                                <strong>CIM Compliance</strong>
-                                <span>The add-on's <code>tags.conf</code> maps sourcetypes to CIM data models. ES accelerates these models for real-time search.</span>
-                            </div>
-                            <div className="csc-sc4s-info-card">
-                                <span className="csc-sc4s-info-card-icon"></span>
-                                <strong>Correlation Searches</strong>
-                                <span>ES correlation searches query CIM-accelerated data models. CIM-compliant data is automatically included — no custom SPL needed.</span>
-                            </div>
-                            {hasEscu && (
-                                <div className="csc-sc4s-info-card">
-                                    <span className="csc-sc4s-info-card-icon"></span>
-                                    <strong>ESCU Detections</strong>
-                                    <span>Install the Enterprise Security Content Update (ESCU) app from Splunkbase to get {detCount} pre-built detections for this product.</span>
-                                </div>
-                            )}
-                            <div className="csc-sc4s-info-card">
-                                <span className="csc-sc4s-info-card-icon"></span>
-                                <strong>Notable Events</strong>
-                                <span>When detections fire, they create Notable Events in the ES Incident Review dashboard for analyst triage and response.</span>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div className="csc-sc4s-info-section">
-                        <h4>Best Practices</h4>
-                        <div className="csc-sc4s-info-bp">
-                            <div className="csc-sc4s-info-bp-item csc-sc4s-info-bp-good">
-                                <span className="csc-sc4s-info-bp-marker"></span>
-                                <div>
-                                    <strong>Accelerate CIM Data Models</strong>
-                                    <p>In ES, go to Settings → Data Models and ensure the relevant CIM models are accelerated. ES relies on accelerated data models for performant correlation searches.</p>
-                                </div>
-                            </div>
-                            <div className="csc-sc4s-info-bp-item csc-sc4s-info-bp-good">
-                                <span className="csc-sc4s-info-bp-marker"></span>
-                                <div>
-                                    <strong>Install the Add-on First</strong>
-                                    <p>The Technology Add-on (TA) provides the CIM field extractions and tag mappings. Install it on search heads (and indexers if needed) before configuring ES.</p>
-                                </div>
-                            </div>
-                            {hasEscu && (
-                                <div className="csc-sc4s-info-bp-item csc-sc4s-info-bp-good">
-                                    <span className="csc-sc4s-info-bp-marker"></span>
-                                    <div>
-                                        <strong>Keep ESCU Updated</strong>
-                                        <p>Splunk releases monthly ESCU updates with new detections. Keep the Enterprise Security Content Update app current to get the latest Cisco-specific detection rules.</p>
+                                {stories.length > 0 && (
+                                    <div style={{ marginBottom: '14px' }}>
+                                        <strong style={{ fontSize: '12px', textTransform: 'uppercase', letterSpacing: '0.5px', color: 'var(--text-secondary, #667180)' }}>ESCU Analytic Stories</strong>
+                                        <div className="csc-es-stories" style={{ marginTop: '6px' }}>
+                                            {stories.map(s => (
+                                                <div key={s} className="csc-es-story-item">
+                                                    <span className="csc-es-story-icon"></span>
+                                                    <span>{s}</span>
+                                                </div>
+                                            ))}
+                                        </div>
                                     </div>
+                                )}
+
+                                {hasEscu && (
+                                    <div style={{ marginBottom: '6px' }}>
+                                        <strong style={{ fontSize: '12px', textTransform: 'uppercase', letterSpacing: '0.5px', color: 'var(--text-secondary, #667180)' }}>ESCU Detections ({detCount})</strong>
+                                        <div style={{ marginTop: '6px' }}>
+                                            {detections.length > 5 && !showDetections ? (
+                                                <>
+                                                    <ul className="csc-es-detection-list">
+                                                        {detections.slice(0, 5).map(d => <li key={d}>{d}</li>)}
+                                                    </ul>
+                                                    <button className="csc-es-show-all-btn" onClick={() => setShowDetections(true)}>
+                                                        Show all {detCount} detections ▾
+                                                    </button>
+                                                </>
+                                            ) : (
+                                                <ul className="csc-es-detection-list">
+                                                    {detections.map(d => <li key={d}>{d}</li>)}
+                                                </ul>
+                                            )}
+                                        </div>
+                                    </div>
+                                )}
+                            </div>
+                        </>
+                    )}
+
+                    {/* ── Tier 2: Security Essentials (Free) ── */}
+                    {hasSse && (
+                        <div className="csc-sc4s-info-section" style={{ borderLeft: '3px solid #22C55E', paddingLeft: '16px' }}>
+                            <h4 style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                                Splunk Security Essentials
+                                <span style={{ fontSize: '11px', padding: '2px 8px', borderRadius: '4px', background: '#D1FAE5', color: '#065F46', fontWeight: 600 }}>Free</span>
+                                {sseInstalled && <span style={{ fontSize: '11px', padding: '2px 8px', borderRadius: '4px', background: '#D1FAE5', color: '#065F46', fontWeight: 600 }}>Installed</span>}
+                            </h4>
+                            <p style={{ marginBottom: '10px', fontSize: '13px' }}>
+                                Security Essentials provides detection guidance, analytics stories, and security use cases
+                                {' '}— <strong>no Enterprise Security license required</strong>.
+                            </p>
+
+                            <div>
+                                <strong style={{ fontSize: '12px', textTransform: 'uppercase', letterSpacing: '0.5px', color: 'var(--text-secondary, #667180)' }}>Use Cases ({sseCount})</strong>
+                                <div style={{ marginTop: '6px' }}>
+                                    {sseList.length > 5 && !showSseUseCases ? (
+                                        <>
+                                            <ul className="csc-es-detection-list">
+                                                {sseList.slice(0, 5).map(u => <li key={u}>{u}</li>)}
+                                            </ul>
+                                            <button className="csc-es-show-all-btn" onClick={() => setShowSseUseCases(true)}>
+                                                Show all {sseCount} use cases ▾
+                                            </button>
+                                        </>
+                                    ) : (
+                                        <ul className="csc-es-detection-list">
+                                            {sseList.map(u => <li key={u}>{u}</li>)}
+                                        </ul>
+                                    )}
                                 </div>
-                            )}
+                            </div>
                         </div>
-                    </div>
+                    )}
 
                     <div className="csc-sc4s-info-footer">
-                        <a href="https://docs.splunk.com/Documentation/ES/latest" target="_blank" rel="noopener noreferrer" className="csc-sc4s-info-link">
-                             ES Documentation
-                        </a>
+                        {esCompatible && (
+                            <a href="https://docs.splunk.com/Documentation/ES/latest" target="_blank" rel="noopener noreferrer" className="csc-sc4s-info-link" style={{ color: '#0A60FF' }}>
+                                 ES Documentation
+                            </a>
+                        )}
                         {hasEscu && (
-                            <a href="https://splunkbase.splunk.com/app/3449" target="_blank" rel="noopener noreferrer" className="csc-sc4s-info-link csc-sc4s-info-link-gh">
+                            <a href="https://splunkbase.splunk.com/app/3449" target="_blank" rel="noopener noreferrer" className="csc-sc4s-info-link" style={{ color: '#0A60FF' }}>
                                  ESCU on Splunkbase
                             </a>
                         )}
-                        <a href="https://docs.splunk.com/Documentation/CIM/latest/User/Overview" target="_blank" rel="noopener noreferrer" className="csc-sc4s-info-link csc-sc4s-info-link-gh">
+                        {hasSse && (
+                            <a href="https://splunkbase.splunk.com/app/3435" target="_blank" rel="noopener noreferrer" className="csc-sc4s-info-link" style={{ color: '#0A60FF' }}>
+                                 Security Essentials on Splunkbase
+                            </a>
+                        )}
+                        <a href="https://docs.splunk.com/Documentation/CIM/latest/User/Overview" target="_blank" rel="noopener noreferrer" className="csc-sc4s-info-link" style={{ color: '#0A60FF' }}>
                              CIM Reference
                         </a>
                     </div>
@@ -3005,42 +3176,68 @@ function LegacyAuditModal({ open, onClose, legacyUids, installedApps, indexerApp
 }
 
 // ────────────────────  FEEDBACK MODAL  ─────────────────────
-function FeedbackModal({ open, onClose }) {
+function feedbackFallbackCopy(text, onSuccess, onFail) {
+    const ta = document.createElement('textarea');
+    ta.value = text;
+    ta.style.position = 'fixed';
+    ta.style.left = '-9999px';
+    ta.style.opacity = '0';
+    document.body.appendChild(ta);
+    ta.select();
+    try { document.execCommand('copy'); onSuccess(); }
+    catch (_) { onFail(); }
+    document.body.removeChild(ta);
+}
+const FEEDBACK_EMAIL = 'scan-feedback@cisco.com';
+const FEEDBACK_TYPES = [
+    { id: 'feature', label: 'Feature Request' },
+    { id: 'bug', label: 'Bug Report' },
+    { id: 'improvement', label: 'Improvement' },
+    { id: 'general', label: 'General' },
+];
+
+function FeedbackModal({ open, onClose, platformType, appVersion }) {
     const returnFocusRef = useRef(null);
     const [feedbackType, setFeedbackType] = useState('feature');
-    const [rating, setRating] = useState('3');
-    const [title, setTitle] = useState('');
     const [description, setDescription] = useState('');
-    const [submitting, setSubmitting] = useState(false);
-    const [submitMsg, setSubmitMsg] = useState(null);
-    const [submitErr, setSubmitErr] = useState(null);
+    const [actionMsg, setActionMsg] = useState(null);
 
     if (!open) return null;
 
-    const handleSubmit = async () => {
-        if (!title.trim()) { setSubmitErr('Please provide a title.'); return; }
-        if (!description.trim()) { setSubmitErr('Please provide a description.'); return; }
-        setSubmitting(true);
-        setSubmitErr(null);
-        setSubmitMsg(null);
-        try {
-            const ts = Math.floor(Date.now() / 1000);
-            const esc = s => s.replace(/"/g, '\\"');
-            const spl = `| makeresults | eval _time=${ts} | eval feedback_type="${esc(feedbackType)}", rating="${rating}", title="${esc(title)}", description="${esc(description)}", app="${APP_ID}", sourcetype="scan:feedback" | collect index=summary source="scan:feedback" sourcetype="stash"`;
-            await splunkFetch(SEARCH_ENDPOINT, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-                body: `search=${encodeURIComponent(spl)}&output_mode=json&exec_mode=oneshot`,
+    const typeLabel = FEEDBACK_TYPES.find(t => t.id === feedbackType)?.label || feedbackType;
+
+    const buildBody = () => [
+        `Type: ${typeLabel}`,
+        `Platform: ${platformType || 'unknown'}`,
+        `SCAN Version: ${appVersion || 'unknown'}`,
+        `Browser: ${navigator.userAgent}`,
+        '',
+        'Feedback:',
+        description || '(please describe your feedback here)',
+    ].join('\n');
+
+    const handleSendEmail = () => {
+        if (!description.trim()) { setActionMsg({ type: 'error', text: 'Please write your feedback first.' }); return; }
+        const subject = `[SCAN Feedback] ${typeLabel}`;
+        const body = buildBody();
+        window.location.href = `mailto:${FEEDBACK_EMAIL}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+        setActionMsg({ type: 'success', text: 'Email client opened! Send the email to complete.' });
+    };
+
+    const handleCopyToClipboard = () => {
+        if (!description.trim()) { setActionMsg({ type: 'error', text: 'Please write your feedback first.' }); return; }
+        const text = `To: ${FEEDBACK_EMAIL}\nSubject: [SCAN Feedback] ${typeLabel}\n\n${buildBody()}`;
+        const onSuccess = () => {
+            setActionMsg({ type: 'success', text: 'Copied to clipboard! Paste into your preferred email or messaging app.' });
+            setTimeout(() => setActionMsg(null), 4000);
+        };
+        const onFail = () => setActionMsg({ type: 'error', text: 'Could not copy — please select and copy manually.' });
+        if (navigator.clipboard && window.isSecureContext) {
+            navigator.clipboard.writeText(text).then(onSuccess).catch(() => {
+                feedbackFallbackCopy(text, onSuccess, onFail);
             });
-            setSubmitMsg('Thank you! Your feedback has been submitted.');
-            setTimeout(() => {
-                setFeedbackType('feature'); setRating('3'); setTitle(''); setDescription(''); setSubmitMsg(null);
-            }, 3000);
-        } catch (e) {
-            console.error('Feedback submit error:', e);
-            setSubmitErr('Failed to submit feedback. Please try again.');
-        } finally {
-            setSubmitting(false);
+        } else {
+            feedbackFallbackCopy(text, onSuccess, onFail);
         }
     };
 
@@ -3057,54 +3254,37 @@ function FeedbackModal({ open, onClose }) {
             <Modal.Body>
                 <div className="csc-sc4s-info" style={{ fontSize: '13px', lineHeight: '1.6' }}>
                     <p style={{ color: 'var(--muted-color, #666)', marginBottom: '20px' }}>
-                        We value your feedback! Share thoughts, report issues, or suggest features.
+                        Share thoughts, report issues, or suggest features.
+                        Clicking <b>Send via Email</b> will open your email client with the details pre-filled.
                     </p>
                     <div style={{ marginBottom: '18px' }}>
                         <label style={{ fontWeight: 600, display: 'block', marginBottom: '6px' }}>Feedback Type</label>
                         <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
-                            {['feature', 'bug', 'improvement', 'general'].map(t => (
-                                <span key={t} style={radioStyle(feedbackType === t)} onClick={() => setFeedbackType(t)}>
-                                    {t === 'feature' ? 'Feature Request' : t === 'bug' ? 'Bug Report' : t.charAt(0).toUpperCase() + t.slice(1)}
+                            {FEEDBACK_TYPES.map(t => (
+                                <span key={t.id} style={radioStyle(feedbackType === t.id)} onClick={() => setFeedbackType(t.id)}>
+                                    {t.label}
                                 </span>
                             ))}
                         </div>
                     </div>
                     <div style={{ marginBottom: '18px' }}>
-                        <label style={{ fontWeight: 600, display: 'block', marginBottom: '6px' }}>Overall Rating</label>
-                        <div style={{ display: 'flex', gap: '6px' }}>
-                            {['1','2','3','4','5'].map(r => (
-                                <span key={r} style={{ ...radioStyle(rating === r), minWidth: '36px', textAlign: 'center' }} onClick={() => setRating(r)}>
-                                    {'⭐'.repeat(Number(r))}
-                                </span>
-                            ))}
-                        </div>
-                    </div>
-                    <div style={{ marginBottom: '18px' }}>
-                        <label style={{ fontWeight: 600, display: 'block', marginBottom: '6px' }}>Title</label>
-                        <input type="text" value={title}
-                            onChange={e => { setTitle(e.target.value); setSubmitErr(null); }}
-                            placeholder="e.g., Dashboard loading issue"
-                            style={{ width: '100%', padding: '8px 12px', fontSize: '13px', border: '1px solid var(--input-border, #ccc)', borderRadius: '6px', boxSizing: 'border-box', background: 'var(--input-bg, #fff)', color: 'var(--page-color, #333)' }}
-                        />
-                    </div>
-                    <div style={{ marginBottom: '18px' }}>
-                        <label style={{ fontWeight: 600, display: 'block', marginBottom: '6px' }}>Description</label>
+                        <label style={{ fontWeight: 600, display: 'block', marginBottom: '6px' }}>Your Feedback</label>
                         <textarea value={description}
-                            onChange={e => { setDescription(e.target.value); setSubmitErr(null); }}
+                            onChange={e => { setDescription(e.target.value); setActionMsg(null); }}
                             rows={5} placeholder="Please provide as much detail as possible..."
                             style={{ width: '100%', padding: '8px 12px', fontSize: '13px', border: '1px solid var(--input-border, #ccc)', borderRadius: '6px', boxSizing: 'border-box', resize: 'vertical', background: 'var(--input-bg, #fff)', color: 'var(--page-color, #333)' }}
                         />
                     </div>
-                    {submitMsg && <Message type="success">{submitMsg}</Message>}
-                    {submitErr && <Message type="error">{submitErr}</Message>}
+                    <div style={{ padding: '10px 14px', marginBottom: '14px', background: 'var(--card-footer-bg, #f9fafb)', borderRadius: '6px', fontSize: '11px', color: 'var(--muted-color, #888)', lineHeight: '1.5' }}>
+                        The following context will be included automatically: feedback type, platform ({platformType || 'unknown'}), SCAN version ({appVersion || 'unknown'}), and browser info.
+                    </div>
+                    {actionMsg && <Message type={actionMsg.type}>{actionMsg.text}</Message>}
                 </div>
             </Modal.Body>
             <Modal.Footer>
                 <Button appearance="secondary" label="Cancel" onClick={onClose} />
-                {submitting
-                    ? <WaitSpinner size="medium" />
-                    : <Button appearance="primary" className="scan-btn-primary" label="Submit Feedback" onClick={handleSubmit} />
-                }
+                <Button appearance="secondary" label="Copy to Clipboard" onClick={handleCopyToClipboard} />
+                <Button appearance="primary" className="scan-btn-primary" label="Send via Email" onClick={handleSendEmail} />
             </Modal.Footer>
         </Modal>
     );
@@ -3399,9 +3579,13 @@ function generateCustomerSummary(product, splunkbaseData) {
         plain.push('');
     }
 
+    if (product.es_compatible || product.sse_content) {
+        html.push(`<h3 style="margin:12px 0 4px;font-size:13px;color:#003366;">SecOps Content</h3>`);
+        plain.push('SECOPS CONTENT');
+    }
     if (product.es_compatible) {
-        html.push(`<h3 style="margin:12px 0 4px;font-size:13px;color:#003366;">Splunk Enterprise Security (ES)</h3>`);
-        plain.push('SPLUNK ENTERPRISE SECURITY (ES)');
+        html.push(`<p style="margin:0 0 4px;font-weight:600;">Enterprise Security (Premium)</p>`);
+        plain.push('  Enterprise Security (Premium)');
         if (product.es_cim_data_models && product.es_cim_data_models.length > 0) {
             html.push(`<p style="margin:0 0 4px;">CIM Data Models: ${product.es_cim_data_models.map(esc).join(', ')}</p>`);
             plain.push(`  CIM Data Models: ${product.es_cim_data_models.join(', ')}`);
@@ -3414,6 +3598,14 @@ function generateCustomerSummary(product, splunkbaseData) {
             html.push(`<p style="margin:0 0 8px;">ESCU Detections: ${esc(String(product.escu_detection_count))}</p>`);
             plain.push(`  ESCU Detections: ${product.escu_detection_count}`);
         }
+    }
+    if (product.sse_content && product.sse_use_case_count) {
+        html.push(`<p style="margin:0 0 4px;font-weight:600;">Security Essentials (Free)</p>`);
+        plain.push('  Security Essentials (Free)');
+        html.push(`<p style="margin:0 0 8px;">SSE Use Cases: ${esc(String(product.sse_use_case_count))}</p>`);
+        plain.push(`  SSE Use Cases: ${product.sse_use_case_count}`);
+    }
+    if (product.es_compatible || product.sse_content) {
         plain.push('');
     }
 
@@ -3432,11 +3624,23 @@ function generateCustomerSummary(product, splunkbaseData) {
         plain.push('');
     }
 
+    if (product.itsi_content_pack || product.ite_learn_content) {
+        html.push(`<h3 style="margin:12px 0 4px;font-size:13px;color:#003366;">ITOps Content</h3>`);
+        plain.push('ITOPS CONTENT');
+    }
     if (product.itsi_content_pack) {
-        html.push(`<h3 style="margin:12px 0 4px;font-size:13px;color:#003366;">Splunk ITSI</h3>`);
-        html.push(`<p style="margin:0 0 8px;">Content Pack: ${esc(product.itsi_content_pack)}</p>`);
-        plain.push('SPLUNK ITSI');
-        plain.push(`  Content Pack: ${product.itsi_content_pack}`);
+        html.push(`<p style="margin:0 0 4px;font-weight:600;">IT Service Intelligence (Premium)</p>`);
+        html.push(`<p style="margin:0 0 8px;">Content Pack: ${esc(product.itsi_content_pack.label || '')}</p>`);
+        plain.push('  IT Service Intelligence (Premium)');
+        plain.push(`  Content Pack: ${product.itsi_content_pack.label || ''}`);
+    }
+    if (product.ite_learn_content && product.ite_learn_procedure_count) {
+        html.push(`<p style="margin:0 0 4px;font-weight:600;">IT Essentials Learn (Free)</p>`);
+        html.push(`<p style="margin:0 0 8px;">Procedures: ${esc(String(product.ite_learn_procedure_count))}</p>`);
+        plain.push('  IT Essentials Learn (Free)');
+        plain.push(`  Procedures: ${product.ite_learn_procedure_count}`);
+    }
+    if (product.itsi_content_pack || product.ite_learn_content) {
         plain.push('');
     }
 
@@ -3495,10 +3699,10 @@ function generateCustomerSummary(product, splunkbaseData) {
 // Renders one product: icon, name, links, support bar (bottom), install/configure actions.
 // Support indicator: one blue bar at bottom via supportBadgeClass / data-support-level (see products.css).
 
-function ProductCard({ product, installedApps, appStatuses, indexerApps, sourcetypeData, splunkbaseData, appidToUidMap, isConfigured, isComingSoon, platformType, onToggleConfigured, onShowBestPractices, onViewLegacy, onSetCustomDashboard, devMode, onViewConfig, showGtmRibbon = false }) {
+function ProductCard({ product, installedApps, appStatuses, indexerApps, sourcetypeData, splunkbaseData, appidToUidMap, isConfigured, isComingSoon, noIntegration, platformType, onToggleConfigured, onShowBestPractices, onViewLegacy, onSetCustomDashboard, devMode, onViewConfig, showGtmRibbon = false, onEditCustom, onCloneCustom, onDeleteCustom, sharedSourcetypeMap }) {
     const {
         product_id, display_name, version, status, description, value_proposition, vendor, tagline,
-        icon_svg, learn_more_url, addon_docs_url, addon_troubleshoot_url, addon_install_url,
+        icon_svg, icon_emoji, learn_more_url, addon_docs_url, addon_troubleshoot_url, addon_install_url,
         addon, addon_label,
         app_viz, app_viz_label, app_viz_docs_url, app_viz_troubleshoot_url, app_viz_install_url,
         app_viz_2, app_viz_2_label, app_viz_2_docs_url, app_viz_2_troubleshoot_url, app_viz_2_install_url,
@@ -3511,6 +3715,11 @@ function ProductCard({ product, installedApps, appStatuses, indexerApps, sourcet
         stream_docs_url, netflow_sourcetypes, netflow_config_notes,
         es_compatible, es_cim_data_models, escu_analytic_stories, escu_detection_count, escu_detections,
     } = product;
+
+    // Suppress all action buttons for cards with no integration to install/configure.
+    // isComingSoon (under_development only) also shows a "Coming Soon" badge;
+    // noIntegration (roadmap / GTM / Integration Needed) suppresses buttons without a badge.
+    const suppressActions = isComingSoon || noIntegration;
 
     const appStatus = appStatuses[addon] || null;
     const vizAppStatus = app_viz ? (appStatuses[app_viz] || null) : null;
@@ -3625,6 +3834,29 @@ function ProductCard({ product, installedApps, appStatuses, indexerApps, sourcet
     const handleLaunchApp = () => {
         if (product.custom_dashboard) { handleLaunchCustom(); } else { handleLaunchDefault(); }
     };
+
+    // TA-only: addon is installed but has no visible UI (no app_viz, addon is_visible=false)
+    const isAddonOnly = !app_viz && addon && appStatus?.installed && !appStatus?.visible;
+
+    // SC4S-only: no addon/app at all — data arrives via SC4S, user needs Explore to see it
+    const isSc4sOnly = !addon && !app_viz && sc4s_supported && (product.sourcetypes || []).length > 0;
+
+    const handleExploreData = () => {
+        const sts = product.sourcetypes || [];
+        if (sts.length > 0) {
+            const escaped = sts.map(s => s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'));
+            const pattern = '^(' + escaped.join('|') + ')$';
+            const spl = `| metadata type=sourcetypes index=* | where match(sourcetype, "${pattern}") | convert ctime(*Time) | table sourcetype recentTime firstTime lastTime totalCount | eventstats sum(totalCount) as GrandTotal | sort - totalCount`;
+            window.open(createURL(`/app/search/search?q=${encodeURIComponent(spl)}`), '_blank');
+        } else {
+            window.open(createURL('/app/search/search'), '_blank');
+        }
+    };
+
+    const handleCreateDashboard = () => {
+        window.open(createURL('/app/search/dashboards'), '_blank');
+    };
+
     const handleSaveCustomDashboard = async () => {
         setCustomDashSaving(true);
         setCustomDashMsg(null);
@@ -3650,12 +3882,14 @@ function ProductCard({ product, installedApps, appStatuses, indexerApps, sourcet
 
     const isInstalled = appStatus?.installed || vizAppStatus?.installed || vizApp2Status?.installed;
     const hasItsi = !!itsi_content_pack;
+    const hasItops = !!itsi_content_pack || !!product.ite_learn_content;
     const hasSoar = soar_connector_uids && soar_connector_uids.length > 0;
     const hasEs = !!es_compatible;
+    const hasSecops = !!es_compatible || !!product.sse_content;
     const [soarInfoOpen, setSoarInfoOpen] = useState(false);
     const [alertActionsInfoOpen, setAlertActionsInfoOpen] = useState(false);
-    const [itsiInfoOpen, setItsiInfoOpen] = useState(false);
-    const [esInfoOpen, setEsInfoOpen] = useState(false);
+    const [itopsInfoOpen, setItopsInfoOpen] = useState(false);
+    const [secopsInfoOpen, setSecopsInfoOpen] = useState(false);
     const addonFamily = product.addon_family || 'default';
 
     // Derive Splunkbase UIDs at runtime from appidToUidMap (CSV lookup) or static catalog fields
@@ -3691,13 +3925,14 @@ function ProductCard({ product, installedApps, appStatuses, indexerApps, sourcet
         ? buildSourcetypeSearchUrl(product.sourcetypes)
         : null;
 
-    // Support indicator: one blue bar at bottom of card for cisco_supported or splunk_supported
-    // (CSS: .csc-card-cisco-supported / .csc-card-splunk-supported; data-support-level for fallback)
+    // Support indicator: colored bar at bottom of card.
+    // Custom cards get a distinct teal border; catalog cards use Cisco blue / Splunk pink / red.
     const hasWorkingIntegration = !!(addon || app_viz || app_viz_2 || sc4s_supported);
-    const supportBadgeClass = support_level === 'cisco_supported' ? 'csc-card-cisco-supported'
+    const supportBadgeClass = product.custom ? 'csc-card-custom'
+        : support_level === 'cisco_supported' ? 'csc-card-cisco-supported'
         : support_level === 'splunk_supported' ? 'csc-card-splunk-supported'
         : hasWorkingIntegration && (support_level === 'developer_supported' || support_level === 'community_supported' || support_level === 'not_supported') ? 'csc-card-unsupported-tier' : '';
-    const supportLevelAttr = supportBadgeClass ? support_level : undefined;
+    const supportLevelAttr = supportBadgeClass ? (product.custom ? 'custom' : support_level) : undefined;
     return (
         <div
             className={`csc-card ${supportBadgeClass}`.trim()}
@@ -3739,7 +3974,7 @@ function ProductCard({ product, installedApps, appStatuses, indexerApps, sourcet
                             />
                         ) : null}
                         <span className="csc-icon-fallback" style={icon_svg ? {display:'none'} : undefined}>
-                            {(display_name || 'C')[0]}
+                            {icon_emoji || (display_name || 'C')[0]}
                         </span>
                     </span>
                 </div>
@@ -3803,11 +4038,11 @@ function ProductCard({ product, installedApps, appStatuses, indexerApps, sourcet
                             {hasSoar && (
                                 <button className="csc-badge-btn csc-badge-soar" title={`${soar_connector_uids.length} SOAR Connector${soar_connector_uids.length !== 1 ? 's' : ''} — Click for Info`} onClick={(e) => { e.stopPropagation(); e.preventDefault(); setSoarInfoOpen(true); }}>SOAR</button>
                             )}
-                            {hasItsi && (
-                                <button className="csc-badge-btn csc-badge-itsi" title="ITSI Content Pack available — Click for Info" onClick={(e) => { e.stopPropagation(); e.preventDefault(); setItsiInfoOpen(true); }}>ITSI</button>
+                            {hasItops && (
+                                <button className="csc-badge-btn csc-badge-itops" title="ITOps content available — Click for Info" onClick={(e) => { e.stopPropagation(); e.preventDefault(); setItopsInfoOpen(true); }}><PulseIcon size="0.85em" style={{ verticalAlign: '-0.1em', marginRight: '3px' }} />ITOps</button>
                             )}
-                            {hasEs && (
-                                <button className="csc-badge-btn csc-badge-es" title={`ES Compatible${escu_detection_count ? ` — ${escu_detection_count} ESCU Detections` : ''} — Click for Info`} onClick={(e) => { e.stopPropagation(); e.preventDefault(); setEsInfoOpen(true); }}>ES</button>
+                            {hasSecops && (
+                                <button className="csc-badge-btn csc-badge-secops" title={`SecOps content${escu_detection_count ? ` — ${escu_detection_count} ESCU Detections` : ''}${product.sse_use_case_count ? ` · ${product.sse_use_case_count} SSE Use Cases` : ''} — Click for Info`} onClick={(e) => { e.stopPropagation(); e.preventDefault(); setSecopsInfoOpen(true); }}><ShieldIcon size="0.85em" style={{ verticalAlign: '-0.1em', marginRight: '3px' }} />SecOps</button>
                             )}
                             {alert_action_uids && alert_action_uids.length > 0 && (
                                 <button className="csc-badge-btn csc-badge-alert" title={`${alert_action_uids.length} custom Alert Action${alert_action_uids.length !== 1 ? 's' : ''} — Click for Info`} onClick={(e) => { e.stopPropagation(); e.preventDefault(); setAlertActionsInfoOpen(true); }}>Alert Actions</button>
@@ -3859,7 +4094,7 @@ function ProductCard({ product, installedApps, appStatuses, indexerApps, sourcet
                 vizAppStatus={vizAppStatus}
                 vizApp2Status={vizApp2Status}
                 sourcetypeInfo={sourcetypeInfo}
-                isRoadmapCard={coverage_gap}
+                isRoadmapCard={coverage_gap || suppressActions}
                 sourcetypeSearchUrl={sourcetypeSearchUrl}
                 isArchived={!!(!addon_install_url && addon_splunkbase_uid)}
             />
@@ -3867,7 +4102,7 @@ function ProductCard({ product, installedApps, appStatuses, indexerApps, sourcet
 
 
             {/* ── Unified summary + single expandable details panel ── */}
-            {hasDeps && (
+            {hasDeps && !suppressActions && (
                 <div className="csc-card-dependency">
                     {/* Single collapsed summary line */}
                     <div className="csc-dep-summary" onClick={() => setDepsExpanded((v) => !v)} role="button" tabIndex={0}>
@@ -3885,7 +4120,7 @@ function ProductCard({ product, installedApps, appStatuses, indexerApps, sourcet
                                     {depItems.length > 1 && <span className="csc-card-meta-sep"> · </span>}
                                     <span className={sourcetypeInfo?.hasData ? 'csc-dep-inline-ok' : 'csc-dep-inline-miss'}>
                                         {sourcetypeInfo?.hasData
-                                            ? `${product.sourcetypes.length} sourcetype${product.sourcetypes.length !== 1 ? 's' : ''} active`
+                                            ? `${sourcetypeInfo.matchedSTs?.length || 0} of ${product.sourcetypes.length} sourcetype${product.sourcetypes.length !== 1 ? 's' : ''} active`
                                             : `${product.sourcetypes.length} sourcetype${product.sourcetypes.length !== 1 ? 's' : ''}`}
                                     </span>
                                 </>
@@ -3905,10 +4140,10 @@ function ProductCard({ product, installedApps, appStatuses, indexerApps, sourcet
                             {addon && (
                                 <>
                                 <div className="csc-dep-detail">
-                                    {appStatus?.installed ? (
+                                    {appStatus?.installed && appStatus?.visible ? (
                                         <a href={createURL(`/app/${addon}/`)} target="_blank" rel="noopener noreferrer" className="csc-dep-name csc-dep-name-link" title={`${addon} — Click to open`}>{addon_label || addon}</a>
                                     ) : (
-                                        <span className="csc-dep-name" title={addon}>{addon_label || addon}</span>
+                                        <span className="csc-dep-name" title={appStatus?.installed ? `${addon} — TA only (no UI)` : addon}>{addon_label || addon}</span>
                                     )}
                                     {(addon_splunkbase_uid || addon_docs_url || addon_troubleshoot_url) && (
                                         <span className="csc-split-pill">
@@ -3932,7 +4167,7 @@ function ProductCard({ product, installedApps, appStatuses, indexerApps, sourcet
                                     {appStatus?.version && (
                                         <span className="csc-dep-version">v{appStatus.version}</span>
                                     )}
-                                    {!appStatus?.installed && !isComingSoon && (
+                                    {!appStatus?.installed && !suppressActions && (
                                         <span className="csc-dep-status-missing">not installed</span>
                                     )}
                                 </div>
@@ -3997,7 +4232,7 @@ function ProductCard({ product, installedApps, appStatuses, indexerApps, sourcet
                                 <>
                                 <hr className="csc-dep-divider" />
                                 <div className="csc-dep-detail">
-                                    {vizAppStatus?.installed ? (
+                                    {vizAppStatus?.installed && vizAppStatus?.visible ? (
                                         <a href={createURL(`/app/${app_viz}/`)} target="_blank" rel="noopener noreferrer" className="csc-dep-name csc-dep-name-link" title={`${app_viz} — Click to open`}>{app_viz_label || app_viz}</a>
                                     ) : (
                                         <span className="csc-dep-name" title={app_viz}>{app_viz_label || app_viz}</span>
@@ -4024,7 +4259,7 @@ function ProductCard({ product, installedApps, appStatuses, indexerApps, sourcet
                                     {vizAppStatus?.version && (
                                         <span className="csc-dep-version">v{vizAppStatus.version}</span>
                                     )}
-                                    {!vizAppStatus?.installed && !isComingSoon && (
+                                    {!vizAppStatus?.installed && !suppressActions && (
                                         <span className="csc-dep-status-missing">not installed</span>
                                     )}
                                 </div>
@@ -4041,7 +4276,7 @@ function ProductCard({ product, installedApps, appStatuses, indexerApps, sourcet
                                 <>
                                 <hr className="csc-dep-divider" />
                                 <div className="csc-dep-detail">
-                                    {vizApp2Status?.installed ? (
+                                    {vizApp2Status?.installed && vizApp2Status?.visible ? (
                                         <a href={createURL(`/app/${app_viz_2}/`)} target="_blank" rel="noopener noreferrer" className="csc-dep-name csc-dep-name-link" title={`${app_viz_2} — Click to open`}>{app_viz_2_label || app_viz_2}</a>
                                     ) : (
                                         <span className="csc-dep-name" title={app_viz_2}>{app_viz_2_label || app_viz_2}</span>
@@ -4068,7 +4303,7 @@ function ProductCard({ product, installedApps, appStatuses, indexerApps, sourcet
                                     {vizApp2Status?.version && (
                                         <span className="csc-dep-version">v{vizApp2Status.version}</span>
                                     )}
-                                    {!vizApp2Status?.installed && !isComingSoon && (
+                                    {!vizApp2Status?.installed && !suppressActions && (
                                         <span className="csc-dep-status-missing">not installed</span>
                                     )}
                                 </div>
@@ -4353,14 +4588,39 @@ function ProductCard({ product, installedApps, appStatuses, indexerApps, sourcet
                                     </summary>
                                     <div className="csc-dep-details-body">
                                         <div className="csc-sourcetypes-chips">
-                                            {product.sourcetypes.map(st => (
-                                                <span
-                                                    key={st}
-                                                    className={`csc-st-chip ${sourcetypeInfo?.hasData ? 'csc-st-chip-active' : ''}`}
-                                                    title={st}
-                                                >{st}</span>
-                                            ))}
+                                            {product.sourcetypes.map(st => {
+                                                const peers = sharedSourcetypeMap && sharedSourcetypeMap[st];
+                                                const isShared = peers && peers.length > 1;
+                                                const hasFlow = sourcetypeInfo?.matchedSTs?.includes(st);
+                                                return (
+                                                    <span
+                                                        key={st}
+                                                        className={`csc-st-chip ${hasFlow ? 'csc-st-chip-active' : 'csc-st-chip-inactive'} ${isShared ? 'csc-st-chip-shared' : ''}`}
+                                                        title={`${st}${hasFlow ? '' : ' — no data in last 7d'}${isShared ? ` — shared with ${peers.filter(x => x.product_id !== product.product_id).map(x => x.display_name).join(', ')}` : ''}`}
+                                                    >{st}{isShared && <span className="csc-st-shared-badge" title="Shared sourcetype">⇄</span>}</span>
+                                                );
+                                            })}
                                         </div>
+                                        {(() => {
+                                            if (!sharedSourcetypeMap) return null;
+                                            const sharedSts = product.sourcetypes.filter(st => sharedSourcetypeMap[st] && sharedSourcetypeMap[st].length > 1);
+                                            if (sharedSts.length === 0) return null;
+                                            const peerNames = new Set();
+                                            for (const st of sharedSts) {
+                                                for (const p of sharedSourcetypeMap[st]) {
+                                                    if (p.product_id !== product.product_id) peerNames.add(p.display_name);
+                                                }
+                                            }
+                                            return (
+                                                <div className="csc-st-shared-note">
+                                                    <span className="csc-st-shared-icon">ℹ</span>
+                                                    {sharedSts.length === product.sourcetypes.length
+                                                        ? 'All sourcetypes are '
+                                                        : `${sharedSts.length} sourcetype${sharedSts.length > 1 ? 's are' : ' is'} `}
+                                                    shared with: {[...peerNames].join(', ')}
+                                                </div>
+                                            );
+                                        })()}
                                     </div>
                                 </details>
                                 </>
@@ -4409,7 +4669,7 @@ function ProductCard({ product, installedApps, appStatuses, indexerApps, sourcet
                     Learn More
                 </a>
                 {/* Disabled TA — link to app manager */}
-                {!isComingSoon && isConfigured && appStatus?.installed && appStatus?.disabled && (
+                {!suppressActions && isConfigured && appStatus?.installed && appStatus?.disabled && (
                     <a href={createURL('/manager/splunk-cisco-app-navigator/apps/local')}
                         target="_blank" rel="noopener noreferrer"
                         className="csc-btn csc-btn-disabled-label"
@@ -4418,7 +4678,7 @@ function ProductCard({ product, installedApps, appStatuses, indexerApps, sourcet
                     </a>
                 )}
                 {/* Disabled Viz App — link to app manager */}
-                {!isComingSoon && isConfigured && vizAppStatus?.installed && vizAppStatus?.disabled && (
+                {!suppressActions && isConfigured && vizAppStatus?.installed && vizAppStatus?.disabled && (
                     <a href={createURL('/manager/splunk-cisco-app-navigator/apps/local')}
                         target="_blank" rel="noopener noreferrer"
                         className="csc-btn csc-btn-disabled-label"
@@ -4427,7 +4687,7 @@ function ProductCard({ product, installedApps, appStatuses, indexerApps, sourcet
                     </a>
                 )}
                 {/* Update TA */}
-                {!isComingSoon && isConfigured && appStatus?.installed && !appStatus?.disabled && appStatus?.updateVersion && (addon_install_url || addon_splunkbase_uid) && (
+                {!suppressActions && isConfigured && appStatus?.installed && !appStatus?.disabled && appStatus?.updateVersion && (addon_install_url || addon_splunkbase_uid) && (
                     <a href={addon_install_url ? createURL(addon_install_url) : generateSplunkbaseUrl(addon_splunkbase_uid)} target="_blank" rel="noopener noreferrer"
                         className="csc-btn csc-btn-upgrade"
                         title={`Update ${addon_label || addon} to v${appStatus.updateVersion}`}>
@@ -4435,7 +4695,7 @@ function ProductCard({ product, installedApps, appStatuses, indexerApps, sourcet
                     </a>
                 )}
                 {/* Update Viz App */}
-                {!isComingSoon && isConfigured && vizAppStatus?.installed && !vizAppStatus?.disabled && vizAppStatus?.updateVersion && (app_viz_install_url || app_viz_splunkbase_uid) && (
+                {!suppressActions && isConfigured && vizAppStatus?.installed && !vizAppStatus?.disabled && vizAppStatus?.updateVersion && (app_viz_install_url || app_viz_splunkbase_uid) && (
                     <a href={app_viz_install_url ? createURL(app_viz_install_url) : generateSplunkbaseUrl(app_viz_splunkbase_uid)} target="_blank" rel="noopener noreferrer"
                         className="csc-btn csc-btn-upgrade"
                         title={`Update ${app_viz_label || app_viz} to v${vizAppStatus.updateVersion}`}>
@@ -4443,7 +4703,7 @@ function ProductCard({ product, installedApps, appStatuses, indexerApps, sourcet
                     </a>
                 )}
                 {/* Update Viz App 2 */}
-                {!isComingSoon && isConfigured && vizApp2Status?.installed && !vizApp2Status?.disabled && vizApp2Status?.updateVersion && app_viz_2_install_url && (
+                {!suppressActions && isConfigured && vizApp2Status?.installed && !vizApp2Status?.disabled && vizApp2Status?.updateVersion && app_viz_2_install_url && (
                     <a href={createURL(app_viz_2_install_url)} target="_blank" rel="noopener noreferrer"
                         className="csc-btn csc-btn-upgrade"
                         title={`Update ${app_viz_2_label || app_viz_2} to v${vizApp2Status.updateVersion}`}>
@@ -4451,7 +4711,7 @@ function ProductCard({ product, installedApps, appStatuses, indexerApps, sourcet
                     </a>
                 )}
                 {/* Install TA */}
-                {!isComingSoon && isConfigured && addon && !appStatus?.installed && (addon_install_url || addon_splunkbase_uid) && (
+                {!suppressActions && isConfigured && addon && !appStatus?.installed && (addon_install_url || addon_splunkbase_uid) && (
                     <a href={addon_install_url ? createURL(addon_install_url) : generateSplunkbaseUrl(addon_splunkbase_uid)}
                         target="_blank" rel="noopener noreferrer"
                         className={`csc-btn ${!addon_install_url ? 'csc-btn-archived' : 'csc-btn-green'}`}
@@ -4462,7 +4722,7 @@ function ProductCard({ product, installedApps, appStatuses, indexerApps, sourcet
                     </a>
                 )}
                 {/* Install Viz App */}
-                {!isComingSoon && isConfigured && app_viz && !vizAppStatus?.installed && (app_viz_install_url || app_viz_splunkbase_uid) && (
+                {!suppressActions && isConfigured && app_viz && !vizAppStatus?.installed && (app_viz_install_url || app_viz_splunkbase_uid) && (
                     <a href={app_viz_install_url ? createURL(app_viz_install_url) : generateSplunkbaseUrl(app_viz_splunkbase_uid)}
                         target="_blank" rel="noopener noreferrer"
                         className={`csc-btn ${!app_viz_install_url ? 'csc-btn-archived' : 'csc-btn-green'}`}
@@ -4473,7 +4733,7 @@ function ProductCard({ product, installedApps, appStatuses, indexerApps, sourcet
                     </a>
                 )}
                 {/* Install Viz App 2 */}
-                {!isComingSoon && isConfigured && app_viz_2 && !vizApp2Status?.installed && (app_viz_2_install_url || app_viz_2_splunkbase_uid) && (
+                {!suppressActions && isConfigured && app_viz_2 && !vizApp2Status?.installed && (app_viz_2_install_url || app_viz_2_splunkbase_uid) && (
                     <a href={app_viz_2_install_url ? createURL(app_viz_2_install_url) : generateSplunkbaseUrl(app_viz_2_splunkbase_uid)}
                         target="_blank" rel="noopener noreferrer"
                         className={`csc-btn ${!app_viz_2_install_url ? 'csc-btn-archived' : 'csc-btn-green'}`}
@@ -4484,35 +4744,118 @@ function ProductCard({ product, installedApps, appStatuses, indexerApps, sourcet
                     </a>
                 )}
                 {/* Launch — only when installed AND not disabled */}
-                {!isComingSoon && isConfigured && isInstalled && !appStatus?.disabled && !vizAppStatus?.disabled && (
+                {!suppressActions && isConfigured && isInstalled && !appStatus?.disabled && !vizAppStatus?.disabled && (
+                    isAddonOnly ? (
+                        /* ── TA-only: contextual Explore dropdown ── */
+                        <div className="csc-launch-wrap" ref={launchBtnRef}>
+                            <button className="csc-btn csc-btn-explore" onClick={product.custom_dashboard ? handleLaunchCustom : handleExploreData}
+                                title={product.custom_dashboard
+                                    ? `Open custom dashboard: ${product.custom_dashboard}`
+                                    : `Explore ${display_name} data in Splunk Search`}>
+                                <Search size={14} style={{ marginRight: 4 }} />
+                                {product.custom_dashboard ? 'Launch' : 'Explore'}
+                            </button>
+                            <button
+                                className="csc-btn csc-btn-explore csc-launch-caret"
+                                onClick={toggleLaunchMenu}
+                                title="More options"
+                            ><ChevronDown size={14} /></button>
+                            {launchMenuOpen && ReactDOM.createPortal(
+                                <div className="csc-launch-menu" ref={launchMenuRef}
+                                    style={{ top: launchMenuPos.top, left: launchMenuPos.left }}>
+                                    <button className="csc-launch-menu-item" onClick={() => { handleExploreData(); setLaunchMenuOpen(false); }}>
+                                        <Search size={13} style={{ marginRight: 6, opacity: 0.7 }} />Explore Data in Search
+                                    </button>
+                                    <button className="csc-launch-menu-item" onClick={() => { handleCreateDashboard(); setLaunchMenuOpen(false); }}>
+                                        <LayoutIcon size={13} style={{ marginRight: 6, opacity: 0.7 }} />Create Dashboard
+                                    </button>
+                                    {product.custom_dashboard && (
+                                        <button className="csc-launch-menu-item" onClick={() => { handleLaunchCustom(); setLaunchMenuOpen(false); }}>
+                                            Custom: {product.custom_dashboard.split('/').pop()}
+                                        </button>
+                                    )}
+                                    <button className="csc-launch-menu-item csc-launch-menu-edit" onClick={() => { setLaunchMenuOpen(false); setCustomDashModalOpen(true); setCustomDashInput(product.custom_dashboard || ''); }}>
+                                        {product.custom_dashboard ? 'Edit Custom…' : 'Set Custom…'}
+                                    </button>
+                                </div>,
+                                document.body
+                            )}
+                        </div>
+                    ) : (
+                        /* ── Normal launch: app has visible UI ── */
+                        <div className="csc-launch-wrap" ref={launchBtnRef}>
+                            <button className="csc-btn csc-btn-green" onClick={handleLaunchApp}
+                                title={product.custom_dashboard
+                                    ? `Launch custom: ${product.custom_dashboard}`
+                                    : `Launch ${app_viz_label || addon_label || addon}`}>
+                                Launch
+                            </button>
+                            <button
+                                className="csc-btn csc-btn-green csc-launch-caret"
+                                onClick={toggleLaunchMenu}
+                                title="Launch options"
+                            ><ChevronDown size={14} /></button>
+                            {launchMenuOpen && ReactDOM.createPortal(
+                                <div className="csc-launch-menu" ref={launchMenuRef}
+                                    style={{ top: launchMenuPos.top, left: launchMenuPos.left }}>
+                                    {productDashboards.length > 1 ? (
+                                        productDashboards.map((dash, i) => (
+                                            <button key={dash} className="csc-launch-menu-item" onClick={() => { handleLaunchDashboard(dash); setLaunchMenuOpen(false); }}>
+                                                {dash.replace(/_/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase())}
+                                            </button>
+                                        ))
+                                    ) : (
+                                        <button className="csc-launch-menu-item" onClick={() => { handleLaunchDefault(); setLaunchMenuOpen(false); }}>
+                                            {productDashboards[0]
+                                                ? productDashboards[0].replace(/_/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase())
+                                                : (app_viz_label || addon_label || 'Default Dashboard')}
+                                        </button>
+                                    )}
+                                    <div className="csc-launch-menu-divider" />
+                                    <button className="csc-launch-menu-item" onClick={() => { handleExploreData(); setLaunchMenuOpen(false); }}>
+                                        <Search size={13} style={{ marginRight: 6, opacity: 0.7 }} />Explore Data in Search
+                                    </button>
+                                    <button className="csc-launch-menu-item" onClick={() => { handleCreateDashboard(); setLaunchMenuOpen(false); }}>
+                                        <LayoutIcon size={13} style={{ marginRight: 6, opacity: 0.7 }} />Create Dashboard
+                                    </button>
+                                    {product.custom_dashboard && (
+                                        <button className="csc-launch-menu-item" onClick={() => { handleLaunchCustom(); setLaunchMenuOpen(false); }}>
+                                            Custom: {product.custom_dashboard.split('/').pop()}
+                                        </button>
+                                    )}
+                                    <button className="csc-launch-menu-item csc-launch-menu-edit" onClick={() => { setLaunchMenuOpen(false); setCustomDashModalOpen(true); setCustomDashInput(product.custom_dashboard || ''); }}>
+                                        {product.custom_dashboard ? 'Edit Custom…' : 'Set Custom…'}
+                                    </button>
+                                </div>,
+                                document.body
+                            )}
+                        </div>
+                    )
+                )}
+                {/* SC4S-only: Explore button when configured (no addon/app to install) */}
+                {!suppressActions && isConfigured && isSc4sOnly && !isInstalled && (
                     <div className="csc-launch-wrap" ref={launchBtnRef}>
-                        <button className="csc-btn csc-btn-green" onClick={handleLaunchApp}
+                        <button className="csc-btn csc-btn-explore" onClick={product.custom_dashboard ? handleLaunchCustom : handleExploreData}
                             title={product.custom_dashboard
-                                ? `Launch custom: ${product.custom_dashboard}`
-                                : `Launch ${app_viz_label || addon_label || addon}`}>
-                            Launch
+                                ? `Open custom dashboard: ${product.custom_dashboard}`
+                                : `Explore ${display_name} data in Splunk Search`}>
+                            <Search size={14} style={{ marginRight: 4 }} />
+                            {product.custom_dashboard ? 'Launch' : 'Explore'}
                         </button>
                         <button
-                            className="csc-btn csc-btn-green csc-launch-caret"
+                            className="csc-btn csc-btn-explore csc-launch-caret"
                             onClick={toggleLaunchMenu}
-                            title="Launch options"
+                            title="More options"
                         ><ChevronDown size={14} /></button>
                         {launchMenuOpen && ReactDOM.createPortal(
                             <div className="csc-launch-menu" ref={launchMenuRef}
                                 style={{ top: launchMenuPos.top, left: launchMenuPos.left }}>
-                                {productDashboards.length > 1 ? (
-                                    productDashboards.map((dash, i) => (
-                                        <button key={dash} className="csc-launch-menu-item" onClick={() => { handleLaunchDashboard(dash); setLaunchMenuOpen(false); }}>
-                                            {dash.replace(/_/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase())}
-                                        </button>
-                                    ))
-                                ) : (
-                                    <button className="csc-launch-menu-item" onClick={() => { handleLaunchDefault(); setLaunchMenuOpen(false); }}>
-                                        {productDashboards[0]
-                                            ? productDashboards[0].replace(/_/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase())
-                                            : (app_viz_label || addon_label || 'Default Dashboard')}
-                                    </button>
-                                )}
+                                <button className="csc-launch-menu-item" onClick={() => { handleExploreData(); setLaunchMenuOpen(false); }}>
+                                    <Search size={13} style={{ marginRight: 6, opacity: 0.7 }} />Explore Data in Search
+                                </button>
+                                <button className="csc-launch-menu-item" onClick={() => { handleCreateDashboard(); setLaunchMenuOpen(false); }}>
+                                    <LayoutIcon size={13} style={{ marginRight: 6, opacity: 0.7 }} />Create Dashboard
+                                </button>
                                 {product.custom_dashboard && (
                                     <button className="csc-launch-menu-item" onClick={() => { handleLaunchCustom(); setLaunchMenuOpen(false); }}>
                                         Custom: {product.custom_dashboard.split('/').pop()}
@@ -4527,21 +4870,21 @@ function ProductCard({ product, installedApps, appStatuses, indexerApps, sourcet
                     </div>
                 )}
                 {/* Add to My Products — allowed for coverage_gap products too (e.g. AppDynamics, Webex) */}
-                {!isComingSoon && !isConfigured && (
+                {!suppressActions && !isConfigured && (
                     <button className="csc-btn csc-btn-green" onClick={() => onToggleConfigured(product_id)}
                         title="Add to My Products">
                         <Plus style={{marginRight: 4}} /> Add
                     </button>
                 )}
                 {/* Best Practices — hidden for roadmap/coverage_gap products (no add-on yet) */}
-                {!isComingSoon && !coverage_gap && (
+                {!suppressActions && !coverage_gap && (
                     <button className="csc-btn csc-btn-icon csc-btn-outline" onClick={() => onShowBestPractices(product)}
                         title="Best Practices">
                         <QuestionCircle size={16} />
                     </button>
                 )}
                 {/* Copy customer summary to clipboard */}
-                {!isComingSoon && (
+                {!suppressActions && (
                     <button className={`csc-btn csc-btn-icon csc-btn-outline ${copiedSummary ? 'csc-btn-copied' : ''}`}
                         onClick={handleCopySummary}
                         title={copiedSummary ? 'Copied to clipboard!' : `Copy ${display_name} summary for customer`}>
@@ -4551,7 +4894,7 @@ function ProductCard({ product, installedApps, appStatuses, indexerApps, sourcet
                     </button>
                 )}
                 {/* Remove */}
-                {!isComingSoon && isConfigured && (
+                {!suppressActions && isConfigured && (
                     <button className="csc-btn csc-btn-icon csc-btn-outline" onClick={() => onToggleConfigured(product_id)}
                         title="Remove from My Products">
                         <Close size={16} />
@@ -4563,6 +4906,25 @@ function ProductCard({ product, installedApps, appStatuses, indexerApps, sourcet
                         onClick={() => onViewConfig(product_id)}
                         title="View product config (Dev Mode)">
                         <Code size={16} />
+                    </button>
+                )}
+                {/* Custom card management — edit, clone, delete (only when callbacks provided) */}
+                {onEditCustom && (
+                    <button className="csc-btn csc-btn-icon csc-btn-outline"
+                        onClick={() => onEditCustom(product)} title="Edit custom product">
+                        <Pencil size={16} />
+                    </button>
+                )}
+                {onCloneCustom && (
+                    <button className="csc-btn csc-btn-icon csc-btn-outline"
+                        onClick={() => onCloneCustom(product)} title="Clone custom product">
+                        <CloneIcon size={16} />
+                    </button>
+                )}
+                {onDeleteCustom && (
+                    <button className="csc-btn csc-btn-icon csc-btn-outline csc-btn-custom-delete"
+                        onClick={() => onDeleteCustom(product)} title="Delete custom product">
+                        <TrashCan size={16} />
                     </button>
                 )}
                 {isComingSoon && (
@@ -4577,8 +4939,10 @@ function ProductCard({ product, installedApps, appStatuses, indexerApps, sourcet
                     <Modal.Body>
                         <div style={{ padding: '8px 0' }}>
                             <p style={{ fontSize: '13px', color: 'var(--muted-color, #666)', marginBottom: '14px', lineHeight: '1.6' }}>
-                                Set a custom dashboard to launch for this product. When set, the Launch button will open your custom dashboard by default.
-                                Use the dropdown arrow to switch between the Cisco default and your custom dashboard at any time.
+                                {isAddonOnly
+                                    ? <>Set a custom dashboard for this product. This is a <strong>TA-only integration</strong> — the add-on ingests and normalises data but has no built-in dashboards. Create one with Dashboard Studio, then paste the path here. When set, the main button will open your dashboard directly.</>
+                                    : <>Set a custom dashboard to launch for this product. When set, the Launch button will open your custom dashboard by default. Use the dropdown arrow to switch between the Cisco default and your custom dashboard at any time.</>
+                                }
                             </p>
                             <label style={{ fontWeight: 600, fontSize: '13px', display: 'block', marginBottom: '6px' }}>
                                 Dashboard path
@@ -4622,8 +4986,8 @@ function ProductCard({ product, installedApps, appStatuses, indexerApps, sourcet
             <HFInfoModal open={hfInfoOpen} onClose={() => setHfInfoOpen(false)} isCloud={platformType === 'cloud'} />
             <MagicEightModal open={magicEightOpen} onClose={() => setMagicEightOpen(false)} sourcetypes={product.sourcetypes} productName={display_name} addonApp={addon} addonLabel={addon_label} appViz={app_viz} appViz2={app_viz_2} installedApps={installedApps} indexerApps={indexerApps} />
             {hasSoar && <SOARInfoModal open={soarInfoOpen} onClose={() => setSoarInfoOpen(false)} soarConnectorUids={soar_connector_uids} splunkbaseData={splunkbaseData} productName={display_name} />}
-            {hasItsi && <ITSIInfoModal open={itsiInfoOpen} onClose={() => setItsiInfoOpen(false)} itsiContentPack={itsi_content_pack} productName={display_name} />}
-            {hasEs && <ESInfoModal open={esInfoOpen} onClose={() => setEsInfoOpen(false)} productName={display_name} cimDataModels={es_cim_data_models} escuStories={escu_analytic_stories} escuDetectionCount={escu_detection_count} escuDetections={escu_detections} />}
+            {hasItops && <ITOpsContentModal open={itopsInfoOpen} onClose={() => setItopsInfoOpen(false)} itsiContentPack={itsi_content_pack} iteLearnContent={product.ite_learn_content} iteLearnProcedures={product.ite_learn_procedures} iteLearnProcedureCount={product.ite_learn_procedure_count} productName={display_name} installedApps={installedApps} />}
+            {hasSecops && <SecOpsContentModal open={secopsInfoOpen} onClose={() => setSecopsInfoOpen(false)} productName={display_name} esCompatible={es_compatible} cimDataModels={es_cim_data_models} escuStories={escu_analytic_stories} escuDetectionCount={escu_detection_count} escuDetections={escu_detections} sseContent={product.sse_content} sseUseCases={product.sse_use_cases} sseUseCaseCount={product.sse_use_case_count} installedApps={installedApps} />}
             {alert_action_uids && alert_action_uids.length > 0 && (
                 <AlertActionsInfoModal open={alertActionsInfoOpen} onClose={() => setAlertActionsInfoOpen(false)} alertActionUids={alert_action_uids} splunkbaseData={splunkbaseData} productName={display_name} />
             )}
@@ -4693,10 +5057,23 @@ function toSplunkConf(data) {
         if (p.alert_action_uids && p.alert_action_uids.length) {
             lines.push(`alert_action_uids = ${p.alert_action_uids.join(',')}`);
         }
+        // SSE
+        if (p.sse_content) {
+            lines.push(`sse_content = true`);
+            if (p.sse_use_case_count) lines.push(`sse_use_case_count = ${p.sse_use_case_count}`);
+            if (p.sse_use_cases && p.sse_use_cases.length) lines.push(`sse_use_cases = ${p.sse_use_cases.join(',')}`);
+            if (p.sse_data_sources && p.sse_data_sources.length) lines.push(`sse_data_sources = ${p.sse_data_sources.join(',')}`);
+        }
         // ITSI
         if (p.itsi_content_pack) {
             lines.push(`itsi_content_pack_label = ${p.itsi_content_pack.label}`);
             if (p.itsi_content_pack.docs_url) lines.push(`itsi_content_pack_docs_url = ${p.itsi_content_pack.docs_url}`);
+        }
+        // ITE Learn
+        if (p.ite_learn_content) {
+            lines.push(`ite_learn_content = true`);
+            if (p.ite_learn_procedure_count) lines.push(`ite_learn_procedure_count = ${p.ite_learn_procedure_count}`);
+            if (p.ite_learn_procedures && p.ite_learn_procedures.length) lines.push(`ite_learn_procedures = ${p.ite_learn_procedures.join(',')}`);
         }
         // SC4S config notes / best practices (pipe-delimited)
         if (p.sc4s_config_notes && p.sc4s_config_notes.length) lines.push(`sc4s_config_notes = ${p.sc4s_config_notes.join('|')}`);
@@ -5039,13 +5416,19 @@ function ConfigViewerModal({ open, onClose, products, initialProductId, installe
 
     if (!open) return null;
 
+    const INTERNAL_KEYS = new Set(['custom', 'catalog_disabled']);
+
     // Build enriched product data (what the card actually sees)
     const enrichProduct = (p) => {
         const appStatus = appStatuses[p.addon] || null;
         const vizStatus = p.app_viz ? (appStatuses[p.app_viz] || null) : null;
         const stData = sourcetypeData[p.product_id] || null;
+        const clean = {};
+        for (const [k, v] of Object.entries(p)) {
+            if (!INTERNAL_KEYS.has(k)) clean[k] = v;
+        }
         return {
-            ...p,
+            ...clean,
             _runtime: {
                 addon_installed: !!installedApps[p.addon],
                 addon_version: appStatus?.version || null,
@@ -5398,12 +5781,433 @@ function TechStackModal({ open, onClose }) {
     );
 }
 
+// ─────────────────────  CUSTOM PRODUCT FORM  ─────────────────
+
+const CUSTOM_FORM_CATEGORIES = [
+    { value: 'security', label: 'Security' },
+    { value: 'networking', label: 'Networking' },
+    { value: 'collaboration', label: 'Collaboration' },
+    { value: 'observability', label: 'Observability' },
+];
+
+
+function CustomProductFormModal({ open, onClose, onSave, editProduct, cloneProduct, existingIds, allProducts }) {
+    const isEdit = !!editProduct;
+    const returnFocusRef = useRef(null);
+    const [displayName, setDisplayName] = useState('');
+    const [vendor, setVendor] = useState('');
+    const [description, setDescription] = useState('');
+    const [tagline, setTagline] = useState('');
+    const [category, setCategory] = useState('security');
+    const [sourcetypes, setSourcetypes] = useState('');
+    const [keywords, setKeywords] = useState('');
+    const [learnMoreUrl, setLearnMoreUrl] = useState('');
+    const [iconEmoji, setIconEmoji] = useState('');
+    const [addonLabel, setAddonLabel] = useState('');
+    const [addonUid, setAddonUid] = useState('');
+    const [addonDocsUrl, setAddonDocsUrl] = useState('');
+    const [addonAppId, setAddonAppId] = useState('');
+    const [addonInstallUrl, setAddonInstallUrl] = useState('');
+    const [supportLevel, setSupportLevel] = useState('');
+    const [dashboards, setDashboards] = useState('');
+    const [aliases, setAliases] = useState('');
+    const [valueProp, setValueProp] = useState('');
+    const [subcategory, setSubcategory] = useState('');
+    const [version, setVersion] = useState('');
+    const [addonTroubleshootUrl, setAddonTroubleshootUrl] = useState('');
+    const [legacyUids, setLegacyUids] = useState('');
+    const [showAdvanced, setShowAdvanced] = useState(false);
+    const [saving, setSaving] = useState(false);
+    const [formError, setFormError] = useState('');
+    const [cloneSource, setCloneSource] = useState('');
+
+    const populateFromProduct = useCallback((product, isClone) => {
+        setDisplayName(isClone ? `Copy of ${product.display_name || ''}` : (product.display_name || ''));
+        setVendor(product.vendor || '');
+        setDescription(product.description || '');
+        setTagline(product.tagline || '');
+        setCategory(product.category || 'security');
+        setSourcetypes((product.sourcetypes || []).join(', '));
+        setKeywords((product.keywords || []).join(', '));
+        setLearnMoreUrl(product.learn_more_url || '');
+        setIconEmoji(product.icon_emoji || '');
+        setAddonLabel(product.addon_label || '');
+        setAddonUid(product.addon_splunkbase_uid || '');
+        setAddonDocsUrl(product.addon_docs_url || '');
+        setAddonAppId(product.addon || '');
+        setAddonInstallUrl(product.addon_install_url || '');
+        setSupportLevel(product.support_level || '');
+        setDashboards((product.dashboards || []).join(', '));
+        setAliases((product.aliases || []).join(', '));
+        setValueProp(product.value_proposition || '');
+        setSubcategory(product.subcategory || '');
+        setVersion(product.version || '');
+        setAddonTroubleshootUrl(product.addon_troubleshoot_url || '');
+        setLegacyUids((product.legacy_uids || []).join(', '));
+        const hasAdv = !!(product.addon || product.support_level || (product.dashboards && product.dashboards.length) || (product.aliases && product.aliases.length) || product.value_proposition || product.addon_troubleshoot_url || (product.legacy_uids && product.legacy_uids.length));
+        setShowAdvanced(hasAdv);
+    }, []);
+
+    const resetForm = useCallback(() => {
+        setDisplayName(''); setVendor(''); setDescription(''); setTagline('');
+        setCategory('security'); setSubcategory(''); setSourcetypes(''); setKeywords('');
+        setLearnMoreUrl(''); setIconEmoji(''); setAddonLabel('');
+        setAddonUid(''); setAddonDocsUrl(''); setAddonAppId('');
+        setAddonInstallUrl(''); setAddonTroubleshootUrl(''); setSupportLevel('');
+        setDashboards(''); setAliases(''); setValueProp('');
+        setVersion(''); setLegacyUids(''); setShowAdvanced(false);
+    }, []);
+
+    useEffect(() => {
+        if (!open) return;
+        if (editProduct) {
+            populateFromProduct(editProduct, false);
+            setCloneSource('');
+        } else if (cloneProduct) {
+            populateFromProduct(cloneProduct, true);
+            setCloneSource(cloneProduct.product_id);
+        } else {
+            resetForm();
+            setCloneSource('');
+        }
+        setFormError(''); setSaving(false);
+    }, [open, editProduct, cloneProduct, populateFromProduct, resetForm]);
+
+    const handleCloneSelect = useCallback((e) => {
+        const pid = e.target.value;
+        setCloneSource(pid);
+        if (!pid) { resetForm(); return; }
+        const source = (allProducts || []).find(p => p.product_id === pid);
+        if (source) populateFromProduct(source, true);
+    }, [allProducts, populateFromProduct, resetForm]);
+
+    const sortedCloneOptions = useMemo(() =>
+        (allProducts || []).filter(p => p.status === 'active').sort((a, b) => (a.display_name || '').localeCompare(b.display_name || '')),
+    [allProducts]);
+
+    const generatedId = useMemo(() => slugifyProductId(displayName || 'untitled'), [displayName]);
+
+    const handleSubmit = useCallback(async () => {
+        if (!displayName.trim()) { setFormError('Display Name is required.'); return; }
+        if (!description.trim()) { setFormError('Description is required.'); return; }
+        const productId = isEdit ? editProduct.product_id : generatedId;
+        if (!isEdit && (existingIds || []).includes(productId)) {
+            setFormError(`A product with ID "${productId}" already exists. Change the display name.`);
+            return;
+        }
+        setSaving(true); setFormError('');
+        try {
+            const fields = {
+                display_name: displayName.trim(),
+                vendor: vendor.trim(),
+                description: description.trim(),
+                tagline: tagline.trim(),
+                category,
+                subcategory: subcategory,
+                version: version.trim() || '1.0.0',
+                sourcetypes: sourcetypes.trim(),
+                keywords: keywords.trim(),
+                learn_more_url: learnMoreUrl.trim(),
+                icon_emoji: iconEmoji.trim(),
+                addon_label: addonLabel.trim(),
+                addon_uid: addonUid.trim(),
+                addon_docs_url: addonDocsUrl.trim(),
+                addon_troubleshoot_url: addonTroubleshootUrl.trim(),
+                addon: addonAppId.trim(),
+                addon_install_url: addonInstallUrl.trim(),
+                support_level: supportLevel,
+                dashboards: dashboards.trim(),
+                aliases: aliases.trim(),
+                value_proposition: valueProp.trim(),
+                legacy_uids: legacyUids.trim(),
+                custom: 'true',
+                status: 'active',
+            };
+            if (isEdit) {
+                await updateCustomProduct(productId, fields);
+            } else {
+                await createCustomProduct(productId, fields);
+            }
+            onSave();
+            onClose();
+        } catch (e) {
+            setFormError(e.message || 'Save failed');
+        } finally {
+            setSaving(false);
+        }
+    }, [displayName, vendor, description, tagline, category, subcategory, version,
+        sourcetypes, keywords, learnMoreUrl, iconEmoji, addonLabel, addonUid, addonDocsUrl,
+        addonTroubleshootUrl, addonAppId, addonInstallUrl, supportLevel, dashboards,
+        aliases, valueProp, legacyUids,
+        isEdit, editProduct, generatedId, existingIds, onSave, onClose]);
+
+    const categoryIcons = { security: '🛡️', networking: '🌐', collaboration: '🎧', observability: '📊' };
+
+    if (!open) return null;
+    return (
+        <Modal open returnFocus={returnFocusRef} onRequestClose={onClose} style={{ maxWidth: '860px', width: '94vw' }}>
+            <Modal.Header title={isEdit ? 'Edit Custom Product' : 'Add Custom Product'} />
+            <Modal.Body>
+                <div className="csc-custom-form">
+                    {formError && <div className="csc-custom-form-error">{formError}</div>}
+
+                    {/* Clone from existing product */}
+                    {!isEdit && (
+                        <div className="csc-custom-form-row">
+                            <label>Clone from existing product</label>
+                            <select value={cloneSource} onChange={handleCloneSelect}>
+                                <option value="">{'\u2014'} Start from scratch {'\u2014'}</option>
+                                {sortedCloneOptions.map(p => (
+                                    <option key={p.product_id} value={p.product_id}>
+                                        {p.display_name}{p.vendor ? ` (${p.vendor})` : ''}
+                                    </option>
+                                ))}
+                            </select>
+                            <span className="csc-custom-form-hint">Pick an existing product to pre-fill the form, or start with a blank card.</span>
+                        </div>
+                    )}
+
+                    {/* Live Preview */}
+                    {displayName && (
+                        <div className="csc-custom-preview">
+                            <span className="csc-custom-preview-badge">Preview</span>
+                            {iconEmoji && <span className="csc-custom-preview-emoji">{iconEmoji}</span>}
+                            <div className="csc-custom-preview-name">{displayName}</div>
+                            {tagline && <div className="csc-custom-preview-tagline">{tagline}</div>}
+                            {vendor && <div className="csc-custom-preview-vendor">{vendor}</div>}
+                            {description && <div className="csc-custom-preview-desc">{description.length > 120 ? description.slice(0, 120) + '\u2026' : description}</div>}
+                        </div>
+                    )}
+
+                    {/* Section: Identity */}
+                    <div className="csc-custom-form-section">
+                        <div className="csc-custom-form-section-title">Identity — name, vendor, and icon</div>
+                        <div className="csc-custom-form-row">
+                            <label>Display Name <span className="csc-req">*</span></label>
+                            <input type="text" value={displayName} onChange={e => setDisplayName(e.target.value)} placeholder="e.g. Cisco Secure Firewall" maxLength={120} />
+                            <span className="csc-custom-form-hint">The product name shown on the card and in search results.</span>
+                            {!isEdit && displayName && <span className="csc-custom-form-id">ID: {generatedId}</span>}
+                        </div>
+                        <div className="csc-custom-form-cols">
+                            <div className="csc-custom-form-row">
+                                <label>Vendor</label>
+                                <input type="text" value={vendor} onChange={e => setVendor(e.target.value)} placeholder="e.g. Cisco" maxLength={80} />
+                                <span className="csc-custom-form-hint">The company or team that makes this product.</span>
+                            </div>
+                            <div className="csc-custom-form-row">
+                                <label>Icon Emoji</label>
+                                <input type="text" value={iconEmoji} onChange={e => setIconEmoji(e.target.value)} placeholder="🔥" maxLength={4} style={{ textAlign: 'center', fontSize: '18px' }} />
+                                <span className="csc-custom-form-hint">A single emoji displayed as the card icon.</span>
+                            </div>
+                        </div>
+                        <div className="csc-custom-form-cols">
+                            <div className="csc-custom-form-row">
+                                <label>Tagline</label>
+                                <input type="text" value={tagline} onChange={e => setTagline(e.target.value)} placeholder="e.g. Next-generation firewall with advanced threat defense" maxLength={100} />
+                                <span className="csc-custom-form-hint">A short subtitle displayed under the product name.</span>
+                            </div>
+                            <div className="csc-custom-form-row">
+                                <label>Version</label>
+                                <input type="text" value={version} onChange={e => setVersion(e.target.value)} placeholder="e.g. 1.0.0" maxLength={20} />
+                                <span className="csc-custom-form-hint">Product or integration version number.</span>
+                            </div>
+                        </div>
+                        <div className="csc-custom-form-row">
+                            <label>Description <span className="csc-req">*</span></label>
+                            <textarea value={description} onChange={e => setDescription(e.target.value)} placeholder="e.g. Cisco Secure Firewall provides advanced threat defense for your network, with Splunk integration via syslog and eStreamer." maxLength={1000} />
+                            <span className="csc-custom-form-hint">Brief overview of the product and its Splunk integration.</span>
+                        </div>
+                    </div>
+
+                    {/* Section: Category */}
+                    <div className="csc-custom-form-section">
+                        <div className="csc-custom-form-section-title">Category — where the card appears</div>
+                        <div className="csc-custom-cat-pills">
+                            {CUSTOM_FORM_CATEGORIES.map(c => (
+                                <button key={c.value} className={`csc-custom-cat-pill${category === c.value ? ' active' : ''}`} onClick={() => { setCategory(c.value); setSubcategory(''); }}>
+                                    {categoryIcons[c.value] || ''} {c.label}
+                                </button>
+                            ))}
+                        </div>
+                        <span className="csc-custom-form-hint">Determines which section the card appears in on the main page.</span>
+                        {SUB_CATEGORIES[category] && SUB_CATEGORIES[category].length > 0 && (
+                            <div className="csc-custom-form-row" style={{ marginTop: '8px' }}>
+                                <label>Subcategory</label>
+                                <select value={subcategory} onChange={e => setSubcategory(e.target.value)}>
+                                    <option value="">— None —</option>
+                                    {SUB_CATEGORIES[category].map(s => (
+                                        <option key={s.id} value={s.id}>{s.name}</option>
+                                    ))}
+                                </select>
+                                <span className="csc-custom-form-hint">Optional sub-section within the category (e.g. Network Security, Cloud Security).</span>
+                            </div>
+                        )}
+                    </div>
+
+                    {/* Section: Data */}
+                    <div className="csc-custom-form-section">
+                        <div className="csc-custom-form-section-title">Data — sourcetypes and search keywords</div>
+                        <div className="csc-custom-form-row">
+                            <label>Sourcetypes</label>
+                            <input type="text" value={sourcetypes} onChange={e => setSourcetypes(e.target.value)} placeholder="e.g. cisco:asa, cisco:ftd" />
+                            <span className="csc-custom-form-hint">Comma-separated Splunk sourcetypes ingested by this product. Used for data detection and search.</span>
+                        </div>
+                        <div className="csc-custom-form-row">
+                            <label>Keywords</label>
+                            <input type="text" value={keywords} onChange={e => setKeywords(e.target.value)} placeholder="e.g. firewall, ftd, asa, firepower" />
+                            <span className="csc-custom-form-hint">Comma-separated extra search terms to help users find this card.</span>
+                        </div>
+                    </div>
+
+                    {/* Section: Add-on */}
+                    <div className="csc-custom-form-section">
+                        <div className="csc-custom-form-section-title">Add-on — optional Splunkbase integration</div>
+                        <div className="csc-custom-form-row">
+                            <label>Add-on Label</label>
+                            <input type="text" value={addonLabel} onChange={e => setAddonLabel(e.target.value)} placeholder="e.g. Cisco Secure Firewall Add-on for Splunk" />
+                            <span className="csc-custom-form-hint">Display name of the Splunkbase add-on associated with this product.</span>
+                        </div>
+                        <div className="csc-custom-form-cols">
+                            <div className="csc-custom-form-row">
+                                <label>Splunkbase UID</label>
+                                <input type="text" value={addonUid} onChange={e => setAddonUid(e.target.value)} placeholder="e.g. 1234" maxLength={10} />
+                                <span className="csc-custom-form-hint">Numeric ID from the Splunkbase URL (splunkbase.splunk.com/app/1234).</span>
+                            </div>
+                            <div className="csc-custom-form-row">
+                                <label>Docs URL</label>
+                                <input type="url" value={addonDocsUrl} onChange={e => setAddonDocsUrl(e.target.value)} placeholder="e.g. https://docs.splunk.com/..." />
+                                <span className="csc-custom-form-hint">Link to the add-on's documentation page.</span>
+                            </div>
+                        </div>
+                        <div className="csc-custom-form-row">
+                            <label>Troubleshooting URL</label>
+                            <input type="url" value={addonTroubleshootUrl} onChange={e => setAddonTroubleshootUrl(e.target.value)} placeholder="e.g. https://docs.splunk.com/.../troubleshoot" />
+                            <span className="csc-custom-form-hint">Link to the add-on's troubleshooting guide. Shows as a link on the card.</span>
+                        </div>
+                    </div>
+
+                    {/* Section: Links */}
+                    <div className="csc-custom-form-section">
+                        <div className="csc-custom-form-section-title">Links — external resources</div>
+                        <div className="csc-custom-form-row">
+                            <label>Learn More URL</label>
+                            <input type="url" value={learnMoreUrl} onChange={e => setLearnMoreUrl(e.target.value)} placeholder="e.g. https://www.cisco.com/go/secure-firewall" />
+                            <span className="csc-custom-form-hint">Link to the product's official page or documentation.</span>
+                        </div>
+                    </div>
+
+                    {/* Section: Advanced (collapsible) */}
+                    <div className={`csc-custom-form-section csc-custom-form-advanced${showAdvanced ? ' open' : ''}`}>
+                        <button className="csc-custom-form-advanced-toggle" onClick={() => setShowAdvanced(prev => !prev)}>
+                            <span className={`csc-custom-form-advanced-arrow${showAdvanced ? ' open' : ''}`}>&#9654;</span>
+                            Advanced
+                            <span className="csc-custom-form-hint" style={{ marginTop: 0, marginLeft: '4px' }}>— install detection, support level, dashboards, aliases, legacy apps</span>
+                        </button>
+                        {showAdvanced && (<>
+                            <div className="csc-custom-form-row">
+                                <label>Add-on App ID (folder name)</label>
+                                <input type="text" value={addonAppId} onChange={e => setAddonAppId(e.target.value)} placeholder="e.g. Splunk_TA_cisco-secure-firewall" maxLength={120} />
+                                <span className="csc-custom-form-hint">The Splunk app folder name — enables install status detection on the card.</span>
+                            </div>
+                            <div className="csc-custom-form-row">
+                                <label>Install URL</label>
+                                <input type="text" value={addonInstallUrl} onChange={e => setAddonInstallUrl(e.target.value)} placeholder='e.g. /manager/splunk-cisco-app-navigator/appsremote?query="Cisco+Secure+Firewall"' />
+                                <span className="csc-custom-form-hint">Deep link to install via Browse More Apps (leave blank to use Splunkbase link).</span>
+                            </div>
+                            <div className="csc-custom-form-row">
+                                <label>Support Level</label>
+                                <div className="csc-custom-cat-pills">
+                                    {[
+                                        { v: '', l: 'None' },
+                                        { v: 'cisco_supported', l: 'Cisco' },
+                                        { v: 'splunk_supported', l: 'Splunk' },
+                                        { v: 'developer_supported', l: 'Developer' },
+                                        { v: 'community_supported', l: 'Community' },
+                                    ].map(sl => (
+                                        <button key={sl.v} className={`csc-custom-cat-pill${supportLevel === sl.v ? ' active' : ''}`} onClick={() => setSupportLevel(sl.v)}>
+                                            {sl.l}
+                                        </button>
+                                    ))}
+                                </div>
+                                <span className="csc-custom-form-hint">Shown as a colored badge on the card.</span>
+                            </div>
+                            <div className="csc-custom-form-row">
+                                <label>Dashboards</label>
+                                <input type="text" value={dashboards} onChange={e => setDashboards(e.target.value)} placeholder="e.g. cisco_fw_overview, cisco_fw_threats" />
+                                <span className="csc-custom-form-hint">Comma-separated Splunk view names that enable the Launch button on the card.</span>
+                            </div>
+                            <div className="csc-custom-form-row">
+                                <label>Aliases (former names)</label>
+                                <input type="text" value={aliases} onChange={e => setAliases(e.target.value)} placeholder="e.g. Firepower, ASA" />
+                                <span className="csc-custom-form-hint">Shows "Formerly: ..." on the card and helps with search.</span>
+                            </div>
+                            <div className="csc-custom-form-row">
+                                <label>Legacy App UIDs</label>
+                                <input type="text" value={legacyUids} onChange={e => setLegacyUids(e.target.value)} placeholder="e.g. Splunk_TA_cisco-old, cisco_legacy_ta" />
+                                <span className="csc-custom-form-hint">Comma-separated app folder names of previous/retired add-ons. Enables "Legacy App" detection on the card.</span>
+                            </div>
+                            <div className="csc-custom-form-row">
+                                <label>Value Proposition</label>
+                                <textarea value={valueProp} onChange={e => setValueProp(e.target.value)} placeholder="e.g. Unified visibility into firewall events, threats, and policy changes" maxLength={300} style={{ minHeight: '50px' }} />
+                                <span className="csc-custom-form-hint">One-liner benefit shown in the detail tooltip.</span>
+                            </div>
+                        </>)}
+                    </div>
+                </div>
+            </Modal.Body>
+            <Modal.Footer>
+                <Button appearance="secondary" label="Cancel" onClick={onClose} disabled={saving} />
+                <Button appearance="primary" label={saving ? 'Saving\u2026' : (isEdit ? 'Save Changes' : 'Create Product')} onClick={handleSubmit} disabled={saving} />
+            </Modal.Footer>
+        </Modal>
+    );
+}
+
+function DeleteCustomProductModal({ open, onClose, product, onConfirm }) {
+    const [deleting, setDeleting] = useState(false);
+    if (!open || !product) return null;
+
+    const handleDelete = async () => {
+        setDeleting(true);
+        try {
+            await deleteCustomProduct(product.product_id);
+            onConfirm();
+            onClose();
+        } catch (e) {
+            console.error('Delete failed:', e);
+        } finally {
+            setDeleting(false);
+        }
+    };
+
+    return (
+        <Modal open onRequestClose={onClose} style={{ width: '420px' }}>
+            <Modal.Header title="Delete Custom Product" />
+            <Modal.Body>
+                <div className="csc-delete-confirm-body">
+                    <div style={{ fontSize: '32px', marginBottom: '8px' }}>🗑️</div>
+                    <div className="csc-delete-confirm-name">{product.display_name}</div>
+                    <div className="csc-delete-confirm-warn">
+                        This will permanently remove this custom product card.<br />
+                        This action cannot be undone.
+                    </div>
+                </div>
+            </Modal.Body>
+            <Modal.Footer>
+                <Button appearance="secondary" label="Cancel" onClick={onClose} disabled={deleting} />
+                <Button appearance="destructive" label={deleting ? 'Deleting...' : 'Delete'} onClick={handleDelete} disabled={deleting} />
+            </Modal.Footer>
+        </Modal>
+    );
+}
+
 // ─────────────────────  SEARCH BAR  ─────────────────
 
 function UniversalFinderBar({ onSearch, resultCount, totalCount, products, externalQuery }) {
     const [query, setQuery] = useState('');
     const [focused, setFocused] = useState(false);
     const [selectedIdx, setSelectedIdx] = useState(-1);
+    const debounceRef = useRef(null);
 
     // Allow parent to clear the query (e.g. after devmode intercept)
     useEffect(() => {
@@ -5411,6 +6215,9 @@ function UniversalFinderBar({ onSearch, resultCount, totalCount, products, exter
             setQuery(externalQuery);
         }
     }, [externalQuery]);
+
+    // Cleanup debounce timer on unmount
+    useEffect(() => () => { if (debounceRef.current) clearTimeout(debounceRef.current); }, []);
 
     const keywordMap = useMemo(() => {
         const map = {};
@@ -5448,9 +6255,25 @@ function UniversalFinderBar({ onSearch, resultCount, totalCount, products, exter
     // Reset selected index when suggestions change
     useEffect(() => { setSelectedIdx(-1); }, [suggestions.length, query]);
 
-    const handleChange = (e) => { const v = e.target.value; setQuery(v); onSearch(v); };
-    const handleSuggestionClick = (kw) => { setQuery(kw); onSearch(kw); setFocused(false); setSelectedIdx(-1); };
-    const handleClear = () => { setQuery(''); onSearch(''); setSelectedIdx(-1); };
+    const handleChange = (e) => {
+        const v = e.target.value;
+        setQuery(v);
+        if (debounceRef.current) clearTimeout(debounceRef.current);
+        debounceRef.current = setTimeout(() => onSearch(v), 250);
+    };
+    const handleSuggestionClick = (kw) => {
+        setQuery(kw);
+        if (debounceRef.current) clearTimeout(debounceRef.current);
+        onSearch(kw);
+        setFocused(false);
+        setSelectedIdx(-1);
+    };
+    const handleClear = () => {
+        setQuery('');
+        if (debounceRef.current) clearTimeout(debounceRef.current);
+        onSearch('');
+        setSelectedIdx(-1);
+    };
     const handleKeyDown = (e) => {
         if (!focused || suggestions.length === 0) return;
         if (e.key === 'ArrowDown') {
@@ -5630,9 +6453,8 @@ function FilterDrawer({
     if (selectedCategory === 'soar') catBase = catBase.filter(p => p.soar_connector_uids && p.soar_connector_uids.length > 0);
     else if (selectedCategory === 'alert_actions') catBase = catBase.filter(p => p.alert_action_uids && p.alert_action_uids.length > 0);
     else if (selectedCategory === 'secure_networking') catBase = catBase.filter(p => p.secure_networking_gtm);
-    else if (selectedCategory === 'ai_powered') catBase = catBase.filter(p => p.ai_enabled);
-    else if (selectedCategory === 'es') catBase = catBase.filter(p => p.es_compatible);
-    else if (selectedCategory === 'itsi') catBase = catBase.filter(p => p.itsi_content_pack);
+    else if (selectedCategory === 'secops') catBase = catBase.filter(p => p.es_compatible || p.sse_content);
+    else if (selectedCategory === 'itops') catBase = catBase.filter(p => p.itsi_content_pack || p.ite_learn_content);
     else if (selectedCategory === 'sc4s') catBase = catBase.filter(p => p.sc4s_supported);
     else if (selectedCategory === 'netflow') catBase = catBase.filter(p => p.netflow_supported);
     else if (selectedCategory) catBase = catBase.filter(p => p.category === selectedCategory);
@@ -5663,8 +6485,6 @@ function FilterDrawer({
     const soarCount = categoryCounts?.soar || 0;
     const alertCount = categoryCounts?.alert_actions || 0;
     const secNetCount = categoryCounts?.secure_networking || 0;
-    const aiPoweredCount = categoryCounts?.ai_powered || 0;
-
     /* Compatibility version list */
     const versionList = (() => {
         if (!splunkbaseData || Object.keys(splunkbaseData).length === 0) return [];
@@ -5707,7 +6527,7 @@ function FilterDrawer({
         return entries;
     }, [preAddonProducts]);
 
-    const isCrossCutting = (cat) => ['soar', 'alert_actions', 'secure_networking', 'ai_powered', 'es', 'itsi', 'sc4s', 'netflow'].includes(cat);
+    const isCrossCutting = (cat) => ['soar', 'alert_actions', 'secure_networking', 'secops', 'itops', 'sc4s', 'netflow'].includes(cat);
     const addonTotal = (preAddonProducts || []).length;
 
     return (
@@ -5760,34 +6580,24 @@ function FilterDrawer({
                                     <span className="scan-drawer-pill-count">{alertCount}</span>
                                 </button>
                             )}
-                            {aiPoweredCount > 0 && (
+                            {(categoryCounts?.secops || 0) > 0 && (
                                 <button
-                                    className={`scan-drawer-pill ${selectedCategory === 'ai_powered' ? 'scan-drawer-pill-ai-active' : ''}`}
-                                    onClick={() => { onSelectCategory(selectedCategory === 'ai_powered' ? null : 'ai_powered'); }}
-                                    title="Products leveraging AI/ML technologies"
+                                    className={`scan-drawer-pill ${selectedCategory === 'secops' ? 'scan-drawer-pill-cisco-active' : ''}`}
+                                    onClick={() => { onSelectCategory(selectedCategory === 'secops' ? null : 'secops'); }}
+                                    title="SecOps — products with ES and/or Security Essentials content"
                                 >
-                                    AI-Powered
-                                    <span className="scan-drawer-pill-count">{aiPoweredCount}</span>
+                                    SecOps
+                                    <span className="scan-drawer-pill-count">{categoryCounts.secops}</span>
                                 </button>
                             )}
-                            {(categoryCounts?.es || 0) > 0 && (
+                            {(categoryCounts?.itops || 0) > 0 && (
                                 <button
-                                    className={`scan-drawer-pill ${selectedCategory === 'es' ? 'scan-drawer-pill-cisco-active' : ''}`}
-                                    onClick={() => { onSelectCategory(selectedCategory === 'es' ? null : 'es'); }}
-                                    title="ES (Enterprise Security) compatible products"
+                                    className={`scan-drawer-pill ${selectedCategory === 'itops' ? 'scan-drawer-pill-cisco-active' : ''}`}
+                                    onClick={() => { onSelectCategory(selectedCategory === 'itops' ? null : 'itops'); }}
+                                    title="ITOps — products with ITSI and/or IT Essentials Learn content"
                                 >
-                                    ES
-                                    <span className="scan-drawer-pill-count">{categoryCounts.es}</span>
-                                </button>
-                            )}
-                            {(categoryCounts?.itsi || 0) > 0 && (
-                                <button
-                                    className={`scan-drawer-pill ${selectedCategory === 'itsi' ? 'scan-drawer-pill-cisco-active' : ''}`}
-                                    onClick={() => { onSelectCategory(selectedCategory === 'itsi' ? null : 'itsi'); }}
-                                    title="Products with ITSI Content Pack"
-                                >
-                                    ITSI
-                                    <span className="scan-drawer-pill-count">{categoryCounts.itsi}</span>
+                                    ITOps
+                                    <span className="scan-drawer-pill-count">{categoryCounts.itops}</span>
                                 </button>
                             )}
                             {(categoryCounts?.sc4s || 0) > 0 && (
@@ -5848,13 +6658,17 @@ function FilterDrawer({
                             >
                                 Developer <span className="scan-drawer-pill-count">{supportCounts.developer_supported}</span>
                             </button>
+                            {/* "No Integration" pill hidden from regular users — these products
+                                only appear in the Integration Needed section which requires devMode/gtmMode */}
+                            {showInternalContent && (
                             <button
                                 className={`scan-drawer-pill ${supportLevelFilter.includes('not_supported') ? 'scan-drawer-pill-unsupported-active' : ''}`}
                                 onClick={() => onSelectSupportLevel('not_supported')}
-                                title="Toggle unsupported products"
+                                title="Toggle products needing integration"
                             >
-                                Unsupported <span className="scan-drawer-pill-count">{supportCounts.not_supported}</span>
+                                No Integration <span className="scan-drawer-pill-count">{supportCounts.not_supported}</span>
                             </button>
+                            )}
                         </div>
                     </div>
                     <div className="scan-drawer-divider" />
@@ -6131,12 +6945,12 @@ function ActiveFilterChips({
     const chips = [];
 
     // Cross-cutting category filters
-    const crossCutLabels = { soar: 'SOAR', alert_actions: 'Alert Actions', secure_networking: 'Secure Networking GTM', ai_powered: 'AI-Powered', es: 'ES', itsi: 'ITSI', sc4s: 'SC4S', netflow: 'NetFlow' };
+    const crossCutLabels = { soar: 'SOAR', alert_actions: 'Alert Actions', secure_networking: 'Secure Networking GTM', secops: 'SecOps', itops: 'ITOps', sc4s: 'SC4S', netflow: 'NetFlow' };
     if (selectedCategory && crossCutLabels[selectedCategory]) {
         chips.push({ label: crossCutLabels[selectedCategory], onRemove: () => onSelectCategory(null) });
     }
     if (supportLevelFilter.length > 0) {
-        const labels = { cisco_supported: 'Cisco', splunk_supported: 'Splunk', developer_supported: 'Developer', not_supported: 'Unsupported' };
+        const labels = { cisco_supported: 'Cisco', splunk_supported: 'Splunk', developer_supported: 'Developer', not_supported: 'No Integration' };
         supportLevelFilter.forEach(level => {
             chips.push({ label: labels[level] || level, onRemove: () => onSelectSupportLevel(level) });
         });
@@ -6337,7 +7151,6 @@ function PersonaModal({ open, onClose, onSelectPersona, products }) {
 function CategoryFilterBar({
     selectedCategory, onSelectCategory,
     selectedSubCategory, onSelectSubCategory,
-    aiFilter, onToggleAiFilter,
     categoryCounts, products,
     onOpenFilterDrawer, activeFilterCount,
     platformFilter, versionFilter, splunkbaseData, versionFilterMode, platformFilterMode,
@@ -6421,8 +7234,8 @@ function CategoryFilterBar({
         };
     };
 
-    const isCrossCutting = ['soar', 'alert_actions', 'secure_networking', 'ai_powered', 'es', 'itsi', 'sc4s', 'netflow'].includes(selectedCategory);
-    const CROSS_CUT_IDS = ['soar', 'alert_actions', 'secure_networking', 'ai_powered', 'es', 'itsi', 'sc4s', 'netflow'];
+    const isCrossCutting = ['soar', 'alert_actions', 'secure_networking', 'secops', 'itops', 'sc4s', 'netflow'].includes(selectedCategory);
+    const CROSS_CUT_IDS = ['soar', 'alert_actions', 'secure_networking', 'secops', 'itops', 'sc4s', 'netflow'];
     const totalCount = categoryCounts ? Object.keys(categoryCounts).reduce((sum, k) => (CROSS_CUT_IDS.includes(k)) ? sum : sum + categoryCounts[k], 0) : null;
 
     return (<>
@@ -6473,12 +7286,11 @@ function CategoryFilterBar({
             const subs = SUB_CATEGORIES[selectedCategory];
             const base = applyCompatFilters(products || []);
             const catProducts = base.filter(p => p.category === selectedCategory);
-            // Faceted counts: subcategory counts respect AI filter, AI count respects subcategory
-            const countBase = aiFilter ? catProducts.filter(p => p.ai_enabled) : catProducts;
+            const countBase = catProducts;
             const subCounts = {};
             subs.forEach(s => { subCounts[s.id] = countBase.filter(p => p.subcategory === s.id).length; });
             const unassigned = countBase.filter(p => !p.subcategory || !subs.some(s => s.id === p.subcategory)).length;
-            const hasAnySubs = subs.some(s => subCounts[s.id] > 0) || (!aiFilter && subs.some(s => catProducts.filter(p => p.subcategory === s.id).length > 0));
+            const hasAnySubs = subs.some(s => subCounts[s.id] > 0);
             if (!hasAnySubs) return null;
             return (
                 <div className="csc-subcategory-bar" style={{ display: 'flex', gap: '6px', marginTop: '8px', paddingLeft: '8px', flexWrap: 'wrap', alignItems: 'center' }}>
@@ -6504,46 +7316,6 @@ function CategoryFilterBar({
                             Other <span className="csc-subcategory-count">{unassigned}</span>
                         </button>
                     )}
-                    {/* ── AI filter pill ── */}
-                    {(() => {
-                        let aiBase = catProducts;
-                        if (selectedSubCategory) {
-                            if (selectedSubCategory === '__other__') {
-                                const knownSubcats = new Set(subs.map(s => s.id));
-                                aiBase = catProducts.filter(p => !p.subcategory || !knownSubcats.has(p.subcategory));
-                            } else {
-                                aiBase = catProducts.filter(p => p.subcategory === selectedSubCategory);
-                            }
-                        }
-                        const aiCount = aiBase.filter(p => p.ai_enabled).length;
-                        if (aiCount === 0) return null;
-                        return (
-                            <>
-                                <span style={{ borderLeft: '1.5px solid var(--card-border, #ddd)', height: '18px', margin: '0 4px' }} />
-                                <button onClick={() => onToggleAiFilter(!aiFilter)}
-                                    className={`csc-subcategory-pill csc-ai-pill ${aiFilter ? 'csc-ai-pill-active' : ''}`}
-                                    title="Filter products that leverage AI technologies">
-                                    <img src={createURL(`/static/app/${APP_ID}/icons/cat-ai.svg`)} alt="" style={{ width: '14px', height: '14px', verticalAlign: '-2px' }} /> AI-Powered <span className="csc-subcategory-count">{aiCount}</span>
-                                </button>
-                            </>
-                        );
-                    })()}
-                </div>
-            );
-        })()}
-        {/* ── AI pill for categories without sub-categories ── */}
-        {selectedCategory && !isCrossCutting && !SUB_CATEGORIES[selectedCategory] && (() => {
-            const base = applyCompatFilters(products || []);
-            const catProducts = base.filter(p => p.category === selectedCategory);
-            const aiCount = catProducts.filter(p => p.ai_enabled).length;
-            if (aiCount === 0) return null;
-            return (
-                <div className="csc-subcategory-bar" style={{ display: 'flex', gap: '6px', marginTop: '8px', paddingLeft: '8px', flexWrap: 'wrap', alignItems: 'center' }}>
-                    <button onClick={() => onToggleAiFilter(!aiFilter)}
-                        className={`csc-subcategory-pill csc-ai-pill ${aiFilter ? 'csc-ai-pill-active' : ''}`}
-                        title="Filter products that leverage AI technologies">
-                        <img src={createURL(`/static/app/${APP_ID}/icons/cat-ai.svg`)} alt="" style={{ width: '14px', height: '14px', verticalAlign: '-2px' }} /> AI-Powered <span className="csc-subcategory-count">{aiCount}</span>
-                    </button>
                 </div>
             );
         })()}
@@ -6558,7 +7330,12 @@ function CategoryFilterBar({
 function SCANProductsPage() {
     const [products, setProducts] = useState(PRODUCT_CATALOG.filter(p => CATEGORY_IDS.has(p.category) && !p.catalog_disabled));
     const [vaultProducts, setVaultProducts] = useState(PRODUCT_CATALOG.filter(p => CATEGORY_IDS.has(p.category) && p.catalog_disabled));
+    const [customProducts, setCustomProducts] = useState([]);
     const [showVault, setShowVault] = useState(false);
+    const [customFormOpen, setCustomFormOpen] = useState(false);
+    const [customEditProduct, setCustomEditProduct] = useState(null);
+    const [customCloneProduct, setCustomCloneProduct] = useState(null);
+    const [customDeleteTarget, setCustomDeleteTarget] = useState(null);
     const [configuredIds, setConfiguredIdsState] = useState(getConfiguredIds);
     const [installedApps, setInstalledApps] = useState({});
     const [appStatuses, setAppStatuses] = useState({});
@@ -6569,7 +7346,6 @@ function SCANProductsPage() {
     const [searchQuery, setSearchQuery] = useState('');
     const [selectedCategory, setSelectedCategory] = useState(_savedFilters.selectedCategory ?? null);
     const [selectedSubCategory, setSelectedSubCategory] = useState(_savedFilters.selectedSubCategory ?? null);
-    const [aiFilter, setAiFilter] = useState(_savedFilters.aiFilter || false);
     const [selectedAddon, setSelectedAddon] = useState(_savedFilters.selectedAddon ?? null);
     const [legacyModalOpen, setLegacyModalOpen] = useState(false);
     const [legacyModalApps, setLegacyModalApps] = useState([]);
@@ -6579,8 +7355,14 @@ function SCANProductsPage() {
     const [removeAllModalOpen, setRemoveAllModalOpen] = useState(false);
     const removeAllReturnRef = useRef(null);
     const [cardLegendOpen, setCardLegendOpen] = useState(false);
+    const [welcomeDismissed, setWelcomeDismissed] = useState(() => {
+        try { return localStorage.getItem('scan_welcome_dismissed') === '1'; } catch (_e) { return false; }
+    });
     const guideReturnRef = useRef(null);
     const [appVersion, setAppVersion] = useState('');
+    const [appBuild, setAppBuild] = useState(() =>
+        typeof SCAN_BUILD_HASH !== 'undefined' ? SCAN_BUILD_HASH : ''
+    );
     const [appUpdateVersion, setAppUpdateVersion] = useState('');
     const [platformType, setPlatformType] = useState('');
     const [splunkVersion, setSplunkVersion] = useState('');          // e.g. '9.3.2' or '10.2.2510.6'
@@ -6588,8 +7370,13 @@ function SCANProductsPage() {
     const [themeOverride, setThemeOverride] = useState(getThemePreference); // 'auto' | 'light' | 'dark'
     const [splunkTheme, setSplunkTheme] = useState(null);                  // true = dark, false = light, null = unknown
     const [showFullPortfolio, setShowFullPortfolio] = useState(getPortfolioPreference); // false = supported only
-    const [devMode, setDevMode] = useState(false);
+    const [devMode, setDevMode] = useState(() => {
+        try { return localStorage.getItem(DEVMODE_STORAGE_KEY) === 'true'; } catch { return false; }
+    });
     const [gtmMode, setGtmMode] = useState(false);
+    // Internal-only sections (Integration Needed, Coming Soon, GTM Roadmap) are
+    // gated behind devMode or gtmMode.  When false, portfolioProducts also
+    // excludes not_supported products so header/pill counts stay consistent.
     const showInternalContent = devMode || gtmMode;
     const [devToast, setDevToast] = useState(null);
     const [configViewerOpen, setConfigViewerOpen] = useState(false);
@@ -6604,7 +7391,7 @@ function SCANProductsPage() {
     const [showComingSoon, setShowComingSoon] = useState(_savedFilters.showComingSoon || false);
     const [showGtmRoadmap, setShowGtmRoadmap] = useState(_savedFilters.showGtmRoadmap || false);
     const [personaModalOpen, setPersonaModalOpen] = useState(() => {
-        try { return localStorage.getItem(PERSONA_STORAGE_KEY) !== 'true'; } catch { return false; }
+        try { return localStorage.getItem(PERSONA_STORAGE_KEY) !== 'true'; } catch (_e) { return false; }
     });
     const [splunkbaseData, setSplunkbaseData] = useState({});    // uid → { version_compatibility, product_compatibility, app_version, title, appid }
     const [appidToUidMap, setAppidToUidMap] = useState({});      // appid (folder name) → uid (for legacy/prereq/community app lookups)
@@ -6630,12 +7417,12 @@ function SCANProductsPage() {
 
     useEffect(() => {
         saveFilters({
-            selectedCategory, selectedSubCategory, aiFilter,
+            selectedCategory, selectedSubCategory,
             selectedAddon, supportLevelFilter, showRetired, showDeprecated,
             showComingSoon, showGtmRoadmap, platformFilter, platformFilterMode,
             versionFilter, versionFilterMode,
         });
-    }, [selectedCategory, selectedSubCategory, aiFilter,
+    }, [selectedCategory, selectedSubCategory,
         selectedAddon, supportLevelFilter, showRetired, showDeprecated,
         showComingSoon, showGtmRoadmap, platformFilter, platformFilterMode,
         versionFilter, versionFilterMode]);
@@ -6650,6 +7437,20 @@ function SCANProductsPage() {
             return next;
         });
     }, []);
+
+    const allPanelsCollapsed = useMemo(() =>
+        Object.values(panelState).every(v => !v),
+    [panelState]);
+
+    const handleExpandCollapseAll = useCallback(() => {
+        const expand = allPanelsCollapsed;
+        setPanelState(prev => {
+            const next = {};
+            for (const key of Object.keys(prev)) next[key] = expand;
+            savePanelState(next);
+            return next;
+        });
+    }, [allPanelsCollapsed]);
 
     /** Toggle a version in/out of the multi-select filter. Pass null to clear all. */
     const handleVersionToggle = (version) => {
@@ -6723,7 +7524,7 @@ function SCANProductsPage() {
                 if (theme === 'dark') return true;
                 if (theme === 'light') return false;
                 return null;
-            } catch {
+            } catch (_e) {
                 return null;
             }
         };
@@ -6811,16 +7612,76 @@ function SCANProductsPage() {
         ));
     }, []);
 
+    const allProductIds = useMemo(() => {
+        return [...products, ...vaultProducts, ...customProducts].map(p => p.product_id);
+    }, [products, vaultProducts, customProducts]);
+
+    const handleCustomProductSaved = useCallback(() => {
+        loadData();
+    }, [loadData]);
+
+    const handleEditCustomProduct = useCallback((product) => {
+        setCustomEditProduct(product);
+        setCustomFormOpen(true);
+    }, []);
+
+    const handleCloneCustomProduct = useCallback((product) => {
+        setCustomEditProduct(null);
+        setCustomCloneProduct(product);
+        setCustomFormOpen(true);
+    }, []);
+
+    const handleDeleteCustomProduct = useCallback((product) => {
+        setCustomDeleteTarget(product);
+    }, []);
+
+    const handleCustomDeleted = useCallback(() => {
+        setCustomDeleteTarget(null);
+        loadData();
+    }, [loadData]);
+
     // ── Secret mode search intercepts ──
     const handleSearchInput = useCallback((value) => {
         const cmd = value.toLowerCase().trim();
         if (cmd === 'devmode') {
             setDevMode(prev => {
                 const next = !prev;
+                try { if (next) localStorage.setItem(DEVMODE_STORAGE_KEY, 'true'); else localStorage.removeItem(DEVMODE_STORAGE_KEY); } catch {}
                 setDevToast(next ? 'Developer Mode ON' : 'Developer Mode OFF');
                 setTimeout(() => setDevToast(null), 2500);
-                if (!next) {
+                if (next) {
+                    setShowRetired(true);
+                    setShowDeprecated(true);
+                    setShowComingSoon(true);
+                    setShowGtmRoadmap(true);
+                    setShowFullPortfolio(true);
+                    setShowVault(true);
+                    setPanelState(prev => {
+                        const collapsed = {};
+                        for (const key of Object.keys(prev)) collapsed[key] = false;
+                        savePanelState(collapsed);
+                        return collapsed;
+                    });
+                } else {
+                    setSelectedCategory(null);
+                    setSelectedSubCategory(null);
+                    setSelectedAddon(null);
+                    setSupportLevelFilter([]);
+                    setShowRetired(false);
+                    setShowDeprecated(false);
+                    setShowComingSoon(false);
+                    setShowGtmRoadmap(false);
                     setShowVault(false);
+                    setPlatformFilter([]);
+                    setVersionFilter([]);
+                    setVersionFilterMode('include');
+                    setPlatformFilterMode('include');
+                    setShowFullPortfolio(false);
+                    savePortfolioPreference(false);
+                    setPanelState({ ...DEFAULT_PANEL_STATE });
+                    savePanelState({ ...DEFAULT_PANEL_STATE });
+                    setCloudSimulation(false);
+                    setAppUpdateVersion('');
                 }
                 return next;
             });
@@ -6837,9 +7698,29 @@ function SCANProductsPage() {
                     setShowComingSoon(true);
                     setShowGtmRoadmap(true);
                     setShowFullPortfolio(true);
+                    setPanelState(prev => {
+                        const collapsed = {};
+                        for (const key of Object.keys(prev)) collapsed[key] = false;
+                        savePanelState(collapsed);
+                        return collapsed;
+                    });
                 } else {
+                    setSelectedCategory(null);
+                    setSelectedSubCategory(null);
+                    setSelectedAddon(null);
+                    setSupportLevelFilter([]);
+                    setShowRetired(false);
+                    setShowDeprecated(false);
                     setShowComingSoon(false);
                     setShowGtmRoadmap(false);
+                    setPlatformFilter([]);
+                    setVersionFilter([]);
+                    setVersionFilterMode('include');
+                    setPlatformFilterMode('include');
+                    setShowFullPortfolio(false);
+                    savePortfolioPreference(false);
+                    setPanelState({ ...DEFAULT_PANEL_STATE });
+                    savePanelState({ ...DEFAULT_PANEL_STATE });
                 }
                 return next;
             });
@@ -6869,12 +7750,12 @@ function SCANProductsPage() {
             });
         }
         // Mark persona modal as shown
-        try { localStorage.setItem(PERSONA_STORAGE_KEY, 'true'); } catch { /* */ }
+        try { localStorage.setItem(PERSONA_STORAGE_KEY, 'true'); } catch (_e) { /* */ }
     }, [products]);
 
     const handleDismissPersona = useCallback(() => {
         setPersonaModalOpen(false);
-        try { localStorage.setItem(PERSONA_STORAGE_KEY, 'true'); } catch { /* */ }
+        try { localStorage.setItem(PERSONA_STORAGE_KEY, 'true'); } catch (_e) { /* */ }
     }, []);
 
     // ── Config viewer handlers ──
@@ -6892,12 +7773,12 @@ function SCANProductsPage() {
             try {
                 const confProducts = await loadProductsFromConf();
                 if (confProducts.length > 0) {
-                    setProducts(confProducts.filter(p => !p.catalog_disabled));
-                    setVaultProducts(confProducts.filter(p => p.catalog_disabled));
+                    setCustomProducts(confProducts.filter(p => p.custom));
+                    setProducts(confProducts.filter(p => !p.custom && !p.catalog_disabled));
+                    setVaultProducts(confProducts.filter(p => !p.custom && p.catalog_disabled));
                 }
             } catch (e) {
                 console.warn('conf-products unavailable, using static catalog:', e);
-                // If REST fails (e.g. outside Splunk), products stay from PRODUCT_CATALOG (generate-catalog.js)
             }
 
             // 2. Installed apps lookup
@@ -6940,8 +7821,11 @@ function SCANProductsPage() {
             try {
                 const vRes = await splunkFetch(`${APPS_LOCAL_ENDPOINT}/${APP_ID}?output_mode=json`);
                 const vData = await vRes.json();
-                const vContent = vData.entry?.[0]?.content || {};
+                const vEntry = vData.entry?.[0] || {};
+                const vContent = vEntry.content || {};
                 setAppVersion(vContent.version || '');
+                const restBuild = String(vContent.build || vEntry.build || '').replace(/^0$/, '');
+                if (restBuild) setAppBuild(restBuild);
                 setAppUpdateVersion(vContent['update.version'] || '');
             } catch (e) { /* ok */ }
         } catch (err) {
@@ -6972,7 +7856,7 @@ function SCANProductsPage() {
             products.forEach((p) => {
                 [p.addon, p.app_viz, p.app_viz_2, p.sc4s_search_head_ta, p.netflow_addon].forEach((aid) => {
                     if (aid && !appIds.has(aid) && !statuses[aid]) {
-                        statuses[aid] = { installed: false, version: null, updateVersion: null, disabled: false };
+                        statuses[aid] = { installed: false, version: null, updateVersion: null, disabled: false, visible: false };
                     }
                 });
             });
@@ -6996,35 +7880,41 @@ function SCANProductsPage() {
         detect();
     }, [products, loading]);
 
-    // ── Indexer tier detection — check add-on deployment across peer indexers ──
+    // ── Indexer tier detection — unified across all platforms ──
+    // Runs on Enterprise standalone, distributed, AND Splunk Cloud.
+    // The subsearch requires both "indexer" AND "search_peer" server roles:
+    //   Standalone → local server lacks search_peer → {} → SH-only chip
+    //   Distributed → indexers have search_peer → full detection → SH + IDX chips
+    //   Cloud → if peers visible, shows indexer status; if REST blocked, null → {} fallback
     useEffect(() => {
         if (loading) return;
         const detect = async () => {
             const result = await detectIndexerTierApps();
-            if (result !== null) setIndexerApps(result);
+            setIndexerApps(result !== null ? result : {});
         };
         detect();
-    }, [loading]);
+    }, [loading, platformType]);
 
-    // ── Load Splunkbase CSV data via inputlookup ──
+    // Stable key of all referenced UIDs — only changes when a product's UID fields change
+    // (e.g. new custom card with a Splunkbase UID), not on unrelated product state updates.
+    const referencedUidKey = useMemo(() => collectReferencedUids(products).join(','), [products]);
+
+    // ── Load Splunkbase CSV data via inputlookup (scoped to referenced UIDs) ──
     useEffect(() => {
-        if (loading) return;
+        if (loading || !referencedUidKey) return;
         const loadSplunkbaseData = async () => {
             try {
-                const searchStr = '| inputlookup scan_splunkbase_apps | table uid appid version_compatibility product_compatibility app_version title archive_status';
-                // console.log('[SCAN] Loading Splunkbase data:', searchStr);
-                // Use app-namespaced endpoint so transforms.conf stanza is resolved
+                const searchStr = buildSplunkbaseLookupSPL(products);
+                if (!searchStr) { console.warn('[SCAN] Splunkbase lookup skipped — no UIDs referenced by catalog'); return; }
                 const sbEndpoint = `/splunkd/__raw/servicesNS/-/${APP_ID}/search/jobs`;
                 const res = await splunkFetch(sbEndpoint, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
                     body: `search=${encodeURIComponent(searchStr)}&output_mode=json&exec_mode=oneshot&count=0&timeout=60`,
                 });
-                // console.log('[SCAN] Splunkbase lookup response status:', res.status);
                 if (!res.ok) { console.warn('[SCAN] Splunkbase lookup not available (not yet synced?)', res.status, res.statusText); return; }
                 const data = await res.json();
                 const rows = data.results || [];
-                // console.log('[SCAN] Splunkbase lookup raw rows:', rows.length, 'sample:', rows.slice(0, 3));
                 const lookup = {};
                 const appidMap = {};
                 rows.forEach(r => {
@@ -7043,13 +7933,12 @@ function SCANProductsPage() {
                 setSplunkbaseData(lookup);
                 setAppidToUidMap(appidMap);
                 setSplunkbaseLoaded(true);
-                // console.log(`[SCAN] Loaded ${Object.keys(lookup).length} Splunkbase entries, sample keys:`, Object.keys(lookup).slice(0, 10));
             } catch (e) {
                 console.error('[SCAN] Could not load Splunkbase data:', e);
             }
         };
         loadSplunkbaseData();
-    }, [loading]);
+    }, [loading, referencedUidKey]);
 
     // ── Splunkbase CSV sync handler ──
     // Runs the "SCAN - Splunkbase Catalog Sync" saved search which:
@@ -7088,8 +7977,9 @@ function SCANProductsPage() {
                 const parts = [`${entryCount.toLocaleString()} apps`];
                 if (catNote) parts.push(catNote);
                 setCsvSyncMessage(`Synced — ${parts.join(' · ')}`);
-                // Reload the Splunkbase data into UI state
-                const reloadSearch = '| inputlookup scan_splunkbase_apps | table uid appid version_compatibility product_compatibility app_version title archive_status';
+                // Reload only the UIDs our catalog references
+                const reloadSearch = buildSplunkbaseLookupSPL(products);
+                if (!reloadSearch) return;
                 const rRes = await splunkFetch(`/splunkd/__raw/servicesNS/-/${APP_ID}/search/jobs`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
@@ -7119,7 +8009,7 @@ function SCANProductsPage() {
             setCsvSyncStatus('error');
             setCsvSyncMessage(e.message || 'Unknown error');
         }
-    }, [products.length]);
+    }, [products]);
 
     // ── Portfolio toggle handler ──
     const handlePortfolioToggle = useCallback(() => {
@@ -7135,11 +8025,16 @@ function SCANProductsPage() {
     }, []);
 
     // ── Base product list (support-level + portfolio + status visibility) ──
+    // This is the single source of truth for counts: the header counter,
+    // category pill badges, and search bar all derive from portfolioProducts.
+    // Every visibility toggle must be mirrored here so counts never include
+    // products the user cannot see in any section on the page.
     const portfolioProducts = useMemo(() => {
         let base = products;
         if (supportLevelFilter.length > 0) {
             base = base.filter((p) => supportLevelFilter.includes(p.support_level));
         } else if (!showFullPortfolio) {
+            // "Supported Only" mode: show only cisco/splunk-supported, hide under_development
             base = base.filter((p) => SUPPORTED_LEVELS.has(p.support_level) && p.status !== 'under_development');
         }
         if (!showRetired) {
@@ -7151,8 +8046,14 @@ function SCANProductsPage() {
         if (!showComingSoon || !showInternalContent) {
             base = base.filter((p) => p.status !== 'under_development');
         }
+        // Coverage-gap products without any integration go to GTM Roadmap section
         if (!showGtmRoadmap || !showInternalContent) {
             base = base.filter((p) => !p.coverage_gap || (p.addon || p.app_viz || p.app_viz_2 || p.sc4s_supported));
+        }
+        // not_supported products go to "Integration Needed" which is only visible in dev/GTM mode;
+        // exclude them from counts when that section is hidden to prevent phantom counts
+        if (!showInternalContent) {
+            base = base.filter((p) => p.support_level !== 'not_supported');
         }
         return base;
     }, [products, supportLevelFilter, showFullPortfolio, showRetired, showDeprecated, showComingSoon, showGtmRoadmap, showInternalContent]);
@@ -7166,12 +8067,10 @@ function SCANProductsPage() {
             filtered = filtered.filter((p) => p.alert_action_uids && p.alert_action_uids.length > 0);
         } else if (selectedCategory === 'secure_networking') {
             filtered = filtered.filter((p) => p.secure_networking_gtm);
-        } else if (selectedCategory === 'ai_powered') {
-            filtered = filtered.filter((p) => p.ai_enabled);
-        } else if (selectedCategory === 'es') {
-            filtered = filtered.filter((p) => p.es_compatible);
-        } else if (selectedCategory === 'itsi') {
-            filtered = filtered.filter((p) => p.itsi_content_pack);
+        } else if (selectedCategory === 'secops') {
+            filtered = filtered.filter((p) => p.es_compatible || p.sse_content);
+        } else if (selectedCategory === 'itops') {
+            filtered = filtered.filter((p) => p.itsi_content_pack || p.ite_learn_content);
         } else if (selectedCategory === 'sc4s') {
             filtered = filtered.filter((p) => p.sc4s_supported);
         } else if (selectedCategory === 'netflow') {
@@ -7187,9 +8086,6 @@ function SCANProductsPage() {
             } else {
                 filtered = filtered.filter((p) => p.subcategory === selectedSubCategory);
             }
-        }
-        if (aiFilter) {
-            filtered = filtered.filter((p) => p.ai_enabled);
         }
         if (searchQuery) {
             const q = searchQuery.toLowerCase().trim();
@@ -7244,7 +8140,7 @@ function SCANProductsPage() {
             }
         }
         return filtered;
-    }, [portfolioProducts, selectedCategory, selectedSubCategory, aiFilter, searchQuery, platformFilter, versionFilter, splunkbaseData, appidToUidMap, versionFilterMode, platformFilterMode]);
+    }, [portfolioProducts, selectedCategory, selectedSubCategory, searchQuery, platformFilter, versionFilter, splunkbaseData, appidToUidMap, versionFilterMode, platformFilterMode]);
 
     const filteredProducts = useMemo(() => {
         if (!selectedAddon) return preAddonProducts;
@@ -7257,7 +8153,7 @@ function SCANProductsPage() {
     }, [preAddonProducts, selectedAddon]);
 
     /* Active filter count for the "Filters" button badge */
-    const crossCutLabels = { soar: 1, alert_actions: 1, secure_networking: 1, ai_powered: 1, es: 1, itsi: 1, sc4s: 1, netflow: 1 };
+    const crossCutLabels = { soar: 1, alert_actions: 1, secure_networking: 1, secops: 1, itops: 1, sc4s: 1, netflow: 1 };
     const activeFilterCount = useMemo(() => {
         let count = 0;
         if (selectedCategory && crossCutLabels[selectedCategory]) count++;
@@ -7282,33 +8178,102 @@ function SCANProductsPage() {
         return match ? (match.addon_label || match.addon) : selectedAddon;
     }, [selectedAddon, preAddonProducts]);
 
+    // ── Section assignment ──
+    // Products are split into mutually exclusive sections in priority order.
+    // coverage_gap products without any integration bypass main sections → gtmGapProducts.
+    // not_supported products bypass Available → unsupportedProducts ("Integration Needed").
+    // Configured/Detected/Available cascade: configured first, then auto-detected, then the rest.
+    // Custom products (from local/products.conf) are merged into the routable pool so
+    // clicking "+ Add" moves them into "Configured Products" alongside catalog cards.
     const includeInMainSections = (p) => !p.coverage_gap || !!(p.addon || p.app_viz || p.app_viz_2 || p.sc4s_supported);
-    const configuredProducts = filteredProducts.filter((p) => p.status !== 'under_development' && p.status !== 'retired' && p.status !== 'deprecated' && includeInMainSections(p) && configuredIds.includes(p.product_id));
-    const detectedProducts = filteredProducts.filter((p) => p.status !== 'under_development' && p.status !== 'retired' && p.status !== 'deprecated' && includeInMainSections(p) && p.support_level !== 'not_supported' && !configuredIds.includes(p.product_id) && sourcetypeData[p.product_id] && sourcetypeData[p.product_id].hasData);
+
+    const filteredCustomProducts = useMemo(() => {
+        if (!searchQuery) return customProducts;
+        const q = searchQuery.toLowerCase().trim();
+        return customProducts.filter((p) => productMatchesSearch(p, q));
+    }, [customProducts, searchQuery]);
+
+    const allRoutableProducts = useMemo(() => [...filteredProducts, ...filteredCustomProducts], [filteredProducts, filteredCustomProducts]);
+    const configuredProducts = allRoutableProducts.filter((p) => p.status !== 'under_development' && p.status !== 'retired' && p.status !== 'deprecated' && includeInMainSections(p) && configuredIds.includes(p.product_id));
+    const configuredIdSet = new Set(configuredProducts.map((p) => p.product_id));
+    const detectedProducts = filteredProducts.filter((p) => p.status !== 'under_development' && p.status !== 'retired' && p.status !== 'deprecated' && includeInMainSections(p) && p.support_level !== 'not_supported' && !configuredIdSet.has(p.product_id) && sourcetypeData[p.product_id] && sourcetypeData[p.product_id].hasData);
     const detectedIds = new Set(detectedProducts.map((p) => p.product_id));
-    const availableProducts = filteredProducts.filter((p) => p.status !== 'under_development' && p.status !== 'retired' && p.status !== 'deprecated' && includeInMainSections(p) && p.support_level !== 'not_supported' && !configuredIds.includes(p.product_id) && !detectedIds.has(p.product_id));
-    const unsupportedProducts = filteredProducts.filter((p) => p.status !== 'under_development' && p.status !== 'retired' && p.status !== 'deprecated' && includeInMainSections(p) && p.support_level === 'not_supported' && !configuredIds.includes(p.product_id));
+    const availableProducts = filteredProducts.filter((p) => p.status !== 'under_development' && p.status !== 'retired' && p.status !== 'deprecated' && includeInMainSections(p) && p.support_level !== 'not_supported' && !configuredIdSet.has(p.product_id) && !detectedIds.has(p.product_id));
+    const unsupportedProducts = filteredProducts.filter((p) => p.status !== 'under_development' && p.status !== 'retired' && p.status !== 'deprecated' && includeInMainSections(p) && p.support_level === 'not_supported' && !configuredIdSet.has(p.product_id));
     const comingSoonProducts = filteredProducts.filter((p) => p.status === 'under_development');
     const deprecatedProducts = filteredProducts.filter((p) => p.status === 'deprecated');
     const retiredProducts = filteredProducts.filter((p) => p.status === 'retired');
     const gtmGapProducts = filteredProducts.filter((p) => p.coverage_gap && !(p.addon || p.app_viz || p.app_viz_2 || p.sc4s_supported));
+    const unconfiguredCustomProducts = filteredCustomProducts.filter((p) => !configuredIdSet.has(p.product_id));
+
+    const sharedSourcetypeMap = useMemo(() => {
+        const stMap = {};
+        for (const p of products) {
+            if (!p.sourcetypes || p.catalog_disabled) continue;
+            for (const st of p.sourcetypes) {
+                if (!stMap[st]) stMap[st] = [];
+                stMap[st].push({ product_id: p.product_id, display_name: p.display_name });
+            }
+        }
+        const shared = {};
+        for (const [st, prods] of Object.entries(stMap)) {
+            if (prods.length > 1) shared[st] = prods;
+        }
+        return shared;
+    }, [products]);
+
+    // ── Section title with inline product icon peek ──
+    const renderSectionTitle = useCallback((label, count, productList, opts = {}) => {
+        const MAX_PEEK = 8;
+        const icons = productList.slice(0, MAX_PEEK);
+        return (
+            <span className="csc-section-title-row">
+                <span>{label} ({count})</span>
+                {count > 0 && (
+                    <span className="csc-section-peek">
+                        {icons.map(p => (
+                            <span key={p.product_id} className="csc-peek-icon">
+                                {p.icon_svg
+                                    ? React.createElement('img', {
+                                        src: createURL(`/static/app/${APP_ID}/icons/${p.icon_svg}${document.documentElement.classList.contains('dce-dark') ? '_white' : ''}.svg`),
+                                        alt: '', className: 'csc-peek-svg',
+                                        onError: (e) => { e.target.replaceWith(document.createTextNode((p.display_name || '?')[0])); }
+                                    })
+                                    : (p.icon_emoji || (p.display_name || '?')[0])
+                                }
+                            </span>
+                        ))}
+                        {count > MAX_PEEK && (
+                            <span
+                                className="csc-peek-more"
+                                title={productList.slice(MAX_PEEK).map(p => p.display_name).join('\n')}
+                            >+{count - MAX_PEEK}</span>
+                        )}
+                    </span>
+                )}
+                {opts.pulse && <span className="csc-section-pulse" />}
+            </span>
+        );
+    }, []);
 
     // ── Effective panel open state (search overrides collapsed panels) ──
     const effectivePanelOpen = useMemo(() => {
         if (!searchQuery) return panelState;
         const overrides = {};
-        if (configuredProducts.length > 0)  overrides.configured_products = true;
-        if (detectedProducts.length > 0)    overrides.detected_products = true;
-        if (availableProducts.length > 0)   overrides.available_products = true;
-        if (unsupportedProducts.length > 0) overrides.unsupported_products = true;
-        if (comingSoonProducts.length > 0)  overrides.coming_soon_products = true;
-        if (deprecatedProducts.length > 0)  overrides.deprecated_products = true;
-        if (retiredProducts.length > 0)     overrides.retired_products = true;
-        if (gtmGapProducts.length > 0)      overrides.gtm_coverage_gaps = true;
+        if (configuredProducts.length > 0)    overrides.configured_products = true;
+        if (detectedProducts.length > 0)      overrides.detected_products = true;
+        if (availableProducts.length > 0)     overrides.available_products = true;
+        if (unsupportedProducts.length > 0)   overrides.unsupported_products = true;
+        if (comingSoonProducts.length > 0)    overrides.coming_soon_products = true;
+        if (deprecatedProducts.length > 0)    overrides.deprecated_products = true;
+        if (retiredProducts.length > 0)       overrides.retired_products = true;
+        if (gtmGapProducts.length > 0)        overrides.gtm_coverage_gaps = true;
+        if (unconfiguredCustomProducts.length > 0) overrides.custom_products = true;
         return { ...panelState, ...overrides };
     }, [searchQuery, panelState, configuredProducts.length, detectedProducts.length,
         availableProducts.length, unsupportedProducts.length, comingSoonProducts.length,
-        deprecatedProducts.length, retiredProducts.length, gtmGapProducts.length]);
+        deprecatedProducts.length, retiredProducts.length, gtmGapProducts.length,
+        unconfiguredCustomProducts.length]);
 
     // ── Scroll to first matching card when search changes ──
     const prevSearchRef = useRef('');
@@ -7358,8 +8323,6 @@ function SCANProductsPage() {
 
     const categoryCounts = useMemo(() => {
         let base = portfolioProducts;
-        // Apply cross-cutting filters so category counts reflect the active filter state
-        if (aiFilter) base = base.filter((p) => p.ai_enabled);
         if (searchQuery) {
             const q = searchQuery.toLowerCase().trim();
             base = base.filter((p) => productMatchesSearch(p, q));
@@ -7395,13 +8358,12 @@ function SCANProductsPage() {
         counts.soar = base.filter((p) => p.soar_connector_uids && p.soar_connector_uids.length > 0).length;
         counts.alert_actions = base.filter((p) => p.alert_action_uids && p.alert_action_uids.length > 0).length;
         counts.secure_networking = base.filter((p) => p.secure_networking_gtm).length;
-        counts.ai_powered = base.filter((p) => p.ai_enabled).length;
-        counts.es = base.filter((p) => p.es_compatible).length;
-        counts.itsi = base.filter((p) => p.itsi_content_pack).length;
+        counts.secops = base.filter((p) => p.es_compatible || p.sse_content).length;
+        counts.itops = base.filter((p) => p.itsi_content_pack || p.ite_learn_content).length;
         counts.sc4s = base.filter((p) => p.sc4s_supported).length;
         counts.netflow = base.filter((p) => p.netflow_supported).length;
         return counts;
-    }, [portfolioProducts, aiFilter, searchQuery, platformFilter, versionFilter, splunkbaseData, selectedAddon, appidToUidMap]);
+    }, [portfolioProducts, searchQuery, platformFilter, versionFilter, splunkbaseData, selectedAddon, appidToUidMap]);
 
     // ── Render ──
     if (loading) {
@@ -7423,6 +8385,7 @@ function SCANProductsPage() {
                     <span className="scan-devmode-banner-pulse" />
                     <span className="scan-devmode-banner-text">DEVELOPER MODE</span>
                     <span className="scan-devmode-banner-pulse" />
+                    <a href={createURL('/_bump')} target="_blank" rel="noopener noreferrer" className="scan-devmode-bump" title="Bump Splunk static asset cache (CSS/JS)">Bump Cache</a>
                 </div>
             )}
             {/* GTM Mode Banner (only when gtmMode is on and devMode is off) */}
@@ -7436,9 +8399,12 @@ function SCANProductsPage() {
             {/* Header */}
             <div className="products-page-header">
                 <div className="header-left">
-                    <h1 className="page-title">Splunk Cisco App Navigator</h1>
+                    <h1 className="page-title">
+                        <span className="scan-logo-mark">SCAN</span>
+                        <span className="scan-logo-full">Splunk Cisco App Navigator</span>
+                    </h1>
                     <p className="products-page-subtitle">
-                        The Front Door to the Cisco–Splunk Ecosystem
+                        The Front Door to the Cisco-Splunk Ecosystem
                     </p>
                 </div>
             </div>
@@ -7461,7 +8427,9 @@ function SCANProductsPage() {
                                 <ul>
                                     <li>Click <b>Add to My Products</b> on any card to start tracking it.</li>
                                     <li>Use the <b>Powered-by</b> pills and <b>search bar</b> to filter the catalog.</li>
-                                    <li>Hit the <b>Open Dashboard</b> button to jump straight into analytics.</li>
+                                    <li>Hit <b>Launch</b> or <b>Explore</b> to jump straight into dashboards or search your data.</li>
+                                    <li>Open <b>Filters</b> and toggle <b>Visibility</b> checkboxes to show Retired or Deprecated products.</li>
+                                    <li>Use the <b>Expand / Collapse All</b> toggle to manage all sections at once.</li>
                                 </ul>
                             </span>
                         }
@@ -7482,42 +8450,34 @@ function SCANProductsPage() {
                     </button>
                 </div>
                 <div className="scan-utility-right">
-                    {/* ── Group 1: Platform & Splunk Version ── */}
-                    {(effectivePlatformType || effectiveSplunkVersion) && (
-                        <span className={`scan-util-pill scan-util-platform ${devMode && cloudSimulation ? 'scan-util-cloud-sim' : ''}`} title={
-                            devMode && cloudSimulation
-                                ? `Cloud Simulation — Splunk Cloud v${SIMULATED_CLOUD_VERSION}`
-                                : effectivePlatformType === 'cloud' ? `Splunk Cloud${effectiveSplunkVersion ? ' v' + effectiveSplunkVersion : ''}` : `Splunk Enterprise${effectiveSplunkVersion ? ' v' + effectiveSplunkVersion : ''}`
+                    {/* ── Dev Mode: platform, Splunk version, SCAN version & build ── */}
+                    {devMode && (
+                        <span className={`scan-util-pill scan-util-devinfo ${cloudSimulation ? 'scan-util-cloud-sim' : ''}`} title={
+                            [
+                                cloudSimulation ? `Cloud Sim v${SIMULATED_CLOUD_VERSION}` : `${effectivePlatformType === 'cloud' ? 'Splunk Cloud' : 'Splunk Enterprise'}${effectiveSplunkVersion ? ' v' + effectiveSplunkVersion : ''}`,
+                                appVersion ? `SCAN v${appVersion}` : null,
+                                appBuild ? `build ${appBuild}` : null,
+                            ].filter(Boolean).join(' · ')
                         }>
-                            <img
-                                className="scan-util-icon"
-                                src={createURL(`/static/app/${APP_ID}/${effectivePlatformType === 'cloud' ? 'icon-cloud.svg' : 'icon-enterprise.svg'}`)}
-                                alt=""
-                            />
                             {effectivePlatformType === 'cloud' ? 'Cloud' : 'Enterprise'}
                             {effectiveSplunkVersion && <span className="scan-util-splunk-ver">{effectiveSplunkVersion}</span>}
+                            {appVersion && <><span className="scan-util-devinfo-sep">|</span>SCAN {appVersion}</>}
+                            {appBuild && <><span className="scan-util-devinfo-sep">|</span><span className="scan-util-devinfo-build">build {appBuild.substring(0, 8)}</span></>}
                         </span>
                     )}
-                    {/* ── Group 2: SCAN App Version & Update ── */}
-                    <span className="scan-util-sep" />
-                    {appVersion && (
-                        <span className="scan-util-pill scan-util-version" title={`Splunk Cisco App Navigator v${appVersion}`}>
-                            SCAN v{appVersion}
-                        </span>
-                    )}
+                    {/* ── Update badge (always visible when update available) ── */}
                     {appUpdateVersion && (
                         <a
-                            href={createURL('/manager/splunk-cisco-app-navigator/appsremote?order=relevance&query=%22Splunk+Cisco+App+Navigator%22&offset=0&support=splunk&support=cisco&type=app')}
+                            href={createURL(`/manager/appinstall/${APP_ID}`)}
                             target="_blank"
                             rel="noopener noreferrer"
                             className="scan-util-pill scan-util-update"
-                            title={`Upgrade from v${appVersion} to v${appUpdateVersion} — click to open Splunkbase`}
+                            title={`Upgrade from v${appVersion} to v${appUpdateVersion} — click to update`}
                         >
                             ⬆ v{appUpdateVersion}
                         </a>
                     )}
-                    {/* ── Group 3: Actions ── */}
-                    <span className="scan-util-sep" />
+                    {/* ── Actions ── */}
                     <button
                         className="scan-util-pill scan-util-theme"
                         onClick={handleThemeCycle}
@@ -7555,6 +8515,13 @@ function SCANProductsPage() {
                     </InfoTooltip>
                     <button
                         className="scan-util-pill"
+                        onClick={handleExpandCollapseAll}
+                        title={allPanelsCollapsed ? 'Expand all sections' : 'Collapse all sections'}
+                    >
+                        {allPanelsCollapsed ? 'Expand All' : 'Collapse All'}
+                    </button>
+                    <button
+                        className="scan-util-pill"
                         ref={guideReturnRef}
                         onClick={() => setCardLegendOpen(true)}
                         title="How to use Splunk Cisco App Navigator"
@@ -7568,6 +8535,15 @@ function SCANProductsPage() {
                     >
                         Role
                     </button>
+                    {welcomeDismissed && (
+                        <button
+                            className="scan-util-pill"
+                            onClick={() => { setWelcomeDismissed(false); try { localStorage.removeItem('scan_welcome_dismissed'); } catch (_e) { /* noop */ } window.scrollTo({ top: 0, behavior: 'smooth' }); }}
+                            title="Show the getting started guide"
+                        >
+                            Welcome
+                        </button>
+                    )}
                     {/* ── Group 4: DevMode tools ── */}
                     {devMode && (
                         <>
@@ -7585,6 +8561,27 @@ function SCANProductsPage() {
                             title={cloudSimulation ? `Cloud Simulation ON — Simulating Splunk Cloud v${SIMULATED_CLOUD_VERSION} — click to disable` : 'Simulate Splunk Cloud environment — click to enable'}
                         >
                             {cloudSimulation ? 'Cloud' : 'Cloud'}
+                        </button>
+                        <button
+                            className={`scan-util-pill scan-util-devmode ${appUpdateVersion ? 'scan-util-cloud-active' : ''}`}
+                            onClick={() => {
+                                setAppUpdateVersion(prev => {
+                                    if (prev) {
+                                        setDevToast('Update Simulation OFF');
+                                        setTimeout(() => setDevToast(null), 2500);
+                                        return '';
+                                    }
+                                    const parts = (appVersion || '1.0.0').split('.');
+                                    parts[parts.length - 1] = String(Number(parts[parts.length - 1] || 0) + 1);
+                                    const fakeVersion = parts.join('.');
+                                    setDevToast(`Update Simulation ON — faking v${fakeVersion}`);
+                                    setTimeout(() => setDevToast(null), 2500);
+                                    return fakeVersion;
+                                });
+                            }}
+                            title={appUpdateVersion ? `Update Simulation ON — faking v${appUpdateVersion} — click to disable` : 'Simulate an available app update — click to enable'}
+                        >
+                            Update
                         </button>
                         <button
                             className="scan-util-pill scan-util-devmode"
@@ -7629,7 +8626,6 @@ function SCANProductsPage() {
                     onSelectCategory={(cat) => {
                         setSelectedCategory(cat);
                         setSelectedSubCategory(null);
-                        setAiFilter(false);
                         if (!cat) {
                             setSelectedAddon(null);
                             setSearchQuery('');
@@ -7638,8 +8634,6 @@ function SCANProductsPage() {
                     }}
                     selectedSubCategory={selectedSubCategory}
                     onSelectSubCategory={setSelectedSubCategory}
-                    aiFilter={aiFilter}
-                    onToggleAiFilter={setAiFilter}
                     categoryCounts={categoryCounts}
                     products={portfolioProducts}
                     onOpenFilterDrawer={() => setFilterDrawerOpen(true)}
@@ -7655,7 +8649,6 @@ function SCANProductsPage() {
                     onSelectCategory={(cat) => {
                         setSelectedCategory(cat);
                         setSelectedSubCategory(null);
-                        setAiFilter(false);
                     }}
                     supportLevelFilter={supportLevelFilter}
                     onSelectSupportLevel={handleSupportLevelToggle}
@@ -7686,7 +8679,6 @@ function SCANProductsPage() {
                 onSelectCategory={(cat) => {
                     setSelectedCategory(cat);
                     setSelectedSubCategory(null);
-                    setAiFilter(false);
                 }}
                 supportLevelFilter={supportLevelFilter}
                 onSelectSupportLevel={(level) => {
@@ -7731,7 +8723,6 @@ function SCANProductsPage() {
                 onResetAll={() => {
                     setSelectedCategory(null);
                     setSelectedSubCategory(null);
-                    setAiFilter(false);
                     setSelectedAddon(null);
                     setSupportLevelFilter([]);
                     setShowRetired(false);
@@ -7752,9 +8743,77 @@ function SCANProductsPage() {
                 }}
             />
 
+            {/* ── Ecosystem Health Stats Bar ── */}
+            {(() => {
+                const visibleProducts = portfolioProducts.filter(p => !p.catalog_disabled);
+                const totalSourcetypes = new Set(visibleProducts.flatMap(p => p.sourcetypes || [])).size;
+                const referencedAddons = new Set(visibleProducts.map(p => p.addon).filter(Boolean));
+                const addonsInstalled = [...referencedAddons].filter(a => installedApps[a]).length;
+                const sc4sReady = visibleProducts.filter(p => p.sc4s_supported).length;
+                const netflowReady = visibleProducts.filter(p => p.netflow_supported).length;
+                const secopsCount = visibleProducts.filter(p => p.es_compatible || p.sse_content).length;
+                const itopsCount = visibleProducts.filter(p => p.itsi_content_pack || p.ite_learn_content).length;
+                const dataFlowing = detectedProducts.length + configuredProducts.filter(p => sourcetypeData[p.product_id] && sourcetypeData[p.product_id].hasData).length;
+                const stats = [
+                    { label: 'Products', value: visibleProducts.length, accent: '#5B6ABF', tip: 'Total Cisco products in your catalog' },
+                    { label: 'Configured', value: configuredProducts.length, accent: '#0A60FF', tip: 'Products pinned to your workspace' },
+                    { label: 'Data Flowing', value: dataFlowing, accent: '#22C55E', pulse: dataFlowing > 0, tip: 'Products with active data in the last 7 days' },
+                    { label: 'Sourcetypes', value: totalSourcetypes, accent: '#546E7A', tip: 'Unique sourcetypes across all products' },
+                    { label: 'Add-ons', value: `${addonsInstalled}/${referencedAddons.size}`, accent: '#7C3AED', tip: 'Installed / total referenced add-ons' },
+                    { label: 'SC4S Ready', value: sc4sReady, accent: '#049FD9', tip: 'Ready-to-go SC4S configurations — deploy the container, point syslog' },
+                    { label: 'NetFlow', value: netflowReady, accent: '#14B8A6', tip: 'Products with ready-to-go NetFlow/IPFIX collection support' },
+                    { label: 'SecOps', value: secopsCount, accent: '#475569', tip: 'Products with SecOps content \u2014 ES (CIM-compliant) and/or Security Essentials use cases' },
+                    { label: 'ITOps', value: itopsCount, accent: '#4F46E5', tip: 'Products with ITOps content \u2014 ITSI content packs and/or IT Essentials Learn procedures' },
+                ];
+                return (
+                    <div className="csc-stats-bar">
+                        {stats.map(s => (
+                            <div key={s.label} className="csc-stat-card" data-tooltip={s.tip} style={{ '--stat-accent': s.accent }}>
+                                <span className="csc-stat-value">
+                                    {s.value}
+                                    {s.pulse && <span className="csc-pulse-dot" />}
+                                </span>
+                                <span className="csc-stat-label">{s.label}</span>
+                            </div>
+                        ))}
+                    </div>
+                );
+            })()}
+
+            {/* ── Welcome Card (shown when not dismissed; toggleable via Welcome button) ── */}
+            {!welcomeDismissed && !searchQuery && (
+                <div className="csc-welcome-card">
+                    <div className="csc-welcome-header">
+                        <div style={{ flex: 1 }}>
+                            <div className="csc-welcome-title">Get started with the Cisco-Splunk Ecosystem</div>
+                            <div className="csc-welcome-subtitle">Connect your Cisco infrastructure to Splunk in four steps</div>
+                        </div>
+                        <button
+                            className="csc-welcome-dismiss"
+                            onClick={() => { setWelcomeDismissed(true); try { localStorage.setItem('scan_welcome_dismissed', '1'); } catch (_e) { /* noop */ } }}
+                            title="Dismiss"
+                        >{'\u2715'}</button>
+                    </div>
+                    <div className="csc-welcome-steps">
+                        {[
+                            { step: '1', title: 'Install Add-ons', desc: 'Deploy from Splunkbase to Search Heads & Indexers' },
+                            { step: '2', title: 'Configure Products', desc: 'Click "+ Add" to pin products to your workspace' },
+                            { step: '3', title: 'Verify Data Flow', desc: 'Confirm sourcetypes appear via status indicators' },
+                            { step: '4', title: 'Explore & Operate', desc: 'Launch dashboards, correlations, and SOAR playbooks' },
+                        ].map(s => (
+                            <div key={s.step} className="csc-welcome-step">
+                                <span className="csc-welcome-step-num">{s.step}</span>
+                                <span className="csc-welcome-step-title">{s.title}</span>
+                                <span className="csc-welcome-step-desc">{s.desc}</span>
+                            </div>
+                        ))}
+                    </div>
+                </div>
+            )}
+
             {/* Section 1: Configured */}
             <div id="configured_products">
-            <CollapsiblePanel title={`Configured Products (${configuredProducts.length})`} open={effectivePanelOpen.configured_products} onChange={handlePanelToggle} panelId="configured_products">
+            <CollapsiblePanel title={renderSectionTitle('Configured Products', configuredProducts.length, configuredProducts)} open={effectivePanelOpen.configured_products} onChange={handlePanelToggle} panelId="configured_products">
                 {configuredProducts.length > 0 && (
                     <div className="csc-section-toolbar">
                         <button
@@ -7769,17 +8828,24 @@ function SCANProductsPage() {
                 {configuredProducts.length > 0 ? (
                     <div className="csc-card-grid">
                         {configuredProducts.map((p) => (
-                            <ProductCard
-                                key={p.product_id} product={p}
-                                installedApps={installedApps} appStatuses={appStatuses} indexerApps={indexerApps}
-                                sourcetypeData={sourcetypeData} splunkbaseData={splunkbaseData} appidToUidMap={appidToUidMap} isConfigured isComingSoon={false}
-                                platformType={effectivePlatformType}
-                                onToggleConfigured={handleToggleConfigured}
-                                onShowBestPractices={handleShowBestPractices}
-                                onViewLegacy={handleViewLegacy}
-                                onSetCustomDashboard={handleSetCustomDashboard}
-                                devMode={devMode} onViewConfig={handleOpenConfigViewer}
-                            />
+                            <div key={p.product_id} style={{ position: 'relative' }}>
+                                {p.custom && <span className="csc-custom-badge">Custom</span>}
+                                <ProductCard
+                                    product={p}
+                                    installedApps={installedApps} appStatuses={appStatuses} indexerApps={indexerApps}
+                                    sourcetypeData={sourcetypeData} splunkbaseData={splunkbaseData} appidToUidMap={appidToUidMap} isConfigured isComingSoon={false}
+                                    platformType={effectivePlatformType}
+                                    onToggleConfigured={handleToggleConfigured}
+                                    onShowBestPractices={handleShowBestPractices}
+                                    onViewLegacy={handleViewLegacy}
+                                    onSetCustomDashboard={handleSetCustomDashboard}
+                                    devMode={devMode} onViewConfig={handleOpenConfigViewer}
+                                    onEditCustom={p.custom ? handleEditCustomProduct : undefined}
+                                    onCloneCustom={p.custom ? handleCloneCustomProduct : undefined}
+                                    onDeleteCustom={p.custom ? handleDeleteCustomProduct : undefined}
+                                    sharedSourcetypeMap={sharedSourcetypeMap}
+                                />
+                            </div>
                         ))}
                     </div>
                 ) : (
@@ -7793,7 +8859,7 @@ function SCANProductsPage() {
             {/* Section 1b: Data Detected — products with flowing sourcetypes not yet configured */}
             {detectedProducts.length > 0 && (
                 <div id="detected_products">
-                <CollapsiblePanel title={`Data Detected (${detectedProducts.length})`} open={effectivePanelOpen.detected_products} onChange={handlePanelToggle} panelId="detected_products">
+                <CollapsiblePanel title={renderSectionTitle('Data Detected', detectedProducts.length, detectedProducts, { pulse: true })} open={effectivePanelOpen.detected_products} onChange={handlePanelToggle} panelId="detected_products">
                     <div style={{ padding: '8px 12px', marginBottom: '12px', background: 'var(--status-info-bg, #f0f9ff)', borderLeft: '4px solid var(--color-primary-hover, #02C8FF)', borderRadius: '4px', fontSize: '13px', color: 'var(--page-color, #333)' }}>
                         These products have <strong>active sourcetype data flowing</strong> into your Splunk environment but haven't been added to your configured list yet. Click <strong>Add to My Products</strong> to start managing them.
                     </div>
@@ -7809,6 +8875,7 @@ function SCANProductsPage() {
                                 onViewLegacy={handleViewLegacy}
                                 onSetCustomDashboard={handleSetCustomDashboard}
                                 devMode={devMode} onViewConfig={handleOpenConfigViewer}
+                                sharedSourcetypeMap={sharedSourcetypeMap}
                             />
                         ))}
                     </div>
@@ -7818,7 +8885,7 @@ function SCANProductsPage() {
 
             {/* Section 2: Available */}
             <div id="available_products">
-            <CollapsiblePanel title={`Available Products (${availableProducts.length})`} open={effectivePanelOpen.available_products} onChange={handlePanelToggle} panelId="available_products">
+            <CollapsiblePanel title={renderSectionTitle('Available Products', availableProducts.length, availableProducts)} open={effectivePanelOpen.available_products} onChange={handlePanelToggle} panelId="available_products">
                 {availableProducts.length > 0 ? (
                     <div className="csc-card-grid">
                         {availableProducts.map((p) => (
@@ -7832,6 +8899,7 @@ function SCANProductsPage() {
                                 onViewLegacy={handleViewLegacy}
                                 onSetCustomDashboard={handleSetCustomDashboard}
                                 devMode={devMode} onViewConfig={handleOpenConfigViewer}
+                                sharedSourcetypeMap={sharedSourcetypeMap}
                             />
                         ))}
                     </div>
@@ -7843,25 +8911,30 @@ function SCANProductsPage() {
             </CollapsiblePanel>
             </div>
 
-            {/* Section 3: Unsupported */}
-            {unsupportedProducts.length > 0 && (
+            {/* Section 3: Integration Needed — Cisco products with support_level = not_supported.
+                Gated behind showInternalContent (devMode or gtmMode) so regular users never
+                see products without Splunk integrations. Cards render with noIntegration to
+                suppress all action buttons and sourcetype warnings without showing a badge
+                (unlike isComingSoon which displays "Coming Soon"). */}
+            {showInternalContent && unsupportedProducts.length > 0 && (
                 <div id="unsupported_products">
-                <CollapsiblePanel title={`Unsupported Products (${unsupportedProducts.length})`} open={effectivePanelOpen.unsupported_products} onChange={handlePanelToggle} panelId="unsupported_products">
-                    <div style={{ padding: '8px 12px', marginBottom: '12px', background: 'var(--warning-bg, #fff3e0)', borderLeft: '4px solid #bf360c', borderRadius: '4px', fontSize: '13px', color: 'var(--page-color, #333)' }}>
-                        These products have a <strong>Not Supported</strong> support level — there is no official Cisco or Splunk support commitment. They may still function correctly but use at your own discretion.
+                <CollapsiblePanel title={renderSectionTitle('Integration Needed', unsupportedProducts.length, unsupportedProducts)} open={effectivePanelOpen.unsupported_products} onChange={handlePanelToggle} panelId="unsupported_products">
+                    <div style={{ padding: '8px 12px', marginBottom: '12px', background: 'var(--status-warning-bg)', borderLeft: '4px solid var(--status-warning-border)', borderRadius: '4px', fontSize: '13px', color: 'var(--text-primary, #333)' }}>
+                        These Cisco products do not have a dedicated Splunk add-on or integration yet. They are listed here for awareness and tracking — a Splunk integration may be developed in the future.
                     </div>
                     <div className="csc-card-grid">
                         {unsupportedProducts.map((p) => (
                             <ProductCard
                                 key={p.product_id} product={p}
                                 installedApps={installedApps} appStatuses={appStatuses} indexerApps={indexerApps}
-                                sourcetypeData={sourcetypeData} splunkbaseData={splunkbaseData} appidToUidMap={appidToUidMap} isConfigured={false} isComingSoon={false}
+                                sourcetypeData={sourcetypeData} splunkbaseData={splunkbaseData} appidToUidMap={appidToUidMap} isConfigured={false} noIntegration
                                 platformType={effectivePlatformType}
                                 onToggleConfigured={handleToggleConfigured}
                                 onShowBestPractices={handleShowBestPractices}
                                 onViewLegacy={handleViewLegacy}
                                 onSetCustomDashboard={handleSetCustomDashboard}
                                 devMode={devMode} onViewConfig={handleOpenConfigViewer}
+                                sharedSourcetypeMap={sharedSourcetypeMap}
                             />
                         ))}
                     </div>
@@ -7871,7 +8944,7 @@ function SCANProductsPage() {
 
             {/* Section 4: Coming Soon (gated behind gtmMode / devMode) */}
             {showInternalContent && <div id="coming_soon_products">
-            <CollapsiblePanel title={`Coming Soon (${comingSoonProducts.length})`} open={effectivePanelOpen.coming_soon_products} onChange={handlePanelToggle} panelId="coming_soon_products">
+            <CollapsiblePanel title={renderSectionTitle('Coming Soon', comingSoonProducts.length, comingSoonProducts)} open={effectivePanelOpen.coming_soon_products} onChange={handlePanelToggle} panelId="coming_soon_products">
                 {comingSoonProducts.length > 0 ? (
                     <div className="csc-card-grid">
                         {comingSoonProducts.map((p) => (
@@ -7885,6 +8958,7 @@ function SCANProductsPage() {
                                 onViewLegacy={handleViewLegacy}
                                 onSetCustomDashboard={handleSetCustomDashboard}
                                 devMode={devMode} onViewConfig={handleOpenConfigViewer}
+                                sharedSourcetypeMap={sharedSourcetypeMap}
                             />
                         ))}
                     </div>
@@ -7894,11 +8968,13 @@ function SCANProductsPage() {
             </CollapsiblePanel>
             </div>}
 
-            {/* Section 5: Deprecated Products */}
+            {/* Section 5: Deprecated Products — warning banner uses theme-aware CSS
+                variables (--status-warning-bg, --status-warning-border, --text-primary) for
+                correct rendering in both light and dark modes */}
             {deprecatedProducts.length > 0 && (
                 <div id="deprecated_products">
-                <CollapsiblePanel title={`Deprecated Products (${deprecatedProducts.length})`} open={effectivePanelOpen.deprecated_products} onChange={handlePanelToggle} panelId="deprecated_products">
-                    <div style={{ padding: '8px 12px', marginBottom: '12px', background: 'var(--warning-bg, #fff3e0)', borderLeft: '4px solid #FF9000', borderRadius: '4px', fontSize: '13px', color: 'var(--page-color, #333)' }}>
+                <CollapsiblePanel title={renderSectionTitle('Deprecated Products', deprecatedProducts.length, deprecatedProducts)} open={effectivePanelOpen.deprecated_products} onChange={handlePanelToggle} panelId="deprecated_products">
+                    <div style={{ padding: '8px 12px', marginBottom: '12px', background: 'var(--status-warning-bg)', borderLeft: '4px solid var(--status-warning-border)', borderRadius: '4px', fontSize: '13px', color: 'var(--text-primary, #333)' }}>
                         These Splunk add-ons or apps have been <strong>deprecated</strong> — the Cisco product may still be active but the integration is being sunset or replaced by a newer add-on.
                     </div>
                     <div className="csc-card-grid">
@@ -7913,6 +8989,7 @@ function SCANProductsPage() {
                                 onViewLegacy={handleViewLegacy}
                                 onSetCustomDashboard={handleSetCustomDashboard}
                                 devMode={devMode} onViewConfig={handleOpenConfigViewer}
+                                sharedSourcetypeMap={sharedSourcetypeMap}
                             />
                         ))}
                     </div>
@@ -7923,7 +9000,7 @@ function SCANProductsPage() {
             {/* Section 6: Retired Products (Cisco EOL) */}
             {retiredProducts.length > 0 && (
                 <div id="retired_products">
-                <CollapsiblePanel title={`Retired Products (${retiredProducts.length})`} open={effectivePanelOpen.retired_products} onChange={handlePanelToggle} panelId="retired_products">
+                <CollapsiblePanel title={renderSectionTitle('Retired Products', retiredProducts.length, retiredProducts)} open={effectivePanelOpen.retired_products} onChange={handlePanelToggle} panelId="retired_products">
                     <div style={{ padding: '8px 12px', marginBottom: '12px', background: 'var(--status-neutral-bg, #fce4ec)', borderLeft: '4px solid var(--color-error, #c62828)', borderRadius: '4px', fontSize: '13px', color: 'var(--page-color, #333)' }}>
                         These Cisco products have reached <strong>end-of-life / end-of-sale</strong> and have been superseded by newer offerings. Their Splunk add-ons may still function if already installed.
                     </div>
@@ -7939,6 +9016,7 @@ function SCANProductsPage() {
                                 onViewLegacy={handleViewLegacy}
                                 onSetCustomDashboard={handleSetCustomDashboard}
                                 devMode={devMode} onViewConfig={handleOpenConfigViewer}
+                                sharedSourcetypeMap={sharedSourcetypeMap}
                             />
                         ))}
                     </div>
@@ -7949,7 +9027,7 @@ function SCANProductsPage() {
             {/* Section 6: GTM Roadmap — Coverage Gaps (only when user has turned on "GTM Roadmap" in filters) */}
             {showGtmRoadmap && gtmGapProducts.length > 0 && (
                 <div id="gtm_coverage_gaps">
-                <CollapsiblePanel title={`GTM Roadmap — Coming Soon (${gtmGapProducts.length})`} open={effectivePanelOpen.gtm_coverage_gaps} onChange={handlePanelToggle} panelId="gtm_coverage_gaps">
+                <CollapsiblePanel title={renderSectionTitle('GTM Roadmap \u2014 Coverage Gaps', gtmGapProducts.length, gtmGapProducts)} open={effectivePanelOpen.gtm_coverage_gaps} onChange={handlePanelToggle} panelId="gtm_coverage_gaps">
                     <div style={{ padding: '8px 12px', marginBottom: '12px', background: 'var(--status-neutral-bg, #eceff1)', borderLeft: '4px solid var(--text-tertiary, #607d8b)', borderRadius: '4px', fontSize: '13px', color: 'var(--page-color, #333)' }}>
                         These Cisco products are on the <strong>Secure Networking GTM roadmap</strong> for Splunk integration. Items are ordered by GTM pillar — <strong>Campus &amp; Branch first</strong>, then WAN Edge, Data Center &amp; Cloud, Visibility &amp; Assurance, and Industrial/OT.
                     </div>
@@ -7961,7 +9039,7 @@ function SCANProductsPage() {
                                     <ProductCard
                                         key={p.product_id} product={p}
                                         installedApps={installedApps} appStatuses={appStatuses} indexerApps={indexerApps}
-                                        sourcetypeData={sourcetypeData} splunkbaseData={splunkbaseData} appidToUidMap={appidToUidMap} isConfigured={false} isComingSoon={false}
+                                        sourcetypeData={sourcetypeData} splunkbaseData={splunkbaseData} appidToUidMap={appidToUidMap} isConfigured={false} noIntegration
                                         platformType={effectivePlatformType}
                                         onToggleConfigured={handleToggleConfigured}
                                         onShowBestPractices={handleShowBestPractices}
@@ -7969,6 +9047,7 @@ function SCANProductsPage() {
                                         onSetCustomDashboard={handleSetCustomDashboard}
                                         devMode={devMode} onViewConfig={handleOpenConfigViewer}
                                         showGtmRibbon
+                                        sharedSourcetypeMap={sharedSourcetypeMap}
                                     />
                                 ))}
                             </div>
@@ -7978,10 +9057,64 @@ function SCANProductsPage() {
                 </div>
             )}
 
-            {/* Section 7: Catalog Vault — Disabled Products */}
+            {/* Section: Custom Products — shows only unconfigured custom cards;
+                configured custom cards move to the "Configured Products" section above. */}
+            <div id="custom_products">
+            <CollapsiblePanel
+                title={renderSectionTitle('Custom Products', unconfiguredCustomProducts.length, unconfiguredCustomProducts)}
+                open={effectivePanelOpen.custom_products}
+                onChange={handlePanelToggle}
+                panelId="custom_products"
+            >
+                <div className="csc-custom-section-banner">
+                    Products you've added beyond the official Cisco catalog. Custom cards are stored in <code>local/products.conf</code> and survive app upgrades.
+                    {configuredIdSet.size > 0 && filteredCustomProducts.length !== unconfiguredCustomProducts.length && (
+                        <span style={{ marginLeft: '6px', fontStyle: 'italic', opacity: 0.8 }}>
+                            ({filteredCustomProducts.length - unconfiguredCustomProducts.length} configured — shown above)
+                        </span>
+                    )}
+                </div>
+                {unconfiguredCustomProducts.length > 0 ? (
+                    <div className="csc-card-grid">
+                        {unconfiguredCustomProducts.map((p) => (
+                            <div key={p.product_id} style={{ position: 'relative' }}>
+                                <span className="csc-custom-badge">Custom</span>
+                                <ProductCard
+                                    product={p}
+                                    installedApps={installedApps} appStatuses={appStatuses} indexerApps={indexerApps}
+                                    sourcetypeData={sourcetypeData} splunkbaseData={splunkbaseData} appidToUidMap={appidToUidMap}
+                                    isConfigured={false} isComingSoon={false}
+                                    platformType={effectivePlatformType}
+                                    onToggleConfigured={handleToggleConfigured}
+                                    onShowBestPractices={handleShowBestPractices}
+                                    onViewLegacy={handleViewLegacy}
+                                    onSetCustomDashboard={handleSetCustomDashboard}
+                                    devMode={devMode} onViewConfig={handleOpenConfigViewer}
+                                    onEditCustom={handleEditCustomProduct}
+                                    onCloneCustom={handleCloneCustomProduct}
+                                    onDeleteCustom={handleDeleteCustomProduct}
+                                    sharedSourcetypeMap={sharedSourcetypeMap}
+                                />
+                            </div>
+                        ))}
+                    </div>
+                ) : (
+                    <div className="empty-section" style={{ textAlign: 'center', padding: '24px' }}>
+                        {searchQuery ? 'No custom products match your search.' : (filteredCustomProducts.length > 0 ? 'All custom products are configured — see Configured Products above.' : 'No custom products yet.')}
+                    </div>
+                )}
+                <div style={{ marginTop: '12px' }}>
+                    <button className="csc-custom-add-btn" onClick={() => { setCustomEditProduct(null); setCustomCloneProduct(null); setCustomFormOpen(true); }}>
+                        <Plus size={14} /> Add Custom Product
+                    </button>
+                </div>
+            </CollapsiblePanel>
+            </div>
+
+            {/* Section 8: Catalog Vault — Disabled Products */}
             {showVault && vaultProducts.length > 0 && (
                 <div id="vault_products">
-                <CollapsiblePanel title={`Catalog Vault (${vaultProducts.length})`} open={effectivePanelOpen.vault_products} onChange={handlePanelToggle} panelId="vault_products">
+                <CollapsiblePanel title={renderSectionTitle('Catalog Vault', vaultProducts.length, vaultProducts)} open={effectivePanelOpen.vault_products} onChange={handlePanelToggle} panelId="vault_products">
                     <div style={{ padding: '8px 12px', marginBottom: '12px', background: 'var(--status-neutral-bg, #f1f5f9)', borderLeft: '4px solid #64748b', borderRadius: '4px', fontSize: '13px', color: 'var(--page-color, #333)' }}>
                         These catalog entries are <strong>disabled</strong> in products.conf and hidden from the main view. They may be placeholders, duplicates, or products intentionally removed from the active catalog.
                     </div>
@@ -7997,6 +9130,7 @@ function SCANProductsPage() {
                                 onViewLegacy={handleViewLegacy}
                                 onSetCustomDashboard={handleSetCustomDashboard}
                                 devMode={devMode} onViewConfig={handleOpenConfigViewer}
+                                sharedSourcetypeMap={sharedSourcetypeMap}
                             />
                         ))}
                     </div>
@@ -8006,6 +9140,21 @@ function SCANProductsPage() {
 
 
             {/* Modals */}
+            <CustomProductFormModal
+                open={customFormOpen}
+                onClose={() => { setCustomFormOpen(false); setCustomEditProduct(null); setCustomCloneProduct(null); }}
+                onSave={handleCustomProductSaved}
+                editProduct={customEditProduct}
+                cloneProduct={customCloneProduct}
+                existingIds={allProductIds}
+                allProducts={[...products, ...customProducts, ...vaultProducts]}
+            />
+            <DeleteCustomProductModal
+                open={!!customDeleteTarget}
+                onClose={() => setCustomDeleteTarget(null)}
+                product={customDeleteTarget}
+                onConfirm={handleCustomDeleted}
+            />
             <BestPracticesModal
                 open={bpModalOpen}
                 onClose={() => setBpModalOpen(false)}
@@ -8025,7 +9174,7 @@ function SCANProductsPage() {
                 <ConfigViewerModal
                     open={configViewerOpen}
                     onClose={() => setConfigViewerOpen(false)}
-                    products={products}
+                    products={[...products, ...customProducts, ...vaultProducts]}
                     initialProductId={configViewerProductId}
                     installedApps={installedApps}
                     appStatuses={appStatuses}
@@ -8045,7 +9194,7 @@ function SCANProductsPage() {
                 onSelectPersona={handleSelectPersona}
                 products={products}
             />
-            <FeedbackModal open={feedbackOpen} onClose={() => setFeedbackOpen(false)} />
+            <FeedbackModal open={feedbackOpen} onClose={() => setFeedbackOpen(false)} platformType={effectivePlatformType} appVersion={appVersion} />
 
             {/* Usage Guide Modal */}
             {cardLegendOpen && (
@@ -8069,7 +9218,7 @@ function SCANProductsPage() {
                                 <summary className="scan-guide-summary">Product Cards</summary>
                                 <ul className="scan-guide-list">
                                     <li>Intelligence badges show <strong>install status</strong>, <strong>updates</strong>, <strong>data flowing</strong> (7d), and <strong>legacy apps</strong>.</li>
-                                    <li>Header badges (<span className="csc-badge-btn csc-badge-sc4s" style={{ fontSize: '12px', padding: '3px 8px' }}>SC4S</span> <span className="csc-badge-btn csc-badge-netflow" style={{ fontSize: '12px', padding: '3px 8px' }}>NetFlow</span> <span className="csc-badge-btn csc-badge-soar" style={{ fontSize: '12px', padding: '3px 8px' }}>SOAR</span> <span className="csc-badge-btn csc-badge-itsi" style={{ fontSize: '12px', padding: '3px 8px' }}>ITSI</span> <span className="csc-badge-btn csc-badge-es" style={{ fontSize: '12px', padding: '3px 8px' }}>ES</span> <span className="csc-badge-btn csc-badge-alert" style={{ fontSize: '12px', padding: '3px 8px' }}>Alert Actions</span>) open info panels.</li>
+                                    <li>Header badges (<span className="csc-badge-btn csc-badge-sc4s" style={{ fontSize: '12px', padding: '3px 8px' }}>SC4S</span> <span className="csc-badge-btn csc-badge-netflow" style={{ fontSize: '12px', padding: '3px 8px' }}>NetFlow</span> <span className="csc-badge-btn csc-badge-soar" style={{ fontSize: '12px', padding: '3px 8px' }}>SOAR</span> <span className="csc-badge-btn csc-badge-itops" style={{ fontSize: '12px', padding: '3px 8px' }}><PulseIcon size="0.85em" style={{ verticalAlign: '-0.1em', marginRight: '3px' }} />ITOps</span> <span className="csc-badge-btn csc-badge-secops" style={{ fontSize: '12px', padding: '3px 8px' }}><ShieldIcon size="0.85em" style={{ verticalAlign: '-0.1em', marginRight: '3px' }} />SecOps</span> <span className="csc-badge-btn csc-badge-alert" style={{ fontSize: '12px', padding: '3px 8px' }}>Alert Actions</span>) open info panels.</li>
                                     <li>Hover <strong>ⓘ</strong> for description, value proposition, and former names.</li>
                                 </ul>
                             </details>
@@ -8096,11 +9245,23 @@ function SCANProductsPage() {
                             <details className="scan-guide-section">
                                 <summary className="scan-guide-summary">Actions &amp; Personalization</summary>
                                 <ul className="scan-guide-list">
-                                    <li>Click <strong>Launch ▾</strong> to open an installed app's dashboard directly.</li>
+                                    <li>Click <strong>Launch ▾</strong> to open an installed app's dashboard directly. For TA-only products (no built-in UI), the button changes to <strong>Explore ▾</strong> with options to search your data or create a dashboard.</li>
                                     <li><strong>? Best Practices</strong> provides platform-specific tips and SC4S links.</li>
                                     <li><strong>Sync Catalog</strong> checks S3 for a newer product catalog (<code>products.conf</code>) and downloads the latest Splunkbase app lookup. Runs nightly, but click for on-demand sync.</li>
                                     <li><strong>Role</strong> picks a persona for a curated quick-start.</li>
                                     <li>Cycle through <strong>Light / Dark / Auto</strong> themes.</li>
+                                    <li>Use <strong>Expand / Collapse All</strong> (next to the search bar) to open or close every section at once.</li>
+                                </ul>
+                            </details>
+
+                            <details className="scan-guide-section">
+                                <summary className="scan-guide-summary">Sections &amp; Visibility</summary>
+                                <ul className="scan-guide-list">
+                                    <li><strong>Configured Products</strong> — cards you've pinned to your workspace.</li>
+                                    <li><strong>Data Detected</strong> — products with active sourcetype data flowing (not yet configured).</li>
+                                    <li><strong>Available Products</strong> — all supported products you haven't added yet.</li>
+                                    <li><strong>Custom Products</strong> — cards you've created beyond the official catalog.</li>
+                                    <li>Toggle visibility in <strong>Filters → Visibility</strong>: Retired and Deprecated products can be shown or hidden.</li>
                                 </ul>
                             </details>
 
@@ -8128,7 +9289,7 @@ function SCANProductsPage() {
                             </div>
                             <p style={{ margin: 0 }}>
                                 All products will be moved back to their original sections
-                                (<em>Available Products</em>, <em>Unsupported Products</em>, or <em>Coming Soon</em>). No data
+                                (<em>Available Products</em>, <em>Integration Needed</em>, or <em>Coming Soon</em>). No data
                                 will be lost — you can re-add products at any time.
                             </p>
                         </div>
@@ -8144,11 +9305,11 @@ function SCANProductsPage() {
 
             {/* Footer */}
             <div style={{
-                marginTop: '30px', padding: '16px 20px', textAlign: 'center',
+                marginTop: '16px', padding: '14px 20px', textAlign: 'center',
                 fontSize: '12px', color: 'var(--faint-color, #888)',
                 borderTop: '1px solid var(--card-border, #e0e0e0)',
             }}>
-                Splunk Cisco App Navigator {appVersion && `v${appVersion}`} — The Front Door to the Cisco-Splunk Ecosystem
+                SCAN {appVersion && `v${appVersion}`} — The Front Door to the Cisco-Splunk Ecosystem
             </div>
         </div>
     );

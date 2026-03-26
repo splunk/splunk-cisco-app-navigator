@@ -39,6 +39,16 @@ category = security | networking | collaboration | infrastructure | observabilit
 version = <string>
 * Current version of this product module (e.g. "1.0.0").
 
+date_created = <date>
+* Date the catalog entry was first added (YYYY-MM-DD).
+* Populated from git history; updated manually when creating new stanzas.
+* Example: 2026-02-23
+
+date_updated = <date>
+* Date the catalog entry was last modified (YYYY-MM-DD).
+* Updated whenever any field in the stanza changes.
+* Example: 2026-03-21
+
 status = active | under_development | deprecated | archived | roadmap
 * Product lifecycle status.
 *   active             — Live product shown in the main grid.
@@ -362,8 +372,15 @@ support_level = cisco_supported | splunk_supported | developer_supported | commu
 *   splunk_supported   — Developed or supported by Splunk / Splunkbase.
 *   developer_supported — Developed by a third-party developer on Splunkbase.
 *   community_supported — Community-maintained; no formal support agreement.
-*   not_supported       — Archived, deprecated, or no longer maintained.
+*   not_supported       — No dedicated Splunk integration exists yet, or the add-on is archived/unmaintained.
 * Default: (empty). When empty, no support badge is shown.
+
+custom = true | false
+* Whether this product card was created by the customer (lives in local/products.conf).
+* Custom cards appear in a dedicated "Custom Products" section and can be
+* edited or deleted from the UI.  Official Cisco catalog cards should never
+* have this flag set.
+* Default: false.
 
 sort_order = <integer>
 * Numeric sort weight. Lower values appear first. Default 100.
@@ -519,4 +536,48 @@ escu_detections = <comma-separated list>
 * These are the savedsearch names from DA-ESS-ContentUpdate.
 * Example: Cisco Duo Admin Login Unusual Browser,Cisco Duo Bulk Policy Deletion
 * Default: (empty).
+
+# ── Splunk Security Essentials (SSE) ────────────────────────────────────────
+
+sse_content = true | false
+* Whether Splunk Security Essentials contains use cases or detections that
+* reference this product's sourcetypes or data.
+* SSE is a free Splunkbase app that provides detection guidance and analytics
+* stories even without Splunk Enterprise Security.
+* When true (alone or combined with es_compatible), the card displays a "SecOps" badge.
+* Default: false.
+
+sse_use_cases = <comma-separated list>
+* Comma-separated names of SSE showcases / use cases relevant to this product.
+* These correspond to summary entries in SSE's ShowcaseInfo.json.
+* Example: Cisco Duo Admin Login Unusual Browser,Cisco Duo Bulk Policy Deletion
 * Default: (empty).
+
+sse_use_case_count = <integer>
+* Number of SSE use cases targeting this product's sourcetypes.
+* Default: (empty / 0).
+
+sse_data_sources = <comma-separated list>
+* SSE data source category codes relevant to this product.
+* Example: VendorSpecific-cisco-duo,DS010NetworkCommunication-ET01Traffic
+* Default: (empty).
+
+# ── IT Essentials Learn (ITE Learn) ─────────────────────────────────────────
+
+ite_learn_content = true | false
+* Whether IT Essentials Learn contains procedures that reference this product's
+* sourcetypes or data.
+* ITE Learn is a free Splunkbase app that provides guided ITOps procedures and
+* operational intelligence even without Splunk ITSI.
+* When true (alone or combined with itsi_content_pack_label), the card displays
+* an "ITOps" badge.
+* Default: false.
+
+ite_learn_procedures = <comma-separated list>
+* Comma-separated names of ITE Learn procedures relevant to this product.
+* Example: Hosts with highest log volume,Detect duplicate IP address
+* Default: (empty).
+
+ite_learn_procedure_count = <integer>
+* Number of ITE Learn procedures targeting this product's sourcetypes.
+* Default: (empty / 0).

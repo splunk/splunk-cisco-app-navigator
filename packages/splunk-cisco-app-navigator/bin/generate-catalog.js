@@ -153,6 +153,14 @@ function buildProduct(name, c) {
         escu_analytic_stories: csvToArray(c.escu_analytic_stories),
         escu_detection_count: parseInt(c.escu_detection_count || '0', 10),
         escu_detections: csvToArray(c.escu_detections),
+        sse_content: c.sse_content === 'true' || c.sse_content === '1',
+        sse_use_cases: csvToArray(c.sse_use_cases),
+        sse_use_case_count: parseInt(c.sse_use_case_count || '0', 10),
+        sse_data_sources: csvToArray(c.sse_data_sources),
+        ite_learn_content: c.ite_learn_content === 'true' || c.ite_learn_content === '1',
+        ite_learn_procedures: csvToArray(c.ite_learn_procedures),
+        ite_learn_procedure_count: parseInt(c.ite_learn_procedure_count || '0', 10),
+        custom: c.custom === 'true' || c.custom === '1',
     };
 }
 

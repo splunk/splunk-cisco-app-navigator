@@ -347,6 +347,21 @@
 			"title": "Cisco Apps (Archived)",
 			"type": "splunk.singlevalue"
 		},
+		"viz_kpi_custom": {
+			"dataSources": {
+				"primary": "ds_kpi_custom_products"
+			},
+			"options": {
+				"backgroundColor": "#f3e8ff",
+				"majorColor": "#7c3aed",
+				"sparklineDisplay": "off",
+				"trendDisplay": "off",
+				"unit": "custom",
+				"unitPosition": "after"
+			},
+			"title": "Custom Products",
+			"type": "splunk.singlevalue"
+		},
 		"viz_kpi_deprecated": {
 			"dataSources": {
 				"primary": "ds_kpi_deprecated"
@@ -924,6 +939,14 @@
 			},
 			"type": "ds.chain"
 		},
+		"ds_kpi_custom_products": {
+			"name": "KPI Custom Products",
+			"options": {
+				"extend": "ds_ecosystem_summary",
+				"query": "| fields custom_products | rename custom_products as total"
+			},
+			"type": "ds.chain"
+		},
 		"ds_kpi_deprecated": {
 			"name": "KPI Deprecated",
 			"options": {
@@ -1176,7 +1199,7 @@
 						"item": "viz_kpi_soar",
 						"position": {
 							"h": 110,
-							"w": 472,
+							"w": 376,
 							"x": 20,
 							"y": 190
 						},
@@ -1186,8 +1209,8 @@
 						"item": "viz_kpi_alert",
 						"position": {
 							"h": 110,
-							"w": 472,
-							"x": 502,
+							"w": 376,
+							"x": 406,
 							"y": 190
 						},
 						"type": "block"
@@ -1196,8 +1219,8 @@
 						"item": "viz_kpi_legacy",
 						"position": {
 							"h": 110,
-							"w": 472,
-							"x": 984,
+							"w": 376,
+							"x": 792,
 							"y": 190
 						},
 						"type": "block"
@@ -1206,8 +1229,18 @@
 						"item": "viz_kpi_deprecated",
 						"position": {
 							"h": 110,
-							"w": 472,
-							"x": 1466,
+							"w": 376,
+							"x": 1178,
+							"y": 190
+						},
+						"type": "block"
+					},
+					{
+						"item": "viz_kpi_custom",
+						"position": {
+							"h": 110,
+							"w": 376,
+							"x": 1564,
 							"y": 190
 						},
 						"type": "block"

@@ -19,6 +19,16 @@ Object.entries(allDeps).forEach(([name, range]) => {
   }
 });
 
+// Read build hash from app.conf (stamped by build.js before webpack runs)
+const fs = require('fs');
+const appConfPath = path.join(__dirname, 'src/main/resources/splunk/default/app.conf');
+let buildHash = '';
+try {
+  const appConf = fs.readFileSync(appConfPath, 'utf8');
+  const m = appConf.match(/^build\s*=\s*(\S+)/m);
+  if (m) buildHash = m[1].trim();
+} catch { /* ok */ }
+
 const commonConfig = webpackMerge(baseConfig, {
   entry: {
     products: path.join(__dirname, 'src/main/webapp/pages/products/render.jsx'),
@@ -27,12 +37,16 @@ const commonConfig = webpackMerge(baseConfig, {
     path: path.join(__dirname, 'stage', 'appserver', 'static', 'pages'),
     filename: '[name].js',
   },
+  stats: 'errors-warnings',
   module: {
     rules: [
       {
         test: /\.jsx?$/,
         exclude: /node_modules/,
-        use: 'babel-loader',
+        use: {
+          loader: 'babel-loader',
+          options: { compact: true },
+        },
       },
 
     ],
@@ -46,6 +60,7 @@ const commonConfig = webpackMerge(baseConfig, {
   plugins: [
     new webpack.DefinePlugin({
       SCAN_DEPENDENCY_VERSIONS: JSON.stringify(depVersions),
+      SCAN_BUILD_HASH: JSON.stringify(buildHash),
     }),
     new CopyPlugin({
       patterns: [

@@ -16,7 +16,9 @@ if [[ -z "$VERSION" ]]; then
   exit 1
 fi
 
-PKG_PATH="${PKG_ROOT}/${APP_NAME}-${VERSION}.tar.gz"
+DIST_DIR="${PKG_ROOT}/../../dist"
+mkdir -p "$DIST_DIR"
+PKG_PATH="${DIST_DIR}/${APP_NAME}-${VERSION}.tar.gz"
 
 if [[ ! -d "$STAGE_DIR" ]]; then
   echo "stage/ not found; running clean:build first..."
@@ -31,8 +33,11 @@ TMP_DIR="$(mktemp -d)"
 trap 'rm -rf "$TMP_DIR"' EXIT
 cp -R "$STAGE_DIR" "${TMP_DIR}/${APP_NAME}"
 find "${TMP_DIR}" -name ".DS_Store" -delete
-# Remove Splunk-generated local/ directory — it should never ship in the package
+# Remove Splunk-generated runtime artifacts — they should never ship in the package.
+# Because /opt/splunk/etc/apps/splunk-cisco-app-navigator symlinks to stage/,
+# Splunk creates local.meta and local/ at runtime inside our build output.
 rm -rf "${TMP_DIR}/${APP_NAME}/local"
+rm -f  "${TMP_DIR}/${APP_NAME}/metadata/local.meta"
 
 # Revert export = system → export = none for Splunkbase packaging
 # (We use export = system in dev for REST conf-products refresh, but apps
