@@ -681,9 +681,10 @@ async function detectAllSourcetypeData(products) {
             if (stCount > 0) {
                 // console.log(`[SCAN] ${p.product_id}: ${stCount} sourcetype(s) matched — ${matchedSTs.join(', ')}`);
             }
+            const totalSTs = p.sourcetypes.length;
             results[p.product_id] = stCount > 0
-                ? { hasData: true, eventCount, matchedSTs, detail: `${stCount} sourcetype${stCount !== 1 ? 's' : ''} · ~${formatCount(eventCount)} events · last 7d` }
-                : { hasData: false, eventCount: 0, matchedSTs: [], detail: 'No data in the last 7 days' };
+                ? { hasData: true, eventCount, matchedSTs, totalSourcetypes: totalSTs, detail: `${stCount} of ${totalSTs} sourcetype${totalSTs !== 1 ? 's' : ''} · ~${formatCount(eventCount)} events · last 7d` }
+                : { hasData: false, eventCount: 0, matchedSTs: [], totalSourcetypes: totalSTs, detail: 'No data in the last 7 days' };
         });
 
         const detected = Object.values(results).filter(r => r.hasData).length;
@@ -1030,9 +1031,9 @@ function IntelligenceBadges({ appStatus, vizAppStatus, vizApp2Status, sourcetype
     if (sourcetypeInfo) {
         const dataTooltip = 'Approximate count based on index metadata from the last 7 days. Click to open in Search for exact figures.';
         if (sourcetypeInfo.hasData && appStatus?.installed) {
-            items.push({ cls: 'data-ok', label: `✓ Data flowing (${sourcetypeInfo.detail})`, key: 'data-ok', url: sourcetypeSearchUrl, tooltip: dataTooltip });
+            items.push({ cls: 'data-ok', label: `✓ Data flowing — ${sourcetypeInfo.detail}`, key: 'data-ok', url: sourcetypeSearchUrl, tooltip: dataTooltip });
         } else if (sourcetypeInfo.hasData && !appStatus?.installed) {
-            items.push({ cls: 'data-ok', label: `Data found (${sourcetypeInfo.detail})`, key: 'data-no-ta', url: sourcetypeSearchUrl, tooltip: dataTooltip });
+            items.push({ cls: 'data-ok', label: `Data found — ${sourcetypeInfo.detail}`, key: 'data-no-ta', url: sourcetypeSearchUrl, tooltip: dataTooltip });
         } else if (!sourcetypeInfo.hasData && !isRoadmapCard) {
             // Roadmap/coverage_gap products have no add-on yet — don't show "No sourcetypes defined"
             items.push({ cls: 'data-none', label: sourcetypeInfo.detail || 'No data (7d)', key: 'data-none', url: sourcetypeSearchUrl });
@@ -1361,10 +1362,10 @@ function NetFlowInfoModal({ open, onClose, installedApps }) {
     const returnFocusRef = useRef(null);
     if (!open) return null;
 
-    // 3 TAs checkable on Search Head (2 Splunk + 1 Cisco)
     const streamTAs = [
         { id: 'splunk_app_stream', label: 'Splunk App for Stream', uid: '1809', vendor: 'Splunk' },
         { id: 'Splunk_TA_stream_wire_data', label: 'Splunk Add-on for Stream Wire Data', uid: '5234', vendor: 'Splunk' },
+        { id: 'Splunk_TA_stream', label: 'Splunk Add-on for Stream Forwarders', uid: '5238', vendor: 'Splunk', forwarderOnly: true },
         { id: 'splunk_app_stream_ipfix_cisco_hsl', label: 'Cisco Catalyst Enhanced Netflow Add-on', uid: '6872', vendor: 'Cisco' },
     ];
 
@@ -1385,7 +1386,7 @@ function NetFlowInfoModal({ open, onClose, installedApps }) {
                         <h4>The 4-Package Ecosystem</h4>
                         <p style={{ marginBottom: '12px', fontSize: '13px' }}>All 4 packages work together. The 3 Splunk packages form the core Stream platform; the Cisco package adds IOS-XE-specific enhancements.</p>
 
-                        {/* TA Install Status — 3 checkable on this Search Head */}
+                        {/* TA Install Status — all 4 packages */}
                         {installedApps && (
                             <div style={{ marginBottom: '14px', padding: '10px 14px', background: 'var(--bg-primary, #f2f5f7)', borderRadius: '8px', border: '1px solid var(--border-light, #E1E6EB)' }}>
                                 <div style={{ fontSize: '11px', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.3px', marginBottom: '6px', color: 'var(--faint-color, #888)' }}>Search Head Install Status</div>
@@ -1394,15 +1395,24 @@ function NetFlowInfoModal({ open, onClose, installedApps }) {
                                         const info = installedApps[ta.id];
                                         return (
                                             <div key={ta.id} style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '12px' }}>
-                                                <span className={info ? 'scan-m8-ok' : 'scan-m8-faint'} style={{ fontWeight: 700, width: '14px' }}>{info ? '✓' : '—'}</span>
-                                                <span style={{ flex: 1 }}>{ta.label} <span className="scan-m8-faint" style={{ fontSize: '10px' }}>({ta.vendor})</span></span>
-                                                {info && <span className="scan-m8-subtle" style={{ fontSize: '10px' }}>v{info.version}</span>}
-                                                {!info && <span className="scan-m8-faint" style={{ fontSize: '10px', fontStyle: 'italic' }}>not on this SH</span>}
+                                                {ta.forwarderOnly ? (
+                                                    <>
+                                                        <span className="scan-m8-faint" style={{ fontWeight: 700, width: '14px' }}>⬦</span>
+                                                        <span style={{ flex: 1 }}>{ta.label} <span className="scan-m8-faint" style={{ fontSize: '10px' }}>({ta.vendor})</span></span>
+                                                        <span className="csc-dep-status-forwarder" style={{ fontSize: '10px' }}>forwarder-only</span>
+                                                    </>
+                                                ) : (
+                                                    <>
+                                                        <span className={info ? 'scan-m8-ok' : 'scan-m8-faint'} style={{ fontWeight: 700, width: '14px' }}>{info ? '✓' : '—'}</span>
+                                                        <span style={{ flex: 1 }}>{ta.label} <span className="scan-m8-faint" style={{ fontSize: '10px' }}>({ta.vendor})</span></span>
+                                                        {info && <span className="scan-m8-subtle" style={{ fontSize: '10px' }}>v{info.version}</span>}
+                                                        {!info && <span className="scan-m8-faint" style={{ fontSize: '10px', fontStyle: 'italic' }}>not on this SH</span>}
+                                                    </>
+                                                )}
                                             </div>
                                         );
                                     })}
                                 </div>
-                                <div className="scan-m8-faint" style={{ fontSize: '10px', marginTop: '6px', fontStyle: 'italic' }}>Stream Forwarder TA (5238) is installed on forwarders — not checkable from the Search Head.</div>
                             </div>
                         )}
 
@@ -4058,7 +4068,7 @@ function ProductCard({ product, installedApps, appStatuses, indexerApps, sourcet
                             return <span>{sub ? sub.name : product.subcategory}</span>;
                         })()}
                     </span>
-                    {tagline && (
+                    {tagline && depsExpanded && (
                         <span className="csc-card-tagline">
                             {tagline}
                         </span>
@@ -4101,39 +4111,10 @@ function ProductCard({ product, installedApps, appStatuses, indexerApps, sourcet
 
 
 
-            {/* ── Unified summary + single expandable details panel ── */}
-            {hasDeps && !suppressActions && (
+            {/* ── Expandable details panel (toggle is in footer) ── */}
+            {hasDeps && !suppressActions && depsExpanded && (
                 <div className="csc-card-dependency">
-                    {/* Single collapsed summary line */}
-                    <div className="csc-dep-summary" onClick={() => setDepsExpanded((v) => !v)} role="button" tabIndex={0}>
-                        <span className="csc-dep-summary-text">
-                            {depItems.length > 1 && depItems.map((d, i) => (
-                                <span key={d.label}>
-                                    {i > 0 && <span className="csc-card-meta-sep"> · </span>}
-                                    <span className={d.sc4sOnly ? 'csc-dep-chip-sc4s' : d.installed ? (d.disabled ? 'csc-dep-inline-disabled' : 'csc-dep-inline-ok') : 'csc-dep-inline-miss'}>
-                                        {d.sc4sOnly ? 'SC4S' : d.label}
-                                    </span>
-                                </span>
-                            ))}
-                            {product.sourcetypes && product.sourcetypes.length > 0 && (
-                                <>
-                                    {depItems.length > 1 && <span className="csc-card-meta-sep"> · </span>}
-                                    <span className={sourcetypeInfo?.hasData ? 'csc-dep-inline-ok' : 'csc-dep-inline-miss'}>
-                                        {sourcetypeInfo?.hasData
-                                            ? `${sourcetypeInfo.matchedSTs?.length || 0} of ${product.sourcetypes.length} sourcetype${product.sourcetypes.length !== 1 ? 's' : ''} active`
-                                            : `${product.sourcetypes.length} sourcetype${product.sourcetypes.length !== 1 ? 's' : ''}`}
-                                    </span>
-                                </>
-                            )}
-                        </span>
-                        <span className="csc-dep-toggle">
-                            {depsExpanded ? '− Hide' : '+ Details'}
-                        </span>
-                    </div>
-
-                    {/* Expanded deployment guide */}
-                    {depsExpanded && (
-                        <div className="csc-dep-expanded">
+                    <div className="csc-dep-expanded">
                             
 
                             {/* ── Primary Add-on ── */}
@@ -4265,7 +4246,7 @@ function ProductCard({ product, installedApps, appStatuses, indexerApps, sourcet
                                 </div>
                                 <div className="scan-tier-chips">
                                     <span className={`scan-tier-chip ${vizAppStatus?.installed ? 'scan-tier-ok' : 'scan-tier-miss'}`} title="Search Head only">
-                                        <CylinderMagnifier size={12} /> SH {vizAppStatus?.installed ? '✓' : '✗'}
+                                        <CylinderMagnifier size={12} /> Search Head {vizAppStatus?.installed ? '✓' : '✗'}
                                     </span>
                                 </div>
                                 </>
@@ -4309,7 +4290,7 @@ function ProductCard({ product, installedApps, appStatuses, indexerApps, sourcet
                                 </div>
                                 <div className="scan-tier-chips">
                                     <span className={`scan-tier-chip ${vizApp2Status?.installed ? 'scan-tier-ok' : 'scan-tier-miss'}`} title="Search Head only">
-                                        <CylinderMagnifier size={12} /> SH {vizApp2Status?.installed ? '✓' : '✗'}
+                                        <CylinderMagnifier size={12} /> Search Head {vizApp2Status?.installed ? '✓' : '✗'}
                                     </span>
                                 </div>
                                 </>
@@ -4626,8 +4607,7 @@ function ProductCard({ product, installedApps, appStatuses, indexerApps, sourcet
                                 </>
                             )}
                         </div>
-                    )}
-                </div>
+                    </div>
             )}
 
             {/* ── Community / third-party shadow app warning (collapsible) ── */}
@@ -4668,6 +4648,14 @@ function ProductCard({ product, installedApps, appStatuses, indexerApps, sourcet
                     title={learn_more_url ? `Learn more about ${display_name}` : `Browse Cisco products (${display_name})`}>
                     Learn More
                 </a>
+                {/* Details toggle — expand/collapse deployment info */}
+                {hasDeps && !suppressActions && (
+                    <button className={`csc-btn csc-btn-outline csc-btn-details-toggle ${depsExpanded ? 'csc-btn-details-active' : ''}`}
+                        onClick={() => setDepsExpanded((v) => !v)}
+                        title={depsExpanded ? 'Hide deployment details' : 'Show deployment details'}>
+                        {depsExpanded ? '− Hide' : '+ Details'}
+                    </button>
+                )}
                 {/* Disabled TA — link to app manager */}
                 {!suppressActions && isConfigured && appStatus?.installed && appStatus?.disabled && (
                     <a href={createURL('/manager/splunk-cisco-app-navigator/apps/local')}

@@ -116,11 +116,11 @@ export const PRODUCT_CATALOG = [
     "sc4s_url": "https://splunk.github.io/splunk-connect-for-syslog/main/sources/vendor/Cisco/cisco_asa/",
     "sc4s_label": "SC4S: Cisco ASA / FTD",
     "sc4s_supported": true,
-    "sc4s_search_head_ta": "Splunk_TA_cisco-asa",
-    "sc4s_search_head_ta_label": "Splunk Add-on for Cisco ASA",
+    "sc4s_search_head_ta": "",
+    "sc4s_search_head_ta_label": "",
     "sc4s_search_head_ta_splunkbase_url": "",
-    "sc4s_search_head_ta_splunkbase_id": "1620",
-    "sc4s_search_head_ta_install_url": "/manager/splunk-cisco-app-navigator/appsremote?order=relevance&query=ASA&offset=0&support=splunk",
+    "sc4s_search_head_ta_splunkbase_id": "",
+    "sc4s_search_head_ta_install_url": "",
     "sc4s_sourcetypes": [
       "cisco:asa",
       "cisco:fwsm",
@@ -4364,16 +4364,15 @@ export const PRODUCT_CATALOG = [
     "app_viz_docs_url": "https://splunkbase.splunk.com/app/7539",
     "app_viz_troubleshoot_url": "",
     "app_viz_install_url": "/manager/launcher/appsremote?order=relevance&query=Catalyst&offset=0&category=network_security&type=addon&support=cisco",
-    "app_viz_2": "",
-    "app_viz_2_label": "",
-    "app_viz_2_splunkbase_uid": "",
-    "app_viz_2_docs_url": "",
+    "app_viz_2": "cisco_ios",
+    "app_viz_2_label": "App for Cisco Network Data",
+    "app_viz_2_splunkbase_uid": "1352",
+    "app_viz_2_docs_url": "https://splunkbase.splunk.com/app/1352",
     "app_viz_2_troubleshoot_url": "",
     "app_viz_2_install_url": "",
     "learn_more_url": "https://www.cisco.com/site/us/en/products/networking/switches/index.html",
     "legacy_uids": [
-      "1467",
-      "1352"
+      "1467"
     ],
     "community_uids": [],
     "sourcetypes": [
@@ -4417,11 +4416,11 @@ export const PRODUCT_CATALOG = [
     "sc4s_url": "https://splunk.github.io/splunk-connect-for-syslog/main/sources/vendor/Cisco/cisco_ios/",
     "sc4s_label": "SC4S: Cisco IOS / Networking",
     "sc4s_supported": true,
-    "sc4s_search_head_ta": "Splunk_TA_cisco-networks",
-    "sc4s_search_head_ta_label": "Cisco Networks Add-on for Splunk",
+    "sc4s_search_head_ta": "",
+    "sc4s_search_head_ta_label": "",
     "sc4s_search_head_ta_splunkbase_url": "",
-    "sc4s_search_head_ta_splunkbase_id": "1467",
-    "sc4s_search_head_ta_install_url": "/manager/splunk-cisco-app-navigator/appsremote?order=relevance&query=%22Cisco+Networks%22&offset=0&support=splunk",
+    "sc4s_search_head_ta_splunkbase_id": "",
+    "sc4s_search_head_ta_install_url": "",
     "sc4s_sourcetypes": [
       "cisco:ios",
       "cisco:xr"
@@ -4678,16 +4677,15 @@ export const PRODUCT_CATALOG = [
     "app_viz_docs_url": "https://splunkbase.splunk.com/app/7539",
     "app_viz_troubleshoot_url": "",
     "app_viz_install_url": "/manager/launcher/appsremote?order=relevance&query=Catalyst&offset=0&category=network_security&type=addon&support=cisco",
-    "app_viz_2": "",
-    "app_viz_2_label": "",
-    "app_viz_2_splunkbase_uid": "",
-    "app_viz_2_docs_url": "",
+    "app_viz_2": "cisco_ios",
+    "app_viz_2_label": "App for Cisco Network Data",
+    "app_viz_2_splunkbase_uid": "1352",
+    "app_viz_2_docs_url": "https://splunkbase.splunk.com/app/1352",
     "app_viz_2_troubleshoot_url": "",
     "app_viz_2_install_url": "",
     "learn_more_url": "https://www.cisco.com/c/en/us/products/wireless/access-points/index.html",
     "legacy_uids": [
-      "1467",
-      "1352"
+      "1467"
     ],
     "community_uids": [],
     "sourcetypes": [
@@ -4717,16 +4715,21 @@ export const PRODUCT_CATALOG = [
     "is_new": false,
     "secure_networking_gtm": true,
     "support_level": "cisco_supported",
-    "sc4s_url": "",
-    "sc4s_label": "",
-    "sc4s_supported": false,
+    "sc4s_url": "https://splunk.github.io/splunk-connect-for-syslog/main/sources/vendor/Cisco/cisco_ios/",
+    "sc4s_label": "SC4S: Cisco IOS / Networking",
+    "sc4s_supported": true,
     "sc4s_search_head_ta": "",
     "sc4s_search_head_ta_label": "",
     "sc4s_search_head_ta_splunkbase_url": "",
     "sc4s_search_head_ta_splunkbase_id": "",
     "sc4s_search_head_ta_install_url": "",
-    "sc4s_sourcetypes": [],
-    "sc4s_config_notes": [],
+    "sc4s_sourcetypes": [
+      "cisco:ios"
+    ],
+    "sc4s_config_notes": [
+      "Access point syslog uses standard IOS format and is auto-detected by SC4S.",
+      "Ensure APs and SC4S clocks are NTP-synced within +/- 30 seconds."
+    ],
     "netflow_supported": false,
     "netflow_addon": "",
     "netflow_addon_label": "",
@@ -4791,16 +4794,15 @@ export const PRODUCT_CATALOG = [
     "app_viz_docs_url": "https://splunkbase.splunk.com/app/7539",
     "app_viz_troubleshoot_url": "",
     "app_viz_install_url": "/manager/launcher/appsremote?order=relevance&query=Catalyst&offset=0&category=network_security&type=addon&support=cisco",
-    "app_viz_2": "",
-    "app_viz_2_label": "",
-    "app_viz_2_splunkbase_uid": "",
-    "app_viz_2_docs_url": "",
+    "app_viz_2": "cisco_ios",
+    "app_viz_2_label": "App for Cisco Network Data",
+    "app_viz_2_splunkbase_uid": "1352",
+    "app_viz_2_docs_url": "https://splunkbase.splunk.com/app/1352",
     "app_viz_2_troubleshoot_url": "",
     "app_viz_2_install_url": "",
     "learn_more_url": "https://www.cisco.com/site/us/en/products/networking/wireless/wireless-lan-controllers/index.html",
     "legacy_uids": [
-      "1467",
-      "1352"
+      "1467"
     ],
     "community_uids": [],
     "sourcetypes": [
@@ -4832,16 +4834,21 @@ export const PRODUCT_CATALOG = [
     "is_new": false,
     "secure_networking_gtm": true,
     "support_level": "cisco_supported",
-    "sc4s_url": "",
-    "sc4s_label": "",
-    "sc4s_supported": false,
+    "sc4s_url": "https://splunk.github.io/splunk-connect-for-syslog/main/sources/vendor/Cisco/cisco_ios/",
+    "sc4s_label": "SC4S: Cisco IOS / Networking",
+    "sc4s_supported": true,
     "sc4s_search_head_ta": "",
     "sc4s_search_head_ta_label": "",
     "sc4s_search_head_ta_splunkbase_url": "",
     "sc4s_search_head_ta_splunkbase_id": "",
     "sc4s_search_head_ta_install_url": "",
-    "sc4s_sourcetypes": [],
-    "sc4s_config_notes": [],
+    "sc4s_sourcetypes": [
+      "cisco:ios"
+    ],
+    "sc4s_config_notes": [
+      "WLC syslog uses standard IOS format and is auto-detected by SC4S.",
+      "Ensure wireless controllers and SC4S clocks are NTP-synced within +/- 30 seconds."
+    ],
     "netflow_supported": true,
     "netflow_addon": "splunk_app_stream_ipfix_cisco_hsl",
     "netflow_addon_label": "Cisco Catalyst Enhanced Netflow Add-on for Splunk",
@@ -5356,16 +5363,15 @@ export const PRODUCT_CATALOG = [
     "app_viz_docs_url": "https://splunkbase.splunk.com/app/7539",
     "app_viz_troubleshoot_url": "",
     "app_viz_install_url": "/manager/launcher/appsremote?order=relevance&query=Catalyst&offset=0&category=network_security&type=addon&support=cisco",
-    "app_viz_2": "",
-    "app_viz_2_label": "",
-    "app_viz_2_splunkbase_uid": "",
-    "app_viz_2_docs_url": "",
+    "app_viz_2": "cisco_ios",
+    "app_viz_2_label": "App for Cisco Network Data",
+    "app_viz_2_splunkbase_uid": "1352",
+    "app_viz_2_docs_url": "https://splunkbase.splunk.com/app/1352",
     "app_viz_2_troubleshoot_url": "",
     "app_viz_2_install_url": "",
     "learn_more_url": "https://www.cisco.com/c/en/us/products/routers/asr-1000-series-aggregation-services-routers/index.html",
     "legacy_uids": [
-      "1467",
-      "1352"
+      "1467"
     ],
     "community_uids": [],
     "sourcetypes": [
@@ -5395,16 +5401,21 @@ export const PRODUCT_CATALOG = [
     "is_new": false,
     "secure_networking_gtm": true,
     "support_level": "cisco_supported",
-    "sc4s_url": "",
-    "sc4s_label": "",
-    "sc4s_supported": false,
+    "sc4s_url": "https://splunk.github.io/splunk-connect-for-syslog/main/sources/vendor/Cisco/cisco_ios/",
+    "sc4s_label": "SC4S: Cisco IOS / Networking",
+    "sc4s_supported": true,
     "sc4s_search_head_ta": "",
     "sc4s_search_head_ta_label": "",
     "sc4s_search_head_ta_splunkbase_url": "",
     "sc4s_search_head_ta_splunkbase_id": "",
     "sc4s_search_head_ta_install_url": "",
-    "sc4s_sourcetypes": [],
-    "sc4s_config_notes": [],
+    "sc4s_sourcetypes": [
+      "cisco:ios"
+    ],
+    "sc4s_config_notes": [
+      "ASR syslog uses standard IOS/IOS-XR format and is auto-detected by SC4S.",
+      "Ensure ASR routers and SC4S clocks are NTP-synced within +/- 30 seconds."
+    ],
     "netflow_supported": true,
     "netflow_addon": "splunk_app_stream_ipfix_cisco_hsl",
     "netflow_addon_label": "Cisco Catalyst Enhanced Netflow Add-on for Splunk",
@@ -5582,16 +5593,15 @@ export const PRODUCT_CATALOG = [
     "app_viz_docs_url": "https://splunkbase.splunk.com/app/7539",
     "app_viz_troubleshoot_url": "",
     "app_viz_install_url": "/manager/launcher/appsremote?order=relevance&query=Catalyst&offset=0&category=network_security&type=addon&support=cisco",
-    "app_viz_2": "",
-    "app_viz_2_label": "",
-    "app_viz_2_splunkbase_uid": "",
-    "app_viz_2_docs_url": "",
+    "app_viz_2": "cisco_ios",
+    "app_viz_2_label": "App for Cisco Network Data",
+    "app_viz_2_splunkbase_uid": "1352",
+    "app_viz_2_docs_url": "https://splunkbase.splunk.com/app/1352",
     "app_viz_2_troubleshoot_url": "",
     "app_viz_2_install_url": "",
     "learn_more_url": "https://www.cisco.com/site/us/en/products/networking/sdwan-routers/1000-series-integrated-services-routers-isr/index.html",
     "legacy_uids": [
-      "1467",
-      "1352"
+      "1467"
     ],
     "community_uids": [],
     "sourcetypes": [
@@ -5620,16 +5630,21 @@ export const PRODUCT_CATALOG = [
     "is_new": false,
     "secure_networking_gtm": true,
     "support_level": "cisco_supported",
-    "sc4s_url": "",
-    "sc4s_label": "",
-    "sc4s_supported": false,
+    "sc4s_url": "https://splunk.github.io/splunk-connect-for-syslog/main/sources/vendor/Cisco/cisco_ios/",
+    "sc4s_label": "SC4S: Cisco IOS / Networking",
+    "sc4s_supported": true,
     "sc4s_search_head_ta": "",
     "sc4s_search_head_ta_label": "",
     "sc4s_search_head_ta_splunkbase_url": "",
     "sc4s_search_head_ta_splunkbase_id": "",
     "sc4s_search_head_ta_install_url": "",
-    "sc4s_sourcetypes": [],
-    "sc4s_config_notes": [],
+    "sc4s_sourcetypes": [
+      "cisco:ios"
+    ],
+    "sc4s_config_notes": [
+      "ISR syslog uses standard IOS format and is auto-detected by SC4S.",
+      "Ensure ISR routers and SC4S clocks are NTP-synced within +/- 30 seconds."
+    ],
     "netflow_supported": true,
     "netflow_addon": "splunk_app_stream_ipfix_cisco_hsl",
     "netflow_addon_label": "Cisco Catalyst Enhanced Netflow Add-on for Splunk",
@@ -5704,16 +5719,15 @@ export const PRODUCT_CATALOG = [
     "app_viz_docs_url": "https://splunkbase.splunk.com/app/7539",
     "app_viz_troubleshoot_url": "",
     "app_viz_install_url": "/manager/launcher/appsremote?order=relevance&query=Catalyst&offset=0&category=network_security&type=addon&support=cisco",
-    "app_viz_2": "",
-    "app_viz_2_label": "",
-    "app_viz_2_splunkbase_uid": "",
-    "app_viz_2_docs_url": "",
+    "app_viz_2": "cisco_ios",
+    "app_viz_2_label": "App for Cisco Network Data",
+    "app_viz_2_splunkbase_uid": "1352",
+    "app_viz_2_docs_url": "https://splunkbase.splunk.com/app/1352",
     "app_viz_2_troubleshoot_url": "",
     "app_viz_2_install_url": "",
     "learn_more_url": "https://www.cisco.com/c/en/us/products/routers/carrier-routing-system/index.html",
     "legacy_uids": [
-      "1467",
-      "1352"
+      "1467"
     ],
     "community_uids": [],
     "sourcetypes": [
@@ -5742,16 +5756,21 @@ export const PRODUCT_CATALOG = [
     "is_new": false,
     "secure_networking_gtm": true,
     "support_level": "cisco_supported",
-    "sc4s_url": "",
-    "sc4s_label": "",
-    "sc4s_supported": false,
+    "sc4s_url": "https://splunk.github.io/splunk-connect-for-syslog/main/sources/vendor/Cisco/cisco_ios/",
+    "sc4s_label": "SC4S: Cisco IOS / Networking",
+    "sc4s_supported": true,
     "sc4s_search_head_ta": "",
     "sc4s_search_head_ta_label": "",
     "sc4s_search_head_ta_splunkbase_url": "",
     "sc4s_search_head_ta_splunkbase_id": "",
     "sc4s_search_head_ta_install_url": "",
-    "sc4s_sourcetypes": [],
-    "sc4s_config_notes": [],
+    "sc4s_sourcetypes": [
+      "cisco:ios"
+    ],
+    "sc4s_config_notes": [
+      "CRS syslog uses IOS-XR format and is auto-detected by SC4S.",
+      "Ensure CRS routers and SC4S clocks are NTP-synced within +/- 30 seconds."
+    ],
     "netflow_supported": true,
     "netflow_addon": "splunk_app_stream_ipfix_cisco_hsl",
     "netflow_addon_label": "Cisco Catalyst Enhanced Netflow Add-on for Splunk",

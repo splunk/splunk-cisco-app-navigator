@@ -2402,7 +2402,6 @@ html.dce-dark [data-view="views/shared/Page"] {
     padding: 6px 16px;
     font-size: 12px;
     line-height: 1.4;
-    margin-top: auto;
 }
 
 /* Collapsible summary row */
@@ -2807,9 +2806,39 @@ html.dce-dark [data-view="views/shared/Page"] {
     background: #126B1C;
 }
 .csc-dep-expanded {
-    margin-top: 6px;
+    margin-top: 0;
     padding-top: 6px;
     border-top: 1px solid var(--border-color, #e0e0e0);
+}
+
+/* Details toggle in footer */
+.csc-btn-details-toggle {
+    font-weight: 600;
+    letter-spacing: 0.2px;
+}
+.csc-btn-details-active {
+    background: #f2f5f7;
+    border-color: #a1a9b2;
+}
+:root.dce-dark .csc-btn-details-active {
+    background: var(--card-footer-bg);
+    border-color: var(--card-border);
+}
+
+/* Forwarder-only status label in NetFlow panel */
+.csc-dep-status-forwarder {
+    display: inline-block;
+    padding: 1px 6px;
+    border-radius: 3px;
+    font-size: 10px;
+    font-weight: 600;
+    background: #e8eaed;
+    color: #5f6368;
+    letter-spacing: 0.2px;
+}
+:root.dce-dark .csc-dep-status-forwarder {
+    background: #3c4043;
+    color: #9aa0a6;
 }
 
 /* ── Support Level Badge ── */
