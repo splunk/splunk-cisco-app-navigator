@@ -2014,7 +2014,7 @@
   resolved "https://registry.yarnpkg.com/@splunk/eslint-config/-/eslint-config-5.0.0.tgz#a4a45d8a570781ac0ba1623029e330d612773620"
   integrity sha512-5//7NG52+gHtFBHZuVcqqt2F95HeHHlSBlkDjAqFl5gLPQiJX99cED62teAn7ktFrkISIvAGD9wrazMYxly+Bw==
 
-"@splunk/react-icons@^5.8.0":
+"@splunk/react-icons@^5.8.0", "@splunk/react-icons@^5.9.0":
   version "5.9.0"
   resolved "https://repo.splunkdev.net:443/artifactory/api/npm/npm/@splunk/react-icons/-/react-icons-5.9.0.tgz#21367d0baf8213df72645fd1e60d53a47d95110c"
   integrity sha512-TQATeHiMA/7OksTF+9F6JrL3Pyl9HVlyXp2XM6CfiFVD1QD9ez3NZqCuOmg+3Qoaz9+kakUYDGLE6ynZJS3NcA==
@@ -2036,17 +2036,17 @@
     scriptjs "^2.5.8"
 
 "@splunk/react-ui@^5.8.0":
-  version "5.8.0"
-  resolved "https://repo.splunkdev.net:443/artifactory/api/npm/npm/@splunk/react-ui/-/react-ui-5.8.0.tgz#c87238740e6a9aabdef1cd3ac892ef7c63830762"
-  integrity sha512-GFssRwTM1NPOyL5ibsXqg78is0Krbex8mnKK+r6pWn/WUc8g6vsXfAiUM929kQ1vFIv6l7Ywj8+pXKWW/0f/2A==
+  version "5.9.0"
+  resolved "https://repo.splunkdev.net:443/artifactory/api/npm/npm/@splunk/react-ui/-/react-ui-5.9.0.tgz#a9e95f10b6c8438a47a7a9b05bdcc49ca4ab58ee"
+  integrity sha512-SWpIfBRk+eyfn5fYBx7es/bIkU5iBQF/LSQI5CfKgHgkYfBkAXiu92Vw7syeCA4hOwUGB2TxXK5fhHRc8tmoYw==
   dependencies:
     "@dnd-kit/core" "^6.1.0"
     "@dnd-kit/modifiers" "^7.0.0"
     "@dnd-kit/sortable" "^8.0.0"
     "@dnd-kit/utilities" "^3.2.2"
     "@react-spring/web" "^9.7.5"
-    "@splunk/react-icons" "^5.8.0"
-    "@splunk/themes" "^1.5.0"
+    "@splunk/react-icons" "^5.9.0"
+    "@splunk/themes" "^1.6.0"
     "@splunk/ui-utils" "^1.12.0"
     decimal.js-light "^2.5.1"
     intl-tel-input "^25.3.2"
@@ -2078,9 +2078,18 @@
     stylelint-config-standard "^34.0.0"
 
 "@splunk/themes@^1.5.0":
-  version "1.5.0"
-  resolved "https://repo.splunkdev.net:443/artifactory/api/npm/npm/@splunk/themes/-/themes-1.5.0.tgz#f04439c5cf0bf3cd50aeaa13404f0b8d49dd4c40"
-  integrity sha512-s+JJaNZE6SfKUFWZhwOXtWGgACvLPsaJJ0tonFbPn6MDaTfV130Yn6XmJGztF6cS34YL4ateVPtsz9W164fVmw==
+  version "1.6.0"
+  resolved "https://repo.splunkdev.net:443/artifactory/api/npm/npm/@splunk/themes/-/themes-1.6.0.tgz#3a6f1e06f7fc3b399976de27007fca78b40fba00"
+  integrity sha512-dfvGPbqUHBVsTCdlmh7VGW1z8/dCAijT0Y6q3pl6lfYhhyaHe8zo71reYX82bgHIcqZkJdc6HSbAGtmVM0niog==
+  dependencies:
+    color-blend "^2.0.9"
+    lodash "^4.17.14"
+    tinycolor2 "^1.4.1"
+
+"@splunk/themes@^1.6.0":
+  version "1.6.0"
+  resolved "https://repo.splunkdev.net:443/artifactory/api/npm/npm/@splunk/themes/-/themes-1.6.0.tgz#3a6f1e06f7fc3b399976de27007fca78b40fba00"
+  integrity sha512-dfvGPbqUHBVsTCdlmh7VGW1z8/dCAijT0Y6q3pl6lfYhhyaHe8zo71reYX82bgHIcqZkJdc6HSbAGtmVM0niog==
   dependencies:
     color-blend "^2.0.9"
     lodash "^4.17.14"
