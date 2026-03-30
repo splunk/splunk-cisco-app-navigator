@@ -73,14 +73,14 @@
      Semantic palette: 90% neutrals, 10% brand color.       */
 :root {
     /* ── Semantic Palette ── */
-    --bg-primary: #f2f5f7;
-    --bg-secondary: #e8ebee;
+    --bg-primary: #f4f4f4;
+    --bg-secondary: #eeeeee;
     --bg-surface: #ffffff;
-    --text-primary: #314257;
-    --text-secondary: #536070;
-    --text-tertiary: #667180;
-    --border-light: #E1E6EB;
-    --border-medium: #CED4DB;
+    --text-primary: #342f2c;
+    --text-secondary: #5a5450;
+    --text-tertiary: #736d68;
+    --border-light: #e3ddd8;
+    --border-medium: #d2cbc5;
     --color-primary: #0A60FF;
     --color-primary-hover: #02C8FF;
     --color-success: #3D851C;
@@ -90,7 +90,7 @@
     /* ── Backward-compat aliases ── */
     --page-bg: var(--bg-primary);
     --page-color: var(--text-primary);
-    --heading-color: #07182D;
+    --heading-color: #1c1816;
     --subtitle-color: var(--text-secondary);
     --muted-color: var(--text-secondary);
     --faint-color: var(--text-tertiary);
@@ -98,15 +98,15 @@
     --italic-muted: var(--text-tertiary);
     --card-bg: var(--bg-surface);
     --card-border: var(--border-light);
-    --card-shadow: none;
-    --card-shadow-hover: none;
+    --card-shadow: 0 1px 3px rgba(0,0,0,0.06), 0 4px 12px rgba(0,0,0,0.04);
+    --card-shadow-hover: 0 6px 20px rgba(0,0,0,0.10), 0 2px 6px rgba(0,0,0,0.06);
     --card-header-bg: var(--bg-surface);
     --card-body-bg: var(--bg-surface);
     --card-footer-bg: var(--bg-primary);
     --card-footer-border: var(--border-light);
     --card-desc-color: var(--text-secondary);
-    --section-bg: var(--bg-primary);
-    --section-alt-bg: var(--bg-secondary);
+    --section-bg: var(--bg-secondary);
+    --section-alt-bg: var(--bg-primary);
     --section-border: var(--border-medium);
     --pill-divider: var(--border-medium);
     --version-bg: var(--bg-secondary);
@@ -118,7 +118,7 @@
     --code-bg: var(--bg-secondary);
     --custom-tip-bg: rgba(10,96,255,0.04);
     --icon-fill: var(--bg-surface);
-    --spinner-overlay-bg: rgba(242,245,247,0.7);
+    --spinner-overlay-bg: rgba(244,244,244,0.7);
     --spinner-text: var(--text-primary);
 
     /* ── Semantic status backgrounds (pale, ~6-8% opacity) ── */
@@ -126,23 +126,23 @@
     --status-warning-border: rgba(255,144,0,0.25);
     --status-info-bg: rgba(10,96,255,0.06);
     --status-info-border: rgba(10,96,255,0.25);
-    --status-neutral-bg: #f5f5f5;
-    --status-neutral-border: #CED4DB;
+    --status-neutral-bg: #f3f0ed;
+    --status-neutral-border: #d2cbc5;
 }
 
 /* --- Dark Theme Overrides ---
      .dce-dark is toggled on <html> by the React component so that
      both .products-page AND portal-rendered modals inherit dark vars. */
 :root.dce-dark {
-    /* ── Semantic Palette (dark) ── */
-    --bg-primary: #1a1f24;
-    --bg-secondary: #1a2228;
-    --bg-surface: #1e262c;
-    --text-primary: #d4d4d4;
-    --text-secondary: #a0aab0;
-    --text-tertiary: #9ca3af;
-    --border-light: #333d44;
-    --border-medium: #444e56;
+    /* ── Semantic Palette (dark, warm) ── */
+    --bg-primary: #1c1a18;
+    --bg-secondary: #22201e;
+    --bg-surface: #262320;
+    --text-primary: #d6d2cf;
+    --text-secondary: #aaa5a0;
+    --text-tertiary: #9a9590;
+    --border-light: #3a3632;
+    --border-medium: #4a4540;
     --color-primary: #0A60FF;
     --color-primary-hover: #02C8FF;
     --color-success: #3D851C;
@@ -160,27 +160,27 @@
     --italic-muted: #888;
     --card-bg: var(--bg-surface);
     --card-border: var(--border-light);
-    --pill-divider: #5a6570;
+    --pill-divider: #5a5550;
     --card-shadow: none;
     --card-shadow-hover: none;
     --card-header-bg: var(--bg-surface);
     --card-body-bg: var(--bg-surface);
-    --card-footer-bg: #232d34;
-    --card-footer-border: #2a353d;
-    --card-desc-color: #b0b0b0;
+    --card-footer-bg: #2a2724;
+    --card-footer-border: #322f2c;
+    --card-desc-color: #b0aba6;
     --section-bg: var(--bg-surface);
     --section-alt-bg: var(--bg-secondary);
     --section-border: var(--border-light);
     --custom-tip-bg: #1b3a1f;
-    --version-bg: #2a353d;
-    --version-color: #a0a0a0;
+    --version-bg: #302d2a;
+    --version-color: #a09b96;
     --modal-bg: var(--bg-surface);
     --modal-color: var(--text-primary);
     --input-border: var(--border-medium);
-    --input-bg: #232d34;
-    --code-bg: #2a353d;
-    --icon-fill: #162430;
-    --spinner-overlay-bg: rgba(23,29,33,0.8);
+    --input-bg: #2a2724;
+    --code-bg: #302d2a;
+    --icon-fill: #1e1a16;
+    --spinner-overlay-bg: rgba(28,26,24,0.8);
     --spinner-text: var(--text-primary);
 
     /* ── Semantic status backgrounds (dark) ── */
@@ -188,8 +188,8 @@
     --status-warning-border: rgba(255,144,0,0.3);
     --status-info-bg: rgba(10,96,255,0.08);
     --status-info-border: rgba(2,200,255,0.2);
-    --status-neutral-bg: #1e2428;
-    --status-neutral-border: #3a4048;
+    --status-neutral-bg: #242220;
+    --status-neutral-border: #403c38;
 }
 
 /* Body / Splunk chrome background — scoped to the app content area only.
@@ -426,10 +426,10 @@ html.dce-dark [data-view="views/shared/Page"] {
     padding: 5px 14px !important;
     margin: 2px 0 12px 0 !important;
     background: #ffffff !important;
-    border: 1px solid #CED4DB !important;
+    border: 1px solid #d2cbc5 !important;
     border-radius: 8px !important;
     min-height: 32px !important;
-    color: #314257 !important;
+    color: #342f2c !important;
 }
 :root.dce-dark .scan-utility-strip {
     background: #1e262c !important;
@@ -463,8 +463,8 @@ html.dce-dark [data-view="views/shared/Page"] {
 /* Dev mode info pill — platform + Splunk version + SCAN version + build */
 .scan-util-devinfo {
     color: #07182D !important;
-    background: #f2f5f7 !important;
-    border-color: #CED4DB !important;
+    background: #f4f4f4 !important;
+    border-color: #d2cbc5 !important;
     cursor: default;
     font-size: 11px;
     font-variant-numeric: tabular-nums;
@@ -476,7 +476,7 @@ html.dce-dark [data-view="views/shared/Page"] {
 }
 .scan-util-devinfo-sep {
     margin: 0 5px;
-    color: #CED4DB;
+    color: #d2cbc5;
     font-weight: 300;
 }
 :root.dce-dark .scan-util-devinfo-sep {
@@ -494,7 +494,7 @@ html.dce-dark [data-view="views/shared/Page"] {
 .scan-util-splunk-ver {
     font-weight: 400;
     font-size: 11px;
-    color: #667180;
+    color: #736d68;
     margin-left: 2px;
     opacity: 0.85;
 }
@@ -507,7 +507,7 @@ html.dce-dark [data-view="views/shared/Page"] {
     display: inline-block;
     width: 1px;
     height: 16px;
-    background: #CED4DB;
+    background: #d2cbc5;
     margin: 0 2px;
     flex-shrink: 0;
 }
@@ -567,8 +567,8 @@ html.dce-dark [data-view="views/shared/Page"] {
 /* Theme pill */
 .scan-util-theme {
     color: #07182D !important;
-    background: #f2f5f7 !important;
-    border-color: #CED4DB !important;
+    background: #f4f4f4 !important;
+    border-color: #d2cbc5 !important;
     cursor: pointer;
     font-weight: 600 !important;
     padding: 3px 12px 3px 8px !important;
@@ -976,7 +976,7 @@ html.dce-dark [data-view="views/shared/Page"] {
 #gtm_coverage_gaps,
 #custom_products,
 #vault_products {
-    margin-bottom: 24px;
+    margin-bottom: 4px;
     border: 1px solid #E5E7EB !important;
     border-left: none !important;
     box-shadow: none !important;
@@ -1125,22 +1125,41 @@ html.dce-dark [data-view="views/shared/Page"] {
     .csc-card-grid { grid-template-columns: 1fr; }
 }
 
-/* ===== CSC Card (clean, minimal depth) ===== */
+/* ===== CSC Card (3D depth — CSS diagonal bands + shadow) ===== */
 .csc-card {
     position: relative;
     overflow: visible;
-    background: #ffffff;
-    border: 1px solid #E1E6EB !important;
-    border-radius: 10px !important;
+    background:
+        linear-gradient(135deg,
+            rgba(255,255,255,0)    0%,
+            rgba(220,218,215,0.35) 8%,
+            rgba(255,255,255,0.7)  16%,
+            rgba(210,208,204,0.25) 26%,
+            rgba(255,255,255,0.6)  36%,
+            rgba(225,222,218,0.3)  46%,
+            rgba(255,255,255,0.5)  56%,
+            rgba(215,212,208,0.2)  68%,
+            rgba(255,255,255,0.4)  80%,
+            rgba(220,218,215,0.15) 90%,
+            rgba(255,255,255,0)   100%
+        ),
+        linear-gradient(180deg, #ffffff 0%, #fafaf8 100%) !important;
+    border: 1px solid rgba(0, 0, 0, 0.08) !important;
+    border-radius: 12px !important;
     display: flex;
     flex-direction: column;
-    box-shadow: none !important;
-    transition: box-shadow 0.25s ease, transform 0.25s ease;
+    box-shadow:
+        rgba(0, 0, 0, 0.18) 0px 1px 5px,
+        rgba(0, 0, 0, 0.15) 0px 0px 1px !important;
+    transition: box-shadow 0.3s ease, transform 0.3s ease, border-color 0.3s ease;
 }
 
 .csc-card:hover {
-    box-shadow: 0 2px 8px rgba(0,0,0,0.06);
-    transform: translateY(-2px);
+    box-shadow:
+        rgba(0, 0, 0, 0.22) 0px 4px 14px,
+        rgba(0, 0, 0, 0.18) 0px 1px 4px !important;
+    transform: translateY(-3px);
+    border-color: #02C8FF !important;
     z-index: 50;
 }
 
@@ -1422,7 +1441,7 @@ html.dce-dark [data-view="views/shared/Page"] {
     white-space: nowrap;
     border: none;
     background: #F2F5F7;
-    color: #536070;
+    color: #5a5450;
     cursor: pointer;
     transition: background 0.15s ease;
 }
@@ -1598,11 +1617,11 @@ html.dce-dark [data-view="views/shared/Page"] {
     background:
         linear-gradient(135deg,
             transparent 0%, transparent 50%,
-            var(--border-medium, #CED4DB) 50%, var(--border-medium, #CED4DB) 55%,
+            var(--border-medium, #d2cbc5) 50%, var(--border-medium, #d2cbc5) 55%,
             transparent 55%, transparent 65%,
-            var(--border-medium, #CED4DB) 65%, var(--border-medium, #CED4DB) 70%,
+            var(--border-medium, #d2cbc5) 65%, var(--border-medium, #d2cbc5) 70%,
             transparent 70%, transparent 80%,
-            var(--border-medium, #CED4DB) 80%, var(--border-medium, #CED4DB) 85%,
+            var(--border-medium, #d2cbc5) 80%, var(--border-medium, #d2cbc5) 85%,
             transparent 85%);
     border-radius: 0 0 8px 0;
     opacity: 0.6;
@@ -1635,9 +1654,9 @@ html.dce-dark [data-view="views/shared/Page"] {
     border-radius: 12px;
     font-size: 12px;
     font-weight: 600;
-    background: var(--bg-primary, #f2f5f7);
-    color: var(--text-primary, #314257);
-    border: 1px solid var(--border-light, #E1E6EB);
+    background: var(--bg-primary, #f4f4f4);
+    color: var(--text-primary, #342f2c);
+    border: 1px solid var(--border-light, #e3ddd8);
     white-space: nowrap;
 }
 :root.dce-dark .csc-es-cim-pill {
@@ -1656,8 +1675,8 @@ html.dce-dark [data-view="views/shared/Page"] {
     gap: 8px;
     padding: 6px 10px;
     border-radius: 6px;
-    background: var(--bg-primary, #f2f5f7);
-    border: 1px solid var(--border-light, #E1E6EB);
+    background: var(--bg-primary, #f4f4f4);
+    border: 1px solid var(--border-light, #e3ddd8);
     font-size: 13px;
     font-weight: 600;
 }
@@ -1679,25 +1698,25 @@ html.dce-dark [data-view="views/shared/Page"] {
 .csc-es-detection-list li {
     padding: 4px 0;
     font-size: 12.5px;
-    border-bottom: 1px solid var(--border-light, #E1E6EB);
-    color: var(--text-primary, #314257);
+    border-bottom: 1px solid var(--border-light, #e3ddd8);
+    color: var(--text-primary, #342f2c);
 }
 :root.dce-dark .csc-es-detection-list li {
     border-bottom-color: var(--border-light);
 }
 .csc-es-detection-list li::before {
     content: "▸ ";
-    color: var(--text-secondary, #536070);
+    color: var(--text-secondary, #5a5450);
     font-weight: 700;
 }
 .csc-es-show-all-btn {
     display: inline-block;
     margin-top: 8px;
     padding: 4px 12px;
-    border: 1px solid var(--border-light, #E1E6EB);
+    border: 1px solid var(--border-light, #e3ddd8);
     border-radius: 4px;
-    background: var(--bg-primary, #f2f5f7);
-    color: var(--text-primary, #314257);
+    background: var(--bg-primary, #f4f4f4);
+    color: var(--text-primary, #342f2c);
     font-size: 12px;
     font-weight: 600;
     cursor: pointer;
@@ -1796,12 +1815,12 @@ html.dce-dark [data-view="views/shared/Page"] {
     margin: 8px 20px 0;
     font-size: 12.5px;
     line-height: 1.5;
-    color: #536070;
+    color: #5a5450;
     font-weight: 500;
     font-style: italic;
     padding: 6px 10px;
     background: #F2F5F7;
-    border-left: 3px solid #CED4DB;
+    border-left: 3px solid #d2cbc5;
     border-radius: 0 4px 4px 0;
 }
 :root.dce-dark .csc-card-value-prop {
@@ -1921,7 +1940,7 @@ html.dce-dark [data-view="views/shared/Page"] {
 }
 
 .csc-btn-outline:hover {
-    background: #f2f5f7;
+    background: #f4f4f4;
     border-color: #a1a9b2;
     color: #606C7A;
     text-decoration: none;
@@ -1930,7 +1949,7 @@ html.dce-dark [data-view="views/shared/Page"] {
 /* View full legacy audit — primary hint a bit stronger so it reads as the main action */
 .csc-btn-legacy-audit {
     background: var(--status-info-bg, rgba(10, 96, 255, 0.1));
-    color: var(--text-secondary, #536070);
+    color: var(--text-secondary, #5a5450);
     border: 1px solid rgba(10, 96, 255, 0.3);
 }
 .csc-btn-legacy-audit:hover {
@@ -1952,7 +1971,7 @@ html.dce-dark [data-view="views/shared/Page"] {
 /* Legacy & Compatibility section summary tag — subtle blue tint to match the audit button */
 .csc-dp-tag-legacy-compat {
     background: rgba(10, 96, 255, 0.08);
-    color: var(--text-secondary, #536070);
+    color: var(--text-secondary, #5a5450);
     border: 1px solid rgba(10, 96, 255, 0.2);
 }
 :root.dce-dark .csc-dp-tag-legacy-compat {
@@ -2199,7 +2218,6 @@ html.dce-dark [data-view="views/shared/Page"] {
     color: #ef9a9a;
 }
 :root.dce-dark .csc-card {
-    background: var(--card-bg);
     border-color: var(--card-border) !important;
 }
 :root.dce-dark .csc-card-name [data-test="tooltip"] svg,
@@ -2594,11 +2612,11 @@ html.dce-dark [data-view="views/shared/Page"] {
 }
 .scan-magic6-allgood {
     padding: 10px 14px;
-    background: var(--bg-primary, #f2f5f7);
-    border: 1px solid var(--border-light, #E1E6EB);
+    background: var(--bg-primary, #f4f4f4);
+    border: 1px solid var(--border-light, #e3ddd8);
     border-left: 3px solid var(--color-success, #3D851C);
     border-radius: 8px;
-    color: var(--text-primary, #314257);
+    color: var(--text-primary, #342f2c);
     font-size: 13px;
     font-weight: 600;
     margin-bottom: 12px;
@@ -2641,7 +2659,7 @@ html.dce-dark [data-view="views/shared/Page"] {
     white-space: nowrap;
 }
 .scan-magic6-th-sort:hover {
-    color: #314257;
+    color: #342f2c;
     background: rgba(0, 0, 0, 0.02);
 }
 :root.dce-dark .scan-magic6-th-st,
@@ -2683,7 +2701,7 @@ html.dce-dark [data-view="views/shared/Page"] {
     border-bottom-color: rgba(243, 244, 246, 0.08);
 }
 .scan-magic6-ok {
-    color: var(--text-primary, #314257);
+    color: var(--text-primary, #342f2c);
     background: transparent;
 }
 :root.dce-dark .scan-magic6-ok {
@@ -2730,7 +2748,7 @@ html.dce-dark [data-view="views/shared/Page"] {
 .scan-sc4s-inline-label {
     font-size: 11px;
     font-weight: 700;
-    color: var(--text-primary, #314257);
+    color: var(--text-primary, #342f2c);
     text-transform: uppercase;
     letter-spacing: 0.3px;
 }
@@ -2747,8 +2765,8 @@ html.dce-dark [data-view="views/shared/Page"] {
 }
 .scan-sc4s-ta-note {
     font-size: 10.5px;
-    background: var(--bg-primary, #f2f5f7);
-    border-left: 2px solid var(--border-medium, #CED4DB);
+    background: var(--bg-primary, #f4f4f4);
+    border-left: 2px solid var(--border-medium, #d2cbc5);
     padding: 4px 8px;
     margin: 2px 0;
     line-height: 1.4;
@@ -2817,7 +2835,7 @@ html.dce-dark [data-view="views/shared/Page"] {
     letter-spacing: 0.2px;
 }
 .csc-btn-details-active {
-    background: #f2f5f7;
+    background: #f4f4f4;
     border-color: #a1a9b2;
 }
 :root.dce-dark .csc-btn-details-active {
@@ -2963,7 +2981,7 @@ html.dce-dark [data-view="views/shared/Page"] {
     font-family: 'CiscoSansTT', 'Splunk Platform Sans', sans-serif;
 }
 .csc-subcategory-pill:hover {
-    border-color: #314257;
+    border-color: #342f2c;
     background: rgba(49, 66, 87, 0.06);
 }
 .csc-subcategory-pill-active {
@@ -3008,7 +3026,7 @@ html.dce-dark [data-view="views/shared/Page"] {
     background: rgba(255, 255, 255, 0.18);
 }
 :root.dce-dark .csc-subcategory-pill-active .csc-subcategory-count {
-    background: #e8ebee;
+    background: #eeeeee;
     color: #1a1f24;
 }
 
@@ -3740,7 +3758,7 @@ a.csc-dep-name-link:hover {
 .csc-badge-item:not(:last-child)::after {
     content: " · ";
     font-weight: 400;
-    color: var(--text-tertiary, #667180);
+    color: var(--text-tertiary, #736d68);
     margin-left: 2px;
 }
 
@@ -3985,7 +4003,7 @@ a.csc-dep-name-link:hover {
 .csc-dp-group-title {
     font-size: 11px;
     font-weight: 700;
-    color: var(--text-primary, #314257);
+    color: var(--text-primary, #342f2c);
     text-transform: uppercase;
     letter-spacing: 0.3px;
 }
@@ -3996,7 +4014,7 @@ a.csc-dep-name-link:hover {
     font-size: 11px;
     color: var(--muted-color, #666);
     padding: 3px 0 3px 10px;
-    border-left: 2px solid #CED4DB;
+    border-left: 2px solid #d2cbc5;
     margin: 2px 0;
 }
 :root.dce-dark .csc-dp-note {
@@ -4515,13 +4533,13 @@ body:has(.scan-drawer-open) .scan-feedback-tab {
 .csc-sc4s-info {
     font-size: 14px;
     line-height: 1.7;
-    color: var(--text-primary, #314257);
+    color: var(--text-primary, #342f2c);
 }
 /* Force ALL inline <code> inside info modals to neutral GitHub-style */
 .csc-sc4s-info code {
     background: #F2F5F7;
-    border: 1px solid #CED4DB;
-    color: #314257;
+    border: 1px solid #d2cbc5;
+    color: #342f2c;
     padding: 1px 6px;
     border-radius: 4px;
     font-size: 12px;
@@ -4542,7 +4560,7 @@ body:has(.scan-drawer-open) .scan-feedback-tab {
     background: var(--bg-surface, #ffffff);
     border-radius: 8px;
     margin-bottom: 24px;
-    border: 1px solid var(--border-light, #E1E6EB);
+    border: 1px solid var(--border-light, #e3ddd8);
 }
 .csc-sc4s-info-hero-icon {
     font-size: 48px;
@@ -4553,11 +4571,11 @@ body:has(.scan-drawer-open) .scan-feedback-tab {
     margin: 0 0 8px 0;
     font-size: 20px;
     font-weight: 700;
-    color: var(--text-primary, #314257);
+    color: var(--text-primary, #342f2c);
 }
 .csc-sc4s-info-hero-text p {
     margin: 0;
-    color: var(--text-secondary, #536070);
+    color: var(--text-secondary, #5a5450);
     font-size: 14px;
 }
 
@@ -4569,9 +4587,9 @@ body:has(.scan-drawer-open) .scan-feedback-tab {
     margin: 0 0 12px 0;
     font-size: 16px;
     font-weight: 700;
-    color: var(--text-primary, #314257);
+    color: var(--text-primary, #342f2c);
     padding-bottom: 6px;
-    border-bottom: 1px solid var(--border-light, #E1E6EB);
+    border-bottom: 1px solid var(--border-light, #e3ddd8);
 }
 
 /* Benefits grid */
@@ -4586,9 +4604,9 @@ body:has(.scan-drawer-open) .scan-feedback-tab {
     gap: 4px;
     padding: 16px;
     background: var(--bg-surface, #ffffff);
-    border: 1px solid var(--border-light, #E1E6EB);
+    border: 1px solid var(--border-light, #e3ddd8);
     border-radius: 8px;
-    border-left: 3px solid var(--info-accent, var(--border-medium, #CED4DB));
+    border-left: 3px solid var(--info-accent, var(--border-medium, #d2cbc5));
     transition: transform 0.15s ease;
 }
 .csc-sc4s-info-card:hover {
@@ -4600,11 +4618,11 @@ body:has(.scan-drawer-open) .scan-feedback-tab {
 }
 .csc-sc4s-info-card strong {
     font-size: 13px;
-    color: var(--text-primary, #314257);
+    color: var(--text-primary, #342f2c);
 }
 .csc-sc4s-info-card span:last-child {
     font-size: 12px;
-    color: var(--text-secondary, #536070);
+    color: var(--text-secondary, #5a5450);
     line-height: 1.5;
 }
 
@@ -4613,16 +4631,16 @@ body:has(.scan-drawer-open) .scan-feedback-tab {
     width: 100%;
     border-collapse: separate;
     border-spacing: 0;
-    border: 1px solid var(--border-light, #E1E6EB);
+    border: 1px solid var(--border-light, #e3ddd8);
     border-radius: 8px;
     overflow: hidden;
     font-size: 13px;
 }
 .csc-sc4s-info-table td {
     padding: 10px 14px;
-    border-bottom: 1px solid var(--border-light, #E1E6EB);
+    border-bottom: 1px solid var(--border-light, #e3ddd8);
     vertical-align: top;
-    color: var(--text-primary, #314257);
+    color: var(--text-primary, #342f2c);
 }
 .csc-sc4s-info-table tr:last-child td {
     border-bottom: none;
@@ -4630,8 +4648,8 @@ body:has(.scan-drawer-open) .scan-feedback-tab {
 .csc-sc4s-info-table-label {
     width: 110px;
     font-weight: 700;
-    color: var(--text-primary, #314257);
-    background: var(--bg-primary, #f2f5f7);
+    color: var(--text-primary, #342f2c);
+    background: var(--bg-primary, #f4f4f4);
     white-space: nowrap;
 }
 .csc-sc4s-info-table code {
@@ -4650,18 +4668,18 @@ body:has(.scan-drawer-open) .scan-feedback-tab {
     align-items: flex-start;
     padding: 14px 16px;
     border-radius: 8px;
-    border: 1px solid #E1E6EB;
+    border: 1px solid #e3ddd8;
     background: #F0F9FF;
     border-left: 3px solid #0A60FF;
 }
 .csc-sc4s-info-bp-item p {
     margin: 4px 0 0 0;
     font-size: 13px;
-    color: var(--text-secondary, #536070);
+    color: var(--text-secondary, #5a5450);
 }
 .csc-sc4s-info-bp-item strong {
     font-size: 14px;
-    color: var(--text-primary, #314257);
+    color: var(--text-primary, #342f2c);
 }
 .csc-sc4s-info-bp-marker {
     display: none;
@@ -4675,7 +4693,7 @@ body:has(.scan-drawer-open) .scan-feedback-tab {
     background: rgba(61,133,28,0.04);
 }
 .csc-sc4s-info-bp-alt {
-    border-left: 3px solid var(--border-medium, #CED4DB);
+    border-left: 3px solid var(--border-medium, #d2cbc5);
     background: var(--bg-surface, #ffffff);
 }
 .csc-sc4s-info-bp-info {
@@ -4692,7 +4710,7 @@ body:has(.scan-drawer-open) .scan-feedback-tab {
     margin-bottom: 8px;
     line-height: 1.6;
     font-size: 13px;
-    color: var(--text-primary, #314257);
+    color: var(--text-primary, #342f2c);
 }
 .csc-sc4s-info-list code {
     /* inherits from .csc-sc4s-info code */
@@ -4706,10 +4724,10 @@ body:has(.scan-drawer-open) .scan-feedback-tab {
     padding: 0;
 }
 .csc-sc4s-info-section-notes h4 {
-    border-bottom-color: var(--border-medium, #CED4DB);
+    border-bottom-color: var(--border-medium, #d2cbc5);
 }
 .csc-sc4s-info-list-notes li {
-    color: var(--text-primary, #314257);
+    color: var(--text-primary, #342f2c);
 }
 
 /* Footer links */
@@ -4718,7 +4736,7 @@ body:has(.scan-drawer-open) .scan-feedback-tab {
     gap: 12px;
     margin-top: 24px;
     padding-top: 16px;
-    border-top: 1px solid var(--border-light, #E1E6EB);
+    border-top: 1px solid var(--border-light, #e3ddd8);
     flex-wrap: wrap;
 }
 .csc-sc4s-info-link {
@@ -4732,7 +4750,7 @@ body:has(.scan-drawer-open) .scan-feedback-tab {
     text-decoration: none;
     background: #fff;
     color: #0A60FF;
-    border: 1px solid #CED4DB;
+    border: 1px solid #d2cbc5;
     transition: all 0.2s ease;
 }
 .csc-sc4s-info-link:hover {
@@ -5387,12 +5405,6 @@ body:has(.scan-drawer-open) .scan-feedback-tab {
 }
 
 /* ─── Dark mode card enhancements ─── */
-:root.dce-dark .csc-card {
-    box-shadow: none;
-}
-:root.dce-dark .csc-card:hover {
-    box-shadow: none;
-}
 :root.dce-dark .csc-card::before {
     background: var(--card-border);
 }
@@ -5839,9 +5851,9 @@ tr.scan-ts-ahead .scan-ts-name {
     gap: 5px;
     padding: 5px 12px;
     border-radius: 16px;
-    border: 1px solid #CED4DB;
+    border: 1px solid #d2cbc5;
     background: #ffffff;
-    color: #314257;
+    color: #342f2c;
     font-size: 12px;
     font-weight: 600;
     cursor: pointer;
@@ -6516,8 +6528,8 @@ tr.scan-ts-ahead .scan-ts-name {
     padding: 8px 0;
     border: 1px solid var(--border-default, #C3CBD4);
     border-radius: 6px;
-    background: var(--bg-primary, #f2f5f7);
-    color: var(--text-secondary, #536070);
+    background: var(--bg-primary, #f4f4f4);
+    color: var(--text-secondary, #5a5450);
     font-size: 12.5px;
     font-weight: 600;
     cursor: pointer;
@@ -6526,7 +6538,7 @@ tr.scan-ts-ahead .scan-ts-name {
 }
 .scan-drawer-reset-btn:hover {
     background: var(--bg-surface, #e8ecf0);
-    border-color: var(--text-tertiary, #667180);
+    border-color: var(--text-tertiary, #736d68);
     color: var(--page-color, #333);
 }
 :root.dce-dark .scan-drawer-reset-btn {
@@ -6578,27 +6590,66 @@ tr.scan-ts-ahead .scan-ts-name {
    CISCO CLEAN UI OVERRIDES (TARGETED)
    ========================================= */
 
-/* 1. Flatten the Product Cards */
+/* 1. Product Cards — 3D depth with CSS diagonal bands + shadow */
 .csc-card {
-    box-shadow: none !important;
-    border: 1px solid #E5E7EB !important;
+    background:
+        linear-gradient(135deg,
+            rgba(255,255,255,0)    0%,
+            rgba(220,218,215,0.35) 8%,
+            rgba(255,255,255,0.7)  16%,
+            rgba(210,208,204,0.25) 26%,
+            rgba(255,255,255,0.6)  36%,
+            rgba(225,222,218,0.3)  46%,
+            rgba(255,255,255,0.5)  56%,
+            rgba(215,212,208,0.2)  68%,
+            rgba(255,255,255,0.4)  80%,
+            rgba(220,218,215,0.15) 90%,
+            rgba(255,255,255,0)   100%
+        ),
+        linear-gradient(180deg, #ffffff 0%, #fafaf8 100%) !important;
+    border: 1px solid rgba(0, 0, 0, 0.08) !important;
     border-radius: 12px !important;
-    background: #FFFFFF !important;
+    box-shadow:
+        rgba(0, 0, 0, 0.18) 0px 1px 5px,
+        rgba(0, 0, 0, 0.15) 0px 0px 1px !important;
 }
 
 .csc-card:hover {
     border-color: #02C8FF !important;
-    box-shadow: none !important;
-    transform: none !important;
+    box-shadow:
+        rgba(0, 0, 0, 0.22) 0px 4px 14px,
+        rgba(0, 0, 0, 0.18) 0px 1px 4px !important;
+    transform: translateY(-3px) !important;
 }
 
 :root.dce-dark .csc-card {
-    background: var(--card-bg) !important;
-    border-color: var(--card-border) !important;
+    background:
+        linear-gradient(135deg,
+            rgba(255,255,255,0)     0%,
+            rgba(255,255,255,0.04)  8%,
+            rgba(0,0,0,0.06)        16%,
+            rgba(255,255,255,0.03)  26%,
+            rgba(0,0,0,0.05)        36%,
+            rgba(255,255,255,0.025) 46%,
+            rgba(0,0,0,0.04)        56%,
+            rgba(255,255,255,0.02)  68%,
+            rgba(0,0,0,0.03)        80%,
+            rgba(255,255,255,0.015) 90%,
+            rgba(255,255,255,0)    100%
+        ),
+        linear-gradient(180deg, var(--bg-surface) 0%, var(--bg-secondary) 100%) !important;
+    border-color: rgba(255, 255, 255, 0.08) !important;
+    box-shadow:
+        rgba(0, 0, 0, 0.4) 0px 2px 6px,
+        rgba(0, 0, 0, 0.3) 0px 0px 2px !important;
 }
 
 :root.dce-dark .csc-card:hover {
     border-color: #02C8FF !important;
+    box-shadow:
+        rgba(0, 0, 0, 0.5) 0px 6px 16px,
+        rgba(0, 0, 0, 0.35) 0px 2px 4px,
+        rgba(2, 200, 255, 0.1) 0px 0px 0px 1px !important;
 }
 
 /* Support indicator: colored bar at bottom of card */
@@ -6647,7 +6698,7 @@ tr.scan-ts-ahead .scan-ts-name {
     box-shadow: none !important;
     border: 1.5px solid rgba(10, 96, 255, 0.25) !important;
     background: #FFFFFF !important;
-    color: #314257 !important;
+    color: #342f2c !important;
 }
 .csc-subcategory-pill:hover {
     border-color: #0A60FF !important;
@@ -7271,7 +7322,7 @@ tr.scan-ts-ahead .scan-ts-name {
     min-width: 85px;
     border-radius: 8px;
     background: var(--bg-primary, #f8f9fb);
-    border: 1px solid var(--border-light, #E1E6EB);
+    border: 1px solid var(--border-light, #e3ddd8);
     border-top: 3px solid var(--stat-accent, #5B6ABF);
     transition: transform 0.15s ease, box-shadow 0.15s ease;
     cursor: default;
@@ -7359,7 +7410,7 @@ tr.scan-ts-ahead .scan-ts-name {
     padding: 20px 24px;
     border-radius: 8px;
     background: var(--bg-primary, #f8f9fb);
-    border: 1px solid var(--border-light, #E1E6EB);
+    border: 1px solid var(--border-light, #e3ddd8);
     border-left: 4px solid #0A60FF;
     animation: csc-welcome-in 0.4s ease-out;
 }
@@ -7397,7 +7448,7 @@ tr.scan-ts-ahead .scan-ts-name {
     padding: 14px;
     border-radius: 8px;
     background: var(--card-bg, #fff);
-    border: 1px solid var(--border-light, #E1E6EB);
+    border: 1px solid var(--border-light, #e3ddd8);
     transition: box-shadow 0.15s ease;
 }
 .csc-welcome-step:hover {
@@ -7469,8 +7520,8 @@ tr.scan-ts-ahead .scan-ts-name {
     width: 22px;
     height: 22px;
     border-radius: 5px;
-    background: var(--bg-primary, #f2f5f7);
-    border: 1px solid var(--border-light, #E1E6EB);
+    background: var(--bg-primary, #f4f4f4);
+    border: 1px solid var(--border-light, #e3ddd8);
     display: inline-flex;
     align-items: center;
     justify-content: center;
@@ -7641,7 +7692,7 @@ tr.scan-ts-ahead .scan-ts-name {
     font-size: 13px;
     font-weight: 500;
     letter-spacing: 0.2px;
-    color: var(--faint-color, #667180);
+    color: var(--faint-color, #736d68);
     vertical-align: middle;
 }
 

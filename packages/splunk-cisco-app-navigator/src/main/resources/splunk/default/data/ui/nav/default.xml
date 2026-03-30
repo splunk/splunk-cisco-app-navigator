@@ -1,5 +1,6 @@
 <nav search_view="search" color="#049fd9">
     <view name="products" default="true" label="Cisco Products" />
+    <!-- <view name="cisco_glass_pane" label="The Glass Pane" /> -->
     <view name="ecosystem_intelligence" label="Ecosystem Intelligence" />
 
     <collection label="Analytics &amp; Reports">
