@@ -346,8 +346,9 @@ function getAllProductUids(product, appidToUidMap) {
     const mainUids = getProductUids(product);
     mainUids.forEach(uid => uids.add(uid));
     
-    // Add legacy and community UIDs directly
+    // Add legacy, legacy viz, and community UIDs directly
     (product.legacy_uids || []).forEach(uid => { if (uid) uids.add(String(uid)); });
+    (product.legacy_viz_uids || []).forEach(uid => { if (uid) uids.add(String(uid)); });
     (product.community_uids || []).forEach(uid => { if (uid) uids.add(String(uid)); });
 
     // Also resolve addon/viz app folder names to UIDs via the lookup map
@@ -437,6 +438,7 @@ async function loadProductsFromConf() {
         const isDisabled = d === true || d === "true" || d === "1" || d === 1;
         const name = entry.name;
         const laUids   = csvToArray(c.legacy_uids);
+        const lvUids   = csvToArray(c.legacy_viz_uids);
         const caUids   = csvToArray(c.community_uids);
         return {
             product_id: name,
@@ -475,6 +477,7 @@ async function loadProductsFromConf() {
             app_viz_2_install_url: c.app_viz_2_install_url || '',
             learn_more_url: c.learn_more_url || '',
             legacy_uids: laUids.filter(Boolean),
+            legacy_viz_uids: lvUids.filter(Boolean),
             community_uids: caUids.filter(Boolean),
             sourcetypes: csvToArray(c.sourcetypes),
             dashboards: csvToArray(c.dashboards),
@@ -575,6 +578,7 @@ function collectReferencedUids(productList) {
         if (p.sc4s_search_head_ta_splunkbase_id) uids.add(String(p.sc4s_search_head_ta_splunkbase_id));
         if (p.netflow_addon_splunkbase_id) uids.add(String(p.netflow_addon_splunkbase_id));
         (p.legacy_uids || []).forEach(u => { if (u) uids.add(String(u)); });
+        (p.legacy_viz_uids || []).forEach(u => { if (u) uids.add(String(u)); });
         (p.community_uids || []).forEach(u => { if (u) uids.add(String(u)); });
         (p.alert_action_uids || []).forEach(u => { if (u) uids.add(String(u)); });
         (p.soar_connector_uids || []).forEach(u => { if (u) uids.add(String(u)); });
@@ -1002,8 +1006,9 @@ function getBestPractices(product, platformType, splunkbaseData) {
         tips.push({ text: `Expected sourcetypes: ${product.sourcetypes.join(', ')}. Verify these appear in your environment after configuring the data input.` });
     }
 
-    if (product.legacy_uids && product.legacy_uids.length > 0) {
-        const names = product.legacy_uids.map(uid => {
+    const allLegacy = [...(product.legacy_uids || []), ...(product.legacy_viz_uids || [])];
+    if (allLegacy.length > 0) {
+        const names = allLegacy.map(uid => {
             const sb = splunkbaseData && splunkbaseData[uid];
             return sb ? (sb.title || sb.appid || `App #${uid}`) : `App #${uid}`;
         }).join(', ');
@@ -1207,14 +1212,52 @@ function CopyModalButton() {
 
 // ────────────────────  SC4S INFO MODAL  ───────────────────────
 
-function SC4SInfoModal({ open, onClose }) {
+function SC4SInfoModal({ open, onClose, productContext }) {
     const returnFocusRef = useRef(null);
     if (!open) return null;
+    const pc = productContext || null;
     return (
         <Modal open returnFocus={returnFocusRef} onRequestClose={onClose} style={{ maxWidth: '820px', width: '92vw' }}>
             <Modal.Header title="Splunk Connect for Syslog (SC4S)" />
             <Modal.Body>
                 <div className="csc-sc4s-info" style={{ '--info-accent': '#00897b' }}>
+                    {pc && (
+                        <div className="scan-modal-product-context">
+                            <h4>For {pc.displayName}</h4>
+                            {pc.hasAddon && (
+                                <p className="scan-modal-pc-note">SC4S is an <strong>optional alternative path</strong> — the add-on is the primary data source for this product.</p>
+                            )}
+                            {pc.sc4sSourcetypes && pc.sc4sSourcetypes.length > 0 && (
+                                <div className="scan-modal-pc-row">
+                                    <span className="scan-modal-pc-label">SC4S Sourcetypes</span>
+                                    <span className="scan-modal-pc-value">{pc.sc4sSourcetypes.join(', ')}</span>
+                                </div>
+                            )}
+                            {pc.companionTa && (
+                                <div className="scan-modal-pc-row">
+                                    <span className="scan-modal-pc-label">Companion TA</span>
+                                    <span className="scan-modal-pc-value">
+                                        {pc.companionTa.label || pc.companionTa.name}
+                                        {pc.companionTa.installed && <span className="csc-dep-version" style={{marginLeft: 6}}>v{pc.companionTa.version}</span>}
+                                        {!pc.companionTa.installed && <span className="csc-dep-status-missing" style={{marginLeft: 6}}>not installed</span>}
+                                        {pc.companionTa.splunkbaseId && (
+                                            <a href={generateSplunkbaseUrl(pc.companionTa.splunkbaseId)} target="_blank" rel="noopener noreferrer" className="csc-split-pill-seg" style={{marginLeft: 6}} title="View on Splunkbase">Splunkbase</a>
+                                        )}
+                                    </span>
+                                </div>
+                            )}
+                            {pc.sc4sConfigNotes && pc.sc4sConfigNotes.length > 0 && (
+                                <ul className="scan-modal-pc-notes">
+                                    {pc.sc4sConfigNotes.map((note, i) => <li key={i}>{note}</li>)}
+                                </ul>
+                            )}
+                            {pc.sc4sUrl && (
+                                <a href={pc.sc4sUrl} target="_blank" rel="noopener noreferrer" className="scan-modal-pc-link">
+                                    SC4S Docs for {pc.displayName} ›
+                                </a>
+                            )}
+                        </div>
+                    )}
                     <div className="csc-sc4s-info-hero">
                         <div className="csc-sc4s-info-hero-icon"></div>
                         <div className="csc-sc4s-info-hero-text">
@@ -1359,9 +1402,10 @@ function SC4SInfoModal({ open, onClose }) {
 
 // ────────────────────  NETFLOW / STREAM INFO MODAL  ───────────────────────
 
-function NetFlowInfoModal({ open, onClose, installedApps }) {
+function NetFlowInfoModal({ open, onClose, installedApps, productContext }) {
     const returnFocusRef = useRef(null);
     if (!open) return null;
+    const pc = productContext || null;
 
     const streamTAs = [
         { id: 'splunk_app_stream', label: 'Splunk App for Stream', uid: '1809', vendor: 'Splunk' },
@@ -1375,6 +1419,34 @@ function NetFlowInfoModal({ open, onClose, installedApps }) {
             <Modal.Header title="NetFlow / Splunk Stream" />
             <Modal.Body>
                 <div className="csc-sc4s-info" style={{ '--info-accent': '#1565c0' }}>
+                    {pc && (
+                        <div className="scan-modal-product-context">
+                            <h4>For {pc.displayName}</h4>
+                            {pc.netflowAddon && (
+                                <div className="scan-modal-pc-row">
+                                    <span className="scan-modal-pc-label">Cisco NetFlow Add-on</span>
+                                    <span className="scan-modal-pc-value">
+                                        {pc.netflowAddonLabel || pc.netflowAddon}
+                                        {pc.netflowAddonStatus?.installed && <span className="csc-dep-version" style={{marginLeft: 6}}>v{pc.netflowAddonStatus.version}</span>}
+                                        {pc.netflowAddonStatus && !pc.netflowAddonStatus.installed && <span className="csc-dep-status-missing" style={{marginLeft: 6}}>not installed</span>}
+                                        {pc.netflowAddonSplunkbaseId && (
+                                            <a href={generateSplunkbaseUrl(pc.netflowAddonSplunkbaseId)} target="_blank" rel="noopener noreferrer" className="csc-split-pill-seg" style={{marginLeft: 6}} title="View on Splunkbase">Splunkbase</a>
+                                        )}
+                                    </span>
+                                </div>
+                            )}
+                            {pc.netflowConfigNotes && pc.netflowConfigNotes.length > 0 && (
+                                <ul className="scan-modal-pc-notes">
+                                    {pc.netflowConfigNotes.map((note, i) => <li key={i}>{note}</li>)}
+                                </ul>
+                            )}
+                            {pc.netflowAddonDocsUrl && (
+                                <a href={pc.netflowAddonDocsUrl} target="_blank" rel="noopener noreferrer" className="scan-modal-pc-link">
+                                    NetFlow Docs for {pc.displayName} ›
+                                </a>
+                            )}
+                        </div>
+                    )}
                     <div className="csc-sc4s-info-hero">
                         <div className="csc-sc4s-info-hero-icon"></div>
                         <div className="csc-sc4s-info-hero-text">
@@ -3717,7 +3789,7 @@ function ProductCard({ product, installedApps, appStatuses, indexerApps, sourcet
         addon, addon_label,
         app_viz, app_viz_label, app_viz_docs_url, app_viz_troubleshoot_url, app_viz_install_url,
         app_viz_2, app_viz_2_label, app_viz_2_docs_url, app_viz_2_troubleshoot_url, app_viz_2_install_url,
-        legacy_uids, soar_connector_uids, alert_action_uids, community_uids, itsi_content_pack,
+        legacy_uids, legacy_viz_uids, soar_connector_uids, alert_action_uids, community_uids, itsi_content_pack,
         is_new, support_level, cisco_retired, coverage_gap, gap_type, gtm_pillar,
         sc4s_url, sc4s_supported, sc4s_search_head_ta, sc4s_search_head_ta_label,
         sc4s_search_head_ta_splunkbase_id, sc4s_search_head_ta_install_url, sc4s_sourcetypes, sc4s_config_notes,
@@ -3756,11 +3828,17 @@ function ProductCard({ product, installedApps, appStatuses, indexerApps, sourcet
     }
 
     const hasLegacy = legacy_uids && legacy_uids.length > 0;
-    // Resolve legacy UIDs to enriched objects via splunkbaseData for install detection
-    const legacyInstalled = hasLegacy ? legacy_uids.filter(uid => {
+    const hasLegacyViz = legacy_viz_uids && legacy_viz_uids.length > 0;
+    const allLegacyUids = [...(legacy_uids || []), ...(legacy_viz_uids || [])];
+    const legacyAddonInstalled = hasLegacy ? legacy_uids.filter(uid => {
         const sb = splunkbaseData && splunkbaseData[uid];
         return sb && sb.appid && installedApps[sb.appid];
     }) : [];
+    const legacyVizInstalled = hasLegacyViz ? legacy_viz_uids.filter(uid => {
+        const sb = splunkbaseData && splunkbaseData[uid];
+        return sb && sb.appid && installedApps[sb.appid];
+    }) : [];
+    const legacyInstalled = [...legacyAddonInstalled, ...legacyVizInstalled];
     const communityInstalled = (community_uids || []).filter(uid => {
         const sb = splunkbaseData && splunkbaseData[uid];
         return sb && sb.appid && installedApps[sb.appid];
@@ -3770,15 +3848,6 @@ function ProductCard({ product, installedApps, appStatuses, indexerApps, sourcet
     const hasDifferentSc4sTa = sc4s_supported && sc4s_search_head_ta && sc4s_search_head_ta !== addon;
 
     const netflowAddonStatus = netflow_addon ? (appStatuses[netflow_addon] || null) : null;
-
-    // Hardcoded Stream app definitions for the NetFlow section
-    const streamPrereqs = netflow_supported ? [
-        { app_id: 'Splunk_TA_stream', display_name: 'Splunk Add-on for Stream Forwarders', uid: '5238' },
-        { app_id: 'Splunk_TA_stream_wire_data', display_name: 'Splunk Add-on for Stream Wire Data', uid: '5234' },
-    ] : [];
-    const streamVizApp = netflow_supported
-        ? { app_id: 'splunk_app_stream', display_name: 'Splunk App for Stream', uid: '1809' }
-        : null;
 
     const [depsExpanded, setDepsExpanded] = useState(false);
     const [sc4sInfoOpen, setSc4sInfoOpen] = useState(false);
@@ -4297,148 +4366,45 @@ function ProductCard({ product, installedApps, appStatuses, indexerApps, sourcet
                                 </>
                             )}
 
-                            {/* ── Data Paths (SC4S + NetFlow consolidated) ── */}
+                            {/* ── Data Paths (SC4S + NetFlow — slim summary, detail in modals) ── */}
                             {(sc4s_supported || netflow_supported) && (
                                 <>
                                 <hr className="csc-dep-divider" />
-                                <details className="csc-dep-details csc-section-data-paths">
-                                    <summary className="csc-dep-details-summary">
+                                <div className="csc-section-data-paths-slim">
+                                    <span className="csc-dp-slim-heading">
                                         Data Paths
                                         {sc4s_supported && <span className="csc-dp-tag csc-dp-tag-sc4s">SC4S</span>}
                                         {netflow_supported && <span className="csc-dp-tag csc-dp-tag-nf">{netflow_addon && netflowAddonStatus?.installed ? 'NetFlow ✓' : 'NetFlow'}</span>}
-                                    </summary>
-                                    <div className="csc-dep-details-body">
+                                    </span>
+                                    <div className="csc-dp-slim-rows">
                                         {sc4s_supported && (
-                                            <div className="csc-dp-group">
-                                                <div className="csc-dp-group-header">
-                                                    <span className="csc-dp-group-title">SC4S</span>
-                                                    {addon && <span className="scan-sc4s-precedence-note">Optional — Add-on is primary</span>}
-                                                    {sc4s_url && (
-                                                        <a href={sc4s_url} target="_blank" rel="noopener noreferrer" className="csc-split-pill-seg" title="SC4S setup documentation">
-                                                            Docs
-                                                        </a>
-                                                    )}
-                                                    <a href={generateSplunkbaseUrl(SC4S_SPLUNKBASE_UID)} target="_blank" rel="noopener noreferrer" className="csc-split-pill-seg" title="SC4S on Splunkbase">
-                                                        Splunkbase
-                                                    </a>
-                                                </div>
-                                                {hasDifferentSc4sTa && sc4s_search_head_ta && (
-                                                    <div className="csc-dp-note">
-                                                        SC4S path may need <strong>{sc4s_search_head_ta_label || sc4s_search_head_ta}</strong> for full CIM coverage
-                                                        {sc4s_search_head_ta_splunkbase_id && (
-                                                            <a href={generateSplunkbaseUrl(sc4s_search_head_ta_splunkbase_id)} target="_blank" rel="noopener noreferrer" className="csc-split-pill-seg" title="View on Splunkbase" style={{marginLeft: 6}}>
-                                                                Splunkbase
-                                                            </a>
-                                                        )}
-                                                        {sc4sShTaStatus?.installed && (
-                                                            <span className="csc-dep-version" style={{marginLeft: 4}}>v{sc4sShTaStatus.version}</span>
-                                                        )}
-                                                        {!addon && sc4sShTaStatus && !sc4sShTaStatus.installed && (
-                                                            <span className="csc-dep-status-missing" style={{marginLeft: 4}}>not installed</span>
-                                                        )}
-                                                    </div>
-                                                )}
-                                                {sc4s_config_notes && sc4s_config_notes.length > 0 && (
-                                                    <ul className="csc-sc4s-config-list csc-dp-notes-list">
-                                                        {sc4s_config_notes.map((note, i) => (
-                                                            <li key={i}>{note}</li>
-                                                        ))}
-                                                    </ul>
-                                                )}
+                                            <div className="csc-dp-slim-row">
+                                                <span className="csc-dp-group-title">SC4S</span>
+                                                {addon && <span className="scan-sc4s-precedence-note">Optional — Add-on is primary</span>}
+                                                <button type="button" className="csc-btn csc-btn-outline csc-dp-guide-btn" onClick={() => setSc4sInfoOpen(true)}>
+                                                    View SC4S Guide
+                                                </button>
                                             </div>
                                         )}
-                                        {sc4s_supported && netflow_supported && <hr className="csc-dep-divider" />}
                                         {netflow_supported && (
-                                            <div className="csc-dp-group">
-                                                <div className="csc-dp-group-header">
-                                                    <span className="csc-dp-group-title">NetFlow / IPFIX</span>
-                                                </div>
-                                                {netflow_addon && (
-                                                    <div className="csc-dep-detail">
-                                                        <span className="csc-dep-name">{netflow_addon_label || netflow_addon}</span>
-                                                        {netflow_addon_label && netflow_addon_label !== netflow_addon && <span className="csc-dep-appid">{netflow_addon}</span>}
-                                                        {(netflow_addon_splunkbase_id || netflow_addon_docs_url) && (
-                                                            <span className="csc-split-pill">
-                                                                {netflow_addon_splunkbase_id && (
-                                                                    <a href={generateSplunkbaseUrl(netflow_addon_splunkbase_id)} target="_blank" rel="noopener noreferrer" className="csc-split-pill-seg" title="View on Splunkbase">Splunkbase</a>
-                                                                )}
-                                                                {netflow_addon_docs_url && (
-                                                                    <a href={netflow_addon_docs_url} target="_blank" rel="noopener noreferrer" className="csc-split-pill-seg" title="NetFlow documentation">Docs</a>
-                                                                )}
-                                                            </span>
-                                                        )}
-                                                        {netflowAddonStatus?.version && <span className="csc-dep-version">v{netflowAddonStatus.version}</span>}
-                                                        {!netflowAddonStatus?.installed && <span className="csc-dep-status-missing">not installed</span>}
-                                                    </div>
-                                                )}
-                                                {streamPrereqs.length > 0 && (
-                                                    <>
-                                                        <span className="csc-dep-label" style={{marginTop: 6}}>Stream Prerequisites</span>
-                                                        {streamPrereqs.map((pa) => {
-                                                            const paStatus = appStatuses[pa.app_id] || null;
-                                                            return (
-                                                                <div className="csc-dep-detail" key={pa.app_id}>
-                                                                    {paStatus?.installed ? (
-                                                                        <a href={createURL(`/app/${pa.app_id}/`)} target="_blank" rel="noopener noreferrer" className="csc-dep-name csc-dep-name-link" title={`Open ${pa.display_name}`}>{pa.display_name}</a>
-                                                                    ) : (
-                                                                        <span className="csc-dep-name">{pa.display_name}</span>
-                                                                    )}
-                                                                    {pa.uid && (
-                                                                        <span className="csc-split-pill">
-                                                                            <a href={generateSplunkbaseUrl(pa.uid)} target="_blank" rel="noopener noreferrer" className="csc-split-pill-seg" title="View on Splunkbase">Splunkbase</a>
-                                                                        </span>
-                                                                    )}
-                                                                    {paStatus?.version && <span className="csc-dep-version">v{paStatus.version}</span>}
-                                                                    {!paStatus?.installed && <span className="csc-dep-status-missing">not installed</span>}
-                                                                </div>
-                                                            );
-                                                        })}
-                                                    </>
-                                                )}
-                                                {streamVizApp && (() => {
-                                                    const svStatus = appStatuses[streamVizApp.app_id] || null;
-                                                    return (
-                                                        <>
-                                                            <span className="csc-dep-label" style={{marginTop: 6}}>NetFlow Dashboard</span>
-                                                            <div className="csc-dep-detail">
-                                                                {svStatus?.installed ? (
-                                                                    <a href={createURL(`/app/${streamVizApp.app_id}/`)} target="_blank" rel="noopener noreferrer" className="csc-dep-name csc-dep-name-link" title={`Open ${streamVizApp.display_name}`}>{streamVizApp.display_name}</a>
-                                                                ) : (
-                                                                    <span className="csc-dep-name">{streamVizApp.display_name}</span>
-                                                                )}
-                                                                <span className="csc-dep-appid">{streamVizApp.app_id}</span>
-                                                                <span className="csc-split-pill">
-                                                                    {streamVizApp.uid && (
-                                                                        <a href={generateSplunkbaseUrl(streamVizApp.uid)} target="_blank" rel="noopener noreferrer" className="csc-split-pill-seg" title="View on Splunkbase">Splunkbase</a>
-                                                                    )}
-                                                                    {stream_docs_url && (
-                                                                        <a href={stream_docs_url} target="_blank" rel="noopener noreferrer" className="csc-split-pill-seg" title="Stream documentation">Docs</a>
-                                                                    )}
-                                                                </span>
-                                                                {svStatus?.version && <span className="csc-dep-version">v{svStatus.version}</span>}
-                                                                {!svStatus?.installed && <span className="csc-dep-status-missing">not installed</span>}
-                                                            </div>
-                                                        </>
-                                                    );
-                                                })()}
-                                                {netflow_config_notes && netflow_config_notes.length > 0 && (
-                                                    <ul className="csc-sc4s-config-list csc-dp-notes-list" style={{marginTop: 6}}>
-                                                        {netflow_config_notes.map((note, i) => (
-                                                            <li key={i}>{note}</li>
-                                                        ))}
-                                                    </ul>
-                                                )}
+                                            <div className="csc-dp-slim-row">
+                                                <span className="csc-dp-group-title">NetFlow / IPFIX</span>
+                                                {netflowAddonStatus?.installed && <span className="csc-dep-version">v{netflowAddonStatus.version}</span>}
+                                                {!netflowAddonStatus?.installed && netflow_addon && <span className="csc-dep-status-missing">not installed</span>}
+                                                <button type="button" className="csc-btn csc-btn-outline csc-dp-guide-btn" onClick={() => setNetflowInfoOpen(true)}>
+                                                    View NetFlow Guide
+                                                </button>
                                             </div>
                                         )}
                                     </div>
-                                </details>
+                                </div>
                                 </>
                             )}
 
                             {/* ── Legacy & Compatibility (consolidated) ── */}
                             {(() => {
                                 const hasLegacyInstalled = legacyInstalled.length > 0;
-                                const hasLegacyCataloged = legacy_uids && legacy_uids.length > 0;
+                                const hasLegacyCataloged = allLegacyUids.length > 0;
                                 const uids = [addon_splunkbase_uid, app_viz_splunkbase_uid, app_viz_2_splunkbase_uid].filter(Boolean);
                                 const compatEntries = splunkbaseData ? uids.map(uid => {
                                     const entry = splunkbaseData[uid];
@@ -4449,53 +4415,63 @@ function ProductCard({ product, installedApps, appStatuses, indexerApps, sourcet
                                 if (!hasLegacyInstalled && !hasCompat && !hasSc4sCompat && !hasLegacyCataloged) return null;
                                 const tagParts = [];
                                 if (hasLegacyInstalled) tagParts.push(`${legacyInstalled.length} legacy`);
-                                if (hasLegacyCataloged && !hasLegacyInstalled) tagParts.push(`${legacy_uids.length} legacy (catalog)`);
+                                if (hasLegacyCataloged && !hasLegacyInstalled) tagParts.push(`${allLegacyUids.length} legacy (catalog)`);
                                 if (hasCompat || hasSc4sCompat) tagParts.push('compat');
+                                const renderLegacyGroup = (groupUids, groupLabel, supersededBy) => {
+                                    if (!groupUids || groupUids.length === 0) return null;
+                                    const installed = groupUids.filter(uid => {
+                                        const sb = splunkbaseData && splunkbaseData[uid];
+                                        return sb && sb.appid && installedApps[sb.appid];
+                                    });
+                                    if (installed.length === 0) return null;
+                                    return (
+                                        <div className="csc-dp-group">
+                                            <div className="csc-dp-group-header">
+                                                <span className="csc-dp-group-title">{groupLabel} ({installed.length} installed)</span>
+                                            </div>
+                                            <div className="scan-legacy-note">
+                                                {supersededBy ? (
+                                                    <>{supersededBy} supersedes {installed.length === 1 ? 'this' : 'these'}. Keeping both may cause duplicate knowledge objects or field conflicts — consider removing the legacy version.</>
+                                                ) : (
+                                                    <>These legacy items have been superseded and may cause duplicate knowledge objects or field conflicts if kept alongside the current version.</>
+                                                )}
+                                            </div>
+                                            {installed.map(uid => {
+                                                const sb = splunkbaseData && splunkbaseData[uid];
+                                                if (!sb) return null;
+                                                const legStatus = installedApps[sb.appid];
+                                                return (
+                                                    <div className="csc-dep-detail" key={uid}>
+                                                        <span className="csc-dep-name">{sb.title || sb.appid}</span>
+                                                        <span className="csc-dep-appid">{sb.appid}</span>
+                                                        <span className="csc-split-pill">
+                                                            <a href={generateSplunkbaseUrl(uid)} target="_blank" rel="noopener noreferrer" className="csc-split-pill-seg" title="View on Splunkbase">Splunkbase</a>
+                                                        </span>
+                                                        {legStatus?.version && <span className="csc-dep-version">v{legStatus.version}</span>}
+                                                    </div>
+                                                );
+                                            })}
+                                        </div>
+                                    );
+                                };
                                 return (
                                     <>
                                     <hr className="csc-dep-divider" />
-                                    <details className="csc-dep-details csc-section-legacy-compat">
+                                    <details className={`csc-dep-details csc-section-legacy-compat${hasLegacyInstalled ? ' csc-section-legacy-warn' : ''}`}>
                                         <summary className="csc-dep-details-summary">
                                             Legacy & Compatibility
-                                            <span className="csc-dp-tag csc-dp-tag-neutral csc-dp-tag-legacy-compat">{tagParts.join(' · ')}</span>
+                                            <span className={`csc-dp-tag ${hasLegacyInstalled ? 'csc-dp-tag-legacy-warn' : 'csc-dp-tag-neutral csc-dp-tag-legacy-compat'}`}>{tagParts.join(' · ')}</span>
                                         </summary>
                                         <div className="csc-dep-details-body">
                                             {hasLegacyCataloged && (
                                                 <div className="csc-dp-group" style={{ marginBottom: hasLegacyInstalled || hasCompat ? 12 : 0 }}>
-                                                    <button type="button" className="csc-btn csc-btn-outline csc-btn-legacy-audit" style={{ fontSize: 12 }} onClick={() => onViewLegacy(legacy_uids)}>
-                                                        View full legacy audit ({legacy_uids.length} app{legacy_uids.length !== 1 ? 's' : ''})
+                                                    <button type="button" className="csc-btn csc-btn-outline csc-btn-legacy-audit" style={{ fontSize: 12 }} onClick={() => onViewLegacy(allLegacyUids)}>
+                                                        View full legacy audit ({allLegacyUids.length} app{allLegacyUids.length !== 1 ? 's' : ''})
                                                     </button>
                                                 </div>
                                             )}
-                                            {hasLegacyInstalled && (
-                                                <div className="csc-dp-group">
-                                                    <div className="csc-dp-group-header">
-                                                        <span className="csc-dp-group-title">Legacy ({legacyInstalled.length} installed)</span>
-                                                    </div>
-                                                    <div className="scan-legacy-note">
-                                                        {addon_label || addon ? (
-                                                            <>{addon_label || addon} supersedes these add-ons. Safe to keep alongside.</>
-                                                        ) : (
-                                                            <>These legacy add-ons are installed but have been superseded.</>
-                                                        )}
-                                                    </div>
-                                                    {legacyInstalled.map(uid => {
-                                                        const sb = splunkbaseData && splunkbaseData[uid];
-                                                        if (!sb) return null;
-                                                        const legStatus = installedApps[sb.appid];
-                                                        return (
-                                                            <div className="csc-dep-detail" key={uid}>
-                                                                <span className="csc-dep-name">{sb.title || sb.appid}</span>
-                                                                <span className="csc-dep-appid">{sb.appid}</span>
-                                                                <span className="csc-split-pill">
-                                                                    <a href={generateSplunkbaseUrl(uid)} target="_blank" rel="noopener noreferrer" className="csc-split-pill-seg" title="View on Splunkbase">Splunkbase</a>
-                                                                </span>
-                                                                {legStatus?.version && <span className="csc-dep-version">v{legStatus.version}</span>}
-                                                            </div>
-                                                        );
-                                                    })}
-                                                </div>
-                                            )}
+                                            {renderLegacyGroup(legacy_uids, 'Legacy Add-ons', addon_label || addon)}
+                                            {renderLegacyGroup(legacy_viz_uids, 'Legacy Apps', app_viz_label || app_viz)}
                                             {hasLegacyInstalled && (hasCompat || hasSc4sCompat) && <hr className="csc-dep-divider" />}
                                             {hasCompat && (
                                                 <div className="csc-dp-group">
@@ -4970,8 +4946,29 @@ function ProductCard({ product, installedApps, appStatuses, indexerApps, sourcet
             )}
 
             {/* ── SC4S / NetFlow / HF / SOAR / ITSI Modals (rendered outside details so they can open from header) ── */}
-            {sc4s_supported && <SC4SInfoModal open={sc4sInfoOpen} onClose={() => setSc4sInfoOpen(false)} />}
-            {netflow_supported && <NetFlowInfoModal open={netflowInfoOpen} onClose={() => setNetflowInfoOpen(false)} installedApps={installedApps} />}
+            {sc4s_supported && <SC4SInfoModal open={sc4sInfoOpen} onClose={() => setSc4sInfoOpen(false)} productContext={{
+                displayName: display_name,
+                sc4sUrl: sc4s_url,
+                sc4sConfigNotes: sc4s_config_notes,
+                sc4sSourcetypes: sc4s_sourcetypes,
+                companionTa: hasDifferentSc4sTa && sc4s_search_head_ta ? {
+                    name: sc4s_search_head_ta,
+                    label: sc4s_search_head_ta_label,
+                    splunkbaseId: sc4s_search_head_ta_splunkbase_id,
+                    installed: sc4sShTaStatus?.installed || false,
+                    version: sc4sShTaStatus?.version || '',
+                } : null,
+                hasAddon: !!addon,
+            }} />}
+            {netflow_supported && <NetFlowInfoModal open={netflowInfoOpen} onClose={() => setNetflowInfoOpen(false)} installedApps={installedApps} productContext={{
+                displayName: display_name,
+                netflowAddon: netflow_addon,
+                netflowAddonLabel: netflow_addon_label,
+                netflowAddonSplunkbaseId: netflow_addon_splunkbase_id,
+                netflowAddonDocsUrl: netflow_addon_docs_url,
+                netflowAddonStatus: netflowAddonStatus,
+                netflowConfigNotes: netflow_config_notes,
+            }} />}
             <HFInfoModal open={hfInfoOpen} onClose={() => setHfInfoOpen(false)} isCloud={platformType === 'cloud'} />
             <MagicEightModal open={magicEightOpen} onClose={() => setMagicEightOpen(false)} sourcetypes={product.sourcetypes} productName={display_name} addonApp={addon} addonLabel={addon_label} appViz={app_viz} appViz2={app_viz_2} installedApps={installedApps} indexerApps={indexerApps} />
             {hasSoar && <SOARInfoModal open={soarInfoOpen} onClose={() => setSoarInfoOpen(false)} soarConnectorUids={soar_connector_uids} splunkbaseData={splunkbaseData} productName={display_name} />}
@@ -7344,6 +7341,7 @@ function SCANProductsPage() {
     const [removeAllModalOpen, setRemoveAllModalOpen] = useState(false);
     const removeAllReturnRef = useRef(null);
     const [cardLegendOpen, setCardLegendOpen] = useState(false);
+    const [issuesPanelOpen, setIssuesPanelOpen] = useState(false);
     const [welcomeDismissed, setWelcomeDismissed] = useState(() => {
         try { return localStorage.getItem('scan_welcome_dismissed') === '1'; } catch (_e) { return false; }
     });
@@ -8781,6 +8779,107 @@ function SCANProductsPage() {
                 const itopsCount = visibleProducts.filter(p => p.itsi_content_pack || p.ite_learn_content).length;
                 const dataFlowing = detectedProducts.length + configuredProducts.filter(p => sourcetypeData[p.product_id] && sourcetypeData[p.product_id].hasData).length;
                 const activeSourcetypes = new Set(Object.values(sourcetypeData).flatMap(d => d.matchedSTs || [])).size;
+
+                // ── Misconfiguration Detection ──
+                // Only compute issues after sourcetype metadata has loaded;
+                // until then sourcetypeData is {} and every configured product
+                // would falsely appear as "no data flowing".
+                const issues = [];
+                const sourcetypeDataReady = Object.keys(sourcetypeData).length > 0;
+                const appStatusesReady = Object.keys(appStatuses).length > 0;
+                sourcetypeDataReady && visibleProducts.forEach(p => {
+                    const stData = sourcetypeData[p.product_id];
+                    const hasData = stData && stData.hasData;
+                    const addonInstalled = p.addon && installedApps[p.addon];
+                    const isConfigured = configuredIds.includes(p.product_id);
+
+                    const pName = p.display_name || p.product_id;
+
+                    if (hasData && p.addon && !addonInstalled) {
+                        issues.push({
+                            severity: 'critical',
+                            type: 'data_no_addon',
+                            product: p,
+                            title: `${pName}: data flowing without add-on`,
+                            detail: `${(stData.matchedSTs || []).length} sourcetype(s) active (~${formatCount(stData.eventCount)} events) but ${p.addon} is not installed. CIM normalization, field aliases, and dashboards are not available for this data.`,
+                        });
+                    }
+
+                    if (isConfigured && p.addon && addonInstalled && !hasData) {
+                        issues.push({
+                            severity: 'warning',
+                            type: 'configured_no_data',
+                            product: p,
+                            title: `${pName}: configured but no data flowing`,
+                            detail: `Product is configured and add-on is installed, but no events detected in the last 7 days. Check data inputs, credentials, and network connectivity.`,
+                        });
+                    }
+
+                    if (appStatusesReady && addonInstalled) {
+                        const status = appStatuses[p.addon];
+                        if (status && status.updateVersion) {
+                            issues.push({
+                                severity: 'warning',
+                                type: 'addon_outdated',
+                                product: p,
+                                title: `${pName}: add-on update available`,
+                                detail: `${p.addon_label || p.addon} v${status.version || '?'} is installed — v${status.updateVersion} is available. Updating ensures the latest CIM mappings, bug fixes, and security patches.`,
+                            });
+                        }
+                    }
+
+                    if (splunkbaseData) {
+                        const legacyAddonFound = (p.legacy_uids || []).filter(uid => {
+                            const sb = splunkbaseData[uid];
+                            return sb && sb.appid && installedApps[sb.appid];
+                        });
+                        const legacyVizFound = (p.legacy_viz_uids || []).filter(uid => {
+                            const sb = splunkbaseData[uid];
+                            return sb && sb.appid && installedApps[sb.appid];
+                        });
+                        if (legacyAddonFound.length > 0) {
+                            const names = legacyAddonFound.map(uid => { const sb = splunkbaseData[uid]; return sb ? (sb.appid || uid) : uid; });
+                            const currentLabel = p.addon_label || p.addon;
+                            issues.push({
+                                severity: 'warning',
+                                type: 'legacy_detected',
+                                product: p,
+                                title: `${pName}: legacy add-on(s) detected`,
+                                detail: `${names.join(', ')} ${legacyAddonFound.length === 1 ? 'is' : 'are'} still installed. ${addonInstalled ? `${currentLabel} supersedes ${legacyAddonFound.length === 1 ? 'this' : 'these'} — the legacy version may cause conflicts or duplicate knowledge objects.` : `Consider migrating to ${currentLabel}.`}`,
+                                legacyUids: legacyAddonFound,
+                            });
+                        }
+                        if (legacyVizFound.length > 0) {
+                            const names = legacyVizFound.map(uid => { const sb = splunkbaseData[uid]; return sb ? (sb.appid || uid) : uid; });
+                            const vizInstalled = p.app_viz && installedApps[p.app_viz];
+                            const currentLabel = p.app_viz_label || p.app_viz;
+                            issues.push({
+                                severity: 'warning',
+                                type: 'legacy_detected',
+                                product: p,
+                                title: `${pName}: legacy app(s) detected`,
+                                detail: `${names.join(', ')} ${legacyVizFound.length === 1 ? 'is' : 'are'} still installed. ${vizInstalled ? `${currentLabel} supersedes ${legacyVizFound.length === 1 ? 'this' : 'these'} — the legacy version may cause conflicts or duplicate dashboards.` : `Consider migrating to ${currentLabel}.`}`,
+                                legacyUids: legacyVizFound,
+                            });
+                        }
+                    }
+
+                    if (hasData && addonInstalled && !isConfigured) {
+                        issues.push({
+                            severity: 'info',
+                            type: 'data_not_configured',
+                            product: p,
+                            title: `${pName}: data flowing but not added to workspace`,
+                            detail: `${(stData.matchedSTs || []).length} sourcetype(s) detected with the add-on installed. Add this product to your configured workspace for dashboards and monitoring.`,
+                        });
+                    }
+                });
+                issues.sort((a, b) => {
+                    const sev = { critical: 0, warning: 1, info: 2 };
+                    return (sev[a.severity] ?? 3) - (sev[b.severity] ?? 3);
+                });
+                const issueCount = issues.filter(i => i.severity !== 'info').length;
+
                 const stats = [
                     { label: 'Products', value: visibleProducts.length, accent: '#5B6ABF', tip: 'Total Cisco products in your catalog' },
                     { label: 'Configured', value: configuredProducts.length, accent: '#0A60FF', tip: 'Products pinned to your workspace' },
@@ -8794,6 +8893,7 @@ function SCANProductsPage() {
                     { label: 'ITOps', value: itopsCount, accent: '#4F46E5', tip: 'Products with ITOps content \u2014 ITSI content packs and/or IT Essentials Learn procedures' },
                 ];
                 return (
+                    <>
                     <div className="csc-stats-bar">
                         {stats.map(s => (
                             <div key={s.label} className="csc-stat-card" data-tooltip={s.tip} style={{ '--stat-accent': s.accent }}>
@@ -8804,7 +8904,124 @@ function SCANProductsPage() {
                                 <span className="csc-stat-label">{s.label}</span>
                             </div>
                         ))}
+                        {issues.length > 0 && (
+                            <div
+                                className={`csc-stat-card csc-issues-badge ${issueCount > 0 ? 'csc-issues-badge--warn' : 'csc-issues-badge--info'}`}
+                                data-tooltip={issueCount > 0 ? `${issueCount} issue${issueCount !== 1 ? 's' : ''} detected — click to review` : `${issues.length} suggestion${issues.length !== 1 ? 's' : ''} — click to review`}
+                                style={{ '--stat-accent': issueCount > 0 ? '#F59E0B' : '#3B82F6', cursor: 'pointer' }}
+                                onClick={() => setIssuesPanelOpen(!issuesPanelOpen)}
+                                role="button"
+                                tabIndex={0}
+                                onKeyDown={e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); setIssuesPanelOpen(!issuesPanelOpen); }}}
+                            >
+                                <span className="csc-stat-value">
+                                    {issueCount > 0 ? issueCount : issues.length}
+                                    {issueCount > 0 && <span className="csc-issues-pulse" />}
+                                </span>
+                                <span className="csc-stat-label">{issueCount > 0 ? 'Issues' : 'Insights'}</span>
+                            </div>
+                        )}
                     </div>
+
+                    {/* ── Issues Panel ── */}
+                    {issuesPanelOpen && issues.length > 0 && (
+                        <div className="csc-issues-panel">
+                            <div className="csc-issues-panel-header">
+                                <span className="csc-issues-panel-title">
+                                    {issueCount > 0 ? '\u26A0' : '\u2139'}{' '}
+                                    Ecosystem Health Check
+                                    <span className="csc-issues-panel-count">{issues.length} item{issues.length !== 1 ? 's' : ''}</span>
+                                </span>
+                                <button className="csc-issues-panel-close" onClick={() => setIssuesPanelOpen(false)} title="Close">{'\u2715'}</button>
+                            </div>
+                            <div className="csc-issues-panel-body">
+                                {issues.map((issue, idx) => (
+                                    <div key={`${issue.product.product_id}-${issue.type}`} className={`csc-issue-row csc-issue-row--${issue.severity}`}>
+                                        <span className="csc-issue-severity-icon">
+                                            {issue.severity === 'critical' ? '\u26D4' : issue.severity === 'warning' ? '\u26A0' : '\u2139\uFE0F'}
+                                        </span>
+                                        <div className="csc-issue-content">
+                                            <div className="csc-issue-title">{issue.title}</div>
+                                            <div className="csc-issue-detail">{issue.detail}</div>
+                                            <div className="csc-issue-action">
+                                                {issue.type === 'data_no_addon' && issue.product.addon && (() => {
+                                                    const p = issue.product;
+                                                    const installUrl = p.addon_install_url;
+                                                    const uid = p.addon_splunkbase_uid || (appidToUidMap && appidToUidMap[p.addon]) || '';
+                                                    const href = installUrl ? createURL(installUrl) : uid ? generateSplunkbaseUrl(uid) : '';
+                                                    return href ? (
+                                                        <a
+                                                            href={href}
+                                                            target="_blank"
+                                                            rel="noopener noreferrer"
+                                                            className="csc-issue-action-link"
+                                                        >
+                                                            Install {p.addon_label || p.addon} {'\u2197'}
+                                                        </a>
+                                                    ) : (
+                                                        <span className="csc-issue-action-text">Install {p.addon_label || p.addon} from Splunkbase</span>
+                                                    );
+                                                })()}
+                                                {issue.type === 'configured_no_data' && (
+                                                    <span className="csc-issue-action-text">Check data inputs, credentials, and network connectivity</span>
+                                                )}
+                                                {issue.type === 'addon_outdated' && issue.product.addon && (() => {
+                                                    const p = issue.product;
+                                                    const installUrl = p.addon_install_url;
+                                                    const uid = p.addon_splunkbase_uid || (appidToUidMap && appidToUidMap[p.addon]) || '';
+                                                    const href = installUrl ? createURL(installUrl) : uid ? generateSplunkbaseUrl(uid) : '';
+                                                    return href ? (
+                                                        <a
+                                                            href={href}
+                                                            target="_blank"
+                                                            rel="noopener noreferrer"
+                                                            className="csc-issue-action-link"
+                                                        >
+                                                            Update Add-on v{appStatuses[p.addon]?.updateVersion} {'\u2197'}
+                                                        </a>
+                                                    ) : (
+                                                        <span className="csc-issue-action-text">Update {p.addon_label || p.addon} from Splunkbase</span>
+                                                    );
+                                                })()}
+                                                {issue.type === 'legacy_detected' && (
+                                                    <button
+                                                        className="csc-issue-action-btn"
+                                                        onClick={() => { handleViewLegacy(issue.legacyUids); }}
+                                                    >
+                                                        View Legacy Audit
+                                                    </button>
+                                                )}
+                                                {!configuredIds.includes(issue.product.product_id) && (
+                                                    <button
+                                                        className="csc-issue-action-btn"
+                                                        onClick={() => { handleToggleConfigured(issue.product.product_id); }}
+                                                    >
+                                                        + Add to My Products
+                                                    </button>
+                                                )}
+                                                <span
+                                                    className="csc-issue-find-link"
+                                                    onClick={() => {
+                                                        const name = issue.product.display_name || issue.product.product_id;
+                                                        setSearchQuery(name);
+                                                        setSearchBarQuery(name);
+                                                        setIssuesPanelOpen(false);
+                                                    }}
+                                                    title={`Filter catalog to show ${issue.product.display_name || issue.product.product_id}`}
+                                                    role="button"
+                                                    tabIndex={0}
+                                                    onKeyDown={e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); const name = issue.product.display_name || issue.product.product_id; setSearchQuery(name); setSearchBarQuery(name); setIssuesPanelOpen(false); }}}
+                                                >
+                                                    Locate {'\u203A'}
+                                                </span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+                    )}
+                    </>
                 );
             })()}
 
