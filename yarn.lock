@@ -2078,9 +2078,9 @@
     stylelint-config-standard "^34.0.0"
 
 "@splunk/themes@^1.5.0":
-  version "1.5.0"
-  resolved "https://repo.splunkdev.net:443/artifactory/api/npm/npm/@splunk/themes/-/themes-1.5.0.tgz#f04439c5cf0bf3cd50aeaa13404f0b8d49dd4c40"
-  integrity sha512-s+JJaNZE6SfKUFWZhwOXtWGgACvLPsaJJ0tonFbPn6MDaTfV130Yn6XmJGztF6cS34YL4ateVPtsz9W164fVmw==
+  version "1.6.0"
+  resolved "https://repo.splunkdev.net:443/artifactory/api/npm/npm/@splunk/themes/-/themes-1.6.0.tgz#3a6f1e06f7fc3b399976de27007fca78b40fba00"
+  integrity sha512-dfvGPbqUHBVsTCdlmh7VGW1z8/dCAijT0Y6q3pl6lfYhhyaHe8zo71reYX82bgHIcqZkJdc6HSbAGtmVM0niog==
   dependencies:
     color-blend "^2.0.9"
     lodash "^4.17.14"
