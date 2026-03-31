@@ -389,6 +389,16 @@ function sc4sCoversFilter(product, platformFilter) {
     });
 }
 
+/**
+ * Resolve an app/addon display label dynamically from the Splunkbase lookup,
+ * falling back to the static label from products.conf, then the folder name.
+ * This keeps labels current when teams rename apps on Splunkbase.
+ */
+function resolveLabel(uid, staticLabel, folderName, splunkbaseData) {
+    const sb = splunkbaseData && uid && splunkbaseData[String(uid)];
+    return (sb && sb.title) || staticLabel || folderName || '';
+}
+
 function productSupportsVersions(product, versions, splunkbaseData, appidToUidMap) {
     if (product.sc4s_supported) return true;
     const uidSupports = (uid) => {
@@ -498,14 +508,12 @@ async function loadProductsFromConf() {
             sc4s_search_head_ta: c.sc4s_search_head_ta || '',
             sc4s_search_head_ta_label: c.sc4s_search_head_ta_label || '',
             sc4s_search_head_ta_splunkbase_id: c.sc4s_search_head_ta_splunkbase_id || '',
-            sc4s_search_head_ta_install_url: c.sc4s_search_head_ta_install_url || '',
             sc4s_sourcetypes: (c.sc4s_sourcetypes || '').split(',').map(s => s.trim()).filter(Boolean),
             sc4s_config_notes: (c.sc4s_config_notes || '').split('|').map(s => s.trim()).filter(Boolean),
             netflow_supported: c.netflow_supported === 'true' || c.netflow_supported === '1' || c.netflow_supported === true,
             netflow_addon: c.netflow_addon || '',
             netflow_addon_label: c.netflow_addon_label || '',
             netflow_addon_splunkbase_id: c.netflow_addon_splunkbase_id || '',
-            netflow_addon_install_url: c.netflow_addon_install_url || '',
             netflow_addon_docs_url: c.netflow_addon_docs_url || '',
             stream_docs_url: c.stream_docs_url || '',
             netflow_sourcetypes: (c.netflow_sourcetypes || '').split(',').map(s => s.trim()).filter(Boolean),
@@ -965,8 +973,8 @@ function renderFormattedText(text) {
 function getBestPractices(product, platformType, splunkbaseData) {
     const isCloud = platformType === 'cloud';
     const pn = product.display_name;
-    const ta = product.addon_label || product.addon;
-    const viz = product.app_viz_label || product.app_viz || null;
+    const ta = resolveLabel(product.addon_splunkbase_uid, product.addon_label, product.addon, splunkbaseData);
+    const viz = resolveLabel(product.app_viz_splunkbase_uid, product.app_viz_label, product.app_viz, splunkbaseData) || null;
     const tips = [];
 
     // ── Platform / data-collection tip ──────────────────────────────────
@@ -3137,7 +3145,7 @@ function LegacyAuditModal({ open, onClose, legacyUids, installedApps, indexerApp
         const isInstalled = isOnSh || isOnIdx;
         return (
             <div key={app.uid} className={`csc-legacy-card ${isArchived ? 'csc-legacy-archived' : 'csc-legacy-active'}`}
-                 style={isInstalled ? { borderLeft: '4px solid var(--border-medium, #d2cbc5)' } : {}}>
+                 style={isInstalled ? { borderLeft: '4px solid var(--border-medium, #d2cbc5)' } : { opacity: 0.7 }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '4px' }}>
                     <strong>{app.display_name || app.app_id}</strong>
                     <div style={{ display: 'flex', gap: '6px', alignItems: 'center', flexWrap: 'wrap' }}>
@@ -3151,8 +3159,13 @@ function LegacyAuditModal({ open, onClose, legacyUids, installedApps, indexerApp
                                 Indexer Tier ({idxInfo.idx_count || '?'})
                             </span>
                         )}
+                        {!isInstalled && !isArchived && (
+                            <span className="csc-legacy-status-badge" style={{ background: 'var(--status-neutral-bg, #f5f5f5)', color: 'var(--muted-color, #888)', fontSize: '11px', padding: '2px 8px', borderRadius: '4px' }}>
+                                Not Installed
+                            </span>
+                        )}
                         <span className={isArchived ? 'csc-legacy-status-badge csc-legacy-status-archived' : 'csc-legacy-status-badge csc-legacy-status-active'}>
-                            {isArchived ? 'Archived' : 'Active'}
+                            {isArchived ? 'Archived' : 'On Splunkbase'}
                         </span>
                     </div>
                 </div>
@@ -3585,16 +3598,16 @@ function generateCustomerSummary(product, splunkbaseData) {
 
     const apps = [];
     if (product.addon) {
-        apps.push({ label: product.addon_label || product.addon, uid: product.addon_splunkbase_uid, type: 'Add-on' });
+        apps.push({ label: resolveLabel(product.addon_splunkbase_uid, product.addon_label, product.addon, splunkbaseData), uid: product.addon_splunkbase_uid, type: 'Add-on' });
     }
     if (product.app_viz) {
-        apps.push({ label: product.app_viz_label || product.app_viz, uid: product.app_viz_splunkbase_uid, type: 'App' });
+        apps.push({ label: resolveLabel(product.app_viz_splunkbase_uid, product.app_viz_label, product.app_viz, splunkbaseData), uid: product.app_viz_splunkbase_uid, type: 'App' });
     }
     if (product.app_viz_2) {
-        apps.push({ label: product.app_viz_2_label || product.app_viz_2, uid: product.app_viz_2_splunkbase_uid, type: 'App' });
+        apps.push({ label: resolveLabel(product.app_viz_2_splunkbase_uid, product.app_viz_2_label, product.app_viz_2, splunkbaseData), uid: product.app_viz_2_splunkbase_uid, type: 'App' });
     }
     if (product.sc4s_search_head_ta) {
-        apps.push({ label: product.sc4s_search_head_ta_label || product.sc4s_search_head_ta, uid: product.sc4s_search_head_ta_splunkbase_id, type: 'Search Head TA (SC4S)' });
+        apps.push({ label: resolveLabel(product.sc4s_search_head_ta_splunkbase_id, product.sc4s_search_head_ta_label, product.sc4s_search_head_ta, splunkbaseData), uid: product.sc4s_search_head_ta_splunkbase_id, type: 'Search Head TA (SC4S)' });
     }
 
     if (apps.length > 0) {
@@ -3640,7 +3653,7 @@ function generateCustomerSummary(product, splunkbaseData) {
         plain.push('NETFLOW / SPLUNK STREAM');
         if (product.netflow_addon) {
             const nfUid = product.netflow_addon_splunkbase_id;
-            const nfLabel = product.netflow_addon_label || product.netflow_addon;
+            const nfLabel = resolveLabel(nfUid, product.netflow_addon_label, product.netflow_addon, splunkbaseData);
             if (nfUid) {
                 const sb = sbLink(nfUid, nfLabel);
                 html.push(`<li>${sb.html}</li>`);
@@ -3792,12 +3805,18 @@ function ProductCard({ product, installedApps, appStatuses, indexerApps, sourcet
         legacy_uids, legacy_viz_uids, soar_connector_uids, alert_action_uids, community_uids, itsi_content_pack,
         is_new, support_level, cisco_retired, coverage_gap, gap_type, gtm_pillar,
         sc4s_url, sc4s_supported, sc4s_search_head_ta, sc4s_search_head_ta_label,
-        sc4s_search_head_ta_splunkbase_id, sc4s_search_head_ta_install_url, sc4s_sourcetypes, sc4s_config_notes,
+        sc4s_search_head_ta_splunkbase_id, sc4s_sourcetypes, sc4s_config_notes,
         netflow_supported, netflow_addon, netflow_addon_label,
-        netflow_addon_splunkbase_id, netflow_addon_install_url, netflow_addon_docs_url,
+        netflow_addon_splunkbase_id, netflow_addon_docs_url,
         stream_docs_url, netflow_sourcetypes, netflow_config_notes,
         es_compatible, es_cim_data_models, escu_analytic_stories, escu_detection_count, escu_detections,
     } = product;
+
+    const _addonLabel = resolveLabel(product.addon_splunkbase_uid, addon_label, addon, splunkbaseData);
+    const _appVizLabel = resolveLabel(product.app_viz_splunkbase_uid, app_viz_label, app_viz, splunkbaseData);
+    const _appViz2Label = resolveLabel(product.app_viz_2_splunkbase_uid, app_viz_2_label, app_viz_2, splunkbaseData);
+    const _sc4sLabel = resolveLabel(sc4s_search_head_ta_splunkbase_id, sc4s_search_head_ta_label, sc4s_search_head_ta, splunkbaseData);
+    const _netflowLabel = resolveLabel(netflow_addon_splunkbase_id, netflow_addon_label, netflow_addon, splunkbaseData);
 
     // Suppress all action buttons for cards with no integration to install/configure.
     // isComingSoon (under_development only) also shows a "Coming Soon" badge;
@@ -4192,9 +4211,9 @@ function ProductCard({ product, installedApps, appStatuses, indexerApps, sourcet
                                 <>
                                 <div className="csc-dep-detail">
                                     {appStatus?.installed && appStatus?.visible ? (
-                                        <a href={createURL(`/app/${addon}/`)} target="_blank" rel="noopener noreferrer" className="csc-dep-name csc-dep-name-link" title={`${addon} — Click to open`}>{addon_label || addon}</a>
+                                        <a href={createURL(`/app/${addon}/`)} target="_blank" rel="noopener noreferrer" className="csc-dep-name csc-dep-name-link" title={`${addon} — Click to open`}>{_addonLabel}</a>
                                     ) : (
-                                        <span className="csc-dep-name" title={appStatus?.installed ? `${addon} — TA only (no UI)` : addon}>{addon_label || addon}</span>
+                                        <span className="csc-dep-name" title={appStatus?.installed ? `${addon} — TA only (no UI)` : addon}>{_addonLabel}</span>
                                     )}
                                     {(addon_splunkbase_uid || addon_docs_url || addon_troubleshoot_url) && (
                                         <span className="csc-split-pill">
@@ -4284,9 +4303,9 @@ function ProductCard({ product, installedApps, appStatuses, indexerApps, sourcet
                                 <hr className="csc-dep-divider" />
                                 <div className="csc-dep-detail">
                                     {vizAppStatus?.installed && vizAppStatus?.visible ? (
-                                        <a href={createURL(`/app/${app_viz}/`)} target="_blank" rel="noopener noreferrer" className="csc-dep-name csc-dep-name-link" title={`${app_viz} — Click to open`}>{app_viz_label || app_viz}</a>
+                                        <a href={createURL(`/app/${app_viz}/`)} target="_blank" rel="noopener noreferrer" className="csc-dep-name csc-dep-name-link" title={`${app_viz} — Click to open`}>{_appVizLabel}</a>
                                     ) : (
-                                        <span className="csc-dep-name" title={app_viz}>{app_viz_label || app_viz}</span>
+                                        <span className="csc-dep-name" title={app_viz}>{_appVizLabel}</span>
                                     )}
                                     {(app_viz_splunkbase_uid || app_viz_docs_url || app_viz_troubleshoot_url) && (
                                         <span className="csc-split-pill">
@@ -4328,9 +4347,9 @@ function ProductCard({ product, installedApps, appStatuses, indexerApps, sourcet
                                 <hr className="csc-dep-divider" />
                                 <div className="csc-dep-detail">
                                     {vizApp2Status?.installed && vizApp2Status?.visible ? (
-                                        <a href={createURL(`/app/${app_viz_2}/`)} target="_blank" rel="noopener noreferrer" className="csc-dep-name csc-dep-name-link" title={`${app_viz_2} — Click to open`}>{app_viz_2_label || app_viz_2}</a>
+                                        <a href={createURL(`/app/${app_viz_2}/`)} target="_blank" rel="noopener noreferrer" className="csc-dep-name csc-dep-name-link" title={`${app_viz_2} — Click to open`}>{_appViz2Label}</a>
                                     ) : (
-                                        <span className="csc-dep-name" title={app_viz_2}>{app_viz_2_label || app_viz_2}</span>
+                                        <span className="csc-dep-name" title={app_viz_2}>{_appViz2Label}</span>
                                     )}
                                     {(app_viz_2_splunkbase_uid || app_viz_2_docs_url || app_viz_2_troubleshoot_url) && (
                                         <span className="csc-split-pill">
@@ -4470,8 +4489,8 @@ function ProductCard({ product, installedApps, appStatuses, indexerApps, sourcet
                                                     </button>
                                                 </div>
                                             )}
-                                            {renderLegacyGroup(legacy_uids, 'Legacy Add-ons', addon_label || addon)}
-                                            {renderLegacyGroup(legacy_viz_uids, 'Legacy Apps', app_viz_label || app_viz)}
+                                            {renderLegacyGroup(legacy_uids, 'Legacy Add-ons', _addonLabel)}
+                                            {renderLegacyGroup(legacy_viz_uids, 'Legacy Apps', _appVizLabel)}
                                             {hasLegacyInstalled && (hasCompat || hasSc4sCompat) && <hr className="csc-dep-divider" />}
                                             {hasCompat && (
                                                 <div className="csc-dp-group">
@@ -4610,7 +4629,7 @@ function ProductCard({ product, installedApps, appStatuses, indexerApps, sourcet
                                 );
                             })}
                             <span className="csc-community-warning-hint">
-                                Not an official Cisco/Splunk add-on. Migrate to <strong>{addon_label || addon}</strong> for full support and compatibility.
+                                Not an official Cisco/Splunk add-on. Migrate to <strong>{_addonLabel}</strong> for full support and compatibility.
                             </span>
                         </div>
                     )}
@@ -4638,7 +4657,7 @@ function ProductCard({ product, installedApps, appStatuses, indexerApps, sourcet
                     <a href={createURL('/manager/splunk-cisco-app-navigator/apps/local')}
                         target="_blank" rel="noopener noreferrer"
                         className="csc-btn csc-btn-disabled-label"
-                        title={`${addon_label || addon} is disabled — search for it in Manage Apps`}>
+                        title={`${_addonLabel} is disabled — search for it in Manage Apps`}>
                         Add-on Disabled
                     </a>
                 )}
@@ -4647,7 +4666,7 @@ function ProductCard({ product, installedApps, appStatuses, indexerApps, sourcet
                     <a href={createURL('/manager/splunk-cisco-app-navigator/apps/local')}
                         target="_blank" rel="noopener noreferrer"
                         className="csc-btn csc-btn-disabled-label"
-                        title={`${app_viz_label || app_viz} is disabled — search for it in Manage Apps`}>
+                        title={`${_appVizLabel} is disabled — search for it in Manage Apps`}>
                         App Disabled
                     </a>
                 )}
@@ -4655,7 +4674,7 @@ function ProductCard({ product, installedApps, appStatuses, indexerApps, sourcet
                 {!suppressActions && isConfigured && appStatus?.installed && !appStatus?.disabled && appStatus?.updateVersion && (addon_install_url || addon_splunkbase_uid) && (
                     <a href={addon_install_url ? createURL(addon_install_url) : generateSplunkbaseUrl(addon_splunkbase_uid)} target="_blank" rel="noopener noreferrer"
                         className="csc-btn csc-btn-upgrade"
-                        title={`Update ${addon_label || addon} to v${appStatus.updateVersion}`}>
+                        title={`Update ${_addonLabel} to v${appStatus.updateVersion}`}>
                         Update Add-on v{appStatus.updateVersion}
                     </a>
                 )}
@@ -4663,7 +4682,7 @@ function ProductCard({ product, installedApps, appStatuses, indexerApps, sourcet
                 {!suppressActions && isConfigured && vizAppStatus?.installed && !vizAppStatus?.disabled && vizAppStatus?.updateVersion && (app_viz_install_url || app_viz_splunkbase_uid) && (
                     <a href={app_viz_install_url ? createURL(app_viz_install_url) : generateSplunkbaseUrl(app_viz_splunkbase_uid)} target="_blank" rel="noopener noreferrer"
                         className="csc-btn csc-btn-upgrade"
-                        title={`Update ${app_viz_label || app_viz} to v${vizAppStatus.updateVersion}`}>
+                        title={`Update ${_appVizLabel} to v${vizAppStatus.updateVersion}`}>
                         Update App v{vizAppStatus.updateVersion}
                     </a>
                 )}
@@ -4671,7 +4690,7 @@ function ProductCard({ product, installedApps, appStatuses, indexerApps, sourcet
                 {!suppressActions && isConfigured && vizApp2Status?.installed && !vizApp2Status?.disabled && vizApp2Status?.updateVersion && app_viz_2_install_url && (
                     <a href={createURL(app_viz_2_install_url)} target="_blank" rel="noopener noreferrer"
                         className="csc-btn csc-btn-upgrade"
-                        title={`Update ${app_viz_2_label || app_viz_2} to v${vizApp2Status.updateVersion}`}>
+                        title={`Update ${_appViz2Label} to v${vizApp2Status.updateVersion}`}>
                         Update App 2 v{vizApp2Status.updateVersion}
                     </a>
                 )}
@@ -4681,8 +4700,8 @@ function ProductCard({ product, installedApps, appStatuses, indexerApps, sourcet
                         target="_blank" rel="noopener noreferrer"
                         className={`csc-btn ${!addon_install_url ? 'csc-btn-archived' : 'csc-btn-green'}`}
                         title={!addon_install_url
-                            ? `Not available in Browse More Apps — download ${addon_label || addon} from Splunkbase`
-                            : `Install ${addon_label || addon}`}>
+                            ? `Not available in Browse More Apps — download ${_addonLabel} from Splunkbase`
+                            : `Install ${_addonLabel}`}>
                         Install Add-on
                     </a>
                 )}
@@ -4692,8 +4711,8 @@ function ProductCard({ product, installedApps, appStatuses, indexerApps, sourcet
                         target="_blank" rel="noopener noreferrer"
                         className={`csc-btn ${!app_viz_install_url ? 'csc-btn-archived' : 'csc-btn-green'}`}
                         title={!app_viz_install_url
-                            ? `Not available in Browse More Apps — download ${app_viz_label || app_viz} from Splunkbase`
-                            : `Install ${app_viz_label || app_viz}`}>
+                            ? `Not available in Browse More Apps — download ${_appVizLabel} from Splunkbase`
+                            : `Install ${_appVizLabel}`}>
                         Install App
                     </a>
                 )}
@@ -4703,8 +4722,8 @@ function ProductCard({ product, installedApps, appStatuses, indexerApps, sourcet
                         target="_blank" rel="noopener noreferrer"
                         className={`csc-btn ${!app_viz_2_install_url ? 'csc-btn-archived' : 'csc-btn-green'}`}
                         title={!app_viz_2_install_url
-                            ? `Not available in Browse More Apps — download ${app_viz_2_label || app_viz_2} from Splunkbase`
-                            : `Install ${app_viz_2_label || app_viz_2}`}>
+                            ? `Not available in Browse More Apps — download ${_appViz2Label} from Splunkbase`
+                            : `Install ${_appViz2Label}`}>
                         Install App 2
                     </a>
                 )}
@@ -4752,7 +4771,7 @@ function ProductCard({ product, installedApps, appStatuses, indexerApps, sourcet
                             <button className="csc-btn csc-btn-green" onClick={handleLaunchApp}
                                 title={product.custom_dashboard
                                     ? `Launch custom: ${product.custom_dashboard}`
-                                    : `Launch ${app_viz_label || addon_label || addon}`}>
+                                    : `Launch ${_appVizLabel || _addonLabel}`}>
                                 Launch
                             </button>
                             <button
@@ -4773,7 +4792,7 @@ function ProductCard({ product, installedApps, appStatuses, indexerApps, sourcet
                                         <button className="csc-launch-menu-item" onClick={() => { handleLaunchDefault(); setLaunchMenuOpen(false); }}>
                                             {productDashboards[0]
                                                 ? productDashboards[0].replace(/_/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase())
-                                                : (app_viz_label || addon_label || 'Default Dashboard')}
+                                                : (_appVizLabel || _addonLabel || 'Default Dashboard')}
                                         </button>
                                     )}
                                     <div className="csc-launch-menu-divider" />
@@ -4953,7 +4972,7 @@ function ProductCard({ product, installedApps, appStatuses, indexerApps, sourcet
                 sc4sSourcetypes: sc4s_sourcetypes,
                 companionTa: hasDifferentSc4sTa && sc4s_search_head_ta ? {
                     name: sc4s_search_head_ta,
-                    label: sc4s_search_head_ta_label,
+                    label: _sc4sLabel,
                     splunkbaseId: sc4s_search_head_ta_splunkbase_id,
                     installed: sc4sShTaStatus?.installed || false,
                     version: sc4sShTaStatus?.version || '',
@@ -4963,14 +4982,14 @@ function ProductCard({ product, installedApps, appStatuses, indexerApps, sourcet
             {netflow_supported && <NetFlowInfoModal open={netflowInfoOpen} onClose={() => setNetflowInfoOpen(false)} installedApps={installedApps} productContext={{
                 displayName: display_name,
                 netflowAddon: netflow_addon,
-                netflowAddonLabel: netflow_addon_label,
+                netflowAddonLabel: _netflowLabel,
                 netflowAddonSplunkbaseId: netflow_addon_splunkbase_id,
                 netflowAddonDocsUrl: netflow_addon_docs_url,
                 netflowAddonStatus: netflowAddonStatus,
                 netflowConfigNotes: netflow_config_notes,
             }} />}
             <HFInfoModal open={hfInfoOpen} onClose={() => setHfInfoOpen(false)} isCloud={platformType === 'cloud'} />
-            <MagicEightModal open={magicEightOpen} onClose={() => setMagicEightOpen(false)} sourcetypes={product.sourcetypes} productName={display_name} addonApp={addon} addonLabel={addon_label} appViz={app_viz} appViz2={app_viz_2} installedApps={installedApps} indexerApps={indexerApps} />
+            <MagicEightModal open={magicEightOpen} onClose={() => setMagicEightOpen(false)} sourcetypes={product.sourcetypes} productName={display_name} addonApp={addon} addonLabel={_addonLabel} appViz={app_viz} appViz2={app_viz_2} installedApps={installedApps} indexerApps={indexerApps} />
             {hasSoar && <SOARInfoModal open={soarInfoOpen} onClose={() => setSoarInfoOpen(false)} soarConnectorUids={soar_connector_uids} splunkbaseData={splunkbaseData} productName={display_name} />}
             {hasItops && <ITOpsContentModal open={itopsInfoOpen} onClose={() => setItopsInfoOpen(false)} itsiContentPack={itsi_content_pack} iteLearnContent={product.ite_learn_content} iteLearnProcedures={product.ite_learn_procedures} iteLearnProcedureCount={product.ite_learn_procedure_count} productName={display_name} installedApps={installedApps} />}
             {hasSecops && <SecOpsContentModal open={secopsInfoOpen} onClose={() => setSecopsInfoOpen(false)} productName={display_name} esCompatible={es_compatible} cimDataModels={es_cim_data_models} escuStories={escu_analytic_stories} escuDetectionCount={escu_detection_count} escuDetections={escu_detections} sseContent={product.sse_content} sseUseCases={product.sse_use_cases} sseUseCaseCount={product.sse_use_case_count} installedApps={installedApps} />}
@@ -5009,7 +5028,6 @@ function toSplunkConf(data) {
             'gtm_pillar',
             'sc4s_url', 'sc4s_label', 'sc4s_search_head_ta', 'sc4s_search_head_ta_label',
             'sc4s_search_head_ta_splunkbase_id',
-            'sc4s_search_head_ta_install_url',
         ];
         for (const f of SCALAR_FIELDS) {
             const v = p[f];
@@ -6503,7 +6521,7 @@ function FilterDrawer({
                 if (p.sc4s_supported) { sc4sOnly++; } else { standalone++; }
                 return;
             }
-            if (!map[p.addon]) map[p.addon] = { label: p.addon_label || p.addon, folder: p.addon, uid: p.addon_splunkbase_uid || '', count: 0 };
+            if (!map[p.addon]) map[p.addon] = { label: resolveLabel(p.addon_splunkbase_uid, p.addon_label, p.addon, splunkbaseData), folder: p.addon, uid: p.addon_splunkbase_uid || '', count: 0 };
             map[p.addon].count++;
         });
         const entries = Object.entries(map)
@@ -6511,7 +6529,7 @@ function FilterDrawer({
         if (sc4sOnly > 0) entries.push(['__sc4s__', { label: 'SC4S Only', count: sc4sOnly }]);
         if (standalone > 0) entries.push(['__standalone__', { label: 'Standalone', count: standalone }]);
         return entries;
-    }, [preAddonProducts]);
+    }, [preAddonProducts, splunkbaseData]);
 
     const isCrossCutting = (cat) => ['soar', 'alert_actions', 'secure_networking', 'secops', 'itops', 'sc4s', 'netflow'].includes(cat);
     const addonTotal = (preAddonProducts || []).length;
@@ -6995,7 +7013,7 @@ function ActiveFilterChips({
  * Shows each unique addon with a product count.  "Standalone" catches
  * products whose addon field is empty.
  */
-function AddonFilterBar({ selectedAddon, onSelectAddon, products }) {
+function AddonFilterBar({ selectedAddon, onSelectAddon, products, splunkbaseData }) {
     const [open, setOpen] = useState(false);
     const ref = useRef(null);
 
@@ -7009,7 +7027,7 @@ function AddonFilterBar({ selectedAddon, onSelectAddon, products }) {
                 else { standalone++; }
                 return;
             }
-            if (!map[p.addon]) map[p.addon] = { label: p.addon_label || p.addon, folder: p.addon, uid: p.addon_splunkbase_uid || '', count: 0 };
+            if (!map[p.addon]) map[p.addon] = { label: resolveLabel(p.addon_splunkbase_uid, p.addon_label, p.addon, splunkbaseData), folder: p.addon, uid: p.addon_splunkbase_uid || '', count: 0 };
             map[p.addon].count++;
         });
         // Sort by count desc, then alphabetical
@@ -7018,7 +7036,7 @@ function AddonFilterBar({ selectedAddon, onSelectAddon, products }) {
         if (sc4sOnly > 0) entries.push(['__sc4s__', { label: 'Splunk Connect for Syslog (SC4S)', count: sc4sOnly }]);
         if (standalone > 0) entries.push(['__standalone__', { label: 'Standalone', count: standalone }]);
         return entries;          // [[ addonId, { label, folder, uid, count }], …]
-    }, [products]);
+    }, [products, splunkbaseData]);
 
     // Close on outside click
     useEffect(() => {
@@ -8184,12 +8202,11 @@ function SCANProductsPage() {
     /* Addon label for active chip display */
     const activeAddonLabel = useMemo(() => {
         if (!selectedAddon || !preAddonProducts) return '';
-        // Derive label from a product that has this addon
         if (selectedAddon === '__standalone__') return 'Standalone';
         if (selectedAddon === '__sc4s__') return 'SC4S Only';
         const match = preAddonProducts.find(p => p.addon === selectedAddon);
-        return match ? (match.addon_label || match.addon) : selectedAddon;
-    }, [selectedAddon, preAddonProducts]);
+        return match ? resolveLabel(match.addon_splunkbase_uid, match.addon_label, match.addon, splunkbaseData) : selectedAddon;
+    }, [selectedAddon, preAddonProducts, splunkbaseData]);
 
     // ── Section assignment ──
     // Products are split into mutually exclusive sections in priority order.
@@ -8823,7 +8840,7 @@ function SCANProductsPage() {
                                 type: 'addon_outdated',
                                 product: p,
                                 title: `${pName}: add-on update available`,
-                                detail: `${p.addon_label || p.addon} v${status.version || '?'} is installed — v${status.updateVersion} is available. Updating ensures the latest CIM mappings, bug fixes, and security patches.`,
+                                detail: `${resolveLabel(p.addon_splunkbase_uid, p.addon_label, p.addon, splunkbaseData)} v${status.version || '?'} is installed — v${status.updateVersion} is available. Updating ensures the latest CIM mappings, bug fixes, and security patches.`,
                             });
                         }
                     }
@@ -8839,7 +8856,7 @@ function SCANProductsPage() {
                         });
                         if (legacyAddonFound.length > 0) {
                             const names = legacyAddonFound.map(uid => { const sb = splunkbaseData[uid]; return sb ? (sb.appid || uid) : uid; });
-                            const currentLabel = p.addon_label || p.addon;
+                            const currentLabel = resolveLabel(p.addon_splunkbase_uid, p.addon_label, p.addon, splunkbaseData);
                             issues.push({
                                 severity: 'warning',
                                 type: 'legacy_detected',
@@ -8852,7 +8869,7 @@ function SCANProductsPage() {
                         if (legacyVizFound.length > 0) {
                             const names = legacyVizFound.map(uid => { const sb = splunkbaseData[uid]; return sb ? (sb.appid || uid) : uid; });
                             const vizInstalled = p.app_viz && installedApps[p.app_viz];
-                            const currentLabel = p.app_viz_label || p.app_viz;
+                            const currentLabel = resolveLabel(p.app_viz_splunkbase_uid, p.app_viz_label, p.app_viz, splunkbaseData);
                             issues.push({
                                 severity: 'warning',
                                 type: 'legacy_detected',
@@ -8956,10 +8973,10 @@ function SCANProductsPage() {
                                                             rel="noopener noreferrer"
                                                             className="csc-issue-action-link"
                                                         >
-                                                            Install {p.addon_label || p.addon} {'\u2197'}
+                                                            Install {resolveLabel(p.addon_splunkbase_uid, p.addon_label, p.addon, splunkbaseData)} {'\u2197'}
                                                         </a>
                                                     ) : (
-                                                        <span className="csc-issue-action-text">Install {p.addon_label || p.addon} from Splunkbase</span>
+                                                        <span className="csc-issue-action-text">Install {resolveLabel(p.addon_splunkbase_uid, p.addon_label, p.addon, splunkbaseData)} from Splunkbase</span>
                                                     );
                                                 })()}
                                                 {issue.type === 'configured_no_data' && (
@@ -8980,7 +8997,7 @@ function SCANProductsPage() {
                                                             Update Add-on v{appStatuses[p.addon]?.updateVersion} {'\u2197'}
                                                         </a>
                                                     ) : (
-                                                        <span className="csc-issue-action-text">Update {p.addon_label || p.addon} from Splunkbase</span>
+                                                        <span className="csc-issue-action-text">Update {resolveLabel(p.addon_splunkbase_uid, p.addon_label, p.addon, splunkbaseData)} from Splunkbase</span>
                                                     );
                                                 })()}
                                                 {issue.type === 'legacy_detected' && (

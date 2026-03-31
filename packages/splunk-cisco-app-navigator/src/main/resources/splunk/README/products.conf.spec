@@ -8,6 +8,10 @@
 
 [<product_id>]
 
+disabled = true | false
+* When true, this product stanza is hidden from the UI entirely.
+* Default: false.
+
 display_name = <string>
 * Card title displayed to the user.
 
@@ -197,6 +201,12 @@ legacy_uids = <comma-separated list>
 * Splunkbase numeric app IDs for legacy, predecessor, and community/third-party
 * apps (e.g. "1808,3662,5543"). One list for all; no separate community_uids.
 * Used to construct links: https://splunkbase.splunk.com/app/<uid>
+
+legacy_viz_uids = <comma-separated list>
+* Splunkbase numeric app IDs for legacy visualization / dashboard apps that have
+* been superseded by the current app_viz. Separate from legacy_uids so the UI
+* can show "Legacy Apps" instead of "Legacy Add-ons" for these entries.
+* Example: 6657
 
 legacy_urls = <comma-separated list>
 * Splunkbase URLs parallel to legacy_apps.
@@ -413,17 +423,9 @@ sc4s_search_head_ta_label = <string>
 * Example: Splunk Add-on for Cisco ISE
 * Default: (empty).
 
-sc4s_search_head_ta_splunkbase_url = <url>
-* Splunkbase URL for the SC4S search-head TA.
-* Default: (empty).
-
 sc4s_search_head_ta_splunkbase_id = <string>
 * Splunkbase app ID number for the SC4S search-head TA.
 * Example: 1915
-* Default: (empty).
-
-sc4s_search_head_ta_install_url = <url>
-* Deep-link install URL for the SC4S search-head TA.
 * Default: (empty).
 
 sc4s_sourcetypes = <comma-separated list>
@@ -458,17 +460,9 @@ netflow_addon_label = <string>
 * Example: Cisco Catalyst Enhanced Netflow Add-on for Splunk
 * Default: (empty).
 
-netflow_addon_splunkbase_url = <url>
-* Splunkbase URL for the NetFlow add-on.
-* Default: (empty).
-
 netflow_addon_splunkbase_id = <string>
 * Splunkbase app ID number for the NetFlow add-on.
 * Example: 6872
-* Default: (empty).
-
-netflow_addon_install_url = <url>
-* Deep-link install URL for the NetFlow add-on within the Splunk App Manager.
 * Default: (empty).
 
 netflow_addon_docs_url = <url>

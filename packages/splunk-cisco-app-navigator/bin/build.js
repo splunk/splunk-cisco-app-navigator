@@ -73,6 +73,29 @@ function stampBuildHash() {
   console.log(`\x1b[36m[build-stamp]\x1b[0m build = ${buildHash}`);
 }
 
+// --- Pre-build: sync app.manifest version from app.conf ---
+function stampManifest() {
+  const appConfPath = path.join(pkgRoot, 'src/main/resources/splunk/default/app.conf');
+  const manifestPath = path.join(pkgRoot, 'src/main/resources/splunk/app.manifest');
+  if (!fs.existsSync(manifestPath) || !fs.existsSync(appConfPath)) return;
+
+  const appConf = fs.readFileSync(appConfPath, 'utf8');
+  const vMatch = appConf.match(/\[id\][\s\S]*?version\s*=\s*(\S+)/m);
+  if (!vMatch) return;
+  const appVersion = vMatch[1].trim();
+
+  const manifest = JSON.parse(fs.readFileSync(manifestPath, 'utf8'));
+  const oldVersion = manifest.info && manifest.info.id && manifest.info.id.version;
+  if (oldVersion === appVersion) {
+    console.log(`\x1b[36m[build-stamp]\x1b[0m app.manifest version = ${oldVersion} (unchanged, skipping)`);
+    return;
+  }
+
+  manifest.info.id.version = appVersion;
+  fs.writeFileSync(manifestPath, JSON.stringify(manifest, null, 2) + '\n', 'utf8');
+  console.log(`\x1b[36m[build-stamp]\x1b[0m app.manifest version: ${oldVersion} → ${appVersion}`);
+}
+
 // --- Post-build: clear Splunk cache & refresh UI ---
 function postBuildRefresh() {
   const splunkHome = process.env.SPLUNK_HOME || '/opt/splunk';
@@ -128,6 +151,8 @@ function postBuildRefresh() {
 if (cmd === 'build') {
   // 0. Stamp build hash in app.conf (git short hash or date fallback)
   stampBuildHash();
+  // 0a. Sync app.manifest version from app.conf
+  stampManifest();
   // 0b. Stamp products.conf line 1 (date/time) and min_app_version from app.conf
   stampProductsConf();
   // 1. Generate static catalog from products.conf
