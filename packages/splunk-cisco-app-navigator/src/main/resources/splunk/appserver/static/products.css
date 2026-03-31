@@ -73,14 +73,14 @@
      Semantic palette: 90% neutrals, 10% brand color.       */
 :root {
     /* ── Semantic Palette ── */
-    --bg-primary: #f2f5f7;
-    --bg-secondary: #e8ebee;
+    --bg-primary: #f4f4f4;
+    --bg-secondary: #eeeeee;
     --bg-surface: #ffffff;
-    --text-primary: #314257;
-    --text-secondary: #536070;
-    --text-tertiary: #667180;
-    --border-light: #E1E6EB;
-    --border-medium: #CED4DB;
+    --text-primary: #342f2c;
+    --text-secondary: #5a5450;
+    --text-tertiary: #736d68;
+    --border-light: #e3ddd8;
+    --border-medium: #d2cbc5;
     --color-primary: #0A60FF;
     --color-primary-hover: #02C8FF;
     --color-success: #3D851C;
@@ -90,7 +90,7 @@
     /* ── Backward-compat aliases ── */
     --page-bg: var(--bg-primary);
     --page-color: var(--text-primary);
-    --heading-color: #07182D;
+    --heading-color: #1c1816;
     --subtitle-color: var(--text-secondary);
     --muted-color: var(--text-secondary);
     --faint-color: var(--text-tertiary);
@@ -98,15 +98,15 @@
     --italic-muted: var(--text-tertiary);
     --card-bg: var(--bg-surface);
     --card-border: var(--border-light);
-    --card-shadow: none;
-    --card-shadow-hover: none;
+    --card-shadow: 0 1px 3px rgba(0,0,0,0.06), 0 4px 12px rgba(0,0,0,0.04);
+    --card-shadow-hover: 0 6px 20px rgba(0,0,0,0.10), 0 2px 6px rgba(0,0,0,0.06);
     --card-header-bg: var(--bg-surface);
     --card-body-bg: var(--bg-surface);
     --card-footer-bg: var(--bg-primary);
     --card-footer-border: var(--border-light);
     --card-desc-color: var(--text-secondary);
-    --section-bg: var(--bg-primary);
-    --section-alt-bg: var(--bg-secondary);
+    --section-bg: var(--bg-secondary);
+    --section-alt-bg: var(--bg-primary);
     --section-border: var(--border-medium);
     --pill-divider: var(--border-medium);
     --version-bg: var(--bg-secondary);
@@ -118,7 +118,7 @@
     --code-bg: var(--bg-secondary);
     --custom-tip-bg: rgba(10,96,255,0.04);
     --icon-fill: var(--bg-surface);
-    --spinner-overlay-bg: rgba(242,245,247,0.7);
+    --spinner-overlay-bg: rgba(244,244,244,0.7);
     --spinner-text: var(--text-primary);
 
     /* ── Semantic status backgrounds (pale, ~6-8% opacity) ── */
@@ -126,23 +126,23 @@
     --status-warning-border: rgba(255,144,0,0.25);
     --status-info-bg: rgba(10,96,255,0.06);
     --status-info-border: rgba(10,96,255,0.25);
-    --status-neutral-bg: #f5f5f5;
-    --status-neutral-border: #CED4DB;
+    --status-neutral-bg: #f3f0ed;
+    --status-neutral-border: #d2cbc5;
 }
 
 /* --- Dark Theme Overrides ---
      .dce-dark is toggled on <html> by the React component so that
      both .products-page AND portal-rendered modals inherit dark vars. */
 :root.dce-dark {
-    /* ── Semantic Palette (dark) ── */
-    --bg-primary: #1a1f24;
-    --bg-secondary: #1a2228;
-    --bg-surface: #1e262c;
-    --text-primary: #d4d4d4;
-    --text-secondary: #a0aab0;
-    --text-tertiary: #9ca3af;
-    --border-light: #333d44;
-    --border-medium: #444e56;
+    /* ── Semantic Palette (dark, warm) ── */
+    --bg-primary: #1c1a18;
+    --bg-secondary: #22201e;
+    --bg-surface: #262320;
+    --text-primary: #d6d2cf;
+    --text-secondary: #aaa5a0;
+    --text-tertiary: #9a9590;
+    --border-light: #3a3632;
+    --border-medium: #4a4540;
     --color-primary: #0A60FF;
     --color-primary-hover: #02C8FF;
     --color-success: #3D851C;
@@ -160,27 +160,27 @@
     --italic-muted: #888;
     --card-bg: var(--bg-surface);
     --card-border: var(--border-light);
-    --pill-divider: #5a6570;
+    --pill-divider: #5a5550;
     --card-shadow: none;
     --card-shadow-hover: none;
     --card-header-bg: var(--bg-surface);
     --card-body-bg: var(--bg-surface);
-    --card-footer-bg: #232d34;
-    --card-footer-border: #2a353d;
-    --card-desc-color: #b0b0b0;
+    --card-footer-bg: #2a2724;
+    --card-footer-border: #322f2c;
+    --card-desc-color: #b0aba6;
     --section-bg: var(--bg-surface);
     --section-alt-bg: var(--bg-secondary);
     --section-border: var(--border-light);
     --custom-tip-bg: #1b3a1f;
-    --version-bg: #2a353d;
-    --version-color: #a0a0a0;
+    --version-bg: #302d2a;
+    --version-color: #a09b96;
     --modal-bg: var(--bg-surface);
     --modal-color: var(--text-primary);
     --input-border: var(--border-medium);
-    --input-bg: #232d34;
-    --code-bg: #2a353d;
-    --icon-fill: #162430;
-    --spinner-overlay-bg: rgba(23,29,33,0.8);
+    --input-bg: #2a2724;
+    --code-bg: #302d2a;
+    --icon-fill: #1e1a16;
+    --spinner-overlay-bg: rgba(28,26,24,0.8);
     --spinner-text: var(--text-primary);
 
     /* ── Semantic status backgrounds (dark) ── */
@@ -188,8 +188,8 @@
     --status-warning-border: rgba(255,144,0,0.3);
     --status-info-bg: rgba(10,96,255,0.08);
     --status-info-border: rgba(2,200,255,0.2);
-    --status-neutral-bg: #1e2428;
-    --status-neutral-border: #3a4048;
+    --status-neutral-bg: #242220;
+    --status-neutral-border: #403c38;
 }
 
 /* Body / Splunk chrome background — scoped to the app content area only.
@@ -426,10 +426,10 @@ html.dce-dark [data-view="views/shared/Page"] {
     padding: 5px 14px !important;
     margin: 2px 0 12px 0 !important;
     background: #ffffff !important;
-    border: 1px solid #CED4DB !important;
+    border: 1px solid #d2cbc5 !important;
     border-radius: 8px !important;
     min-height: 32px !important;
-    color: #314257 !important;
+    color: #342f2c !important;
 }
 :root.dce-dark .scan-utility-strip {
     background: #1e262c !important;
@@ -463,8 +463,8 @@ html.dce-dark [data-view="views/shared/Page"] {
 /* Dev mode info pill — platform + Splunk version + SCAN version + build */
 .scan-util-devinfo {
     color: #07182D !important;
-    background: #f2f5f7 !important;
-    border-color: #CED4DB !important;
+    background: #f4f4f4 !important;
+    border-color: #d2cbc5 !important;
     cursor: default;
     font-size: 11px;
     font-variant-numeric: tabular-nums;
@@ -476,7 +476,7 @@ html.dce-dark [data-view="views/shared/Page"] {
 }
 .scan-util-devinfo-sep {
     margin: 0 5px;
-    color: #CED4DB;
+    color: #d2cbc5;
     font-weight: 300;
 }
 :root.dce-dark .scan-util-devinfo-sep {
@@ -494,7 +494,7 @@ html.dce-dark [data-view="views/shared/Page"] {
 .scan-util-splunk-ver {
     font-weight: 400;
     font-size: 11px;
-    color: #667180;
+    color: #736d68;
     margin-left: 2px;
     opacity: 0.85;
 }
@@ -507,7 +507,7 @@ html.dce-dark [data-view="views/shared/Page"] {
     display: inline-block;
     width: 1px;
     height: 16px;
-    background: #CED4DB;
+    background: #d2cbc5;
     margin: 0 2px;
     flex-shrink: 0;
 }
@@ -567,8 +567,8 @@ html.dce-dark [data-view="views/shared/Page"] {
 /* Theme pill */
 .scan-util-theme {
     color: #07182D !important;
-    background: #f2f5f7 !important;
-    border-color: #CED4DB !important;
+    background: #f4f4f4 !important;
+    border-color: #d2cbc5 !important;
     cursor: pointer;
     font-weight: 600 !important;
     padding: 3px 12px 3px 8px !important;
@@ -976,7 +976,7 @@ html.dce-dark [data-view="views/shared/Page"] {
 #gtm_coverage_gaps,
 #custom_products,
 #vault_products {
-    margin-bottom: 24px;
+    margin-bottom: 4px;
     border: 1px solid #E5E7EB !important;
     border-left: none !important;
     box-shadow: none !important;
@@ -1125,22 +1125,41 @@ html.dce-dark [data-view="views/shared/Page"] {
     .csc-card-grid { grid-template-columns: 1fr; }
 }
 
-/* ===== CSC Card (clean, minimal depth) ===== */
+/* ===== CSC Card (3D depth — CSS diagonal bands + shadow) ===== */
 .csc-card {
     position: relative;
     overflow: visible;
-    background: #ffffff;
-    border: 1px solid #E1E6EB !important;
-    border-radius: 10px !important;
+    background:
+        linear-gradient(135deg,
+            rgba(255,255,255,0)    0%,
+            rgba(220,218,215,0.35) 8%,
+            rgba(255,255,255,0.7)  16%,
+            rgba(210,208,204,0.25) 26%,
+            rgba(255,255,255,0.6)  36%,
+            rgba(225,222,218,0.3)  46%,
+            rgba(255,255,255,0.5)  56%,
+            rgba(215,212,208,0.2)  68%,
+            rgba(255,255,255,0.4)  80%,
+            rgba(220,218,215,0.15) 90%,
+            rgba(255,255,255,0)   100%
+        ),
+        linear-gradient(180deg, #ffffff 0%, #fafaf8 100%) !important;
+    border: 1px solid rgba(0, 0, 0, 0.08) !important;
+    border-radius: 12px !important;
     display: flex;
     flex-direction: column;
-    box-shadow: none !important;
-    transition: box-shadow 0.25s ease, transform 0.25s ease;
+    box-shadow:
+        rgba(0, 0, 0, 0.18) 0px 1px 5px,
+        rgba(0, 0, 0, 0.15) 0px 0px 1px !important;
+    transition: box-shadow 0.3s ease, transform 0.3s ease, border-color 0.3s ease;
 }
 
 .csc-card:hover {
-    box-shadow: 0 2px 8px rgba(0,0,0,0.06);
-    transform: translateY(-2px);
+    box-shadow:
+        rgba(0, 0, 0, 0.22) 0px 4px 14px,
+        rgba(0, 0, 0, 0.18) 0px 1px 4px !important;
+    transform: translateY(-3px);
+    border-color: #02C8FF !important;
     z-index: 50;
 }
 
@@ -1422,7 +1441,7 @@ html.dce-dark [data-view="views/shared/Page"] {
     white-space: nowrap;
     border: none;
     background: #F2F5F7;
-    color: #536070;
+    color: #5a5450;
     cursor: pointer;
     transition: background 0.15s ease;
 }
@@ -1598,11 +1617,11 @@ html.dce-dark [data-view="views/shared/Page"] {
     background:
         linear-gradient(135deg,
             transparent 0%, transparent 50%,
-            var(--border-medium, #CED4DB) 50%, var(--border-medium, #CED4DB) 55%,
+            var(--border-medium, #d2cbc5) 50%, var(--border-medium, #d2cbc5) 55%,
             transparent 55%, transparent 65%,
-            var(--border-medium, #CED4DB) 65%, var(--border-medium, #CED4DB) 70%,
+            var(--border-medium, #d2cbc5) 65%, var(--border-medium, #d2cbc5) 70%,
             transparent 70%, transparent 80%,
-            var(--border-medium, #CED4DB) 80%, var(--border-medium, #CED4DB) 85%,
+            var(--border-medium, #d2cbc5) 80%, var(--border-medium, #d2cbc5) 85%,
             transparent 85%);
     border-radius: 0 0 8px 0;
     opacity: 0.6;
@@ -1635,9 +1654,9 @@ html.dce-dark [data-view="views/shared/Page"] {
     border-radius: 12px;
     font-size: 12px;
     font-weight: 600;
-    background: var(--bg-primary, #f2f5f7);
-    color: var(--text-primary, #314257);
-    border: 1px solid var(--border-light, #E1E6EB);
+    background: var(--bg-primary, #f4f4f4);
+    color: var(--text-primary, #342f2c);
+    border: 1px solid var(--border-light, #e3ddd8);
     white-space: nowrap;
 }
 :root.dce-dark .csc-es-cim-pill {
@@ -1656,8 +1675,8 @@ html.dce-dark [data-view="views/shared/Page"] {
     gap: 8px;
     padding: 6px 10px;
     border-radius: 6px;
-    background: var(--bg-primary, #f2f5f7);
-    border: 1px solid var(--border-light, #E1E6EB);
+    background: var(--bg-primary, #f4f4f4);
+    border: 1px solid var(--border-light, #e3ddd8);
     font-size: 13px;
     font-weight: 600;
 }
@@ -1679,25 +1698,25 @@ html.dce-dark [data-view="views/shared/Page"] {
 .csc-es-detection-list li {
     padding: 4px 0;
     font-size: 12.5px;
-    border-bottom: 1px solid var(--border-light, #E1E6EB);
-    color: var(--text-primary, #314257);
+    border-bottom: 1px solid var(--border-light, #e3ddd8);
+    color: var(--text-primary, #342f2c);
 }
 :root.dce-dark .csc-es-detection-list li {
     border-bottom-color: var(--border-light);
 }
 .csc-es-detection-list li::before {
     content: "▸ ";
-    color: var(--text-secondary, #536070);
+    color: var(--text-secondary, #5a5450);
     font-weight: 700;
 }
 .csc-es-show-all-btn {
     display: inline-block;
     margin-top: 8px;
     padding: 4px 12px;
-    border: 1px solid var(--border-light, #E1E6EB);
+    border: 1px solid var(--border-light, #e3ddd8);
     border-radius: 4px;
-    background: var(--bg-primary, #f2f5f7);
-    color: var(--text-primary, #314257);
+    background: var(--bg-primary, #f4f4f4);
+    color: var(--text-primary, #342f2c);
     font-size: 12px;
     font-weight: 600;
     cursor: pointer;
@@ -1796,12 +1815,12 @@ html.dce-dark [data-view="views/shared/Page"] {
     margin: 8px 20px 0;
     font-size: 12.5px;
     line-height: 1.5;
-    color: #536070;
+    color: #5a5450;
     font-weight: 500;
     font-style: italic;
     padding: 6px 10px;
     background: #F2F5F7;
-    border-left: 3px solid #CED4DB;
+    border-left: 3px solid #d2cbc5;
     border-radius: 0 4px 4px 0;
 }
 :root.dce-dark .csc-card-value-prop {
@@ -1921,7 +1940,7 @@ html.dce-dark [data-view="views/shared/Page"] {
 }
 
 .csc-btn-outline:hover {
-    background: #f2f5f7;
+    background: #f4f4f4;
     border-color: #a1a9b2;
     color: #606C7A;
     text-decoration: none;
@@ -1930,7 +1949,7 @@ html.dce-dark [data-view="views/shared/Page"] {
 /* View full legacy audit — primary hint a bit stronger so it reads as the main action */
 .csc-btn-legacy-audit {
     background: var(--status-info-bg, rgba(10, 96, 255, 0.1));
-    color: var(--text-secondary, #536070);
+    color: var(--text-secondary, #5a5450);
     border: 1px solid rgba(10, 96, 255, 0.3);
 }
 .csc-btn-legacy-audit:hover {
@@ -1952,13 +1971,31 @@ html.dce-dark [data-view="views/shared/Page"] {
 /* Legacy & Compatibility section summary tag — subtle blue tint to match the audit button */
 .csc-dp-tag-legacy-compat {
     background: rgba(10, 96, 255, 0.08);
-    color: var(--text-secondary, #536070);
+    color: var(--text-secondary, #5a5450);
     border: 1px solid rgba(10, 96, 255, 0.2);
 }
 :root.dce-dark .csc-dp-tag-legacy-compat {
     background: rgba(10, 96, 255, 0.1);
     color: var(--text-secondary);
     border-color: rgba(10, 96, 255, 0.25);
+}
+/* Legacy warning state — when legacy add-on(s) are actually installed */
+.csc-dp-tag-legacy-warn {
+    background: rgba(245, 158, 11, 0.12);
+    color: #92400E;
+    border: 1px solid rgba(245, 158, 11, 0.35);
+    font-weight: 650;
+}
+:root.dce-dark .csc-dp-tag-legacy-warn {
+    background: rgba(245, 158, 11, 0.15);
+    color: #FCD34D;
+    border-color: rgba(245, 158, 11, 0.3);
+}
+.csc-section-legacy-warn > .csc-dep-details-summary {
+    color: #92400E;
+}
+:root.dce-dark .csc-section-legacy-warn > .csc-dep-details-summary {
+    color: #FCD34D;
 }
 
 .csc-btn-green {
@@ -2199,7 +2236,6 @@ html.dce-dark [data-view="views/shared/Page"] {
     color: #ef9a9a;
 }
 :root.dce-dark .csc-card {
-    background: var(--card-bg);
     border-color: var(--card-border) !important;
 }
 :root.dce-dark .csc-card-name [data-test="tooltip"] svg,
@@ -2402,7 +2438,6 @@ html.dce-dark [data-view="views/shared/Page"] {
     padding: 6px 16px;
     font-size: 12px;
     line-height: 1.4;
-    margin-top: auto;
 }
 
 /* Collapsible summary row */
@@ -2595,11 +2630,11 @@ html.dce-dark [data-view="views/shared/Page"] {
 }
 .scan-magic6-allgood {
     padding: 10px 14px;
-    background: var(--bg-primary, #f2f5f7);
-    border: 1px solid var(--border-light, #E1E6EB);
+    background: var(--bg-primary, #f4f4f4);
+    border: 1px solid var(--border-light, #e3ddd8);
     border-left: 3px solid var(--color-success, #3D851C);
     border-radius: 8px;
-    color: var(--text-primary, #314257);
+    color: var(--text-primary, #342f2c);
     font-size: 13px;
     font-weight: 600;
     margin-bottom: 12px;
@@ -2642,7 +2677,7 @@ html.dce-dark [data-view="views/shared/Page"] {
     white-space: nowrap;
 }
 .scan-magic6-th-sort:hover {
-    color: #314257;
+    color: #342f2c;
     background: rgba(0, 0, 0, 0.02);
 }
 :root.dce-dark .scan-magic6-th-st,
@@ -2684,7 +2719,7 @@ html.dce-dark [data-view="views/shared/Page"] {
     border-bottom-color: rgba(243, 244, 246, 0.08);
 }
 .scan-magic6-ok {
-    color: var(--text-primary, #314257);
+    color: var(--text-primary, #342f2c);
     background: transparent;
 }
 :root.dce-dark .scan-magic6-ok {
@@ -2731,7 +2766,7 @@ html.dce-dark [data-view="views/shared/Page"] {
 .scan-sc4s-inline-label {
     font-size: 11px;
     font-weight: 700;
-    color: var(--text-primary, #314257);
+    color: var(--text-primary, #342f2c);
     text-transform: uppercase;
     letter-spacing: 0.3px;
 }
@@ -2748,8 +2783,8 @@ html.dce-dark [data-view="views/shared/Page"] {
 }
 .scan-sc4s-ta-note {
     font-size: 10.5px;
-    background: var(--bg-primary, #f2f5f7);
-    border-left: 2px solid var(--border-medium, #CED4DB);
+    background: var(--bg-primary, #f4f4f4);
+    border-left: 2px solid var(--border-medium, #d2cbc5);
     padding: 4px 8px;
     margin: 2px 0;
     line-height: 1.4;
@@ -2807,9 +2842,39 @@ html.dce-dark [data-view="views/shared/Page"] {
     background: #126B1C;
 }
 .csc-dep-expanded {
-    margin-top: 6px;
+    margin-top: 0;
     padding-top: 6px;
     border-top: 1px solid var(--border-color, #e0e0e0);
+}
+
+/* Details toggle in footer */
+.csc-btn-details-toggle {
+    font-weight: 600;
+    letter-spacing: 0.2px;
+}
+.csc-btn-details-active {
+    background: #f4f4f4;
+    border-color: #a1a9b2;
+}
+:root.dce-dark .csc-btn-details-active {
+    background: var(--card-footer-bg);
+    border-color: var(--card-border);
+}
+
+/* Forwarder-only status label in NetFlow panel */
+.csc-dep-status-forwarder {
+    display: inline-block;
+    padding: 1px 6px;
+    border-radius: 3px;
+    font-size: 10px;
+    font-weight: 600;
+    background: #e8eaed;
+    color: #5f6368;
+    letter-spacing: 0.2px;
+}
+:root.dce-dark .csc-dep-status-forwarder {
+    background: #3c4043;
+    color: #9aa0a6;
 }
 
 /* ── Support Level Badge ── */
@@ -2934,7 +2999,7 @@ html.dce-dark [data-view="views/shared/Page"] {
     font-family: 'CiscoSansTT', 'Splunk Platform Sans', sans-serif;
 }
 .csc-subcategory-pill:hover {
-    border-color: #314257;
+    border-color: #342f2c;
     background: rgba(49, 66, 87, 0.06);
 }
 .csc-subcategory-pill-active {
@@ -2979,7 +3044,7 @@ html.dce-dark [data-view="views/shared/Page"] {
     background: rgba(255, 255, 255, 0.18);
 }
 :root.dce-dark .csc-subcategory-pill-active .csc-subcategory-count {
-    background: #e8ebee;
+    background: #eeeeee;
     color: #1a1f24;
 }
 
@@ -3429,6 +3494,13 @@ html.dce-dark [data-view="views/shared/Page"] {
 :root.dce-dark .csc-section-legacy-compat.csc-dep-details[open] > .csc-dep-details-body {
     border-left-color: rgba(2, 200, 255, 0.25);
 }
+/* Warning state border when legacy add-on is installed */
+.csc-section-legacy-warn.csc-dep-details[open] > .csc-dep-details-body {
+    border-left: 2px solid rgba(245, 158, 11, 0.4);
+}
+:root.dce-dark .csc-section-legacy-warn.csc-dep-details[open] > .csc-dep-details-body {
+    border-left-color: rgba(245, 158, 11, 0.35);
+}
 
 /* ── Compatibility rows inside card ── */
 .csc-compat-entry {
@@ -3711,7 +3783,7 @@ a.csc-dep-name-link:hover {
 .csc-badge-item:not(:last-child)::after {
     content: " · ";
     font-weight: 400;
-    color: var(--text-tertiary, #667180);
+    color: var(--text-tertiary, #736d68);
     margin-left: 2px;
 }
 
@@ -3956,7 +4028,7 @@ a.csc-dep-name-link:hover {
 .csc-dp-group-title {
     font-size: 11px;
     font-weight: 700;
-    color: var(--text-primary, #314257);
+    color: var(--text-primary, #342f2c);
     text-transform: uppercase;
     letter-spacing: 0.3px;
 }
@@ -3967,7 +4039,7 @@ a.csc-dep-name-link:hover {
     font-size: 11px;
     color: var(--muted-color, #666);
     padding: 3px 0 3px 10px;
-    border-left: 2px solid #CED4DB;
+    border-left: 2px solid #d2cbc5;
     margin: 2px 0;
 }
 :root.dce-dark .csc-dp-note {
@@ -3980,6 +4052,125 @@ a.csc-dep-name-link:hover {
 }
 .csc-dp-notes-list li {
     margin-bottom: 2px;
+}
+
+/* ── Slim Data Paths (card summary rows) ── */
+.csc-dp-slim-heading {
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--muted-color, #555);
+    text-transform: uppercase;
+    letter-spacing: 0.4px;
+    padding: 5px 0;
+    user-select: none;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+.csc-section-data-paths-slim {
+    padding: 4px 0 2px;
+}
+.csc-dp-slim-rows {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    margin-top: 6px;
+    padding-left: 2px;
+}
+.csc-dp-slim-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+.csc-dp-guide-btn {
+    margin-left: auto;
+    font-size: 11px !important;
+    padding: 2px 10px !important;
+}
+
+/* ── Modal "For This Product" context block ── */
+.scan-modal-product-context {
+    margin-bottom: 20px;
+    padding: 16px 20px;
+    background: var(--bg-primary, #f8f6f4);
+    border: 1px solid var(--border-light, #e3ddd8);
+    border-left: 3px solid var(--info-accent, #0A60FF);
+    border-radius: 6px;
+}
+.scan-modal-product-context h4 {
+    margin: 0 0 10px 0;
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--text-primary, #342f2c);
+    border-bottom: none;
+    padding-bottom: 0;
+}
+.scan-modal-pc-note {
+    margin: 0 0 8px 0;
+    font-size: 12.5px;
+    color: var(--text-secondary, #5a5450);
+    line-height: 1.5;
+}
+.scan-modal-pc-row {
+    display: flex;
+    align-items: baseline;
+    gap: 8px;
+    margin-bottom: 4px;
+    font-size: 12.5px;
+}
+.scan-modal-pc-label {
+    font-weight: 700;
+    color: var(--text-secondary, #5a5450);
+    white-space: nowrap;
+    min-width: 120px;
+}
+.scan-modal-pc-value {
+    color: var(--text-primary, #342f2c);
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 4px;
+}
+.scan-modal-pc-notes {
+    margin: 8px 0 6px 0;
+    padding-left: 18px;
+    font-size: 12px;
+    color: var(--text-secondary, #5a5450);
+    line-height: 1.6;
+}
+.scan-modal-pc-notes li {
+    margin-bottom: 3px;
+}
+.scan-modal-pc-link {
+    display: inline-block;
+    margin-top: 6px;
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--color-primary, #0A60FF);
+    text-decoration: none;
+}
+.scan-modal-pc-link:hover {
+    text-decoration: underline;
+}
+
+/* Dark mode overrides */
+:root.dce-dark .scan-modal-product-context {
+    background: rgba(255, 255, 255, 0.04);
+    border-color: rgba(255, 255, 255, 0.1);
+    border-left-color: var(--color-primary, #4d94ff);
+}
+:root.dce-dark .scan-modal-product-context h4 {
+    color: var(--text-primary);
+}
+:root.dce-dark .scan-modal-pc-label {
+    color: var(--text-secondary);
+}
+:root.dce-dark .scan-modal-pc-value {
+    color: var(--text-primary);
+}
+:root.dce-dark .scan-modal-pc-notes {
+    color: var(--text-secondary);
 }
 
 /* ===== Legacy App Hover Tooltip ===== */
@@ -4486,13 +4677,13 @@ body:has(.scan-drawer-open) .scan-feedback-tab {
 .csc-sc4s-info {
     font-size: 14px;
     line-height: 1.7;
-    color: var(--text-primary, #314257);
+    color: var(--text-primary, #342f2c);
 }
 /* Force ALL inline <code> inside info modals to neutral GitHub-style */
 .csc-sc4s-info code {
     background: #F2F5F7;
-    border: 1px solid #CED4DB;
-    color: #314257;
+    border: 1px solid #d2cbc5;
+    color: #342f2c;
     padding: 1px 6px;
     border-radius: 4px;
     font-size: 12px;
@@ -4513,7 +4704,7 @@ body:has(.scan-drawer-open) .scan-feedback-tab {
     background: var(--bg-surface, #ffffff);
     border-radius: 8px;
     margin-bottom: 24px;
-    border: 1px solid var(--border-light, #E1E6EB);
+    border: 1px solid var(--border-light, #e3ddd8);
 }
 .csc-sc4s-info-hero-icon {
     font-size: 48px;
@@ -4524,11 +4715,11 @@ body:has(.scan-drawer-open) .scan-feedback-tab {
     margin: 0 0 8px 0;
     font-size: 20px;
     font-weight: 700;
-    color: var(--text-primary, #314257);
+    color: var(--text-primary, #342f2c);
 }
 .csc-sc4s-info-hero-text p {
     margin: 0;
-    color: var(--text-secondary, #536070);
+    color: var(--text-secondary, #5a5450);
     font-size: 14px;
 }
 
@@ -4540,9 +4731,9 @@ body:has(.scan-drawer-open) .scan-feedback-tab {
     margin: 0 0 12px 0;
     font-size: 16px;
     font-weight: 700;
-    color: var(--text-primary, #314257);
+    color: var(--text-primary, #342f2c);
     padding-bottom: 6px;
-    border-bottom: 1px solid var(--border-light, #E1E6EB);
+    border-bottom: 1px solid var(--border-light, #e3ddd8);
 }
 
 /* Benefits grid */
@@ -4557,9 +4748,9 @@ body:has(.scan-drawer-open) .scan-feedback-tab {
     gap: 4px;
     padding: 16px;
     background: var(--bg-surface, #ffffff);
-    border: 1px solid var(--border-light, #E1E6EB);
+    border: 1px solid var(--border-light, #e3ddd8);
     border-radius: 8px;
-    border-left: 3px solid var(--info-accent, var(--border-medium, #CED4DB));
+    border-left: 3px solid var(--info-accent, var(--border-medium, #d2cbc5));
     transition: transform 0.15s ease;
 }
 .csc-sc4s-info-card:hover {
@@ -4571,11 +4762,11 @@ body:has(.scan-drawer-open) .scan-feedback-tab {
 }
 .csc-sc4s-info-card strong {
     font-size: 13px;
-    color: var(--text-primary, #314257);
+    color: var(--text-primary, #342f2c);
 }
 .csc-sc4s-info-card span:last-child {
     font-size: 12px;
-    color: var(--text-secondary, #536070);
+    color: var(--text-secondary, #5a5450);
     line-height: 1.5;
 }
 
@@ -4584,16 +4775,16 @@ body:has(.scan-drawer-open) .scan-feedback-tab {
     width: 100%;
     border-collapse: separate;
     border-spacing: 0;
-    border: 1px solid var(--border-light, #E1E6EB);
+    border: 1px solid var(--border-light, #e3ddd8);
     border-radius: 8px;
     overflow: hidden;
     font-size: 13px;
 }
 .csc-sc4s-info-table td {
     padding: 10px 14px;
-    border-bottom: 1px solid var(--border-light, #E1E6EB);
+    border-bottom: 1px solid var(--border-light, #e3ddd8);
     vertical-align: top;
-    color: var(--text-primary, #314257);
+    color: var(--text-primary, #342f2c);
 }
 .csc-sc4s-info-table tr:last-child td {
     border-bottom: none;
@@ -4601,8 +4792,8 @@ body:has(.scan-drawer-open) .scan-feedback-tab {
 .csc-sc4s-info-table-label {
     width: 110px;
     font-weight: 700;
-    color: var(--text-primary, #314257);
-    background: var(--bg-primary, #f2f5f7);
+    color: var(--text-primary, #342f2c);
+    background: var(--bg-primary, #f4f4f4);
     white-space: nowrap;
 }
 .csc-sc4s-info-table code {
@@ -4621,18 +4812,18 @@ body:has(.scan-drawer-open) .scan-feedback-tab {
     align-items: flex-start;
     padding: 14px 16px;
     border-radius: 8px;
-    border: 1px solid #E1E6EB;
+    border: 1px solid #e3ddd8;
     background: #F0F9FF;
     border-left: 3px solid #0A60FF;
 }
 .csc-sc4s-info-bp-item p {
     margin: 4px 0 0 0;
     font-size: 13px;
-    color: var(--text-secondary, #536070);
+    color: var(--text-secondary, #5a5450);
 }
 .csc-sc4s-info-bp-item strong {
     font-size: 14px;
-    color: var(--text-primary, #314257);
+    color: var(--text-primary, #342f2c);
 }
 .csc-sc4s-info-bp-marker {
     display: none;
@@ -4646,7 +4837,7 @@ body:has(.scan-drawer-open) .scan-feedback-tab {
     background: rgba(61,133,28,0.04);
 }
 .csc-sc4s-info-bp-alt {
-    border-left: 3px solid var(--border-medium, #CED4DB);
+    border-left: 3px solid var(--border-medium, #d2cbc5);
     background: var(--bg-surface, #ffffff);
 }
 .csc-sc4s-info-bp-info {
@@ -4663,7 +4854,7 @@ body:has(.scan-drawer-open) .scan-feedback-tab {
     margin-bottom: 8px;
     line-height: 1.6;
     font-size: 13px;
-    color: var(--text-primary, #314257);
+    color: var(--text-primary, #342f2c);
 }
 .csc-sc4s-info-list code {
     /* inherits from .csc-sc4s-info code */
@@ -4677,10 +4868,10 @@ body:has(.scan-drawer-open) .scan-feedback-tab {
     padding: 0;
 }
 .csc-sc4s-info-section-notes h4 {
-    border-bottom-color: var(--border-medium, #CED4DB);
+    border-bottom-color: var(--border-medium, #d2cbc5);
 }
 .csc-sc4s-info-list-notes li {
-    color: var(--text-primary, #314257);
+    color: var(--text-primary, #342f2c);
 }
 
 /* Footer links */
@@ -4689,7 +4880,7 @@ body:has(.scan-drawer-open) .scan-feedback-tab {
     gap: 12px;
     margin-top: 24px;
     padding-top: 16px;
-    border-top: 1px solid var(--border-light, #E1E6EB);
+    border-top: 1px solid var(--border-light, #e3ddd8);
     flex-wrap: wrap;
 }
 .csc-sc4s-info-link {
@@ -4703,7 +4894,7 @@ body:has(.scan-drawer-open) .scan-feedback-tab {
     text-decoration: none;
     background: #fff;
     color: #0A60FF;
-    border: 1px solid #CED4DB;
+    border: 1px solid #d2cbc5;
     transition: all 0.2s ease;
 }
 .csc-sc4s-info-link:hover {
@@ -5358,12 +5549,6 @@ body:has(.scan-drawer-open) .scan-feedback-tab {
 }
 
 /* ─── Dark mode card enhancements ─── */
-:root.dce-dark .csc-card {
-    box-shadow: none;
-}
-:root.dce-dark .csc-card:hover {
-    box-shadow: none;
-}
 :root.dce-dark .csc-card::before {
     background: var(--card-border);
 }
@@ -5810,9 +5995,9 @@ tr.scan-ts-ahead .scan-ts-name {
     gap: 5px;
     padding: 5px 12px;
     border-radius: 16px;
-    border: 1px solid #CED4DB;
+    border: 1px solid #d2cbc5;
     background: #ffffff;
-    color: #314257;
+    color: #342f2c;
     font-size: 12px;
     font-weight: 600;
     cursor: pointer;
@@ -6487,8 +6672,8 @@ tr.scan-ts-ahead .scan-ts-name {
     padding: 8px 0;
     border: 1px solid var(--border-default, #C3CBD4);
     border-radius: 6px;
-    background: var(--bg-primary, #f2f5f7);
-    color: var(--text-secondary, #536070);
+    background: var(--bg-primary, #f4f4f4);
+    color: var(--text-secondary, #5a5450);
     font-size: 12.5px;
     font-weight: 600;
     cursor: pointer;
@@ -6497,7 +6682,7 @@ tr.scan-ts-ahead .scan-ts-name {
 }
 .scan-drawer-reset-btn:hover {
     background: var(--bg-surface, #e8ecf0);
-    border-color: var(--text-tertiary, #667180);
+    border-color: var(--text-tertiary, #736d68);
     color: var(--page-color, #333);
 }
 :root.dce-dark .scan-drawer-reset-btn {
@@ -6549,27 +6734,66 @@ tr.scan-ts-ahead .scan-ts-name {
    CISCO CLEAN UI OVERRIDES (TARGETED)
    ========================================= */
 
-/* 1. Flatten the Product Cards */
+/* 1. Product Cards — 3D depth with CSS diagonal bands + shadow */
 .csc-card {
-    box-shadow: none !important;
-    border: 1px solid #E5E7EB !important;
+    background:
+        linear-gradient(135deg,
+            rgba(255,255,255,0)    0%,
+            rgba(220,218,215,0.35) 8%,
+            rgba(255,255,255,0.7)  16%,
+            rgba(210,208,204,0.25) 26%,
+            rgba(255,255,255,0.6)  36%,
+            rgba(225,222,218,0.3)  46%,
+            rgba(255,255,255,0.5)  56%,
+            rgba(215,212,208,0.2)  68%,
+            rgba(255,255,255,0.4)  80%,
+            rgba(220,218,215,0.15) 90%,
+            rgba(255,255,255,0)   100%
+        ),
+        linear-gradient(180deg, #ffffff 0%, #fafaf8 100%) !important;
+    border: 1px solid rgba(0, 0, 0, 0.08) !important;
     border-radius: 12px !important;
-    background: #FFFFFF !important;
+    box-shadow:
+        rgba(0, 0, 0, 0.18) 0px 1px 5px,
+        rgba(0, 0, 0, 0.15) 0px 0px 1px !important;
 }
 
 .csc-card:hover {
     border-color: #02C8FF !important;
-    box-shadow: none !important;
-    transform: none !important;
+    box-shadow:
+        rgba(0, 0, 0, 0.22) 0px 4px 14px,
+        rgba(0, 0, 0, 0.18) 0px 1px 4px !important;
+    transform: translateY(-3px) !important;
 }
 
 :root.dce-dark .csc-card {
-    background: var(--card-bg) !important;
-    border-color: var(--card-border) !important;
+    background:
+        linear-gradient(135deg,
+            rgba(255,255,255,0)     0%,
+            rgba(255,255,255,0.04)  8%,
+            rgba(0,0,0,0.06)        16%,
+            rgba(255,255,255,0.03)  26%,
+            rgba(0,0,0,0.05)        36%,
+            rgba(255,255,255,0.025) 46%,
+            rgba(0,0,0,0.04)        56%,
+            rgba(255,255,255,0.02)  68%,
+            rgba(0,0,0,0.03)        80%,
+            rgba(255,255,255,0.015) 90%,
+            rgba(255,255,255,0)    100%
+        ),
+        linear-gradient(180deg, var(--bg-surface) 0%, var(--bg-secondary) 100%) !important;
+    border-color: rgba(255, 255, 255, 0.08) !important;
+    box-shadow:
+        rgba(0, 0, 0, 0.4) 0px 2px 6px,
+        rgba(0, 0, 0, 0.3) 0px 0px 2px !important;
 }
 
 :root.dce-dark .csc-card:hover {
     border-color: #02C8FF !important;
+    box-shadow:
+        rgba(0, 0, 0, 0.5) 0px 6px 16px,
+        rgba(0, 0, 0, 0.35) 0px 2px 4px,
+        rgba(2, 200, 255, 0.1) 0px 0px 0px 1px !important;
 }
 
 /* Support indicator: colored bar at bottom of card */
@@ -6618,7 +6842,7 @@ tr.scan-ts-ahead .scan-ts-name {
     box-shadow: none !important;
     border: 1.5px solid rgba(10, 96, 255, 0.25) !important;
     background: #FFFFFF !important;
-    color: #314257 !important;
+    color: #342f2c !important;
 }
 .csc-subcategory-pill:hover {
     border-color: #0A60FF !important;
@@ -7242,7 +7466,7 @@ tr.scan-ts-ahead .scan-ts-name {
     min-width: 85px;
     border-radius: 8px;
     background: var(--bg-primary, #f8f9fb);
-    border: 1px solid var(--border-light, #E1E6EB);
+    border: 1px solid var(--border-light, #e3ddd8);
     border-top: 3px solid var(--stat-accent, #5B6ABF);
     transition: transform 0.15s ease, box-shadow 0.15s ease;
     cursor: default;
@@ -7321,6 +7545,223 @@ tr.scan-ts-ahead .scan-ts-name {
     color: #888;
 }
 
+/* ── Issues Badge (in stats bar) ── */
+.csc-issues-badge {
+    cursor: pointer !important;
+    position: relative;
+}
+.csc-issues-badge--warn {
+    border-top-color: #F59E0B !important;
+    background: linear-gradient(135deg, #FFFBEB 0%, var(--bg-primary, #f8f9fb) 100%) !important;
+}
+.csc-issues-badge--info {
+    border-top-color: #3B82F6 !important;
+}
+.csc-issues-badge:hover {
+    transform: translateY(-2px) !important;
+    box-shadow: 0 4px 12px rgba(245, 158, 11, 0.18) !important;
+}
+.csc-issues-pulse {
+    width: 7px;
+    height: 7px;
+    background: #F59E0B;
+    border-radius: 50%;
+    display: inline-block;
+    animation: csc-issues-pulse-anim 2s ease-in-out infinite;
+}
+@keyframes csc-issues-pulse-anim {
+    0%, 100% { box-shadow: 0 0 0 0 rgba(245, 158, 11, 0.4); }
+    50% { box-shadow: 0 0 0 5px rgba(245, 158, 11, 0); }
+}
+:root.dce-dark .csc-issues-badge--warn {
+    background: linear-gradient(135deg, rgba(245, 158, 11, 0.08) 0%, rgba(255, 255, 255, 0.03) 100%) !important;
+}
+:root.dce-dark .csc-issues-badge:hover {
+    box-shadow: 0 4px 12px rgba(245, 158, 11, 0.12) !important;
+}
+
+/* ── Issues Panel ── */
+.csc-issues-panel {
+    background: var(--bg-primary, #ffffff);
+    border: 1px solid var(--border-light, #e3ddd8);
+    border-radius: 10px;
+    margin: 0 0 16px;
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
+    overflow: hidden;
+    animation: csc-issues-slide-in 0.2s ease-out;
+}
+@keyframes csc-issues-slide-in {
+    from { opacity: 0; transform: translateY(-8px); }
+    to   { opacity: 1; transform: translateY(0); }
+}
+.csc-issues-panel-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px 16px;
+    background: linear-gradient(135deg, #FFFBEB 0%, #FEF3C7 100%);
+    border-bottom: 1px solid rgba(245, 158, 11, 0.15);
+}
+.csc-issues-panel-title {
+    font-size: 14px;
+    font-weight: 700;
+    color: #92400E;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+.csc-issues-panel-count {
+    font-size: 11px;
+    font-weight: 600;
+    background: rgba(245, 158, 11, 0.15);
+    color: #92400E;
+    padding: 2px 8px;
+    border-radius: 10px;
+}
+.csc-issues-panel-close {
+    background: none;
+    border: none;
+    font-size: 16px;
+    color: #92400E;
+    cursor: pointer;
+    padding: 4px 8px;
+    border-radius: 4px;
+    line-height: 1;
+    opacity: 0.7;
+    transition: opacity 0.15s;
+}
+.csc-issues-panel-close:hover { opacity: 1; }
+.csc-issues-panel-body {
+    padding: 8px 12px;
+    max-height: 320px;
+    overflow-y: auto;
+}
+
+/* Issue rows */
+.csc-issue-row {
+    display: flex;
+    gap: 10px;
+    padding: 10px 8px;
+    border-radius: 6px;
+    transition: background 0.12s;
+}
+.csc-issue-row:not(:last-child) {
+    border-bottom: 1px solid var(--border-light, #f0ebe6);
+}
+.csc-issue-row:hover {
+    background: rgba(0, 0, 0, 0.015);
+}
+.csc-issue-severity-icon {
+    font-size: 16px;
+    flex-shrink: 0;
+    margin-top: 1px;
+}
+.csc-issue-content {
+    flex: 1;
+    min-width: 0;
+}
+.csc-issue-title {
+    font-size: 13px;
+    font-weight: 650;
+    color: var(--page-color, #1a1a2e);
+    line-height: 1.3;
+}
+.csc-issue-detail {
+    font-size: 12px;
+    color: var(--faint-color, #666);
+    line-height: 1.4;
+    margin-top: 3px;
+}
+.csc-issue-action {
+    margin-top: 6px;
+}
+.csc-issue-action-link {
+    font-size: 12px;
+    font-weight: 600;
+    color: #0A60FF;
+    text-decoration: none;
+    transition: color 0.12s;
+}
+.csc-issue-action-link:hover {
+    color: #0044CC;
+    text-decoration: underline;
+}
+.csc-issue-action-text {
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--faint-color, #888);
+    font-style: italic;
+}
+.csc-issue-action-btn {
+    font-size: 12px;
+    font-weight: 600;
+    color: #0A60FF;
+    background: rgba(10, 96, 255, 0.06);
+    border: 1px solid rgba(10, 96, 255, 0.2);
+    border-radius: 5px;
+    padding: 3px 10px;
+    cursor: pointer;
+    transition: background 0.12s, border-color 0.12s;
+}
+.csc-issue-action-btn:hover {
+    background: rgba(10, 96, 255, 0.12);
+    border-color: rgba(10, 96, 255, 0.35);
+}
+
+.csc-issue-find-link {
+    font-size: 11px;
+    font-weight: 500;
+    color: #9CA3AF;
+    cursor: pointer;
+    transition: color 0.12s;
+    white-space: nowrap;
+}
+.csc-issue-find-link:hover {
+    color: #0A60FF;
+    text-decoration: underline;
+}
+.csc-issue-action {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 6px;
+}
+
+/* Severity accents */
+.csc-issue-row--critical { border-left: 3px solid #EF4444; }
+.csc-issue-row--warning  { border-left: 3px solid #F59E0B; }
+.csc-issue-row--info     { border-left: 3px solid #3B82F6; }
+
+/* Dark mode overrides */
+:root.dce-dark .csc-issues-panel {
+    background: var(--bg-primary, #1a1a2e);
+    border-color: rgba(255, 255, 255, 0.08);
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.3);
+}
+:root.dce-dark .csc-issues-panel-header {
+    background: linear-gradient(135deg, rgba(245, 158, 11, 0.1) 0%, rgba(245, 158, 11, 0.04) 100%);
+    border-bottom-color: rgba(245, 158, 11, 0.1);
+}
+:root.dce-dark .csc-issues-panel-title { color: #FCD34D; }
+:root.dce-dark .csc-issues-panel-count { background: rgba(245, 158, 11, 0.12); color: #FCD34D; }
+:root.dce-dark .csc-issues-panel-close { color: #FCD34D; }
+:root.dce-dark .csc-issue-row:hover { background: rgba(255, 255, 255, 0.03); }
+:root.dce-dark .csc-issue-row:not(:last-child) { border-bottom-color: rgba(255, 255, 255, 0.06); }
+:root.dce-dark .csc-issue-title { color: #f0f0f0; }
+:root.dce-dark .csc-issue-detail { color: #999; }
+:root.dce-dark .csc-issue-action-link { color: #60A5FA; }
+:root.dce-dark .csc-issue-action-link:hover { color: #93C5FD; }
+:root.dce-dark .csc-issue-action-btn {
+    color: #60A5FA;
+    background: rgba(96, 165, 250, 0.08);
+    border-color: rgba(96, 165, 250, 0.2);
+}
+:root.dce-dark .csc-issue-action-btn:hover {
+    background: rgba(96, 165, 250, 0.15);
+}
+:root.dce-dark .csc-issue-find-link { color: #6B7280; }
+:root.dce-dark .csc-issue-find-link:hover { color: #60A5FA; }
+
 /* ═══════════════════════════════════════════════════════════════════════════
    WELCOME / GETTING STARTED CARD
    ═══════════════════════════════════════════════════════════════════════════ */
@@ -7330,7 +7771,7 @@ tr.scan-ts-ahead .scan-ts-name {
     padding: 20px 24px;
     border-radius: 8px;
     background: var(--bg-primary, #f8f9fb);
-    border: 1px solid var(--border-light, #E1E6EB);
+    border: 1px solid var(--border-light, #e3ddd8);
     border-left: 4px solid #0A60FF;
     animation: csc-welcome-in 0.4s ease-out;
 }
@@ -7368,7 +7809,7 @@ tr.scan-ts-ahead .scan-ts-name {
     padding: 14px;
     border-radius: 8px;
     background: var(--card-bg, #fff);
-    border: 1px solid var(--border-light, #E1E6EB);
+    border: 1px solid var(--border-light, #e3ddd8);
     transition: box-shadow 0.15s ease;
 }
 .csc-welcome-step:hover {
@@ -7440,8 +7881,8 @@ tr.scan-ts-ahead .scan-ts-name {
     width: 22px;
     height: 22px;
     border-radius: 5px;
-    background: var(--bg-primary, #f2f5f7);
-    border: 1px solid var(--border-light, #E1E6EB);
+    background: var(--bg-primary, #f4f4f4);
+    border: 1px solid var(--border-light, #e3ddd8);
     display: inline-flex;
     align-items: center;
     justify-content: center;
@@ -7612,7 +8053,7 @@ tr.scan-ts-ahead .scan-ts-name {
     font-size: 13px;
     font-weight: 500;
     letter-spacing: 0.2px;
-    color: var(--faint-color, #667180);
+    color: var(--faint-color, #736d68);
     vertical-align: middle;
 }
 
