@@ -6,18 +6,18 @@
 # ticket assignment. Order matters — last matching pattern takes precedence.
 
 # Default: all files
-* akhamis@splunk.com alchamberlain@splunk.com
+* akkhamis@cisco.com aleccham@cisco.com
 
 # Splunk app configuration (products catalog, saved searches, views)
-packages/splunk-cisco-app-navigator/src/main/resources/splunk/ akhamis@splunk.com
+packages/splunk-cisco-app-navigator/src/main/resources/splunk/ akkhamis@cisco.com
 
 # React UI source
-packages/splunk-cisco-app-navigator/src/main/webapp/ akhamis@splunk.com alchamberlain@splunk.com
+packages/splunk-cisco-app-navigator/src/main/webapp/ akkhamis@cisco.com aleccham@cisco.com
 
 # Build and packaging
-packages/splunk-cisco-app-navigator/bin/build.js akhamis@splunk.com
-package.json akhamis@splunk.com
-lerna.json akhamis@splunk.com
+packages/splunk-cisco-app-navigator/bin/build.js akkhamis@cisco.com
+package.json akkhamis@cisco.com
+lerna.json akkhamis@cisco.com
 
 # Documentation and playbooks
-docs/ akhamis@splunk.com
+docs/ akkhamis@cisco.com
