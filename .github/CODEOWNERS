@@ -1,0 +1,23 @@
+# CODEOWNERS — splunk/splunk-cisco-app-navigator
+# https://docs.github.com/en/repositories/managing-your-repositorys-settings-and-features/customizing-your-repository/about-code-owners
+#
+# These owners are automatically requested for review on pull requests
+# and are used by CTS (Centralized Ticketing Service) for vulnerability
+# ticket assignment. Order matters — last matching pattern takes precedence.
+
+# Default: all files
+* akkhamis@cisco.com aleccham@cisco.com
+
+# Splunk app configuration (products catalog, saved searches, views)
+packages/splunk-cisco-app-navigator/src/main/resources/splunk/ akkhamis@cisco.com
+
+# React UI source
+packages/splunk-cisco-app-navigator/src/main/webapp/ akkhamis@cisco.com aleccham@cisco.com
+
+# Build and packaging
+packages/splunk-cisco-app-navigator/bin/build.js akkhamis@cisco.com
+package.json akkhamis@cisco.com
+lerna.json akkhamis@cisco.com
+
+# Documentation and playbooks
+docs/ akkhamis@cisco.com

@@ -4156,18 +4156,18 @@ export const PRODUCT_CATALOG = [
       "Ensure Catalyst Center and SC4S clocks are NTP-synced within +/- 30 seconds."
     ],
     "netflow_supported": true,
-    "netflow_addon": "splunk_app_stream_ipfix_cisco_hsl",
-    "netflow_addon_label": "Cisco Catalyst Enhanced Netflow Add-on for Splunk",
-    "netflow_addon_splunkbase_id": "6872",
-    "netflow_addon_docs_url": "https://www.cisco.com/c/en/us/solutions/collateral/enterprise-networks/sd-wan/sd-wan-splunk-integration-ug.html",
+    "netflow_addon": "",
+    "netflow_addon_label": "",
+    "netflow_addon_splunkbase_id": "",
+    "netflow_addon_docs_url": "",
     "stream_docs_url": "https://help.splunk.com/en/splunk-cloud-platform/collect-stream-data/install-and-configure-splunk-stream/8.1/introduction/about-splunk-stream",
     "netflow_sourcetypes": [
       "stream:netflow"
     ],
     "netflow_config_notes": [
-      "Configure NetFlow v9 or IPFIX export on IOS-XE devices to point at the Stream Forwarder.",
+      "Catalyst Center does not export NetFlow directly — configure NetFlow v9 or IPFIX export on managed IOS-XE devices (Catalyst Switches, ISR, ASR) to point at the Stream Forwarder.",
       "Requires Stream: App for Stream (1809) on search heads; Add-on for Stream Forwarders (5238) on forwarders; Add-on for Stream Wire Data (5234) on indexers and search heads for full field normalization and extraction.",
-      "For IOS-XE/Catalyst also install Cisco Enhanced Netflow Add-on (6872)."
+      "For managed IOS-XE devices exporting Cisco IPFIX, also install Cisco Enhanced Netflow Add-on (6872) on search heads."
     ],
     "best_practices": [],
     "sort_order": 100,
@@ -4280,18 +4280,18 @@ export const PRODUCT_CATALOG = [
       "Ensure all Cisco network devices are NTP-synced — SC4S requires clocks within +/- 30s for proper timestamp parsing."
     ],
     "netflow_supported": true,
-    "netflow_addon": "splunk_app_stream_ipfix_cisco_hsl",
-    "netflow_addon_label": "Cisco Catalyst Enhanced Netflow Add-on for Splunk",
-    "netflow_addon_splunkbase_id": "6872",
-    "netflow_addon_docs_url": "https://www.cisco.com/c/en/us/solutions/collateral/enterprise-networks/sd-wan/sd-wan-splunk-integration-ug.html",
+    "netflow_addon": "",
+    "netflow_addon_label": "",
+    "netflow_addon_splunkbase_id": "",
+    "netflow_addon_docs_url": "",
     "stream_docs_url": "https://help.splunk.com/en/splunk-cloud-platform/collect-stream-data/install-and-configure-splunk-stream/8.1/introduction/about-splunk-stream",
     "netflow_sourcetypes": [
       "stream:netflow"
     ],
     "netflow_config_notes": [
-      "Configure NetFlow v9 or IPFIX export on IOS-XE devices to point at the Stream Forwarder.",
-      "Requires Stream: App for Stream (1809) on search heads; Add-on for Stream Forwarders (5238) on forwarders; Add-on for Stream Wire Data (5234) on indexers and search heads for full field normalization and extraction.",
-      "For IOS-XE/Catalyst also install Cisco Enhanced Netflow Add-on (6872)."
+      "Configure NetFlow v9 or IPFIX export on Catalyst switches (IOS-XE) to point at the Stream Forwarder.",
+      "Standard NetFlow v9/IPFIX is supported — no product-specific NetFlow add-on is required.",
+      "Requires Stream: App for Stream (1809) on search heads; Add-on for Stream Forwarders (5238) on forwarders; Add-on for Stream Wire Data (5234) on indexers and search heads for full field normalization and extraction."
     ],
     "best_practices": [],
     "sort_order": 101,
@@ -4688,18 +4688,18 @@ export const PRODUCT_CATALOG = [
       "Ensure wireless controllers and SC4S clocks are NTP-synced within +/- 30 seconds."
     ],
     "netflow_supported": true,
-    "netflow_addon": "splunk_app_stream_ipfix_cisco_hsl",
-    "netflow_addon_label": "Cisco Catalyst Enhanced Netflow Add-on for Splunk",
-    "netflow_addon_splunkbase_id": "6872",
-    "netflow_addon_docs_url": "https://www.cisco.com/c/en/us/solutions/collateral/enterprise-networks/sd-wan/sd-wan-splunk-integration-ug.html",
+    "netflow_addon": "",
+    "netflow_addon_label": "",
+    "netflow_addon_splunkbase_id": "",
+    "netflow_addon_docs_url": "",
     "stream_docs_url": "https://help.splunk.com/en/splunk-cloud-platform/collect-stream-data/install-and-configure-splunk-stream/8.1/introduction/about-splunk-stream",
     "netflow_sourcetypes": [
       "stream:netflow"
     ],
     "netflow_config_notes": [
-      "Configure NetFlow v9 or IPFIX export on IOS-XE devices to point at the Stream Forwarder.",
-      "Requires Stream: App for Stream (1809) on search heads; Add-on for Stream Forwarders (5238) on forwarders; Add-on for Stream Wire Data (5234) on indexers and search heads for full field normalization and extraction.",
-      "For IOS-XE/Catalyst also install Cisco Enhanced Netflow Add-on (6872)."
+      "Catalyst 9800 WLC (IOS-XE) supports NetFlow v9/IPFIX export for wireless client traffic analytics.",
+      "Standard NetFlow v9/IPFIX is supported — no product-specific NetFlow add-on is required. AireOS-based WLCs may have limited NetFlow support — verify with your platform version.",
+      "Requires Stream: App for Stream (1809) on search heads; Add-on for Stream Forwarders (5238) on forwarders; Add-on for Stream Wire Data (5234) on indexers and search heads for full field normalization and extraction."
     ],
     "best_practices": [],
     "sort_order": 104,
@@ -4868,18 +4868,18 @@ export const PRODUCT_CATALOG = [
       "Meraki syslog format is auto-detected by SC4S — no unique port assignment needed in most cases."
     ],
     "netflow_supported": true,
-    "netflow_addon": "splunk_app_stream_ipfix_cisco_hsl",
-    "netflow_addon_label": "Cisco Catalyst Enhanced Netflow Add-on for Splunk",
-    "netflow_addon_splunkbase_id": "6872",
-    "netflow_addon_docs_url": "https://www.cisco.com/c/en/us/solutions/collateral/enterprise-networks/sd-wan/sd-wan-splunk-integration-ug.html",
+    "netflow_addon": "",
+    "netflow_addon_label": "",
+    "netflow_addon_splunkbase_id": "",
+    "netflow_addon_docs_url": "",
     "stream_docs_url": "https://help.splunk.com/en/splunk-cloud-platform/collect-stream-data/install-and-configure-splunk-stream/8.1/introduction/about-splunk-stream",
     "netflow_sourcetypes": [
       "stream:netflow"
     ],
     "netflow_config_notes": [
-      "Configure NetFlow v9 or IPFIX export on IOS-XE devices to point at the Stream Forwarder.",
-      "Requires Stream: App for Stream (1809) on search heads; Add-on for Stream Forwarders (5238) on forwarders; Add-on for Stream Wire Data (5234) on indexers and search heads for full field normalization and extraction.",
-      "For IOS-XE/Catalyst also install Cisco Enhanced Netflow Add-on (6872)."
+      "Enable NetFlow v9 export in Meraki Dashboard under Security & SD-WAN > Traffic analytics > Add a collector.",
+      "Meraki exports standard NetFlow v9 — no Cisco Enhanced Netflow Add-on (6872) is required.",
+      "Requires Stream: App for Stream (1809) on search heads; Add-on for Stream Forwarders (5238) on forwarders; Add-on for Stream Wire Data (5234) on indexers and search heads for full field normalization and extraction."
     ],
     "best_practices": [],
     "sort_order": 105,
@@ -5241,18 +5241,18 @@ export const PRODUCT_CATALOG = [
       "Ensure ASR routers and SC4S clocks are NTP-synced within +/- 30 seconds."
     ],
     "netflow_supported": true,
-    "netflow_addon": "splunk_app_stream_ipfix_cisco_hsl",
-    "netflow_addon_label": "Cisco Catalyst Enhanced Netflow Add-on for Splunk",
-    "netflow_addon_splunkbase_id": "6872",
-    "netflow_addon_docs_url": "https://www.cisco.com/c/en/us/solutions/collateral/enterprise-networks/sd-wan/sd-wan-splunk-integration-ug.html",
+    "netflow_addon": "",
+    "netflow_addon_label": "",
+    "netflow_addon_splunkbase_id": "",
+    "netflow_addon_docs_url": "",
     "stream_docs_url": "https://help.splunk.com/en/splunk-cloud-platform/collect-stream-data/install-and-configure-splunk-stream/8.1/introduction/about-splunk-stream",
     "netflow_sourcetypes": [
       "stream:netflow"
     ],
     "netflow_config_notes": [
-      "Configure NetFlow v9 or IPFIX export on IOS-XE devices to point at the Stream Forwarder.",
-      "Requires Stream: App for Stream (1809) on search heads; Add-on for Stream Forwarders (5238) on forwarders; Add-on for Stream Wire Data (5234) on indexers and search heads for full field normalization and extraction.",
-      "For IOS-XE/Catalyst also install Cisco Enhanced Netflow Add-on (6872)."
+      "Configure NetFlow v9 or IPFIX export on ASR routers to point at the Stream Forwarder.",
+      "ASR 1000 (IOS-XE) and ASR 9000 (IOS-XR) both support standard NetFlow v9/IPFIX — no product-specific NetFlow add-on is required.",
+      "Requires Stream: App for Stream (1809) on search heads; Add-on for Stream Forwarders (5238) on forwarders; Add-on for Stream Wire Data (5234) on indexers and search heads for full field normalization and extraction."
     ],
     "best_practices": [],
     "sort_order": 111,
@@ -5462,18 +5462,18 @@ export const PRODUCT_CATALOG = [
       "Ensure ISR routers and SC4S clocks are NTP-synced within +/- 30 seconds."
     ],
     "netflow_supported": true,
-    "netflow_addon": "splunk_app_stream_ipfix_cisco_hsl",
-    "netflow_addon_label": "Cisco Catalyst Enhanced Netflow Add-on for Splunk",
-    "netflow_addon_splunkbase_id": "6872",
-    "netflow_addon_docs_url": "https://www.cisco.com/c/en/us/solutions/collateral/enterprise-networks/sd-wan/sd-wan-splunk-integration-ug.html",
+    "netflow_addon": "",
+    "netflow_addon_label": "",
+    "netflow_addon_splunkbase_id": "",
+    "netflow_addon_docs_url": "",
     "stream_docs_url": "https://help.splunk.com/en/splunk-cloud-platform/collect-stream-data/install-and-configure-splunk-stream/8.1/introduction/about-splunk-stream",
     "netflow_sourcetypes": [
       "stream:netflow"
     ],
     "netflow_config_notes": [
-      "Configure NetFlow v9 or IPFIX export on IOS-XE devices to point at the Stream Forwarder.",
-      "Requires Stream: App for Stream (1809) on search heads; Add-on for Stream Forwarders (5238) on forwarders; Add-on for Stream Wire Data (5234) on indexers and search heads for full field normalization and extraction.",
-      "For IOS-XE/Catalyst also install Cisco Enhanced Netflow Add-on (6872)."
+      "Configure NetFlow v9 or IPFIX export on ISR routers (IOS-XE) to point at the Stream Forwarder.",
+      "Standard NetFlow v9/IPFIX is supported — no product-specific NetFlow add-on is required.",
+      "Requires Stream: App for Stream (1809) on search heads; Add-on for Stream Forwarders (5238) on forwarders; Add-on for Stream Wire Data (5234) on indexers and search heads for full field normalization and extraction."
     ],
     "best_practices": [],
     "sort_order": 112,
@@ -5584,18 +5584,18 @@ export const PRODUCT_CATALOG = [
       "Ensure CRS routers and SC4S clocks are NTP-synced within +/- 30 seconds."
     ],
     "netflow_supported": true,
-    "netflow_addon": "splunk_app_stream_ipfix_cisco_hsl",
-    "netflow_addon_label": "Cisco Catalyst Enhanced Netflow Add-on for Splunk",
-    "netflow_addon_splunkbase_id": "6872",
-    "netflow_addon_docs_url": "https://www.cisco.com/c/en/us/solutions/collateral/enterprise-networks/sd-wan/sd-wan-splunk-integration-ug.html",
+    "netflow_addon": "",
+    "netflow_addon_label": "",
+    "netflow_addon_splunkbase_id": "",
+    "netflow_addon_docs_url": "",
     "stream_docs_url": "https://help.splunk.com/en/splunk-cloud-platform/collect-stream-data/install-and-configure-splunk-stream/8.1/introduction/about-splunk-stream",
     "netflow_sourcetypes": [
       "stream:netflow"
     ],
     "netflow_config_notes": [
-      "Configure NetFlow v9 or IPFIX export on IOS-XE devices to point at the Stream Forwarder.",
-      "Requires Stream: App for Stream (1809) on search heads; Add-on for Stream Forwarders (5238) on forwarders; Add-on for Stream Wire Data (5234) on indexers and search heads for full field normalization and extraction.",
-      "For IOS-XE/Catalyst also install Cisco Enhanced Netflow Add-on (6872)."
+      "Configure NetFlow v9 or IPFIX export on IOS-XR routers to point at the Stream Forwarder.",
+      "CRS runs IOS-XR and exports standard NetFlow — no Cisco Enhanced Netflow Add-on (6872) is required.",
+      "Requires Stream: App for Stream (1809) on search heads; Add-on for Stream Forwarders (5238) on forwarders; Add-on for Stream Wire Data (5234) on indexers and search heads for full field normalization and extraction."
     ],
     "best_practices": [],
     "sort_order": 113,

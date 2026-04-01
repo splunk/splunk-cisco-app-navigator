@@ -39,19 +39,19 @@
 		},
 		"input_m6_scope": {
 			"options": {
-				"defaultValue": "local",
+				"defaultValue": "environment",
 				"items": [
 					{
 						"label": "Local Only (This SH)",
 						"value": "local"
 					},
 					{
-						"label": "Environment (Exclude SH)",
-						"value": "environment"
+						"label": "Remote Only (Peers / Indexers)",
+						"value": "remote"
 					},
 					{
-						"label": "Everything",
-						"value": "all"
+						"label": "Full Environment",
+						"value": "environment"
 					}
 				],
 				"token": "m6_scope"
@@ -256,7 +256,7 @@
 		},
 		"viz_header_magic6": {
 			"options": {
-				"markdown": "### Magic Eight Audit\nOne row per data stream: **Sourcetype** and **Stanza** (the stanza that governs ingestion). When a source or host stanza sets sourcetype (e.g. source::...synclookup.log → scan:synclookup:log), only that stanza is audited; the sourcetype-level stanza is skipped. Otherwise the sourcetype stanza is audited. Audits 8 best-practice settings: SHOULD_LINEMERGE, LINE_BREAKER, TRUNCATE, TIME_FORMAT, TIME_PREFIX, MAX_TIMESTAMP_LOOKAHEAD, ANNOTATE_PUNCT, LEARN_SOURCETYPE."
+				"markdown": "### Magic Eight Audit\n\nEach row represents one **data stream** — the sourcetype users search for. The audit checks whether 8 best-practice `props.conf` settings (the **Magic Eight**) are explicitly defined.\n\n**Column guide:**\n- **Sourcetype** — The effective sourcetype at search-time\n- **Stanza** — The `props.conf` stanza whose settings govern this data stream\n- **Source** — Shown when a `source::` or `host::` stanza overrides the sourcetype-level stanza\n- **Defining App(s)** — The app(s) that own the governing stanza\n- **Renamed From** — Original stanza name when `rename = ...` collapses two stanzas into one row\n- **Inherits From** — Wildcard pattern (e.g. `[(?::){0}cisco:*]`) that contributed inherited settings\n\n**How stanzas merge:** Source/host stanzas take highest precedence, then explicit sourcetype stanzas, then wildcard stanzas (more-specific wildcards win over broader ones). Settings from higher-priority stanzas win where defined; lower-priority stanzas fill in the gaps.\n\n**The 8 settings audited:** `SHOULD_LINEMERGE` · `LINE_BREAKER` · `TRUNCATE` · `TIME_FORMAT` · `TIME_PREFIX` · `MAX_TIMESTAMP_LOOKAHEAD` · `ANNOTATE_PUNCT` · `LEARN_SOURCETYPE`"
 			},
 			"type": "splunk.markdown"
 		},
@@ -682,7 +682,8 @@
 					"headerBackgroundColor": "#E8EDF2",
 					"headerFontColor": "#314257",
 					"rowBackgroundColors": "> table | seriesByIndex(0) | pick(#f9fafb,#ffffff)"
-				}
+				},
+				"fontSize": "small"
 			},
 			"title": "Magic Eight Compliance — All Stanzas",
 			"type": "splunk.table"
@@ -998,14 +999,14 @@
 		"ds_magic6_app_choices": {
 			"name": "Magic Eight App Choices",
 			"options": {
-				"query": "| rest splunk_server=local /services/apps/local f=title f=core \n| where core=0 \n| search NOT title IN (system,SplunkDeploymentServerConfig,learned,Splunk_SA_CIM,python_upgrade_readiness_app,splunk_instrumentation,splunk_internal_metrics,splunk_monitoring_console,splunk_secure_gateway,splunk_ingest_actions)\n| rename title as label \n| eval value=label \n| fields label value \n| dedup label \n| sort label"
+				"query": "| rest splunk_server=local /services/apps/local f=title f=core \n| where core=0 \n| search NOT title IN (system,SplunkDeploymentServerConfig,learned,Splunk_SA_CIM,python_upgrade_readiness_app,splunk_instrumentation,splunk_internal_metrics,splunk_monitoring_console,splunk_secure_gateway,splunk_insights,splunk_httpinput,splunk_ingest_actions,splunk_gdi,splunk_metrics_workspace,splunk_app_for_splunk_o11y_cloud,splunk-dashboard-studio,SplunkForwarder,SplunkLightForwarder,launcher,legacy,search,introspection_generator_addon,agent_management_versioned_app_retrieval,user-prefs)\n| rename title as label \n| eval value=label \n| fields label value \n| dedup label \n| sort label"
 			},
 			"type": "ds.search"
 		},
 		"ds_magic6_audit": {
 			"name": "Magic Eight Audit",
 			"options": {
-				"query": "| savedsearch \"SCAN - Magic Eight Audit\" scope=\"$m6_scope$\""
+				"query": "| savedsearch \"SCAN - Magic Eight Audit\" scope=\"$m6_scope$\" app=\"$m6_app$\""
 			},
 			"type": "ds.search"
 		},
@@ -1719,6 +1720,9 @@
 				}
 			]
 		}
+	},
+	"applicationProperties": {
+		"hideEdit": true
 	}
 }
     ]]></definition>
