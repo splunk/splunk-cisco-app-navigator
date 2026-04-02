@@ -6450,7 +6450,10 @@ function FilterDrawer({
     const rawBase = applyCompatFilters(allProducts || products);
     const portfolioBase = showFullPortfolio
         ? rawBase
-        : rawBase.filter(p => SUPPORTED_LEVELS.has(p.support_level) && p.status !== 'under_development');
+        : rawBase.filter(p =>
+            (SUPPORTED_LEVELS.has(p.support_level) && p.status !== 'under_development')
+            || p.status === 'retired'
+            || p.status === 'deprecated');
 
     // Category + capability: main categories (security, networking, …) or cross-cutting (es, itsi, sc4s, netflow, soar, alert_actions, etc.)
     let catBase = portfolioBase;
@@ -6477,9 +6480,10 @@ function FilterDrawer({
     };
     const supportTotal = supportCountBase.length;
 
-    /* Visibility counts */
+    /* Visibility counts — retired/deprecated bypass support-level filter to match rendering */
     let visCountBase = catBase;
-    if (supportLevelFilter.length > 0) visCountBase = visCountBase.filter(p => supportLevelFilter.includes(p.support_level));
+    if (supportLevelFilter.length > 0) visCountBase = visCountBase.filter(p => supportLevelFilter.includes(p.support_level)
+        || p.status === 'retired' || p.status === 'deprecated');
     const retiredCount = visCountBase.filter(p => p.status === 'retired').length;
     const deprecatedCount = visCountBase.filter(p => p.status === 'deprecated').length;
     const comingSoonCount = visCountBase.filter(p => p.status === 'under_development').length;
@@ -8063,10 +8067,14 @@ function SCANProductsPage() {
     const portfolioProducts = useMemo(() => {
         let base = products;
         if (supportLevelFilter.length > 0) {
-            base = base.filter((p) => supportLevelFilter.includes(p.support_level));
+            base = base.filter((p) => supportLevelFilter.includes(p.support_level)
+                || (showRetired && p.status === 'retired')
+                || (showDeprecated && p.status === 'deprecated'));
         } else if (!showFullPortfolio) {
-            // "Supported Only" mode: show only cisco/splunk-supported, hide under_development
-            base = base.filter((p) => SUPPORTED_LEVELS.has(p.support_level) && p.status !== 'under_development');
+            base = base.filter((p) =>
+                (SUPPORTED_LEVELS.has(p.support_level) && p.status !== 'under_development')
+                || (showRetired && p.status === 'retired')
+                || (showDeprecated && p.status === 'deprecated'));
         }
         if (!showRetired) {
             base = base.filter((p) => p.status !== 'retired');
@@ -8077,14 +8085,13 @@ function SCANProductsPage() {
         if (!showComingSoon || !showInternalContent) {
             base = base.filter((p) => p.status !== 'under_development');
         }
-        // Coverage-gap products without any integration go to GTM Roadmap section
         if (!showGtmRoadmap || !showInternalContent) {
             base = base.filter((p) => !p.coverage_gap || (p.addon || p.app_viz || p.app_viz_2 || p.sc4s_supported));
         }
-        // not_supported products go to "Integration Needed" which is only visible in dev/GTM mode;
-        // exclude them from counts when that section is hidden to prevent phantom counts
         if (!showInternalContent) {
-            base = base.filter((p) => p.support_level !== 'not_supported');
+            base = base.filter((p) => p.support_level !== 'not_supported'
+                || (showRetired && p.status === 'retired')
+                || (showDeprecated && p.status === 'deprecated'));
         }
         return base;
     }, [products, supportLevelFilter, showFullPortfolio, showRetired, showDeprecated, showComingSoon, showGtmRoadmap, showInternalContent]);
