@@ -2,7 +2,7 @@
 
 **Codename:** "The Front Door"  
 **Author:** Cisco Systems  
-**Version:** 1.0.19  
+**Version:** 1.0.23  
 **Compatibility:** Splunk Enterprise / Splunk Cloud 9.0+
 
 ## What It Does
@@ -23,7 +23,7 @@ Each Cisco product is represented by an **intelligent card** that actively inspe
 ## Key Features
 
 ### Product Catalog
-- **93 Cisco products** across 4 categories: **Security** (43), **Networking** (35), **Observability** (3), **Collaboration** (12).
+- **93 Cisco products** across 4 categories: **Security** (44), **Networking** (35), **Observability** (3), **Collaboration** (12).
 - **19 subcategories** for granular filtering within Security, Networking, Collaboration, and Observability.
 - **Product lifecycle tracking** via `date_created` and `date_updated` fields on every product card.
 
@@ -45,11 +45,12 @@ Each Cisco product is represented by an **intelligent card** that actively inspe
 - **Data Flowing (N events)** — Live 24h event count per product's sourcetypes.
 - **Data Found — No Add-on Detected** — Orphaned data warning.
 - **N Legacy Apps Detected** — Red badge with hover tooltip listing each legacy app.
-- **SOAR** — Purple badge for products with Splunk SOAR connectors (12 products).
-- **ITSI** — Blue badge for products with ITSI Content Packs (6 products).
-- **Alert Actions** — Badge for companion alert action add-ons (4 products).
-- **AI-Powered** — Purple gradient badge for AI-enabled products (17 products).
-- **ES Compatible** — Badge for products with CIM data model mappings (25 products).
+- **SOAR** — Purple badge for products with Splunk SOAR connectors (15 products).
+- **SecOps** — Slate badge for products with ES/SSE content (36 products).
+- **ITOps** — Indigo badge for products with ITSI/ITE Learn content (12 products).
+- **Alert Actions** — Rose badge for companion alert action add-ons (12 products).
+- **SC4S** — Blue badge for products with SC4S documentation (23 products).
+- **NetFlow** — Badge for products with NetFlow collection guidance (11 products).
 - **Platform: Enterprise / Cloud** — SVG platform compatibility badge.
 
 ### Version Intelligence & Upgrade Buttons
@@ -61,7 +62,7 @@ Each Cisco product is represented by an **intelligent card** that actively inspe
 - Per-card red badge, page-level legacy banner, and detailed Legacy Audit Modal.
 
 ### Optimized Data Validation (MTTI)
-- **Single search** validates all 293+ unique sourcetypes across products in one SPL query.
+- **Single search** validates all 320 unique sourcetypes across products in one SPL query.
 - Uses `| metadata type=sourcetypes` for sub-second validation.
 - Results distributed to individual cards — green (data flowing), orange (orphaned), or yellow (no data).
 - **Mean Time to Innocence (MTTI):** Proves data flow instantly to eliminate finger-pointing.
@@ -74,7 +75,7 @@ Each Cisco product is represented by an **intelligent card** that actively inspe
 
 ### Category Filter Bar
 - Horizontal pill-style filter bar with live counts per category.
-- **Cross-cutting filters**: Secure Networking (71), SOAR (12), Alert Actions, AI-Powered (17), ES (25), ITSI (6), SC4S (18), NetFlow (11).
+- **Cross-cutting filters**: SOAR (15), SecOps/ES (36), ITOps (12), Alert Actions (12), SC4S (23), NetFlow (11).
 - Each filter pill shows a live count of matching products.
 
 ### Universal Finder (Search Bar)

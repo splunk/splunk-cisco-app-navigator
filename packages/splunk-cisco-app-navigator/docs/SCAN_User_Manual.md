@@ -1,6 +1,6 @@
 # Splunk Cisco App Navigator — User Manual
 
-**Version:** 1.0.19 · **Last Updated:** March 22, 2026
+**Version:** 1.0.23 · **Last Updated:** April 1, 2026
 
 ---
 

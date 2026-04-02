@@ -6,6 +6,33 @@
 
 ---
 
+## 2026-04-01 — Retired/Deprecated Filter Toggle Fix
+
+**Decision:** Fix the `portfolioProducts` useMemo, FilterDrawer badge counts,
+and card rendering logic to correctly include retired and deprecated products
+when their visibility toggles are active.
+
+**Rationale:** The filter toggles for retired and deprecated products existed in
+the FilterDrawer UI, but the underlying `portfolioProducts` array excluded those
+statuses from the filtered set. This caused the toggles to appear functional but
+produce zero results. The fix adds retired/deprecated products to the filtered
+portfolio when the corresponding toggle is on, and updates badge counts to
+reflect the true totals.
+
+---
+
+## 2026-04-01 — Explore Button for TA-Only Products
+
+**Decision:** Replace the green "Launch" button with a blue "Explore" dropdown
+on cards where the installed add-on has `is_visible = false` (TA-only products
+with no companion app UI).
+
+**Rationale:** TA-only products have no dashboards — clicking "Launch" returned
+a 404. The contextual "Explore" dropdown guides users to the next productive
+step: exploring their data in Search or creating a Dashboard Studio dashboard.
+
+---
+
 ## 2026-03-21 — Remove AI-Powered Filter
 
 **Decision:** Remove the AI-Powered category filter from the UI entirely.

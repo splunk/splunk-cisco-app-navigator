@@ -1,19 +1,20 @@
 # Splunk Cisco App Navigator (SCAN)
 
 **Codename:** "The Front Door"
-**Version:** 1.0.21
+**Version:** 1.0.23
 **Author:** Amir (AK) Khamis & Alec Chamberlain
 
 The **Splunk Cisco App Navigator** is a Splunkbase app that provides a unified
 Product Catalog UI — the single entry point for all Cisco-Splunk integrations.
-It catalogs **93 Cisco products**, maps each to the correct Splunk add-on,
-validates data flow, detects legacy debt, and provides one-click install and
-launch actions. Each product card displays Cisco brand SVG icons (97 icons),
-SOAR/SecOps/ITOps/Alert/ES badges, SC4S documentation links, Splunkbase
-compatibility filters, platform-aware best practices, and a **Props.conf Audit
-(Magic Eight)** for ingestion health. The app also includes an **Ecosystem
-Intelligence** dashboard for portfolio analytics, **Indexer Tier detection** for
-deployment validation, and a **Catalog Vault** for disabled products.
+It catalogs **93 Cisco products** (94 stanzas, ~3389 lines), maps each to the
+correct Splunk add-on, validates data flow, detects legacy debt, and provides
+one-click install and launch actions. Each product card displays Cisco brand
+SVG icons (97 icons), SOAR/SecOps/ITOps/Alert/ES badges, SC4S documentation
+links, NetFlow guidance, Splunkbase compatibility filters, platform-aware best
+practices, and a **Props.conf Audit (Magic Eight)** for ingestion health. The
+app also includes an **Ecosystem Intelligence** dashboard for portfolio
+analytics, **Indexer Tier detection** for deployment validation, and a
+**Catalog Vault** for disabled products.
 
 ---
 
@@ -46,8 +47,8 @@ splunk-cisco-app-navigator/
         ├── src/main/
         │   ├── resources/splunk/
         │   │   ├── default/
-        │   │   │   ├── app.conf       # Version 1.0.21
-        │   │   │   ├── products.conf  # 93 products (~3378 lines)
+        │   │   │   ├── app.conf       # Version 1.0.23
+        │   │   │   ├── products.conf  # 93 products (~3389 lines)
         │   │   │   ├── savedsearches.conf  # 42 saved searches
         │   │   │   ├── props.conf     # Sourcetype + field extractions
         │   │   │   ├── transforms.conf    # Lookup definitions
@@ -57,13 +58,13 @@ splunk-cisco-app-navigator/
         │   │   │   ├── download_splunkbase_csv.py  # Custom command
         │   │   │   └── splunklib/     # Bundled splunklib 2.1.1
         │   │   ├── appserver/static/
-        │   │   │   ├── products.css   # ~7652 lines (incl. dark mode)
+        │   │   │   ├── products.css   # ~8099 lines (incl. dark mode)
         │   │   │   ├── icons/         # 97 Cisco brand icons
         │   │   │   └── fonts/         # CiscoSansTT
         │   │   ├── lookups/           # Splunkbase CSV catalog
         │   │   └── README/products.conf.spec
         │   └── webapp/pages/products/
-        │       ├── index.jsx          # ~9280 lines (React UI)
+        │       ├── index.jsx          # ~9587 lines (React UI)
         │       └── productCatalog.generated.js
         └── stage/                     # Build output
 ```
@@ -92,13 +93,13 @@ curl -sk -u admin:changeme \
 
 | Feature | Description |
 |---|---|
-| **93 Product Cards** | Security (43), Networking (35), Observability (3), Collaboration (12) |
-| **Product Status** | 48 active, 22 roadmap, 3 deprecated, 2 under development, 11 retired, 7 archived |
-| **Support Levels** | 36 Cisco, 9 Splunk, 6 Developer, 1 Community, 41 Not Supported |
+| **93 Product Cards** | Security (44), Networking (35), Observability (3), Collaboration (12) |
+| **Product Status** | 50 active, 38 roadmap, 3 deprecated, 2 under development, 11 retired |
+| **Support Levels** | 38 Cisco, 9 Splunk, 6 Developer, 1 Community, 40 Not Supported |
 | **97 Cisco Brand Icons** | SVGs with light/dark variants |
-| **Cross-Cutting Badges** | SOAR (11), SecOps (ES) (34), ITOps (5), Alert Actions (8), SC4S (17) |
-| **SC4S Integration** | 17 products with SC4S documentation links |
-| **303 Unique Sourcetypes** | Data flow detection via `metadata` search |
+| **Cross-Cutting Badges** | SOAR (15), SecOps (ES) (36), ITOps (12), Alert Actions (12), SC4S (23), NetFlow (11) |
+| **SC4S Integration** | 23 products with SC4S documentation links |
+| **320 Unique Sourcetypes** | Data flow detection via `metadata` search |
 | **19 Subcategories** | Granular filtering within Security, Networking, Collaboration, Observability |
 | **Dark/Light/Auto Theme** | Three-state toggle with frosted glass card icons and theme-aware banners |
 | **Props.conf Audit (Magic Eight)** | Per-product ingestion health check with tier version audit |

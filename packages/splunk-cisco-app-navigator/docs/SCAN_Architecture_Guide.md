@@ -1,7 +1,7 @@
 # SCAN Architecture Guide — A to Z
 
 > **Splunk Cisco App Navigator (SCAN)** — The Front Door to the Cisco–Splunk Ecosystem
-> **Version:** 1.0.19 · **Last updated:** March 22, 2026
+> **Version:** 1.0.23 · **Last updated:** April 1, 2026
 
 ---
 
@@ -396,7 +396,7 @@ SCANProductsPage
 │   ├── InfoTooltip ("How do I get started?")
 │   ├── Portfolio Toggle (Supported Only / All Products)
 │   ├── Platform Badge (Splunk Cloud / Enterprise)
-│   ├── Version Badge (v1.0.19)
+│   ├── Version Badge (v1.0.23)
 │   ├── Theme Toggle (Auto / Light / Dark)
 │   ├── Guide Button
 │   └── Role Button
@@ -922,7 +922,7 @@ The **ES Compatible** badge marks integrations whose data is suitable for **Splu
 - **Two tiers** — **Tier 1:** out-of-the-box ESCU (Splunk Enterprise Security Content Update) detections or stories where the TA participates. **Tier 2:** CIM data model mapping so the data can power ES data models, correlations, and dashboards even when a specific ESCU story is not listed on the card.
 - **`es_compatible = true`** — Indicates the product’s data is intended to participate in ES (subject to your deployment and CIM alignment).
 - **`es_cim_data_models`** — Lists the **CIM data models** the TA maps to (e.g. Network Traffic, Authentication), surfaced in `ESInfoModal`.
-- **Coverage** — As of v1.0.19, **34** catalog products carry the badge; counts may change as the catalog evolves.
+- **Coverage** — As of v1.0.23, **36** catalog products carry the SecOps badge; counts may change as the catalog evolves.
 - **Tooltip** — “CIM-compliant products ready for Enterprise Security — includes OOB detections where available.”
 
 ---
@@ -945,7 +945,7 @@ the main catalog and rendered in a separate **Catalog Vault** section.
 ## 18. Configuration Files
 
 ### `app.conf`
-App identity, version (1.0.19), supported themes, launcher description.
+App identity, version (1.0.23), supported themes, launcher description.
 `reload.products = simple` enables hot-reload via `_reload` endpoint.
 
 ### `products.conf`
@@ -1058,7 +1058,7 @@ field extractions work from any app context (e.g., the `search` app).
 
 ## 21. Saved Searches
 
-`default/savedsearches.conf` defines **42** active `[SCAN - …]` saved searches (v1.0.19). The comments in that file group them by purpose; stanza titles and SPL are authoritative.
+`default/savedsearches.conf` defines **42** active `[SCAN - …]` saved searches (v1.0.23). The comments in that file group them by purpose; stanza titles and SPL are authoritative.
 
 **Product catalog & Splunkbase gap analysis**
 - **SCAN - Product Catalog - Full Dump**, **SCAN - Product Catalog - By Category**, **SCAN - Product Catalog - By Add-on Family**

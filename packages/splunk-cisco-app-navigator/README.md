@@ -1,6 +1,6 @@
 # Splunk Cisco App Navigator (SCAN)
 
-**Version:** 1.0.19
+**Version:** 1.0.23
 
 The **Splunk Cisco App Navigator** is the unified "Glass Pane" for the
 Cisco-Splunk ecosystem — a single Product Catalog UI where Splunk administrators
@@ -25,11 +25,11 @@ ln -s "$(pwd)/stage" /opt/splunk/etc/apps/splunk-cisco-app-navigator
 
 - **93 product cards** with real-time intelligence badges
 - **97 Cisco brand icons** (SVGs) with light/dark variants
-- **293+ unique sourcetypes** validated via `metadata` search for data flow detection
+- **320 unique sourcetypes** validated via `metadata` search for data flow detection
 - **19 subcategories** across Security, Networking, Collaboration, and Observability
-- **Cross-cutting badges** — SOAR (12), ITSI (6), Alert Actions (4), AI-Powered (17), ES (25)
-- **SC4S integration** — 18 products with SC4S links
-- **Secure Networking GTM** — 71 products tagged
+- **Cross-cutting badges** — SOAR (15), SecOps/ES (36), ITOps (12), Alert Actions (12), SC4S (23), NetFlow (11)
+- **SC4S integration** — 23 products with SC4S links
+- **NetFlow integration** — 11 products with NetFlow guidance
 - **Splunkbase compatibility** — Platform & multi-select version filters synced from S3
 - **42 saved searches** — 7 categories of analytics + scheduled sync
 - **Custom search command** — `downloadsplunkbasecsv` for catalog sync
@@ -54,32 +54,32 @@ ln -s "$(pwd)/stage" /opt/splunk/etc/apps/splunk-cisco-app-navigator
 
 | Category | Count | Subcategories |
 |---|---|---|
-| Security | 43 | cloud_security, network_security, identity_access, endpoint_security, email_security, threat_response, workload_security, application_security, threat_intelligence |
+| Security | 44 | cloud_security, network_security, identity_access, endpoint_security, email_security, threat_response, workload_security, application_security, threat_intelligence |
 | Networking | 35 | campus_wireless, routing_wan, data_center_net, compute_infra |
 | Collaboration | 12 | meetings_calling, voice_telephony, contact_center |
 | Observability | 3 | infrastructure_monitoring, digital_experience, application_monitoring |
 
 | Status | Count |
 |---|---|
-| Active | 47 |
-| Roadmap | 30 |
+| Active | 50 |
+| Roadmap | 38 |
 | Retired | 11 |
 | Deprecated | 3 |
 | Under Development | 2 |
 
 | Support Level | Count |
 |---|---|
-| Cisco Supported | 36 |
+| Cisco Supported | 38 |
 | Splunk Supported | 9 |
-| Developer Supported | 5 |
+| Developer Supported | 6 |
 | Community Supported | 1 |
-| Not Supported | 42 |
+| Not Supported | 40 |
 
 ## Architecture
 
-- **Product catalog:** `default/products.conf` — 93 stanzas (~3250 lines)
-- **React UI:** `index.jsx` (~8772 lines) via Simple XML + RequireJS + webpack
-- **Styles:** `products.css` (~7165 lines) with CSS variables and dark mode
+- **Product catalog:** `default/products.conf` — 93 stanzas (~3389 lines)
+- **React UI:** `index.jsx` (~9587 lines) via Simple XML + RequireJS + webpack
+- **Styles:** `products.css` (~8099 lines) with CSS variables and dark mode
 - **Build:** `node bin/build.js build` runs generate-catalog.js + webpack
 - **Logging:** `props.conf` with Magic Eight + field extractions via `transforms.conf`
 - **Sync:** `downloadsplunkbasecsv` custom search command (Python 3, splunklib 2.1.1)
@@ -90,9 +90,9 @@ ln -s "$(pwd)/stage" /opt/splunk/etc/apps/splunk-cisco-app-navigator
 
 | File | Lines | Purpose |
 |---|---|---|
-| `src/main/webapp/pages/products/index.jsx` | ~8772 | Main React component |
-| `src/main/resources/splunk/default/products.conf` | ~3250 | Product catalog (93 stanzas) |
-| `src/main/resources/splunk/appserver/static/products.css` | ~7165 | All styles including dark mode |
+| `src/main/webapp/pages/products/index.jsx` | ~9587 | Main React component |
+| `src/main/resources/splunk/default/products.conf` | ~3389 | Product catalog (93 stanzas) |
+| `src/main/resources/splunk/appserver/static/products.css` | ~8099 | All styles including dark mode |
 | `src/main/resources/splunk/default/savedsearches.conf` | — | 42 saved searches |
 | `src/main/resources/splunk/default/data/ui/views/ecosystem_intelligence.xml` | — | Ecosystem Intelligence dashboard (Studio v2) |
 | `src/main/resources/splunk/default/props.conf` | — | Sourcetype + field extractions |

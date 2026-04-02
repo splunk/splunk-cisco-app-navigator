@@ -1,5 +1,42 @@
 # Change Log
 
+1.0.23 — April 1, 2026
+-------
+
+### UI & Card Enhancements
+* **Retired/Deprecated filter fix** — Products with `status = retired` or `status = deprecated` now render correctly when their visibility toggles are active. Fixed in `portfolioProducts` useMemo, FilterDrawer counting, and badge counts.
+* **Slim Data Paths** — Streamlined data path display on cards, enriched SC4S and NetFlow modals with product-specific context.
+* **Glass Pane view** — Added "Active STs" metric to stats bar for data flow visibility.
+* **Dynamic labels from Splunkbase lookup** — Badge and status labels sourced from Splunkbase CSV for accuracy.
+* **Explore button** — Cards with TA-only products (no visible UI) get a contextual "Explore" dropdown (Explore Data in Search, Create Dashboard, Set Custom).
+
+### Catalog Updates
+* **50 active products** (was 48), **38 roadmap** (was 22), **320 unique sourcetypes** (was 303).
+* **Cisco Spaces** — Promoted to active with Splunkbase TA reference.
+* **Cisco Secure Cloud Analytics** — Promoted to active.
+* **Coverage gaps** — Identified and tagged products missing Splunk integration.
+* **NetFlow guidance** — 11 products now include NetFlow collection details.
+* **SC4S expansion** — 23 products (was 17) with SC4S documentation links.
+
+### Build & Packaging
+* **AppInspect automation** — `appinspect.sh` and `appinspect_html_report.py` for automated Splunkbase validation with HTML reports.
+* **App manifest** — `app.manifest` auto-stamped during build.
+* **CODEOWNERS** — Added with `cisco.com` emails for GitHub org matching.
+* **Duplicate key fix** — Merged duplicate `dashboards` key in `[cisco_aci]`.
+* **Package hygiene** — Stripped `local.meta` from package tarball.
+
+### Documentation
+* **Architecture Guide** — Comprehensive A-to-Z guide tracked in `packages/.../docs/`.
+* **User Manual** — End-user guide added to tracked docs.
+* **Decision log** — `DECISIONS.md` tracks all major design decisions with rationale.
+* **Cursor rules** — AI development conventions added for consistent coding assistance.
+
+### Bug Fixes
+* **Sourcetype data accuracy** — Improved chip coloring and search scoping.
+* **Standalone detection** — Fixed for non-cluster Splunk deployments.
+* **Feedback clipboard fallback** — Graceful degradation when clipboard API unavailable.
+* **Build number display** — Correctly reflects `app.conf` build hash.
+
 1.0.5 — March 21, 2026
 -------
 
