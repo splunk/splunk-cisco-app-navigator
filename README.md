@@ -130,20 +130,6 @@ curl -sk -u admin:changeme \
 | Webpack | 5.105.4 |
 | Simple XML | 1.1 |
 
-## Cisco Brand Assets
-
-The app uses Cisco brand icons, fonts, and logos. These assets are **not tracked
-in git** (too large). To obtain them locally, download from:
-
-- **BX Employee Collection:** https://bx.cisco.com/cisco-brand-exchange/employee
-- **Cisco Security Brand Resources Hub:** https://brandfolder.com/ciscosecurity
-
-Place downloaded assets in a local `cisco/` folder at the repo root. See
-`cisco/README.md` (if present) for the expected folder structure.
-
-The icons actually used in the app are already committed in
-`packages/splunk-cisco-app-navigator/src/main/resources/splunk/appserver/static/icons/`.
-
 ## Documentation
 
 - [Architecture Guide](packages/splunk-cisco-app-navigator/docs/SCAN_Architecture_Guide.md) — comprehensive A-Z documentation
