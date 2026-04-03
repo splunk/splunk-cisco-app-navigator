@@ -7,18 +7,16 @@ metadata:
     functionalDomain: []
     description: ' Splunk Cisco App Navigator provides a unified glass-pane for discovering, deploying, and managing the full portfolio of Cisco Splunk apps and add-ons. Browse the product catalog, check installation health, view documentation, and streamline onboarding across Splunk Enterprise and Splunk Cloud — all from a single dashboard.'
     annotations:
-        backstage.io/source-location: url:https://cd.splunkdev.com/sg-cloud-tools-engineering/splunk-cisco-app-navigator
-        splunk.com/issue-tracker-url: http://go/replace/me
+        backstage.io/source-location: url:https://github.com/splunk/splunk-cisco-app-navigator
+        splunk.com/issue-tracker-url: https://github.com/splunk/splunk-cisco-app-navigator/issues
         splunk.com/slack-url: http://go/replace/me
-        backstage.io/view-url: https://cd.splunkdev.com/sg-cloud-tools-engineering/splunk-cisco-app-navigator/-/blob/main/.service-manifests/splunk-cisco-app-navigator-component.yaml
-        backstage.io/edit-url: https://cd.splunkdev.com/sg-cloud-tools-engineering/splunk-cisco-app-navigator/-/edit/main/.service-manifests/splunk-cisco-app-navigator-component.yaml
+        backstage.io/view-url: https://github.com/splunk/splunk-cisco-app-navigator/blob/main/.service-manifests/splunk-cisco-app-navigator-component.yaml
+        backstage.io/edit-url: https://github.com/splunk/splunk-cisco-app-navigator/edit/main/.service-manifests/splunk-cisco-app-navigator-component.yaml
     links:
-        - title: Overview
-          url: http://go/replace/me
-        - title: ERD/RFC
-          url: http://go/replace/me
-        - title: Ops Runbook
-          url: http://go/replace/me
+        - title: Splunkbase
+          url: https://splunkbase.splunk.com/app/8566
+        - title: GitHub Issues
+          url: https://github.com/splunk/splunk-cisco-app-navigator/issues
 spec:
     lifecycle: production
     type: product

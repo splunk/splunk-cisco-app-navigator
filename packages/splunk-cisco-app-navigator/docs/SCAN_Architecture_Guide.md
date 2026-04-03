@@ -1304,16 +1304,13 @@ maintenance, auditing, and data management:
 
 | Remote | Host | URL |
 |---|---|---|
-| `origin` | GitLab (cd.splunkdev.com) | `https://cd.splunkdev.com/sg-cloud-tools-engineering/splunk-cisco-app-navigator.git` |
-| `github` | GitHub (github.com) | `https://github.com/splunk/splunk-cisco-app-navigator.git` |
+| `origin` | GitHub | `https://github.com/splunk/splunk-cisco-app-navigator.git` |
 
-**Primary working branch:** `TENG-2573`  
-**Public default branch on GitHub:** `main`
+**Default branch:** `main`
 
-**Workflow:** Day-to-day commits land on GitLab (`origin`); changes are pushed to **GitHub `main`** for public visibility and downstream consumers (per team process — keep both remotes in sync as appropriate).
+**Workflow:** All development happens on GitHub. Feature branches follow the `TENG-<Jira Number>` naming convention and merge to `main` via pull request.
 
-The app was previously at a separate "Cisco Control Center" repo which has
-been archived. All development now happens in this repository.
+The app was previously hosted on GitLab (cd.splunkdev.com) and before that at a separate "Cisco Control Center" repo — both have been archived. All development now happens on GitHub.
 
 ### Branching Convention
 
