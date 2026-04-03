@@ -80,7 +80,7 @@ ln -s "$(pwd)/stage" /opt/splunk/etc/apps/splunk-cisco-app-navigator
 
 # 4. Clear cache & refresh
 rm -f /opt/splunk/var/run/splunk/appserver/i18n/products*.cache
-curl -sk -u admin:changeme \
+curl -sk -u admin:<your-password> \
   https://localhost:8089/servicesNS/nobody/splunk-cisco-app-navigator/configs/conf-products/_reload \
   -X POST > /dev/null 2>&1
 ```

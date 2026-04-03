@@ -1310,7 +1310,7 @@ maintenance, auditing, and data management:
 
 **Workflow:** All development happens on GitHub. Feature branches follow the `TENG-<Jira Number>` naming convention and merge to `main` via pull request.
 
-The app was previously hosted on GitLab (cd.splunkdev.com) and before that at a separate "Cisco Control Center" repo — both have been archived. All development now happens on GitHub.
+The app was previously known as "Cisco Control Center" in an earlier repo which has been archived. All development now happens on GitHub.
 
 ### Branching Convention
 
