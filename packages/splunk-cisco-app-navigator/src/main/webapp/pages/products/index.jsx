@@ -3271,124 +3271,14 @@ function LegacyAuditModal({ open, onClose, legacyUids, installedApps, indexerApp
     );
 }
 
-// ────────────────────  FEEDBACK MODAL  ─────────────────────
-function feedbackFallbackCopy(text, onSuccess, onFail) {
-    const ta = document.createElement('textarea');
-    ta.value = text;
-    ta.style.position = 'fixed';
-    ta.style.left = '-9999px';
-    ta.style.opacity = '0';
-    document.body.appendChild(ta);
-    ta.select();
-    try { document.execCommand('copy'); onSuccess(); }
-    catch (_) { onFail(); }
-    document.body.removeChild(ta);
-}
-const FEEDBACK_EMAIL = 'scan-feedback@cisco.com';
-const FEEDBACK_TYPES = [
-    { id: 'feature', label: 'Feature Request' },
-    { id: 'bug', label: 'Bug Report' },
-    { id: 'improvement', label: 'Improvement' },
-    { id: 'general', label: 'General' },
-];
+// ────────────────────  FEEDBACK TAB  ─────────────────────
+const GITHUB_ISSUES_URL = 'https://github.com/splunk/splunk-cisco-app-navigator/issues';
 
-function FeedbackModal({ open, onClose, platformType, appVersion }) {
-    const returnFocusRef = useRef(null);
-    const [feedbackType, setFeedbackType] = useState('feature');
-    const [description, setDescription] = useState('');
-    const [actionMsg, setActionMsg] = useState(null);
+function FeedbackModal() { return null; }
 
-    if (!open) return null;
-
-    const typeLabel = FEEDBACK_TYPES.find(t => t.id === feedbackType)?.label || feedbackType;
-
-    const buildBody = () => [
-        `Type: ${typeLabel}`,
-        `Platform: ${platformType || 'unknown'}`,
-        `SCAN Version: ${appVersion || 'unknown'}`,
-        `Browser: ${navigator.userAgent}`,
-        '',
-        'Feedback:',
-        description || '(please describe your feedback here)',
-    ].join('\n');
-
-    const handleSendEmail = () => {
-        if (!description.trim()) { setActionMsg({ type: 'error', text: 'Please write your feedback first.' }); return; }
-        const subject = `[SCAN Feedback] ${typeLabel}`;
-        const body = buildBody();
-        window.location.href = `mailto:${FEEDBACK_EMAIL}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
-        setActionMsg({ type: 'success', text: 'Email client opened! Send the email to complete.' });
-    };
-
-    const handleCopyToClipboard = () => {
-        if (!description.trim()) { setActionMsg({ type: 'error', text: 'Please write your feedback first.' }); return; }
-        const text = `To: ${FEEDBACK_EMAIL}\nSubject: [SCAN Feedback] ${typeLabel}\n\n${buildBody()}`;
-        const onSuccess = () => {
-            setActionMsg({ type: 'success', text: 'Copied to clipboard! Paste into your preferred email or messaging app.' });
-            setTimeout(() => setActionMsg(null), 4000);
-        };
-        const onFail = () => setActionMsg({ type: 'error', text: 'Could not copy — please select and copy manually.' });
-        if (navigator.clipboard && window.isSecureContext) {
-            navigator.clipboard.writeText(text).then(onSuccess).catch(() => {
-                feedbackFallbackCopy(text, onSuccess, onFail);
-            });
-        } else {
-            feedbackFallbackCopy(text, onSuccess, onFail);
-        }
-    };
-
-    const radioStyle = (selected) => ({
-        padding: '6px 14px', fontSize: '13px', fontWeight: 500, cursor: 'pointer',
-        borderRadius: '6px', border: '1px solid', borderColor: selected ? 'var(--border-medium, #d2cbc5)' : 'var(--border-light, #e3ddd8)',
-        background: selected ? 'var(--bg-primary, #f4f4f4)' : 'var(--bg-surface, #fff)', color: 'var(--text-primary, #342f2c)',
-        transition: 'all .15s',
-    });
-
+function FeedbackTab() {
     return (
-        <Modal open={true} returnFocus={returnFocusRef} onRequestClose={onClose} style={{ maxWidth: '640px', width: '92vw' }}>
-            <Modal.Header title="Give Feedback" />
-            <Modal.Body>
-                <div className="csc-sc4s-info" style={{ fontSize: '13px', lineHeight: '1.6' }}>
-                    <p style={{ color: 'var(--muted-color, #666)', marginBottom: '20px' }}>
-                        Share thoughts, report issues, or suggest features.
-                        Clicking <b>Send via Email</b> will open your email client with the details pre-filled.
-                    </p>
-                    <div style={{ marginBottom: '18px' }}>
-                        <label style={{ fontWeight: 600, display: 'block', marginBottom: '6px' }}>Feedback Type</label>
-                        <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
-                            {FEEDBACK_TYPES.map(t => (
-                                <span key={t.id} style={radioStyle(feedbackType === t.id)} onClick={() => setFeedbackType(t.id)}>
-                                    {t.label}
-                                </span>
-                            ))}
-                        </div>
-                    </div>
-                    <div style={{ marginBottom: '18px' }}>
-                        <label style={{ fontWeight: 600, display: 'block', marginBottom: '6px' }}>Your Feedback</label>
-                        <textarea value={description}
-                            onChange={e => { setDescription(e.target.value); setActionMsg(null); }}
-                            rows={5} placeholder="Please provide as much detail as possible..."
-                            style={{ width: '100%', padding: '8px 12px', fontSize: '13px', border: '1px solid var(--input-border, #ccc)', borderRadius: '6px', boxSizing: 'border-box', resize: 'vertical', background: 'var(--input-bg, #fff)', color: 'var(--page-color, #333)' }}
-                        />
-                    </div>
-                    <div style={{ padding: '10px 14px', marginBottom: '14px', background: 'var(--card-footer-bg, #f9fafb)', borderRadius: '6px', fontSize: '11px', color: 'var(--muted-color, #888)', lineHeight: '1.5' }}>
-                        The following context will be included automatically: feedback type, platform ({platformType || 'unknown'}), SCAN version ({appVersion || 'unknown'}), and browser info.
-                    </div>
-                    {actionMsg && <Message type={actionMsg.type}>{actionMsg.text}</Message>}
-                </div>
-            </Modal.Body>
-            <Modal.Footer>
-                <Button appearance="secondary" label="Cancel" onClick={onClose} />
-                <Button appearance="secondary" label="Copy to Clipboard" onClick={handleCopyToClipboard} />
-                <Button appearance="primary" className="scan-btn-primary" label="Send via Email" onClick={handleSendEmail} />
-            </Modal.Footer>
-        </Modal>
-    );
-}
-
-function FeedbackTab({ onClick }) {
-    return (
-        <button className="scan-feedback-tab" onClick={onClick} title="Give Feedback">
+        <button className="scan-feedback-tab" onClick={() => window.open(GITHUB_ISSUES_URL, '_blank', 'noopener,noreferrer')} title="Give Feedback on GitHub">
             <span className="scan-feedback-tab-icon"></span>
             <span className="scan-feedback-tab-text">Give Feedback</span>
         </button>
