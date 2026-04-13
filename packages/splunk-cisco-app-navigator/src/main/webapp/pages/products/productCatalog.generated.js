@@ -2471,8 +2471,10 @@ export const PRODUCT_CATALOG = [
     "legacy_uids": [],
     "community_uids": [],
     "sourcetypes": [
+      "cisco:cloud_security:appdiscovery",
       "cisco:cloud_security:audit",
       "cisco:cloud_security:dlp",
+      "cisco:cloud_security:dns",
       "cisco:cloud_security:fileevent",
       "cisco:cloud_security:firewall",
       "cisco:cloud_security:intrusion",
@@ -2481,7 +2483,14 @@ export const PRODUCT_CATALOG = [
       "cisco:cloud_security:ravpn",
       "cisco:cloud_security:ztna",
       "cisco:cloud_security:ztnaenrollment",
-      "cisco:cloud_security:ztnaflow"
+      "cisco:cloud_security:ztnaflow",
+      "cisco:secure_access:security_events_andalerts",
+      "cisco:secure_access:security_events_dlp",
+      "cisco:secure_access:security_events_dns",
+      "cisco:secure_access:security_events_intrusion",
+      "cisco:secure_access:security_events_ravpn",
+      "cisco:secure_access:security_events_web",
+      "cisco:secure_access:security_events_ztna"
     ],
     "dashboards": [
       "access"
@@ -2601,8 +2610,11 @@ export const PRODUCT_CATALOG = [
     "sourcetypes": [
       "cisco:cloud_security:appdiscovery",
       "cisco:cloud_security:audit",
+      "cisco:cloud_security:dlp",
       "cisco:cloud_security:dns",
-      "cisco:cloud_security:ip"
+      "cisco:cloud_security:firewall",
+      "cisco:cloud_security:ip",
+      "cisco:cloud_security:proxy"
     ],
     "dashboards": [
       "dns"
@@ -4095,9 +4107,6 @@ export const PRODUCT_CATALOG = [
     ],
     "community_uids": [],
     "sourcetypes": [
-      "cisco:catalyst:center:compliance:report",
-      "cisco:catalyst:center:inventory:report",
-      "cisco:catalyst:syslog",
       "cisco:dnac:audit:logs",
       "cisco:dnac:client",
       "cisco:dnac:clienthealth",

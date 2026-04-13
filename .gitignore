@@ -25,6 +25,9 @@ __pycache__/
 # === Splunk local overrides (never commit) ===
 **/local/
 
+# Splunk MCP local secrets (see packages/splunk-cisco-app-navigator/splunk-mcp.env.example)
+packages/splunk-cisco-app-navigator/.env.splunk-mcp
+
 # === Backups & docs (local reference, not tracked) ===
 backups/
 /docs/
@@ -36,3 +39,8 @@ backups/
 .github/copilot-instructions.md
 *.bak
 *.backup
+packages/splunk-cisco-app-navigator/bin/run-splunk-mcp.sh
+packages/splunk-cisco-app-navigator/docs/SPLUNK_MCP_CURSOR_MANUAL.md
+packages/splunk-cisco-app-navigator/splunk-mcp.cursor.example.json
+packages/splunk-cisco-app-navigator/splunk-mcp.env.example
+packages/splunk-cisco-app-navigator/docs/DECISIONS.md
