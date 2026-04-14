@@ -2484,6 +2484,7 @@ export const PRODUCT_CATALOG = [
       "cisco:cloud_security:ztna",
       "cisco:cloud_security:ztnaenrollment",
       "cisco:cloud_security:ztnaflow",
+      "cisco:secure_access:*",
       "cisco:secure_access:security_events_andalerts",
       "cisco:secure_access:security_events_dlp",
       "cisco:secure_access:security_events_dns",
@@ -4952,7 +4953,9 @@ export const PRODUCT_CATALOG = [
     "learn_more_url": "https://www.cisco.com/c/en/us/solutions/enterprise-networks/dna-spaces/index.html",
     "legacy_uids": [],
     "community_uids": [],
-    "sourcetypes": [],
+    "sourcetypes": [
+      "cisco:spaces:firehose"
+    ],
     "dashboards": [],
     "custom_dashboard": "",
     "icon_emoji": "globe",
@@ -5052,6 +5055,7 @@ export const PRODUCT_CATALOG = [
     "community_uids": [],
     "sourcetypes": [
       "cisco:firewall:logs",
+      "cisco:sdwan:*",
       "cisco:sdwan:acl:logs",
       "cisco:sdwan:alert:off",
       "cisco:sdwan:alert:on",
