@@ -1,6 +1,6 @@
 # Splunk Cisco App Navigator (SCAN)
 
-**Version:** 1.0.25 · [**Splunkbase**](https://splunkbase.splunk.com/app/8566) · [**GitHub Issues**](https://github.com/splunk/splunk-cisco-app-navigator/issues)
+**Version:** 1.0.26 · [**Splunkbase**](https://splunkbase.splunk.com/app/8566) · [**GitHub Issues**](https://github.com/splunk/splunk-cisco-app-navigator/issues)
 
 The **Splunk Cisco App Navigator** is the front door to the Cisco–Splunk
 ecosystem — a unified product catalog where Splunk administrators can discover,
