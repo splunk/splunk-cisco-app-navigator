@@ -1917,7 +1917,7 @@ const MAGIC_EIGHT = [
     },
 ];
 
-function MagicEightModal({ open, onClose, sourcetypes, productName, addonApp, addonLabel, appViz, appViz2, installedApps, indexerApps }) {
+function MagicEightModal({ open, onClose, sourcetypes, productName, addonApp, addonLabel, appViz, appViz2, installedApps, indexerApps, platformType }) {
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
     const [results, setResults] = useState(null); // { sourcetype: { setting: value } }
@@ -2019,7 +2019,7 @@ function MagicEightModal({ open, onClose, sourcetypes, productName, addonApp, ad
             } else if (!indexerApps) {
                 state = 'loading';
             } else if (Object.keys(indexerApps).length === 0) {
-                state = 'standalone';
+                state = platformType === 'cloud' ? 'cloud' : 'standalone';
             } else if (!idx) {
                 state = 'missing';
             } else if (idxDisabled) {
@@ -2265,6 +2265,7 @@ function MagicEightModal({ open, onClose, sourcetypes, productName, addonApp, ad
                                                 missing: { cls: 'scan-m8-state-missing', label: 'Not on Indexers' },
                                                 disabled: { cls: 'scan-m8-state-disabled', label: 'Disabled on IDX' },
                                                 standalone: { cls: 'scan-m8-state-standalone', label: 'Standalone' },
+                                                cloud: { cls: 'scan-m8-state-ok', label: 'Cloud' },
                                                 sh_only: { cls: 'scan-m8-state-ok', label: 'SH Only' },
                                                 loading: { cls: 'scan-m8-state-standalone', label: 'Checking…' },
                                             }[r.state] || { cls: 'scan-m8-state-standalone', label: '—' };
@@ -2278,7 +2279,7 @@ function MagicEightModal({ open, onClose, sourcetypes, productName, addonApp, ad
                                                         <code style={{ fontSize: '11px', padding: '1px 6px', background: 'var(--bg-surface, #f0ede9)', borderRadius: '3px' }}>{r.shVer || '—'}</code>
                                                     </td>
                                                     <td style={{ padding: '4px 8px' }}>
-                                                        {r.state === 'standalone' || r.state === 'sh_only' ? (
+                                                        {r.state === 'standalone' || r.state === 'cloud' || r.state === 'sh_only' ? (
                                                             <span className="scan-m8-muted">N/A</span>
                                                         ) : r.state === 'loading' ? (
                                                             <span className="scan-m8-muted">…</span>
@@ -3786,15 +3787,25 @@ function ProductCard({ product, installedApps, appStatuses, indexerApps, sourcet
     const hasDeps = allDeps.length > 0;
 
     // Launch handlers
+    // Each dashboard entry may be "view_name" or "app_id/view_name".
     const productDashboards = product.dashboards || (product.dashboard ? [product.dashboard] : []);
+
+    const parseDashEntry = (entry) => {
+        if (!entry) return { app: null, view: '' };
+        const slash = entry.indexOf('/');
+        if (slash > 0) return { app: entry.slice(0, slash), view: entry.slice(slash + 1) };
+        return { app: null, view: entry };
+    };
+
     const handleLaunchDashboard = (dash) => {
-        const launchTarget = app_viz || addon;
-        if (!launchTarget || !(vizAppStatus?.installed || appStatus?.installed)) return;
-        if (dash) {
-            const dashApp = app_viz || addon || launchTarget;
-            window.open(createURL(`/app/${dashApp}/${dash}`), '_blank');
+        const fallbackApp = app_viz || addon;
+        if (!fallbackApp || !(vizAppStatus?.installed || appStatus?.installed)) return;
+        const { app: explicitApp, view } = parseDashEntry(dash);
+        if (view) {
+            const dashApp = explicitApp || app_viz || addon;
+            window.open(createURL(`/app/${dashApp}/${view}`), '_blank');
         } else {
-            window.open(createURL(`/app/${launchTarget}/`), '_blank');
+            window.open(createURL(`/app/${fallbackApp}/`), '_blank');
         }
     };
     const handleLaunchDefault = () => {
@@ -4157,7 +4168,7 @@ function ProductCard({ product, installedApps, appStatuses, indexerApps, sourcet
                                         </span>
                                         </>
                                     ) : (
-                                        <span className={`scan-tier-chip ${appStatus?.installed ? 'scan-tier-ok' : 'scan-tier-miss'}`} title={appStatus?.installed ? `Standalone: v${appStatus.version || ''} — Click to audit props.conf` : 'Not installed'} onClick={product.sourcetypes && product.sourcetypes.length > 0 ? (e) => { e.stopPropagation(); e.preventDefault(); setMagicEightOpen(true); } : undefined} style={product.sourcetypes && product.sourcetypes.length > 0 ? { cursor: 'pointer' } : undefined}>
+                                        <span className={`scan-tier-chip ${appStatus?.installed ? 'scan-tier-ok' : 'scan-tier-miss'}`} title={appStatus?.installed ? `${platformType === 'cloud' ? 'Cloud' : 'Standalone'}: v${appStatus.version || ''} — Click to audit props.conf` : 'Not installed'} onClick={product.sourcetypes && product.sourcetypes.length > 0 ? (e) => { e.stopPropagation(); e.preventDefault(); setMagicEightOpen(true); } : undefined} style={product.sourcetypes && product.sourcetypes.length > 0 ? { cursor: 'pointer' } : undefined}>
                                             <CylinderMagnifier size={12} /> Search Head {appStatus?.installed ? '✓' : '✗'}
                                         </span>
                                     )}
@@ -4673,15 +4684,29 @@ function ProductCard({ product, installedApps, appStatuses, indexerApps, sourcet
                                 <div className="csc-launch-menu" ref={launchMenuRef}
                                     style={{ top: launchMenuPos.top, left: launchMenuPos.left }}>
                                     {productDashboards.length > 1 ? (
-                                        productDashboards.map((dash, i) => (
-                                            <button key={dash} className="csc-launch-menu-item" onClick={() => { handleLaunchDashboard(dash); setLaunchMenuOpen(false); }}>
-                                                {dash.replace(/_/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase())}
-                                            </button>
-                                        ))
+                                        productDashboards.map((dash) => {
+                                            const { app: dApp, view: dView } = parseDashEntry(dash);
+                                            const viewLabel = dView.replace(/_/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase());
+                                            const dashAppInstalled = dApp
+                                                ? !!(appStatuses[dApp]?.installed)
+                                                : !!(vizAppStatus?.installed || appStatus?.installed);
+                                            const appLabel = dApp === addon ? _addonLabel
+                                                : dApp === app_viz ? _appVizLabel
+                                                : dApp || '';
+                                            return (
+                                                <button key={dash}
+                                                    className={`csc-launch-menu-item${dashAppInstalled ? '' : ' csc-launch-menu-item-unavailable'}`}
+                                                    title={dashAppInstalled ? `Open ${dView} in ${appLabel || 'app'}` : `${appLabel || dApp} is not installed`}
+                                                    onClick={() => { handleLaunchDashboard(dash); setLaunchMenuOpen(false); }}>
+                                                    {viewLabel}
+                                                    {dApp && <span className="csc-launch-menu-app-hint">{appLabel || dApp}{!dashAppInstalled ? ' ✗' : ''}</span>}
+                                                </button>
+                                            );
+                                        })
                                     ) : (
                                         <button className="csc-launch-menu-item" onClick={() => { handleLaunchDefault(); setLaunchMenuOpen(false); }}>
                                             {productDashboards[0]
-                                                ? productDashboards[0].replace(/_/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase())
+                                                ? parseDashEntry(productDashboards[0]).view.replace(/_/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase())
                                                 : (_appVizLabel || _addonLabel || 'Default Dashboard')}
                                         </button>
                                     )}
@@ -4879,7 +4904,7 @@ function ProductCard({ product, installedApps, appStatuses, indexerApps, sourcet
                 netflowConfigNotes: netflow_config_notes,
             }} />}
             <HFInfoModal open={hfInfoOpen} onClose={() => setHfInfoOpen(false)} isCloud={platformType === 'cloud'} />
-            <MagicEightModal open={magicEightOpen} onClose={() => setMagicEightOpen(false)} sourcetypes={product.sourcetypes} productName={display_name} addonApp={addon} addonLabel={_addonLabel} appViz={app_viz} appViz2={app_viz_2} installedApps={installedApps} indexerApps={indexerApps} />
+            <MagicEightModal open={magicEightOpen} onClose={() => setMagicEightOpen(false)} sourcetypes={product.sourcetypes} productName={display_name} addonApp={addon} addonLabel={_addonLabel} appViz={app_viz} appViz2={app_viz_2} installedApps={installedApps} indexerApps={indexerApps} platformType={platformType} />
             {hasSoar && <SOARInfoModal open={soarInfoOpen} onClose={() => setSoarInfoOpen(false)} soarConnectorUids={soar_connector_uids} splunkbaseData={splunkbaseData} productName={display_name} />}
             {hasItops && <ITOpsContentModal open={itopsInfoOpen} onClose={() => setItopsInfoOpen(false)} itsiContentPack={itsi_content_pack} iteLearnContent={product.ite_learn_content} iteLearnProcedures={product.ite_learn_procedures} iteLearnProcedureCount={product.ite_learn_procedure_count} productName={display_name} installedApps={installedApps} />}
             {hasSecops && <SecOpsContentModal open={secopsInfoOpen} onClose={() => setSecopsInfoOpen(false)} productName={display_name} esCompatible={es_compatible} cimDataModels={es_cim_data_models} escuStories={escu_analytic_stories} escuDetectionCount={escu_detection_count} escuDetections={escu_detections} sseContent={product.sse_content} sseUseCases={product.sse_use_cases} sseUseCaseCount={product.sse_use_case_count} installedApps={installedApps} />}
@@ -4930,7 +4955,7 @@ function toSplunkConf(data) {
         if (p.sc4s_supported) lines.push('sc4s_supported = true');
         // CSV array fields
         if (p.sourcetypes && p.sourcetypes.length) lines.push(`sourcetypes = ${p.sourcetypes.join(',')}`);
-        if (p.dashboard) lines.push(`dashboards = ${p.dashboard}`);
+        if (p.dashboards && p.dashboards.length) lines.push(`dashboards = ${p.dashboards.join(',')}`);
         if (p.custom_dashboard) lines.push(`custom_dashboard = ${p.custom_dashboard}`);
         if (p.keywords && p.keywords.length) lines.push(`keywords = ${p.keywords.join(',')}`);
         if (p.aliases && p.aliases.length) lines.push(`aliases = ${p.aliases.join(',')}`);

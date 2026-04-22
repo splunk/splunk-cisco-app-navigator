@@ -1,5 +1,22 @@
 # Change Log
 
+1.0.26 — April 22, 2026
+-------
+
+### Launch Button — Explicit App Context for Dashboards
+* **`app_id/view_name` format** — The `dashboards` field in products.conf now accepts explicit app context (e.g. `ta_cisco_thousandeyes/application`) alongside plain view names. This resolves ambiguity for hybrid TA+app products whose dashboards span multiple Splunk apps.
+* **Smart launch handler** — The Launch button and dropdown now parse the explicit app from each dashboard entry, falling back to the existing `app_viz || addon` resolution for plain names. Backward-compatible with all existing products.
+* **Per-dashboard app label** — The dropdown shows the owning app name alongside each dashboard entry, with dimmed styling when the app is not installed.
+* **Cisco ThousandEyes** — Added `dashboards = ta_cisco_thousandeyes/application,cisco-catalyst-app/network,cisco-catalyst-app/alerts` so the primary dashboard opens in the TA while the network and alerts dashboards open in the viz app.
+
+### Bug Fixes
+* **Stray text in savedsearches.conf** — Removed accidental `so thi` appended to end of file that caused a Splunk btool parse error.
+* **Export function** — Fixed dashboard export to use `p.dashboards` (array) instead of stale `p.dashboard` (singular).
+
+1.0.25 — April 6, 2026
+-------
+*Splunkbase release — version bump, build hash stamp, README update.*
+
 1.0.23 — April 1, 2026
 -------
 

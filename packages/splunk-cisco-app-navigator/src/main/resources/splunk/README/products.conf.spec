@@ -234,7 +234,10 @@ sourcetypes = <comma-separated list>
 * Sourcetypes for MTTI health checks (e.g. "cisco:asa,cisco:asa:syslog").
 
 dashboards = <comma-separated list>
-* Dashboard XML view names for the "Launch" button.
+* Dashboard view names for the "Launch" button. The first entry is the default.
+* Each entry can be a plain view name (e.g. "overview") which resolves to app_viz
+* or addon, OR an explicit "app_id/view_name" pair when the dashboard lives in a
+* specific app (e.g. "ta_cisco_thousandeyes/application,cisco-catalyst-app/network").
 
 custom_dashboard = <string>
 * Optional. Customer-defined dashboard to launch instead of (or alongside) the default.

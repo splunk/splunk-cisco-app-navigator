@@ -7636,8 +7636,9 @@ export const PRODUCT_CATALOG = [
       "cisco:thousandeyes:trace"
     ],
     "dashboards": [
-      "network",
-      "alerts"
+      "ta_cisco_thousandeyes/application",
+      "cisco-catalyst-app/network",
+      "cisco-catalyst-app/alerts"
     ],
     "custom_dashboard": "",
     "icon_emoji": "eye",
