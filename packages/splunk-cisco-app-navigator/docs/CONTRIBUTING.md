@@ -9,16 +9,22 @@ via pull request.
 ```
 main ─────●────────●────────●──── (always releasable)
            \      / \      /
-            TENG-1234  TENG-5678
+       feature/…   fix/…
 ```
 
 ### Branch Naming
 
-| Type | Pattern | Example |
+| Prefix | When to use | Example |
 |---|---|---|
-| Feature / task | `TENG-<Jira#>` | `TENG-2573` |
-| Hotfix | `hotfix/TENG-<Jira#>` | `hotfix/TENG-2600` |
-| Experimental | `spike/<short-desc>` | `spike/react18-upgrade` |
+| `feature/` | New feature or enhancement | `feature/dashboard-app-context` |
+| `fix/` | Bug fix | `fix/savedsearches-parse-error` |
+| `hotfix/` | Urgent production fix | `hotfix/btool-crash` |
+| `docs/` | Documentation only | `docs/contributing-branching-policy` |
+| `chore/` | Build, deps, version bumps | `chore/bump-v1.0.27` |
+| `refactor/` | Code restructuring | `refactor/launch-handler` |
+| `spike/` | Experimental / throwaway | `spike/react18-upgrade` |
+
+Use lowercase, hyphens for spaces, and keep it short but descriptive.
 
 ### Rules
 
@@ -33,7 +39,7 @@ main ─────●────────●────────●─
 ```bash
 git checkout main
 git pull origin main
-git checkout -b TENG-<Jira#>
+git checkout -b feature/my-new-feature
 ```
 
 ## Commit Messages — Conventional Commits
@@ -70,7 +76,7 @@ docs: add architecture guide
 
 1. Push your branch to origin:
    ```bash
-   git push -u origin TENG-<Jira#>
+   git push -u origin feature/my-new-feature
    ```
 2. Open a PR targeting `main` on GitHub.
 3. PR title should match the primary commit message.
