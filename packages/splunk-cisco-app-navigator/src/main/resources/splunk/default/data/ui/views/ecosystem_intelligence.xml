@@ -623,6 +623,7 @@
 				"count": 25,
 				"dataOverlayMode": "none",
 				"drilldown": "none",
+				"headerVisibility": "fixed",
 				"showRowNumbers": true,
 				"tableFormat": {
 					"headerBackgroundColor": "#E8EDF2",
@@ -641,6 +642,7 @@
 				"count": 30,
 				"dataOverlayMode": "none",
 				"drilldown": "none",
+				"headerVisibility": "fixed",
 				"showRowNumbers": true,
 				"tableFormat": {
 					"headerBackgroundColor": "#E8EDF2",
@@ -659,6 +661,7 @@
 				"count": 50,
 				"dataOverlayMode": "none",
 				"drilldown": "none",
+				"headerVisibility": "fixed",
 				"showRowNumbers": true,
 				"tableFormat": {
 					"headerBackgroundColor": "#E8EDF2",
@@ -677,13 +680,14 @@
 				"count": 50,
 				"dataOverlayMode": "none",
 				"drilldown": "none",
+				"fontSize": "small",
+				"headerVisibility": "fixed",
 				"showRowNumbers": true,
 				"tableFormat": {
 					"headerBackgroundColor": "#E8EDF2",
 					"headerFontColor": "#314257",
 					"rowBackgroundColors": "> table | seriesByIndex(0) | pick(#f9fafb,#ffffff)"
-				},
-				"fontSize": "small"
+				}
 			},
 			"title": "Magic Eight Compliance — All Stanzas",
 			"type": "splunk.table"
@@ -696,6 +700,7 @@
 				"count": 30,
 				"dataOverlayMode": "none",
 				"drilldown": "none",
+				"headerVisibility": "fixed",
 				"showRowNumbers": true,
 				"tableFormat": {
 					"headerBackgroundColor": "#E8EDF2",
@@ -714,6 +719,7 @@
 				"count": 50,
 				"dataOverlayMode": "none",
 				"drilldown": "none",
+				"headerVisibility": "fixed",
 				"showRowNumbers": true,
 				"tableFormat": {
 					"headerBackgroundColor": "#E8EDF2",
@@ -732,6 +738,7 @@
 				"count": 50,
 				"dataOverlayMode": "none",
 				"drilldown": "none",
+				"headerVisibility": "fixed",
 				"showRowNumbers": true,
 				"tableFormat": {
 					"headerBackgroundColor": "#E8EDF2",
@@ -750,6 +757,7 @@
 				"count": 30,
 				"dataOverlayMode": "none",
 				"drilldown": "none",
+				"headerVisibility": "fixed",
 				"showRowNumbers": true,
 				"tableFormat": {
 					"headerBackgroundColor": "#E8EDF2",
@@ -768,6 +776,7 @@
 				"count": 20,
 				"dataOverlayMode": "none",
 				"drilldown": "none",
+				"headerVisibility": "fixed",
 				"showRowNumbers": true,
 				"tableFormat": {
 					"headerBackgroundColor": "#E8EDF2",
@@ -786,6 +795,7 @@
 				"count": 25,
 				"dataOverlayMode": "none",
 				"drilldown": "none",
+				"headerVisibility": "fixed",
 				"showRowNumbers": true,
 				"tableFormat": {
 					"headerBackgroundColor": "#E8EDF2",
@@ -1578,13 +1588,13 @@
 					},
 					{
 						"item": "input_min_version",
-						"type": "input",
 						"position": {
-							"x": 1470,
-							"y": 20,
+							"h": 82,
 							"w": 198,
-							"h": 82
-						}
+							"x": 1470,
+							"y": 20
+						},
+						"type": "input"
 					}
 				],
 				"type": "absolute"
@@ -1592,14 +1602,14 @@
 			"layout_tab4": {
 				"options": {
 					"display": "fit-to-width",
-					"height": 1100,
+					"height": 1400,
 					"width": 1960
 				},
 				"structure": [
 					{
 						"item": "viz_umspZWQb",
 						"position": {
-							"h": 1100,
+							"h": 1350,
 							"w": 1960,
 							"x": 0,
 							"y": 0
@@ -1669,7 +1679,7 @@
 					{
 						"item": "viz_table_magic6",
 						"position": {
-							"h": 540,
+							"h": 770,
 							"w": 1920,
 							"x": 20,
 							"y": 550
