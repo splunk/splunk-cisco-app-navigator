@@ -1000,8 +1000,18 @@ export const PRODUCT_CATALOG = [
     ],
     "community_uids": [],
     "sourcetypes": [
+      "cisco:duo",
+      "cisco:duo:*",
+      "cisco:duo:account",
+      "cisco:duo:activity",
+      "cisco:duo:administrator",
       "cisco:duo:authentication",
-      "cisco:duo:authentication_v2"
+      "cisco:duo:authentication_v2",
+      "cisco:duo:endpoint",
+      "cisco:duo:telephony",
+      "cisco:duo:telephony_v2",
+      "cisco:duo:trust_monitor",
+      "cisco:duo:user"
     ],
     "dashboards": [
       "duo_overview"
@@ -2940,6 +2950,7 @@ export const PRODUCT_CATALOG = [
     "legacy_uids": [],
     "community_uids": [],
     "sourcetypes": [
+      "cisco:multicloud:defense",
       "cisco:multicloud:defense:appid",
       "cisco:multicloud:defense:auditlogs",
       "cisco:multicloud:defense:av",
@@ -6167,6 +6178,7 @@ export const PRODUCT_CATALOG = [
       "cisco:dc:aci:authentication",
       "cisco:dc:aci:class",
       "cisco:dc:aci:health",
+      "cisco:dc:aci:managed_object",
       "cisco:dc:aci:stats",
       "cisco:dc:aci:syslog"
     ],
@@ -6291,6 +6303,7 @@ export const PRODUCT_CATALOG = [
     "community_uids": [],
     "sourcetypes": [
       "cisco:dc:nexus9k",
+      "cisco:dc:nexus9k:dme",
       "cisco:dc:nexus9k:syslog"
     ],
     "dashboards": [
@@ -7876,6 +7889,11 @@ export const PRODUCT_CATALOG = [
     "sourcetypes": [
       "cisco:webex:admin:audit:events",
       "cisco:webex:call:detailed_history",
+      "cisco:webex:contact:center",
+      "cisco:webex:contact:center:aar",
+      "cisco:webex:contact:center:asr",
+      "cisco:webex:contact:center:car",
+      "cisco:webex:contact:center:csr",
       "cisco:webex:meeting:attendee:reports",
       "cisco:webex:meeting:qualities",
       "cisco:webex:meeting:usage:reports",
@@ -10171,7 +10189,23 @@ export const PRODUCT_CATALOG = [
       "4851"
     ],
     "community_uids": [],
-    "sourcetypes": [],
+    "sourcetypes": [
+      "skylight:alexa",
+      "skylight:citrix",
+      "skylight:cleanevent",
+      "skylight:dga_ml",
+      "skylight:dns",
+      "skylight:http",
+      "skylight:ml",
+      "skylight:smb",
+      "skylight:sql",
+      "skylight:tcp",
+      "skylight:ti",
+      "skylight:ti_domain",
+      "skylight:tls",
+      "skylight:udp",
+      "skylight:voip"
+    ],
     "dashboards": [],
     "custom_dashboard": "",
     "icon_emoji": "chart",
