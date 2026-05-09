@@ -4119,6 +4119,8 @@ export const PRODUCT_CATALOG = [
     ],
     "community_uids": [],
     "sourcetypes": [
+      "cisco:catalyst:center:compliance:report",
+      "cisco:catalyst:center:inventory:report",
       "cisco:dnac:audit:logs",
       "cisco:dnac:client",
       "cisco:dnac:clienthealth",
