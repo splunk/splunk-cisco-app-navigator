@@ -1,6 +1,6 @@
 # Splunk Cisco App Navigator (SCAN)
 
-**Version:** 1.0.26
+**Version:** 1.0.27
 
 The **Splunk Cisco App Navigator** is the unified "Glass Pane" for the
 Cisco-Splunk ecosystem — a single Product Catalog UI where Splunk administrators
