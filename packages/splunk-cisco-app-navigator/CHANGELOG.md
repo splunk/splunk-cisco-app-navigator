@@ -1,5 +1,14 @@
 # Change Log
 
+1.0.27 — May 9, 2026
+-------
+
+### Catalog Fixes
+* **Cisco DNA Center / Catalyst Center card** — Restored `cisco:catalyst:center:compliance:report` and `cisco:catalyst:center:inventory:report` sourcetypes that the Catalyst Center TA emits but had been previously commented out (#10, #16).
+
+### Documentation
+* **CONTRIBUTING.md expanded** — Added Daily Workflow with CLI + GitHub Desktop instructions, 12-step quick reference, "What Goes Where" file map, Build & Test pre-PR checklist, "Files to Never Commit" list, and SCAN Conventions cheat sheet. Added Issue Tracking run-book: every bug fix and enhancement gets a tracked GitHub issue with required fields and a backfill rule tied to releases (#15, #17).
+
 1.0.26 — April 22, 2026
 -------
 
