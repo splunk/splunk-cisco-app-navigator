@@ -6,13 +6,21 @@ Step-by-step process for publishing a new version to Splunkbase.
 
 ## Pre-Release Checklist
 
-- [ ] All changes committed and pushed to `TENG-<Jira>` branch
-- [ ] Branch merged to `main` on GitHub
+- [ ] All bug fixes / enhancements going into the release have a tracked GitHub issue
+      (see Issue Tracking run-book in [`CONTRIBUTING.md`](CONTRIBUTING.md))
+- [ ] All feature/fix branches already merged to `main` via PR
 - [ ] App tested locally (light mode + dark mode)
 - [ ] `CHANGELOG.md` updated with new version entry
 - [ ] `DECISIONS.md` updated if any design decisions were made
 
 ## 1. Bump the Version
+
+Cut a release branch from a fully-synced `main`:
+
+```bash
+git checkout main && git pull origin main --ff-only
+git checkout -b chore/bump-vX.Y.Z
+```
 
 Edit `packages/splunk-cisco-app-navigator/src/main/resources/splunk/default/app.conf`:
 
@@ -24,19 +32,36 @@ version = X.Y.Z
 version = X.Y.Z
 ```
 
-Both version fields must match.
+Both version fields must match. Also bump `version` in `app.manifest` and add a new entry at the top of `CHANGELOG.md`.
 
-## 2. Commit, Push, and Merge
+## 2. Commit, Build, Push, PR, Merge
 
 ```bash
 git add -A
 git commit -m "chore: bump version to X.Y.Z"
-git push origin TENG-XXXX
-git checkout main
-git merge TENG-XXXX
-git push origin main
-git checkout TENG-XXXX
+
+cd packages/splunk-cisco-app-navigator
+yarn run package:app                # auto-stamps build hash; produces dist/*.tar.gz
+git add -A
+git commit -m "chore: stamp build hash for vX.Y.Z Splunkbase upload"
+
+git push -u origin chore/bump-vX.Y.Z
+gh pr create --base main --head chore/bump-vX.Y.Z \
+  --title "chore: bump version to X.Y.Z" \
+  --body  "Release vX.Y.Z — packages #<issues> for Splunkbase."
+
+# After review:
+gh pr merge <number> --squash --delete-branch
+
+# Tag the squash-merge commit on main:
+git checkout main && git pull origin main --ff-only
+git tag -a vX.Y.Z -m "Release vX.Y.Z"
+git push origin vX.Y.Z
 ```
+
+> Version-bump PRs do **not** need a `Closes #N` reference — they are tracked by
+> the release tag (`vX.Y.Z`), not by an issue. See the run-book table in
+> `CONTRIBUTING.md`.
 
 ## 3. Package the App
 
