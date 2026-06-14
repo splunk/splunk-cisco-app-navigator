@@ -1,0 +1,32 @@
+# Splunk Cisco App Navigator - Code Owners
+# 
+# This file defines code review requirements and ownership for different parts of the repository.
+# See https://docs.github.com/en/repositories/managing-your-repositorys-settings-and-features/customizing-your-repository/about-code-owners
+
+# Global default (applies if no more specific rule matches)
+* @akhamis
+
+# Product catalog and configuration
+products.conf @akhamis
+packages/splunk-cisco-app-navigator/src/main/resources/splunk/default/products.conf @akhamis
+scripts/ @akhamis
+
+# React component and UI
+packages/splunk-cisco-app-navigator/src/main/webapp/pages/products/index.jsx @akhamis
+packages/splunk-cisco-app-navigator/src/main/resources/splunk/appserver/static/products.css @akhamis
+
+# Build and deployment
+packages/splunk-cisco-app-navigator/bin/ @akhamis
+packages/splunk-cisco-app-navigator/webpack.config.js @akhamis
+package.json @akhamis
+lerna.json @akhamis
+
+# Documentation
+docs/ @akhamis
+README.md @akhamis
+packages/splunk-cisco-app-navigator/README.md @akhamis
+packages/splunk-cisco-app-navigator/CHANGELOG.md @akhamis
+
+# Governance and security
+.github/ @akhamis
+CONTRIBUTING.md @akhamis
