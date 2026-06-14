@@ -3460,9 +3460,17 @@ function fallbackCopyHtml(html, onSuccess) {
 }
 
 function esc(s) { return String(s == null ? '' : s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;'); }
+function escAttr(s) {
+    return String(s == null ? '')
+        .replace(/&/g, '&amp;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#39;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;');
+}
 function sbLink(uid, label) {
     const url = `https://splunkbase.splunk.com/app/${uid}`;
-    return { url, html: `<a href="${url}">${esc(label || uid)}</a>`, text: label || uid };
+    return { url, html: `<a href="${escAttr(url)}">${esc(label || uid)}</a>`, text: label || uid };
 }
 
 function generateCustomerSummary(product, splunkbaseData) {
@@ -3525,7 +3533,7 @@ function generateCustomerSummary(product, splunkbaseData) {
         plain.push('  Splunk Connect for Syslog (SC4S) is supported for this product.');
         plain.push('  SC4S on Splunkbase: https://splunkbase.splunk.com/app/4740');
         if (product.sc4s_url) {
-            html.push(`<p style="margin:0 0 4px;"><a href="${esc(product.sc4s_url)}">SC4S Documentation</a></p>`);
+            html.push(`<p style="margin:0 0 4px;"><a href="${escAttr(product.sc4s_url)}">SC4S Documentation</a></p>`);
             plain.push(`  SC4S documentation: ${product.sc4s_url}`);
         }
         if (product.sc4s_sourcetypes && product.sc4s_sourcetypes.length > 0) {
@@ -3653,7 +3661,7 @@ function generateCustomerSummary(product, splunkbaseData) {
         html.push(`<h3 style="margin:12px 0 4px;font-size:13px;color:#003366;">Documentation &amp; Links</h3><ul style="margin:0 0 8px;padding-left:20px;">`);
         plain.push('DOCUMENTATION & LINKS');
         docs.forEach(d => {
-            html.push(`<li><a href="${esc(d.url)}">${esc(d.label)}</a></li>`);
+            html.push(`<li><a href="${escAttr(d.url)}">${esc(d.label)}</a></li>`);
             plain.push(`  • ${d.label}: ${d.url}`);
         });
         html.push(`</ul>`);
