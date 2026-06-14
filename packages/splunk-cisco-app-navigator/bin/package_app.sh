@@ -39,6 +39,36 @@ find "${TMP_DIR}" -name ".DS_Store" -delete
 rm -rf "${TMP_DIR}/${APP_NAME}/local"
 rm -f  "${TMP_DIR}/${APP_NAME}/metadata/local.meta"
 
+# Stamp [install] build in the packaged app.conf only.
+# This keeps source app.conf stable in git while still producing a stamped artifact.
+PKG_APP_CONF="${TMP_DIR}/${APP_NAME}/default/app.conf"
+if [[ -f "$PKG_APP_CONF" ]]; then
+  BUILD_HASH="$(git -C "$PKG_ROOT" rev-parse --short=8 HEAD 2>/dev/null || true)"
+  if [[ -z "$BUILD_HASH" ]]; then
+    BUILD_HASH="$(printf '%x' "$(date -u +%Y%m%d)" | cut -c1-8)"
+  fi
+
+  PKG_APP_CONF_TMP="$(mktemp)"
+  if awk -v build_hash="$BUILD_HASH" '
+    BEGIN { in_install = 0; stamped = 0 }
+    /^\[.*\]$/ { in_install = ($0 == "[install]") }
+    {
+      if (in_install && $0 ~ /^[[:space:]]*build[[:space:]]*=/) {
+        sub(/=.*/, "= " build_hash)
+        stamped = 1
+      }
+      print
+    }
+    END { exit(stamped ? 0 : 2) }
+  ' "$PKG_APP_CONF" > "$PKG_APP_CONF_TMP"; then
+    mv "$PKG_APP_CONF_TMP" "$PKG_APP_CONF"
+    echo "[package] app.conf: stamped [install] build = ${BUILD_HASH} (package-only)"
+  else
+    rm -f "$PKG_APP_CONF_TMP"
+    echo "[package] WARNING: could not find [install] build line in app.conf" >&2
+  fi
+fi
+
 # Revert export = system → export = none for Splunkbase packaging
 # (We use export = system in dev for REST conf-products refresh, but apps
 #  should never export system-wide on customer instances)

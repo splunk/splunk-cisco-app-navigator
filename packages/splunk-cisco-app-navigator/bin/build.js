@@ -41,38 +41,6 @@ function stampProductsConf() {
   console.log(`\x1b[36m[build-stamp]\x1b[0m products.conf: version = ${versionStamp}, min_app_version = ${appVersion}`);
 }
 
-// --- Pre-build: stamp build hash in app.conf (git short hash or date fallback) ---
-function stampBuildHash() {
-  const appConfPath = path.join(pkgRoot, 'src/main/resources/splunk/default/app.conf');
-  if (!fs.existsSync(appConfPath)) return;
-
-  let conf = fs.readFileSync(appConfPath, 'utf8');
-
-  const buildMatch = conf.match(/^build\s*=\s*(\S+)/m);
-  const oldHash = buildMatch ? buildMatch[1].trim() : null;
-
-  let buildHash;
-  try {
-    buildHash = execSync('git rev-parse --short=8 HEAD', { cwd: pkgRoot, stdio: 'pipe' })
-      .toString()
-      .trim();
-  } catch (_) {
-    const now = new Date();
-    const pad = (n) => String(n).padStart(2, '0');
-    const stamp = `${now.getFullYear()}${pad(now.getMonth() + 1)}${pad(now.getDate())}`;
-    buildHash = parseInt(stamp, 10).toString(16).slice(0, 8);
-  }
-
-  if (buildHash === oldHash) {
-    console.log(`\x1b[36m[build-stamp]\x1b[0m build = ${oldHash} (unchanged, skipping)`);
-    return;
-  }
-
-  conf = conf.replace(/^build\s*=\s*.+$/m, `build = ${buildHash}`);
-  fs.writeFileSync(appConfPath, conf, 'utf8');
-  console.log(`\x1b[36m[build-stamp]\x1b[0m build = ${buildHash}`);
-}
-
 // --- Pre-build: sync app.manifest version from app.conf ---
 function stampManifest() {
   const appConfPath = path.join(pkgRoot, 'src/main/resources/splunk/default/app.conf');
@@ -149,11 +117,9 @@ function postBuildRefresh() {
 }
 
 if (cmd === 'build') {
-  // 0. Stamp build hash in app.conf (git short hash or date fallback)
-  stampBuildHash();
-  // 0a. Sync app.manifest version from app.conf
+  // 0. Sync app.manifest version from app.conf
   stampManifest();
-  // 0b. Stamp products.conf line 1 (date/time) and min_app_version from app.conf
+  // 0a. Stamp products.conf line 1 (date/time) and min_app_version from app.conf
   stampProductsConf();
   // 1. Generate static catalog from products.conf
   const genResult = spawnSync('node', [path.join(pkgRoot, 'bin', 'generate-catalog.js')], {
