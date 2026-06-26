@@ -13,19 +13,30 @@ const glob = require('glob');
 
 const cmd = process.argv[2] || 'build';
 const pkgRoot = path.join(__dirname, '..');
+const rootDir = path.join(pkgRoot, '..', '..');
+
+function readBuildVersion() {
+  const versionPath = path.join(rootDir, 'VERSION');
+  if (fs.existsSync(versionPath)) {
+    const version = fs.readFileSync(versionPath, 'utf8').trim();
+    if (version) return version;
+  }
+
+  const appConfPath = path.join(pkgRoot, 'src/main/resources/splunk/default/app.conf');
+  if (fs.existsSync(appConfPath)) {
+    const appConf = fs.readFileSync(appConfPath, 'utf8');
+    const idMatch = appConf.match(/\[id\][\s\S]*?version\s*=\s*(\S+)/m);
+    if (idMatch) return idMatch[1].trim();
+  }
+
+  return '1.0.0';
+}
 
 // --- Pre-build: stamp products.conf line 1 (date/time) and min_app_version ---
 function stampProductsConf() {
   const productsConfPath = path.join(pkgRoot, 'src/main/resources/splunk/default/products.conf');
-  const appConfPath = path.join(pkgRoot, 'src/main/resources/splunk/default/app.conf');
   if (!fs.existsSync(productsConfPath)) return;
-
-  let appVersion = '1.0.0';
-  if (fs.existsSync(appConfPath)) {
-    const appConf = fs.readFileSync(appConfPath, 'utf8');
-    const idMatch = appConf.match(/\[id\][\s\S]*?version\s*=\s*(\S+)/m);
-    if (idMatch) appVersion = idMatch[1].trim();
-  }
+  const appVersion = readBuildVersion();
 
   const now = new Date();
   const pad = (n) => String(n).padStart(2, '0');
@@ -41,27 +52,19 @@ function stampProductsConf() {
   console.log(`\x1b[36m[build-stamp]\x1b[0m products.conf: version = ${versionStamp}, min_app_version = ${appVersion}`);
 }
 
-// --- Pre-build: sync app.manifest version from app.conf ---
-function stampManifest() {
-  const appConfPath = path.join(pkgRoot, 'src/main/resources/splunk/default/app.conf');
-  const manifestPath = path.join(pkgRoot, 'src/main/resources/splunk/app.manifest');
-  if (!fs.existsSync(manifestPath) || !fs.existsSync(appConfPath)) return;
+// --- Post-webpack: stamp staged Splunk resources from VERSION ---
+function stampStageVersion() {
+  const stageDir = path.join(pkgRoot, 'stage');
+  const stampScript = path.join(pkgRoot, 'bin', 'stamp_version.sh');
+  if (!fs.existsSync(stageDir) || !fs.existsSync(stampScript)) return;
 
-  const appConf = fs.readFileSync(appConfPath, 'utf8');
-  const vMatch = appConf.match(/\[id\][\s\S]*?version\s*=\s*(\S+)/m);
-  if (!vMatch) return;
-  const appVersion = vMatch[1].trim();
-
-  const manifest = JSON.parse(fs.readFileSync(manifestPath, 'utf8'));
-  const oldVersion = manifest.info && manifest.info.id && manifest.info.id.version;
-  if (oldVersion === appVersion) {
-    console.log(`\x1b[36m[build-stamp]\x1b[0m app.manifest version = ${oldVersion} (unchanged, skipping)`);
-    return;
+  const r = spawnSync('bash', [stampScript, stageDir], {
+    stdio: 'inherit',
+    cwd: pkgRoot,
+  });
+  if (r.status !== 0) {
+    process.exit(r.status || 1);
   }
-
-  manifest.info.id.version = appVersion;
-  fs.writeFileSync(manifestPath, JSON.stringify(manifest, null, 2) + '\n', 'utf8');
-  console.log(`\x1b[36m[build-stamp]\x1b[0m app.manifest version: ${oldVersion} → ${appVersion}`);
 }
 
 // --- Post-build: clear Splunk cache & refresh UI ---
@@ -117,9 +120,7 @@ function postBuildRefresh() {
 }
 
 if (cmd === 'build') {
-  // 0. Sync app.manifest version from app.conf
-  stampManifest();
-  // 0a. Stamp products.conf line 1 (date/time) and min_app_version from app.conf
+  // 0. Stamp products.conf line 1 (date/time) and min_app_version from VERSION
   stampProductsConf();
   // 1. Generate static catalog from products.conf
   const genResult = spawnSync('node', [path.join(pkgRoot, 'bin', 'generate-catalog.js')], {
@@ -139,7 +140,9 @@ if (cmd === 'build') {
   if (r.status !== 0) {
     process.exit(r.status != null ? r.status : 1);
   }
-  // 3. Post-build: clear cache & refresh
+  // 3. Stamp staged app.conf/app.manifest/products.conf from VERSION
+  stampStageVersion();
+  // 4. Post-build: clear cache & refresh
   postBuildRefresh();
   process.exit(0);
 } else if (cmd === 'link') {

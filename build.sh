@@ -4,6 +4,9 @@
 # any Splunk instance. Pass --install or --deploy (and optionally
 # --restart) to push the build into a local Splunk.
 #
+# Version is read from the repo-root VERSION file and stamped into the
+# staged/package app.conf, app.manifest, and products.conf at package time.
+#
 # Default workflow:
 #   ./build.sh                                                # build only; produces dist/<app>-<version>.tar.gz
 #
@@ -23,6 +26,10 @@
 #   ./build.sh --no-build --install --auth admin:pw1                          # -> default Splunk
 #   SPLUNK_HOME=/opt/10 ./build.sh --no-build --install --auth admin:pw2      # -> /opt/10
 #   SPLUNK_HOME=/opt/9  ./build.sh --no-build --deploy --restart --auth a:b   # -> /opt/9 (filesystem) + restart
+#
+# Watch-mode workflow (keeps splunkd install, skips full webpack rebuild):
+#   cd packages/splunk-cisco-app-navigator && yarn start     # terminal 1; maintains stage/
+#   SPLUNK_HOME=/opt/10 ./build.sh --fast --install --auth admin:pw
 #
 # --install vs --deploy (mutually exclusive; mirrors ta_cisco_common/build.sh
 # and field-solutions-demo-data-gen/build.sh):
@@ -55,10 +62,12 @@ ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 APP_NAME="splunk-cisco-app-navigator"
 APP_DIR="${ROOT_DIR}/packages/${APP_NAME}"
 DIST_DIR="${ROOT_DIR}/dist"
+VERSION_FILE="${ROOT_DIR}/VERSION"
 
 do_install=0
 do_deploy=0
 no_build=0
+from_stage=0
 restart_after_install=0
 verbose=0
 splunk_bin_override=""
@@ -127,6 +136,7 @@ usage() {
 Usage: ./build.sh [options]
 
 Default behavior: build the .tar.gz only. No Splunk install, no restart.
+Version is read from ./VERSION and stamped at package time.
 
 Push-to-Splunk options (mutually exclusive):
   --install              splunkd-managed install via REST mgmt port. Calls
@@ -142,6 +152,11 @@ Other options:
                          --install or --deploy. Lets you fan one build
                          out to multiple Splunk instances with different
                          credentials without rebuilding each time.
+  --fast, --from-stage   Package the current packages/<app>/stage directory
+                         without running clean_build.sh or webpack. Designed
+                         for use with a long-running 'yarn start' watcher.
+                         Still creates a fresh tarball and can still use
+                         --install, so splunkd remains the installer.
   --auth user:pass       Splunk CLI credentials. Passed through as
                          '-auth user:pass'. Aliases: -auth, --auth=user:pass.
   --restart              Restart Splunk after install/deploy.
@@ -164,6 +179,10 @@ Examples:
   ./build.sh
   ./build.sh --no-build --install --auth admin:pw1
   SPLUNK_HOME=/opt/10 ./build.sh --no-build --install --auth admin:pw2
+
+  # Keep webpack watch running, then package current stage/ and install via splunkd:
+  cd packages/splunk-cisco-app-navigator && yarn start
+  SPLUNK_HOME=/opt/10 ./build.sh --fast --install --auth admin:pw
 EOF
 }
 
@@ -179,6 +198,10 @@ while [[ $# -gt 0 ]]; do
             ;;
         --no-build|--skip-build)
             no_build=1
+            shift
+            ;;
+        --fast|--from-stage|--stage)
+            from_stage=1
             shift
             ;;
         -v|--verbose)
@@ -248,6 +271,13 @@ if [[ "$no_build" -eq 1 && "$do_install" -eq 0 && "$do_deploy" -eq 0 ]]; then
     exit 2
 fi
 
+if [[ "$from_stage" -eq 1 && "$no_build" -eq 1 ]]; then
+    echo "ERROR: --from-stage and --no-build are mutually exclusive." >&2
+    echo "       --from-stage creates a fresh tarball from stage/." >&2
+    echo "       --no-build reuses the newest tarball already in dist/." >&2
+    exit 2
+fi
+
 if [[ "$do_install" -eq 1 ]]; then
     if [[ -z "$auth_value" ]]; then
         echo "ERROR: --install requires --auth user:pass" >&2
@@ -276,19 +306,39 @@ if [[ "$do_deploy" -eq 1 ]]; then
     fi
 fi
 
+build_version=""
+if [[ "$no_build" -eq 0 ]]; then
+    if [[ ! -f "$VERSION_FILE" ]]; then
+        err "ERROR: VERSION file not found: ${VERSION_FILE}"
+        exit 1
+    fi
+    build_version="$(tr -d '[:space:]' < "$VERSION_FILE")"
+    if [[ -z "$build_version" ]]; then
+        err "ERROR: VERSION file is empty: ${VERSION_FILE}"
+        exit 1
+    fi
+fi
+
 if [[ "$no_build" -eq 1 ]]; then
     hdr "Reusing existing tarball (--no-build)..."
+elif [[ "$from_stage" -eq 1 ]]; then
+    hdr "Packaging current stage/ v${build_version} (--from-stage)..."
+    run_quietly bash "${APP_DIR}/bin/package_app.sh" --from-stage
 else
-    hdr "Packaging ${APP_NAME}..."
+    hdr "Packaging ${APP_NAME} v${build_version}..."
     run_quietly bash -c "cd '$APP_DIR' && yarn run package:app"
 fi
 
-package_path="$(
-    find "$DIST_DIR" -maxdepth 1 -type f -name "${APP_NAME}-*.tar.gz" \
-        -print0 \
-        | xargs -0 ls -t 2>/dev/null \
-        | head -n 1
-)"
+if [[ "$no_build" -eq 1 ]]; then
+    package_path="$(
+        find "$DIST_DIR" -maxdepth 1 -type f -name "${APP_NAME}-*.tar.gz" \
+            -print0 \
+            | xargs -0 ls -t 2>/dev/null \
+            | head -n 1
+    )"
+else
+    package_path="${DIST_DIR}/${APP_NAME}-${build_version}.tar.gz"
+fi
 
 if [[ -z "$package_path" ]]; then
     if [[ "$no_build" -eq 1 ]]; then
@@ -394,6 +444,9 @@ else
 fi
 if [[ "$no_build" -eq 1 ]]; then
     mode_label="--no-build (reused dist/) + ${mode_label}"
+fi
+if [[ "$from_stage" -eq 1 ]]; then
+    mode_label="--from-stage (packaged existing stage/) + ${mode_label}"
 fi
 
 echo ""
