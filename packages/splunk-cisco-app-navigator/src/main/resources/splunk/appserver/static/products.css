@@ -594,6 +594,7 @@ html.dce-dark [data-view="views/shared/Page"] {
 
 /* Portfolio toggle pill */
 .scan-util-portfolio {
+    gap: 8px !important;
     color: #1a7f37 !important;
     background: #dff7e1 !important;
     border-color: #a3d9a5 !important;
@@ -631,6 +632,38 @@ html.dce-dark [data-view="views/shared/Page"] {
 :root.dce-dark .scan-util-portfolio-on:hover {
     background: rgba(187, 128, 9, 0.25) !important;
     border-color: #bb8009 !important;
+}
+.scan-util-portfolio-switch {
+    width: 24px;
+    height: 14px;
+    border-radius: 999px;
+    background: #2f9e44;
+    position: relative;
+    box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.08);
+    flex-shrink: 0;
+}
+.scan-util-portfolio-on .scan-util-portfolio-switch {
+    background: #d99a00;
+}
+.scan-util-portfolio-knob {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: #fff;
+    position: absolute;
+    top: 2px;
+    left: 2px;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.22);
+    transition: transform 0.18s ease;
+}
+.scan-util-portfolio-on .scan-util-portfolio-knob {
+    transform: translateX(10px);
+}
+:root.dce-dark .scan-util-portfolio-switch {
+    background: #2ea043;
+}
+:root.dce-dark .scan-util-portfolio-on .scan-util-portfolio-switch {
+    background: #bb8009;
 }
 .scan-util-portfolio-label {
     font-size: 11.5px;
@@ -986,6 +1019,10 @@ html.dce-dark [data-view="views/shared/Page"] {
     overflow: hidden;
 }
 
+#configured_products {
+    position: relative;
+}
+
 #configured_products > div,
 #detected_products > div,
 #available_products > div,
@@ -1080,6 +1117,7 @@ html.dce-dark [data-view="views/shared/Page"] {
 /* Each section gets a unique accent color */
 #configured_products button[data-test='toggle'] {
     border-left-color: #0A60FF;
+    padding-right: 132px;
 }
 #detected_products button[data-test='toggle'] {
     border-left-color: #16a34a;
@@ -1117,6 +1155,10 @@ html.dce-dark [data-view="views/shared/Page"] {
     grid-template-columns: repeat(3, 1fr);
     gap: 20px;
     padding: 20px;
+}
+#configured_products .csc-card-grid {
+    padding-top: 14px;
+    padding-bottom: 18px;
 }
 @media (max-width: 1200px) {
     .csc-card-grid { grid-template-columns: repeat(2, 1fr); }
@@ -4353,6 +4395,22 @@ a.csc-dep-name-link:hover {
     border-color: #c62828;
     color: #FF007F;
 }
+.csc-section-header-action {
+    position: absolute;
+    top: 9px;
+    right: 16px;
+    z-index: 5;
+    min-height: 28px;
+    box-shadow: 0 1px 3px rgba(15, 23, 42, 0.08);
+}
+.csc-section-header-action-near {
+    left: 306px;
+    right: auto;
+}
+.csc-section-header-action:focus-visible {
+    outline: 2px solid #0A60FF;
+    outline-offset: 2px;
+}
 :root.dce-dark .csc-btn-remove-all {
     color: #ef9a9a;
     background: #2a2020;
@@ -4361,6 +4419,24 @@ a.csc-dep-name-link:hover {
 :root.dce-dark .csc-btn-remove-all:hover {
     background: #3d2222;
     border-color: #ef9a9a;
+}
+:root.dce-dark .csc-section-header-action {
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.35);
+}
+
+@media (max-width: 680px) {
+    #configured_products button[data-test='toggle'] {
+        padding-right: 44px;
+        padding-bottom: 44px;
+    }
+    #configured_products .csc-section-header-action {
+        top: 42px;
+        left: auto;
+        right: 14px;
+    }
+    #configured_products .csc-card-grid {
+        padding-top: 12px;
+    }
 }
 
 .empty-section {
@@ -6851,51 +6927,102 @@ tr.scan-ts-ahead .scan-ts-name {
     display: none !important;
 }
 
-/* 2. Round the Filter Pills & Hide Icons (Top Bar) — Cisco Midnight Blue theme */
-/* ── Subcategory pills: soft Cisco Blue outlines ── */
-.csc-subcategory-pill {
+/* 2. Top filter pills: quiet inactive state, consistent Cisco blue active state */
+.csc-category-pill,
+.csc-subcategory-pill,
+.scan-filter-trigger {
     border-radius: 9999px !important;
-    box-shadow: none !important;
-    border: 1.5px solid rgba(10, 96, 255, 0.25) !important;
-    background: #FFFFFF !important;
-    color: #342f2c !important;
+    border: 1px solid rgba(71, 85, 105, 0.18) !important;
+    background: rgba(255, 255, 255, 0.92) !important;
+    color: #26384f !important;
+    box-shadow: 0 1px 2px rgba(15, 23, 42, 0.04) !important;
 }
-.csc-subcategory-pill:hover {
-    border-color: #0A60FF !important;
-    background: rgba(10, 96, 255, 0.04) !important;
-    color: #0A60FF !important;
+
+.csc-category-pill:hover,
+.csc-subcategory-pill:hover,
+.scan-filter-trigger:hover {
+    border-color: rgba(10, 96, 255, 0.38) !important;
+    background: #f8fbff !important;
+    color: #0b4fd3 !important;
 }
+
+.csc-category-pill-active,
 .csc-subcategory-pill-active {
     background: #0A60FF !important;
     border-color: #0A60FF !important;
     color: #ffffff !important;
-}
-.csc-subcategory-pill-active .csc-subcategory-count {
-    background: rgba(255, 255, 255, 0.22) !important;
-    color: #fff !important;
+    box-shadow: 0 5px 14px rgba(10, 96, 255, 0.22) !important;
 }
 
-:root.dce-dark .csc-subcategory-pill {
-    background: #1e262c !important;
-    border-color: rgba(10, 96, 255, 0.3) !important;
-    color: #d4d4d4 !important;
-}
-:root.dce-dark .csc-subcategory-pill:hover {
-    border-color: #0A60FF !important;
-    background: rgba(10, 96, 255, 0.1) !important;
-    color: #6ea0ff !important;
-}
-:root.dce-dark .csc-subcategory-pill-active {
-    background: #0A60FF !important;
-    border-color: #0A60FF !important;
+.csc-category-pill-active:hover,
+.csc-subcategory-pill-active:hover {
+    background: #084fd6 !important;
+    border-color: #084fd6 !important;
     color: #ffffff !important;
 }
-:root.dce-dark .csc-subcategory-count {
-    background: rgba(255, 255, 255, 0.15) !important;
+
+.csc-category-count,
+.csc-subcategory-count {
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    min-width: 20px !important;
+    height: 20px !important;
+    padding: 0 6px !important;
+    border-radius: 9999px !important;
+    background: #edf2f7 !important;
+    color: #52647a !important;
+    font-size: 10px !important;
+    font-weight: 700 !important;
+    line-height: 1 !important;
 }
+
+.csc-category-pill-active .csc-category-count,
+.csc-subcategory-pill-active .csc-subcategory-count {
+    background: rgba(255, 255, 255, 0.24) !important;
+    color: #ffffff !important;
+}
+
+.scan-filter-trigger-active {
+    border-color: rgba(10, 96, 255, 0.45) !important;
+    background: #eff6ff !important;
+    color: #0A60FF !important;
+}
+
+:root.dce-dark .csc-category-pill,
+:root.dce-dark .csc-subcategory-pill,
+:root.dce-dark .scan-filter-trigger {
+    background: #1e262c !important;
+    border-color: rgba(148, 163, 184, 0.26) !important;
+    color: #d9e2ec !important;
+    box-shadow: none !important;
+}
+
+:root.dce-dark .csc-category-pill:hover,
+:root.dce-dark .csc-subcategory-pill:hover,
+:root.dce-dark .scan-filter-trigger:hover {
+    border-color: rgba(110, 160, 255, 0.55) !important;
+    background: rgba(10, 96, 255, 0.12) !important;
+    color: #9dc0ff !important;
+}
+
+:root.dce-dark .csc-category-pill-active,
+:root.dce-dark .csc-subcategory-pill-active {
+    background: #2b7cff !important;
+    border-color: #2b7cff !important;
+    color: #ffffff !important;
+}
+
+:root.dce-dark .csc-category-count,
+:root.dce-dark .csc-subcategory-count {
+    background: rgba(255, 255, 255, 0.12) !important;
+    color: #d9e2ec !important;
+}
+
+:root.dce-dark .csc-category-pill-active .csc-category-count,
 :root.dce-dark .csc-subcategory-pill-active .csc-subcategory-count {
-    background: rgba(7, 24, 45, 0.3) !important;
-    color: #07182D !important;
+    background: rgba(255, 255, 255, 0.22) !important;
+    color: #ffffff !important;
 }
 
 /* Hide the icons inside the top pills */

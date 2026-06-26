@@ -1494,7 +1494,8 @@ export const PRODUCT_CATALOG = [
       "secure client nvm",
       "endpoint flow",
       "user protection suite",
-      "cisco security cloud"
+      "cisco security cloud",
+      "cisco nvm"
     ],
     "alert_action_uids": [],
     "soar_connector_uids": [],
@@ -1849,7 +1850,8 @@ export const PRODUCT_CATALOG = [
       "securex",
       "ai assistant",
       "attack path analysis",
-      "automated investigation"
+      "automated investigation",
+      "cisco xdr"
     ],
     "alert_action_uids": [],
     "soar_connector_uids": [],
@@ -4119,17 +4121,19 @@ export const PRODUCT_CATALOG = [
     ],
     "community_uids": [],
     "sourcetypes": [
-      "cisco:catalyst:center:compliance:report",
-      "cisco:catalyst:center:inventory:report",
+      "cisco:dnac:application:traffic",
       "cisco:dnac:audit:logs",
       "cisco:dnac:client",
       "cisco:dnac:clienthealth",
       "cisco:dnac:compliance",
       "cisco:dnac:devicehealth",
+      "cisco:dnac:devicehealth:interface",
       "cisco:dnac:issue",
       "cisco:dnac:networkhealth",
       "cisco:dnac:securityadvisory",
-      "cisco:dnac:site:topology"
+      "cisco:dnac:site:topology",
+      "cisco:dnac:swim",
+      "cisco:dnac:custom:*"
     ],
     "dashboards": [
       "overview",
@@ -4422,18 +4426,20 @@ export const PRODUCT_CATALOG = [
     ],
     "community_uids": [],
     "sourcetypes": [
+      "cisco:ise",
+      "cisco:ise:syslog",
+      "cisco:ise:radius:policyset",
+      "cisco:ise:radius:authz:policy",
+      "cisco:ise:tacacs:policyset",
+      "cisco:ise:tacacs:authz:policy",
+      "cisco:ise:securitygroups",
+      "cisco:ise:sgtbindings",
       "cisco:ise:analytics",
       "cisco:ise:analytics:applications",
       "cisco:ise:analytics:fullreport",
       "cisco:ise:analytics:hardware",
       "cisco:ise:analytics:registry",
-      "cisco:ise:radius:authz:policy",
-      "cisco:ise:radius:policyset",
-      "cisco:ise:securitygroups",
-      "cisco:ise:sgtbindings",
-      "cisco:ise:syslog",
-      "cisco:ise:tacacs:authz:policy",
-      "cisco:ise:tacacs:policyset"
+      "cisco:ise:custom:*"
     ],
     "dashboards": [
       "security_insights"
@@ -5067,34 +5073,34 @@ export const PRODUCT_CATALOG = [
     ],
     "community_uids": [],
     "sourcetypes": [
-      "cisco:firewall:logs",
-      "cisco:sdwan:*",
-      "cisco:sdwan:acl:logs",
-      "cisco:sdwan:alert:off",
-      "cisco:sdwan:alert:on",
       "cisco:sdwan:audit:logs",
-      "cisco:sdwan:block:host",
-      "cisco:sdwan:dmi:cli:engine:write:fail",
-      "cisco:sdwan:drop:pkt",
-      "cisco:sdwan:host:tcp:alert:on",
+      "cisco:sdwan:energy:stats",
       "cisco:sdwan:linkhealth",
-      "cisco:sdwan:log:summary",
-      "cisco:sdwan:pass:pkt",
-      "cisco:sdwan:session:audit:trail",
-      "cisco:sdwan:session:audit:trail:start",
-      "cisco:sdwan:sessions:maximum",
-      "cisco:sdwan:sgacl:logs",
       "cisco:sdwan:sitehealth",
-      "cisco:sdwan:smart:lic:platform:error",
+      "cisco:sdwan:ssetunnelhealth",
       "cisco:sdwan:ssetunnels",
-      "cisco:sdwan:system:logs",
       "cisco:sdwan:tunnelhealth",
-      "cisco:sdwan:unblock:host",
-      "cisco:sdwan:utd:logs",
       "cisco:sdwan:utdhealth",
-      "cisco:sgacl:logs",
-      "cisco:viptela",
-      "stream:netflow"
+      "cisco:sdwan:custom:*",
+      "cisco:sdwan:system:logs",
+      "cisco:sdwan:sytem:logs",
+      "cisco:sdwan:session:audit:trail:start",
+      "cisco:sdwan:session:audit:trail",
+      "cisco:sdwan:unblock:host",
+      "cisco:sdwan:block:host",
+      "cisco:sdwan:host:tcp:alert:on",
+      "cisco:sdwan:alert:on",
+      "cisco:sdwan:alert:off",
+      "cisco:sdwan:sessions:maximum",
+      "cisco:sdwan:pass:pkt",
+      "cisco:sdwan:drop:pkt",
+      "cisco:sdwan:log:summary",
+      "cisco:sdwan:smart:lic:platform:error",
+      "cisco:sdwan:dmi:cli:engine:write:fail",
+      "cisco:sdwan:utd:logs",
+      "cisco:sdwan:acl:logs",
+      "cisco:sdwan:sgacl:logs",
+      "cisco:sgacl:logs"
     ],
     "dashboards": [
       "performance"
@@ -7537,8 +7543,8 @@ export const PRODUCT_CATALOG = [
       "cisco:cybervision:devices",
       "cisco:cybervision:events",
       "cisco:cybervision:flows",
-      "cisco:cybervision:syslog",
-      "cisco:cybervision:vulnerabilities"
+      "cisco:cybervision:vulnerabilities",
+      "cisco:cybervision:syslog"
     ],
     "dashboards": [
       "overview"

@@ -608,14 +608,53 @@ function buildSplunkbaseLookupSPL(productList) {
     return `| inputlookup scan_splunkbase_apps where ${whereClause} | fields uid appid version_compatibility product_compatibility app_version title archive_status`;
 }
 
+function escapeRegexLiteral(value) {
+    return String(value || '').replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+}
+
+function sourcetypePatternToRegex(pattern) {
+    const escaped = escapeRegexLiteral(pattern).replace(/\\\*/g, '.*');
+    return new RegExp(`^${escaped}$`);
+}
+
+function sourcetypeMatchesPattern(sourcetype, pattern) {
+    if (!sourcetype || !pattern) return false;
+    if (!String(pattern).includes('*')) return sourcetype === pattern;
+    return sourcetypePatternToRegex(pattern).test(sourcetype);
+}
+
+function sourcetypeMatchesAnyPattern(sourcetype, patterns) {
+    return (patterns || []).some(pattern => sourcetypeMatchesPattern(sourcetype, pattern));
+}
+
+function catalogSourcetypeHasFlow(catalogSourcetype, sourcetypeInfo) {
+    const matchedCatalogSTs = sourcetypeInfo?.matchedCatalogSTs || [];
+    if (matchedCatalogSTs.includes(catalogSourcetype)) return true;
+    return (sourcetypeInfo?.matchedSTs || []).some(st => sourcetypeMatchesPattern(st, catalogSourcetype));
+}
+
 /**
- * Build the prefix-match patterns for a product's sourcetypes list.
- * Shared by detectAllSourcetypeData and buildSourcetypeSearchUrl.
+ * Build sourcetype patterns for data detection and search links.
+ * A catalog entry may be exact (cisco:dnac:client) or wildcarded
+ * (cisco:dnac:custom:*). Wildcards represent one catalog chip even
+ * when multiple concrete sourcetypes match behind it.
  */
 function buildSourcetypePatterns(sourcetypes) {
-    // Strict exact-match only — no prefix collapsing or wildcard rollup.
-    // Each sourcetype listed in products.conf is matched individually.
-    return [...new Set(sourcetypes)];
+    return [...new Set((sourcetypes || []).filter(Boolean))];
+}
+
+function buildSourcetypeMatchRegex(patterns) {
+    const alternates = buildSourcetypePatterns(patterns).map(pattern => (
+        escapeRegexLiteral(pattern).replace(/\\\*/g, '.*')
+    ));
+    return alternates.length > 0 ? `^(${alternates.join('|')})$` : null;
+}
+
+function buildSourcetypeMetadataSPL(sourcetypes) {
+    const pattern = buildSourcetypeMatchRegex(sourcetypes);
+    if (!pattern) return null;
+    const splPattern = pattern.replace(/\\/g, '\\\\').replace(/"/g, '\\"');
+    return `| metadata type=sourcetypes index=* | where match(sourcetype, "${splPattern}") | convert ctime(*Time) | table sourcetype recentTime firstTime lastTime totalCount | eventstats sum(totalCount) as GrandTotal | sort - totalCount`;
 }
 
 /**
@@ -681,23 +720,31 @@ async function detectAllSourcetypeData(products) {
         const results = {};
         withST.forEach(p => {
             const patterns = buildSourcetypePatterns(p.sourcetypes);
-            let stCount = 0;
             let eventCount = 0;
             const matchedSTs = [];
+            const matchedCatalogSTs = [];
+
             stMap.forEach((count, st) => {
-                if (patterns.some(pat => st === pat)) {
-                    stCount++;
+                if (sourcetypeMatchesAnyPattern(st, patterns)) {
                     eventCount += count;
                     matchedSTs.push(st);
                 }
             });
+
+            patterns.forEach(pattern => {
+                if (matchedSTs.some(st => sourcetypeMatchesPattern(st, pattern))) {
+                    matchedCatalogSTs.push(pattern);
+                }
+            });
+
+            const stCount = matchedCatalogSTs.length;
             if (stCount > 0) {
                 // console.log(`[SCAN] ${p.product_id}: ${stCount} sourcetype(s) matched — ${matchedSTs.join(', ')}`);
             }
             const totalSTs = p.sourcetypes.length;
             results[p.product_id] = stCount > 0
-                ? { hasData: true, eventCount, matchedSTs, totalSourcetypes: totalSTs, detail: `${stCount} of ${totalSTs} sourcetype${totalSTs !== 1 ? 's' : ''} · ~${formatCount(eventCount)} events · last 7d` }
-                : { hasData: false, eventCount: 0, matchedSTs: [], totalSourcetypes: totalSTs, detail: 'No data in the last 7 days' };
+                ? { hasData: true, eventCount, matchedSTs, matchedCatalogSTs, totalSourcetypes: totalSTs, detail: `${stCount} of ${totalSTs} sourcetype${totalSTs !== 1 ? 's' : ''} · ~${formatCount(eventCount)} events · last 7d` }
+                : { hasData: false, eventCount: 0, matchedSTs: [], matchedCatalogSTs: [], totalSourcetypes: totalSTs, detail: 'No data in the last 7 days' };
         });
 
         const detected = Object.values(results).filter(r => r.hasData).length;
@@ -797,11 +844,8 @@ async function detectIndexerTierApps() {
  */
 function buildSourcetypeSearchUrl(sourcetypes) {
     if (!sourcetypes || sourcetypes.length === 0) return null;
-    const filtered = buildSourcetypePatterns(sourcetypes);
-    // Anchor regex to exact-match each sourcetype (no substring/prefix matching)
-    const escaped = filtered.map(s => s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'));
-    const pattern = '^(' + escaped.join('|') + ')$';
-    const spl = `| metadata type=sourcetypes index=* | where match(sourcetype, "${pattern}") | convert ctime(*Time) | table sourcetype recentTime firstTime lastTime totalCount | eventstats sum(totalCount) as GrandTotal | sort - totalCount`;
+    const spl = buildSourcetypeMetadataSPL(sourcetypes);
+    if (!spl) return null;
     return createURL(`/app/search/search?q=${encodeURIComponent(spl)}`);
 }
 
@@ -3852,10 +3896,9 @@ function ProductCard({ product, installedApps, appStatuses, indexerApps, sourcet
     const handleExploreData = () => {
         const sts = product.sourcetypes || [];
         if (sts.length > 0) {
-            const escaped = sts.map(s => s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'));
-            const pattern = '^(' + escaped.join('|') + ')$';
-            const spl = `| metadata type=sourcetypes index=* | where match(sourcetype, "${pattern}") | convert ctime(*Time) | table sourcetype recentTime firstTime lastTime totalCount | eventstats sum(totalCount) as GrandTotal | sort - totalCount`;
-            window.open(createURL(`/app/search/search?q=${encodeURIComponent(spl)}`), '_blank');
+            const spl = buildSourcetypeMetadataSPL(sts);
+            if (spl) window.open(createURL(`/app/search/search?q=${encodeURIComponent(spl)}`), '_blank');
+            else window.open(createURL('/app/search/search'), '_blank');
         } else {
             window.open(createURL('/app/search/search'), '_blank');
         }
@@ -3991,50 +4034,50 @@ function ProductCard({ product, installedApps, appStatuses, indexerApps, sourcet
                         <div className="csc-title-content">
                             <span className="csc-card-name">
                                 {display_name}
-                                {description && (
-                                    <InfoTooltip
-                                        placement="right"
-                                        width={420}
-                                        delay={300}
-                                        persistent
-                                        title={display_name}
-                                        content={
-                                            <div>
-                                                <div className="csc-info-popover-section">
-                                                    <div className="csc-info-popover-label">Description</div>
-                                                    <div className="csc-info-popover-text">{renderFormattedText(description)}</div>
-                                                </div>
-                                                {value_proposition && (
-                                                    <div className="csc-info-popover-section csc-info-popover-value">
-                                                        <div className="csc-info-popover-label">Value</div>
-                                                        <div className="csc-info-popover-text">{renderFormattedText(value_proposition)}</div>
-                                                    </div>
-                                                )}
-                                                {support_level && (
-                                                    <div className="csc-info-popover-section">
-                                                        <div className="csc-info-popover-label">Support</div>
-                                                        <div className="csc-info-popover-text">
-                                                            {support_level === 'cisco_supported' && 'Cisco Supported'}
-                                                            {support_level === 'splunk_supported' && 'Splunk Supported'}
-                                                            {support_level === 'developer_supported' && 'Developer Supported'}
-                                                            {support_level === 'community_supported' && 'Community Supported'}
-                                                            {support_level === 'not_supported' && 'Not Supported'}
-                                                        </div>
-                                                    </div>
-                                                )}
-                                                {product.aliases && product.aliases.length > 0 && (
-                                                    <div className="csc-info-popover-section csc-info-popover-aliases">
-                                                        <div className="csc-info-popover-label">Former Names</div>
-                                                        <div className="csc-info-popover-text">{product.aliases.join(', ')}</div>
-                                                    </div>
-                                                )}
-                                            </div>
-                                        }
-                                    >
-                                        <span className="csc-info-trigger" title="Hover for product details"><InfoCircle size={15} /></span>
-                                    </InfoTooltip>
-                                )}
                             </span>
+                            {description && (
+                                <InfoTooltip
+                                    placement="right"
+                                    width={420}
+                                    delay={300}
+                                    persistent
+                                    title={display_name}
+                                    content={
+                                        <div>
+                                            <div className="csc-info-popover-section">
+                                                <div className="csc-info-popover-label">Description</div>
+                                                <div className="csc-info-popover-text">{renderFormattedText(description)}</div>
+                                            </div>
+                                            {value_proposition && (
+                                                <div className="csc-info-popover-section csc-info-popover-value">
+                                                    <div className="csc-info-popover-label">Value</div>
+                                                    <div className="csc-info-popover-text">{renderFormattedText(value_proposition)}</div>
+                                                </div>
+                                            )}
+                                            {support_level && (
+                                                <div className="csc-info-popover-section">
+                                                    <div className="csc-info-popover-label">Support</div>
+                                                    <div className="csc-info-popover-text">
+                                                        {support_level === 'cisco_supported' && 'Cisco Supported'}
+                                                        {support_level === 'splunk_supported' && 'Splunk Supported'}
+                                                        {support_level === 'developer_supported' && 'Developer Supported'}
+                                                        {support_level === 'community_supported' && 'Community Supported'}
+                                                        {support_level === 'not_supported' && 'Not Supported'}
+                                                    </div>
+                                                </div>
+                                            )}
+                                            {product.aliases && product.aliases.length > 0 && (
+                                                <div className="csc-info-popover-section csc-info-popover-aliases">
+                                                    <div className="csc-info-popover-label">Former Names</div>
+                                                    <div className="csc-info-popover-text">{product.aliases.join(', ')}</div>
+                                                </div>
+                                            )}
+                                        </div>
+                                    }
+                                >
+                                    <span className="csc-info-trigger" title="Hover for product details"><InfoCircle size={15} /></span>
+                                </InfoTooltip>
+                            )}
                         </div>
                         <div className="csc-header-badges">
                             {sc4s_supported && (
@@ -4477,7 +4520,7 @@ function ProductCard({ product, installedApps, appStatuses, indexerApps, sourcet
                                             {product.sourcetypes.map(st => {
                                                 const peers = sharedSourcetypeMap && sharedSourcetypeMap[st];
                                                 const isShared = peers && peers.length > 1;
-                                                const hasFlow = sourcetypeInfo?.matchedSTs?.includes(st);
+                                                const hasFlow = catalogSourcetypeHasFlow(st, sourcetypeInfo);
                                                 return (
                                                     <span
                                                         key={st}
@@ -7140,25 +7183,10 @@ function CategoryFilterBar({
             style: { width: '18px', height: '18px', filter: active ? (isDark ? 'brightness(0.15)' : 'brightness(0) invert(1)') : 'none', transition: 'filter 0.2s' },
         });
     };
-    const btnStyle = (active) => {
-        if (isDark) {
-            return {
-                display: 'flex', alignItems: 'center', gap: '6px', whiteSpace: 'nowrap',
-                padding: '7px 14px', borderRadius: '9999px', border: '1px solid',
-                borderColor: active ? '#0A60FF' : 'rgba(10, 96, 255, 0.3)',
-                background: active ? '#0A60FF' : '#1e262c',
-                color: active ? '#ffffff' : '#d4d4d4',
-                boxShadow: 'none',
-                cursor: 'pointer', fontWeight: 600, fontSize: '13px',
-                transition: 'all 0.2s', flexShrink: 0,
-            };
-        }
+    const btnStyle = () => {
         return {
             display: 'flex', alignItems: 'center', gap: '6px', whiteSpace: 'nowrap',
             padding: '7px 14px', borderRadius: '9999px', border: '1px solid',
-            borderColor: active ? '#342f2c' : '#e3ddd8',
-            background: active ? '#342f2c' : '#FFFFFF',
-            color: active ? '#fff' : 'var(--page-color, #333)',
             boxShadow: 'none',
             cursor: 'pointer', fontWeight: 600, fontSize: '13px',
             transition: 'all 0.2s', flexShrink: 0,
@@ -7171,13 +7199,14 @@ function CategoryFilterBar({
 
     return (<>
         <div style={{ display: 'flex', gap: '8px', overflowX: 'auto', paddingBottom: '4px', scrollBehavior: 'smooth', alignItems: 'center' }}>
-            <button onClick={() => onSelectCategory(null)} style={btnStyle(!selectedCategory)}>
+            <button
+                onClick={() => onSelectCategory(null)}
+                className={`csc-category-pill ${!selectedCategory ? 'csc-category-pill-active' : ''}`}
+                style={btnStyle(!selectedCategory)}
+            >
                 All
                 {totalCount != null && (
-                    <span style={isDark
-                        ? { fontSize: '10px', background: !selectedCategory ? 'rgba(255,255,255,0.22)' : 'rgba(255,255,255,0.15)', color: !selectedCategory ? '#ffffff' : '#d4d4d4', padding: '1px 6px', borderRadius: '10px' }
-                        : { fontSize: '10px', background: !selectedCategory ? '#5a5450' : 'var(--version-bg, #e8e8e8)', color: !selectedCategory ? '#fff' : undefined, padding: '1px 6px', borderRadius: '10px' }
-                    }>
+                    <span className="csc-category-count">
                         {totalCount}
                     </span>
                 )}
@@ -7185,13 +7214,16 @@ function CategoryFilterBar({
             {CATEGORIES.map((cat) => {
                 const active = selectedCategory === cat.id;
                 return (
-                    <button key={cat.id} onClick={() => onSelectCategory(cat.id)} title={cat.description} style={btnStyle(active)}>
+                    <button
+                        key={cat.id}
+                        onClick={() => onSelectCategory(cat.id)}
+                        title={cat.description}
+                        className={`csc-category-pill ${active ? 'csc-category-pill-active' : ''}`}
+                        style={btnStyle(active)}
+                    >
                         {cat.name}
                         {categoryCounts?.[cat.id] != null && (
-                            <span style={isDark
-                                ? { fontSize: '10px', background: active ? 'rgba(255,255,255,0.22)' : 'rgba(255,255,255,0.15)', color: active ? '#ffffff' : '#d4d4d4', padding: '1px 6px', borderRadius: '10px' }
-                                : { fontSize: '10px', background: active ? '#5a5450' : 'var(--version-bg, #e8e8e8)', color: active ? '#fff' : undefined, padding: '1px 6px', borderRadius: '10px' }
-                            }>
+                            <span className="csc-category-count">
                                 {categoryCounts[cat.id]}
                             </span>
                         )}
@@ -8404,6 +8436,9 @@ function SCANProductsPage() {
                         onClick={handlePortfolioToggle}
                         title={showFullPortfolio ? 'Showing all products — click to show supported only' : 'Showing supported products only — click to show all'}
                     >
+                        <span className="scan-util-portfolio-switch" aria-hidden="true">
+                            <span className="scan-util-portfolio-knob" />
+                        </span>
                         <span className="scan-util-portfolio-label">
                             {showFullPortfolio ? 'All Products' : 'Supported Only'}
                         </span>
@@ -9005,18 +9040,17 @@ function SCANProductsPage() {
 
             {/* Section 1: Configured */}
             <div id="configured_products">
+            {configuredProducts.length > 0 && (
+                <button
+                    ref={removeAllReturnRef}
+                    className={`csc-btn csc-btn-remove-all csc-section-header-action ${configuredProducts.length <= 3 ? 'csc-section-header-action-near' : ''}`}
+                    onClick={() => setRemoveAllModalOpen(true)}
+                    title="Remove all products from your configured list"
+                >
+                    Remove All
+                </button>
+            )}
             <CollapsiblePanel title={renderSectionTitle('Configured Products', configuredProducts.length, configuredProducts)} open={effectivePanelOpen.configured_products} onChange={handlePanelToggle} panelId="configured_products">
-                {configuredProducts.length > 0 && (
-                    <div className="csc-section-toolbar">
-                        <button
-                            className="csc-btn csc-btn-remove-all"
-                            onClick={() => setRemoveAllModalOpen(true)}
-                            title="Remove all products from your configured list"
-                        >
-                            Remove All
-                        </button>
-                    </div>
-                )}
                 {configuredProducts.length > 0 ? (
                     <div className="csc-card-grid">
                         {configuredProducts.map((p) => (
