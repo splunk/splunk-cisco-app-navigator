@@ -73,23 +73,23 @@
      Semantic palette: 90% neutrals, 10% brand color.       */
 :root {
     /* ── Semantic Palette ── */
-    --background: #f0f4f8;
+    --background: #f6f7f9;
     --foreground: #0f172a;
     --card: #ffffff;
     --primary: #0369a1;
-    --accent: #e0eaf4;
-    --muted: #e8edf3;
-    --border: #d1dce8;
+    --accent: #edf2f7;
+    --muted: #eef1f4;
+    --border: #d8dee6;
     --accent-muted-bg: rgba(3,105,161,0.08);
 
-    --bg-primary: #f0f4f8;
-    --bg-secondary: #e8edf3;
+    --bg-primary: #f6f7f9;
+    --bg-secondary: #eef1f4;
     --bg-surface: #ffffff;
     --text-primary: #0f172a;
     --text-secondary: #64748b;
     --text-tertiary: #64748b;
-    --border-light: #d1dce8;
-    --border-medium: #bfd0df;
+    --border-light: #d8dee6;
+    --border-medium: #c8d1dc;
     --color-primary: #0369a1;
     --color-primary-hover: #075985;
     --color-success: #15803d;
@@ -114,7 +114,7 @@
     --card-footer-bg: var(--bg-primary);
     --card-footer-border: var(--border-light);
     --card-desc-color: var(--text-secondary);
-    --section-bg: var(--bg-secondary);
+    --section-bg: #eef1f4;
     --section-alt-bg: var(--bg-primary);
     --section-border: var(--border-medium);
     --pill-divider: var(--border-medium);
@@ -135,70 +135,79 @@
     --status-warning-border: rgba(180,83,9,0.28);
     --status-info-bg: rgba(3,105,161,0.08);
     --status-info-border: rgba(3,105,161,0.26);
-    --status-neutral-bg: #e8edf3;
-    --status-neutral-border: #d1dce8;
+    --status-neutral-bg: #eef1f4;
+    --status-neutral-border: #d8dee6;
 }
 
 /* --- Dark Theme Overrides ---
      .dce-dark is toggled on <html> by the React component so that
      both .products-page AND portal-rendered modals inherit dark vars. */
 :root.dce-dark {
-    /* ── Semantic Palette (dark, warm) ── */
-    --bg-primary: #1c1a18;
-    --bg-secondary: #22201e;
-    --bg-surface: #262320;
-    --text-primary: #d6d2cf;
-    --text-secondary: #aaa5a0;
-    --text-tertiary: #9a9590;
-    --border-light: #3a3632;
-    --border-medium: #4a4540;
-    --color-primary: #0A60FF;
-    --color-primary-hover: #02C8FF;
-    --color-success: #3D851C;
-    --color-warning: #FF9000;
-    --color-error: #D91821;
+    /* ── Semantic Palette (dark graphite) ── */
+    --background: #111418;
+    --foreground: #e6edf3;
+    --card: #20262d;
+    --primary: #38bdf8;
+    --accent: #26313b;
+    --muted: #1a1f25;
+    --border: #343d48;
+    --accent-muted-bg: rgba(56,189,248,0.12);
+
+    --bg-primary: #111418;
+    --bg-secondary: #171c22;
+    --bg-surface: #20262d;
+    --text-primary: #e6edf3;
+    --text-secondary: #a7b0bb;
+    --text-tertiary: #87919d;
+    --border-light: #343d48;
+    --border-medium: #46515f;
+    --color-primary: #38bdf8;
+    --color-primary-hover: #7dd3fc;
+    --color-success: #22c55e;
+    --color-warning: #f59e0b;
+    --color-error: #f87171;
 
     /* ── Backward-compat aliases (dark) ── */
     --page-bg: var(--bg-primary);
     --page-color: var(--text-primary);
-    --heading-color: #e8e8e8;
+    --heading-color: var(--text-primary);
     --subtitle-color: var(--text-secondary);
-    --muted-color: #a0a0a0;
+    --muted-color: var(--text-secondary);
     --faint-color: var(--text-tertiary);
-    --dimmed-color: #777777;
-    --italic-muted: #888;
+    --dimmed-color: var(--text-tertiary);
+    --italic-muted: var(--text-tertiary);
     --card-bg: var(--bg-surface);
     --card-border: var(--border-light);
-    --pill-divider: #5a5550;
+    --pill-divider: var(--border-medium);
     --card-shadow: none;
     --card-shadow-hover: none;
     --card-header-bg: var(--bg-surface);
     --card-body-bg: var(--bg-surface);
-    --card-footer-bg: #2a2724;
-    --card-footer-border: #322f2c;
-    --card-desc-color: #b0aba6;
-    --section-bg: var(--bg-surface);
+    --card-footer-bg: #181d23;
+    --card-footer-border: #303946;
+    --card-desc-color: var(--text-secondary);
+    --section-bg: var(--bg-secondary);
     --section-alt-bg: var(--bg-secondary);
     --section-border: var(--border-light);
-    --custom-tip-bg: #1b3a1f;
-    --version-bg: #302d2a;
-    --version-color: #a09b96;
+    --custom-tip-bg: rgba(34,197,94,0.10);
+    --version-bg: #26313b;
+    --version-color: var(--text-secondary);
     --modal-bg: var(--bg-surface);
     --modal-color: var(--text-primary);
     --input-border: var(--border-medium);
-    --input-bg: #2a2724;
-    --code-bg: #302d2a;
-    --icon-fill: #1e1a16;
-    --spinner-overlay-bg: rgba(28,26,24,0.8);
+    --input-bg: #171c22;
+    --code-bg: #151a20;
+    --icon-fill: #171c22;
+    --spinner-overlay-bg: rgba(17,20,24,0.82);
     --spinner-text: var(--text-primary);
 
     /* ── Semantic status backgrounds (dark) ── */
-    --status-warning-bg: rgba(255,144,0,0.08);
-    --status-warning-border: rgba(255,144,0,0.3);
-    --status-info-bg: rgba(10,96,255,0.08);
-    --status-info-border: rgba(2,200,255,0.2);
-    --status-neutral-bg: #242220;
-    --status-neutral-border: #403c38;
+    --status-warning-bg: rgba(245,158,11,0.12);
+    --status-warning-border: rgba(245,158,11,0.34);
+    --status-info-bg: rgba(56,189,248,0.12);
+    --status-info-border: rgba(56,189,248,0.32);
+    --status-neutral-bg: #20262d;
+    --status-neutral-border: #343d48;
 }
 
 /* Body / Splunk chrome background — scoped to the app content area only.
@@ -255,9 +264,9 @@ html.dce-dark [data-view="views/shared/Page"] {
     flex: 1;
     min-width: 0;
     display: flex;
-    align-items: baseline;
+    align-items: center;
     flex-wrap: wrap;
-    gap: 8px;
+    gap: 10px;
 }
 
 .products-page .page-title {
@@ -266,8 +275,12 @@ html.dce-dark [data-view="views/shared/Page"] {
     font-weight: 800 !important;
     color: var(--heading-color) !important;
     letter-spacing: -0.5px;
-    line-height: 1.15;
+    line-height: 1;
     font-family: 'CiscoSansTT', 'Splunk Platform Sans', 'Proxima Nova', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    flex-shrink: 0;
 }
 
 .products-page-subtitle {
@@ -276,8 +289,12 @@ html.dce-dark [data-view="views/shared/Page"] {
     font-weight: 500;
     color: var(--subtitle-color);
     letter-spacing: 0;
-    line-height: 1.3;
+    line-height: 14px;
     opacity: 1;
+    display: inline-flex;
+    align-items: center;
+    padding-left: 10px;
+    border-left: 1px solid var(--border-light);
 }
 
 .products-page-instructions {
@@ -447,9 +464,9 @@ html.dce-dark [data-view="views/shared/Page"] {
     color: var(--text-primary) !important;
 }
 :root.dce-dark .scan-utility-strip {
-    background: #1e262c !important;
-    border-color: #444e56 !important;
-    color: #d4d4d4 !important;
+    background: var(--bg-primary) !important;
+    border-color: var(--border-light) !important;
+    color: var(--text-primary) !important;
 }
 
 .scan-utility-left,
@@ -464,15 +481,45 @@ html.dce-dark [data-view="views/shared/Page"] {
 .scan-util-pill {
     display: inline-flex !important;
     align-items: center !important;
+    justify-content: center !important;
     gap: 5px !important;
-    padding: 3px 10px !important;
-    border-radius: 12px !important;
+    height: 30px !important;
+    min-height: 30px !important;
+    padding: 0 12px !important;
+    border-radius: 5px !important;
     font-size: 12px !important;
-    font-weight: 600 !important;
-    line-height: 1.3 !important;
+    font-weight: 500 !important;
+    line-height: 1 !important;
     white-space: nowrap !important;
-    border: 1px solid transparent !important;
-    transition: background 0.2s, border-color 0.2s, opacity 0.2s;
+    border: 1px solid var(--border-light) !important;
+    background: var(--bg-surface) !important;
+    color: #40546f !important;
+    box-shadow: none !important;
+    text-decoration: none !important;
+    transition: background 0.15s, border-color 0.15s, color 0.15s, opacity 0.15s;
+}
+.scan-util-pill:hover {
+    border-color: rgba(3, 105, 161, 0.42) !important;
+    background: rgba(3, 105, 161, 0.08) !important;
+    color: var(--color-primary) !important;
+    text-decoration: none !important;
+}
+button.scan-util-pill,
+a.scan-util-pill {
+    cursor: pointer;
+}
+button.scan-util-pill:disabled {
+    cursor: not-allowed;
+}
+:root.dce-dark .scan-util-pill {
+    background: var(--bg-surface) !important;
+    border-color: var(--border-light) !important;
+    color: var(--text-secondary) !important;
+}
+:root.dce-dark .scan-util-pill:hover {
+    border-color: rgba(56, 189, 248, 0.48) !important;
+    background: var(--accent-muted-bg) !important;
+    color: var(--color-primary) !important;
 }
 
 /* Dev mode info pill — platform + Splunk version + SCAN version + build */
@@ -485,9 +532,9 @@ html.dce-dark [data-view="views/shared/Page"] {
     font-variant-numeric: tabular-nums;
 }
 :root.dce-dark .scan-util-devinfo {
-    background: rgba(255,255,255,0.06) !important;
-    border-color: #444e56 !important;
-    color: #d4d4d4 !important;
+    background: var(--bg-surface) !important;
+    border-color: var(--border-light) !important;
+    color: var(--text-secondary) !important;
 }
 .scan-util-devinfo-sep {
     margin: 0 5px;
@@ -495,7 +542,7 @@ html.dce-dark [data-view="views/shared/Page"] {
     font-weight: 300;
 }
 :root.dce-dark .scan-util-devinfo-sep {
-    color: #555;
+    color: var(--border-medium);
 }
 .scan-util-devinfo-build {
     margin-left: 3px;
@@ -527,7 +574,7 @@ html.dce-dark [data-view="views/shared/Page"] {
     flex-shrink: 0;
 }
 :root.dce-dark .scan-util-sep {
-    background: #444e56;
+    background: var(--border-light);
 }
 
 /* Cloud simulation toggle */
@@ -581,30 +628,36 @@ html.dce-dark [data-view="views/shared/Page"] {
 
 /* Theme pill */
 .scan-util-theme {
-    color: #07182D !important;
-    background: #f4f4f4 !important;
-    border-color: #d2cbc5 !important;
+    width: 30px !important;
     cursor: pointer;
-    font-weight: 600 !important;
-    padding: 3px 12px 3px 8px !important;
+    padding: 0 !important;
 }
 .scan-util-theme:hover {
-    background: #E8EBEE !important;
-    border-color: #07182D !important;
+    background: rgba(3, 105, 161, 0.08) !important;
+    border-color: rgba(3, 105, 161, 0.42) !important;
+    color: var(--color-primary) !important;
 }
 :root.dce-dark .scan-util-theme {
-    background: rgba(255,255,255,0.06) !important;
-    border-color: #444e56 !important;
-    color: #d4d4d4 !important;
+    background: var(--bg-surface) !important;
+    border-color: var(--border-light) !important;
+    color: var(--text-secondary) !important;
 }
 :root.dce-dark .scan-util-theme:hover {
-    background: rgba(255,255,255,0.10) !important;
-    border-color: #02C8FF !important;
+    background: var(--accent-muted-bg) !important;
+    border-color: rgba(56, 189, 248, 0.48) !important;
+    color: var(--color-primary) !important;
 }
 .scan-util-theme-label {
-    font-size: 11.5px;
-    letter-spacing: 0.3px;
-    text-transform: uppercase;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+    letter-spacing: 0;
+    line-height: 1;
+}
+.scan-util-theme-label svg {
+    display: block;
+    color: currentColor;
 }
 
 /* Portfolio toggle pill */
@@ -686,17 +739,18 @@ html.dce-dark [data-view="views/shared/Page"] {
     text-transform: uppercase;
 }
 
-/* Sync Splunkbase pill — on Midnight Blue strip */
+/* Sync Splunkbase pill — matches active filter pill styling */
 .scan-util-sync {
-    color: #ffffff !important;
-    background: #07182D !important;
-    border-color: transparent !important;
+    color: var(--color-primary) !important;
+    background: var(--accent-muted-bg) !important;
+    border-color: rgba(3, 105, 161, 0.46) !important;
     cursor: pointer;
     font-weight: 600 !important;
 }
 .scan-util-sync:hover {
-    background: #0A60FF !important;
-    border-color: transparent !important;
+    background: rgba(3, 105, 161, 0.14) !important;
+    border-color: var(--color-primary) !important;
+    color: var(--color-primary) !important;
 }
 .scan-util-sync:disabled {
     opacity: 0.7 !important;
@@ -733,13 +787,14 @@ html.dce-dark [data-view="views/shared/Page"] {
     color: #6e4b00 !important;
 }
 :root.dce-dark .scan-util-sync {
-    background: #02C8FF !important;
-    border-color: transparent !important;
-    color: #07182D !important;
+    background: var(--accent-muted-bg) !important;
+    border-color: rgba(56, 189, 248, 0.48) !important;
+    color: var(--color-primary) !important;
 }
 :root.dce-dark .scan-util-sync:hover {
-    background: #00b0e0 !important;
-    border-color: transparent !important;
+    background: rgba(56, 189, 248, 0.18) !important;
+    border-color: var(--color-primary) !important;
+    color: var(--color-primary-hover) !important;
 }
 :root.dce-dark .scan-sync-ok {
     color: #7ee787 !important;
@@ -778,24 +833,24 @@ html.dce-dark [data-view="views/shared/Page"] {
     transition: all 0.2s;
 }
 .csc-compat-select:hover {
-    border-color: #02C8FF !important;
+    border-color: var(--color-primary) !important;
 }
 .csc-compat-select:focus {
-    border-color: #02C8FF !important;
-    box-shadow: 0 0 0 2px rgba(2,200,255,0.2);
+    border-color: var(--color-primary) !important;
+    box-shadow: 0 0 0 2px rgba(3,105,161,0.18);
 }
 :root.dce-dark .csc-compat-select {
-    background: rgba(255,255,255,0.06) !important;
-    color: #e0e0e0 !important;
-    border-color: #3d434a !important;
+    background: var(--input-bg) !important;
+    color: var(--text-primary) !important;
+    border-color: var(--border-light) !important;
 }
 :root.dce-dark .csc-compat-select:hover,
 :root.dce-dark .csc-compat-select:focus {
-    border-color: #02C8FF !important;
+    border-color: var(--color-primary) !important;
 }
 :root.dce-dark .csc-compat-select option {
-    background: #1e1e1e;
-    color: #e0e0e0;
+    background: var(--bg-surface);
+    color: var(--text-primary);
 }
 
 .header-app-icon {
@@ -1073,11 +1128,11 @@ html.dce-dark [data-view="views/shared/Page"] {
 #custom_products,
 #vault_products {
     margin-bottom: 4px;
-    border: 1px solid #E5E7EB !important;
+    border: 1px solid var(--border-light) !important;
     border-left: none !important;
     box-shadow: none !important;
     min-height: 42px !important;
-    background: #FFFFFF !important;
+    background: var(--bg-surface) !important;
     border-radius: 8px !important;
     overflow: hidden;
 }
@@ -1141,7 +1196,7 @@ html.dce-dark [data-view="views/shared/Page"] {
 #custom_products button[data-test='toggle'],
 #vault_products button[data-test='toggle'] {
     padding: 11px 14px 11px 44px;
-    background: var(--bg-primary) !important;
+    background: #f3f5f7 !important;
     border: none;
     border-left: 12px solid;
     color: var(--text-primary) !important;
@@ -1158,7 +1213,7 @@ html.dce-dark [data-view="views/shared/Page"] {
 #gtm_coverage_gaps button[data-test='toggle']:hover,
 #custom_products button[data-test='toggle']:hover,
 #vault_products button[data-test='toggle']:hover {
-    background: var(--bg-secondary) !important;
+    background: #eceff3 !important;
 }
 
 #configured_products button[data-test='toggle'] span,
@@ -1691,7 +1746,7 @@ html.dce-dark [data-view="views/shared/Page"] {
     transform: rotate(90deg);
 }
 .scan-guide-summary:hover {
-    background: var(--hover-bg, #f0f4f8);
+    background: var(--hover-bg, #f6f7f9);
 }
 .scan-guide-list {
     margin: 0;
@@ -2241,21 +2296,22 @@ html.dce-dark [data-view="views/shared/Page"] {
     border-color: #1f9b2c;
 }
 :root.dce-dark .modal .csc-btn-green {
-    background: #0A60FF;
-    border-color: #0A60FF;
+    background: var(--color-primary);
+    border-color: var(--color-primary);
+    color: var(--bg-primary);
 }
 :root.dce-dark .modal .csc-btn-green:hover {
-    background: #3380FF;
-    border-color: #3380FF;
+    background: var(--color-primary-hover);
+    border-color: var(--color-primary-hover);
 }
 :root.dce-dark .modal .csc-btn-green-outline {
-    color: #5B9AFF;
-    border-color: #5B9AFF;
+    color: var(--color-primary);
+    border-color: var(--color-primary);
 }
 :root.dce-dark .modal .csc-btn-green-outline:hover {
-    background: #0A60FF;
-    color: #fff;
-    border-color: #0A60FF;
+    background: var(--color-primary);
+    color: var(--bg-primary);
+    border-color: var(--color-primary);
 }
 :root.dce-dark .csc-btn-disabled-label {
     background: transparent;
@@ -2330,11 +2386,11 @@ html.dce-dark [data-view="views/shared/Page"] {
     color: #ced4db;
 }
 :root.dce-dark .csc-split-pill-seg {
-    color: #02C8FF;
+    color: var(--color-primary);
 }
 :root.dce-dark .csc-split-pill-seg:hover {
-    background: #02C8FF;
-    color: #07182D;
+    background: var(--color-primary);
+    color: var(--bg-primary);
 }
 :root.dce-dark .csc-sourcetype-link {
     color: #a1a9b2;
@@ -2361,28 +2417,28 @@ html.dce-dark [data-view="views/shared/Page"] {
 }
 :root.dce-dark .csc-card-name [data-test="tooltip"] svg,
 :root.dce-dark .csc-card-name [class*="Tooltip"] svg {
-    color: #02C8FF;
+    color: var(--color-primary);
 }
 :root.dce-dark .csc-card-name [data-test="tooltip"] svg:hover,
 :root.dce-dark .csc-card-name [class*="Tooltip"] svg:hover {
-    color: #02C8FF;
-    background-color: rgba(102, 187, 106, 0.1);
+    color: var(--color-primary);
+    background-color: var(--accent-muted-bg);
 }
 :root.dce-dark .addon-dropdown-trigger:hover {
-    border-color: #02C8FF;
+    border-color: var(--color-primary);
 }
 :root.dce-dark .addon-dropdown-value {
-    color: #02C8FF;
+    color: var(--color-primary);
 }
 :root.dce-dark .addon-dropdown-item-active {
-    color: #02C8FF;
+    color: var(--color-primary);
 }
 :root.dce-dark .addon-dropdown-item-active .addon-pill-count {
-    background: rgba(102, 187, 106, 0.12);
-    color: #02C8FF;
+    background: var(--accent-muted-bg);
+    color: var(--color-primary);
 }
 :root.dce-dark .scan-info-pill-icon {
-    color: #02C8FF;
+    color: var(--color-primary);
 }
 :root.dce-dark .scan-tooltip-pin {
     color: #888;
@@ -2391,7 +2447,7 @@ html.dce-dark [data-view="views/shared/Page"] {
     color: #ccc;
 }
 :root.dce-dark .scan-tooltip-pin.pinned {
-    color: #02C8FF;
+    color: var(--color-primary);
 }
 :root.dce-dark .scan-tooltip-drag {
     color: #888;
@@ -3012,10 +3068,10 @@ html.dce-dark [data-view="views/shared/Page"] {
 .csc-support-developer_supported { background: rgba(255,144,0,0.08); color: #FF9000; }
 .csc-support-community_supported { background: rgba(10,96,255,0.08); color: #0A60FF; }
 .csc-support-not_supported       { background: #fafafa; color: #9e9e9e; }
-:root.dce-dark .csc-support-cisco_supported     { background: rgba(10,96,255,0.18); color: #02C8FF; }
+:root.dce-dark .csc-support-cisco_supported     { background: var(--accent-muted-bg); color: var(--color-primary); }
 :root.dce-dark .csc-support-splunk_supported    { background: rgba(228,68,156,0.18); color: #F0A0D0; }
 :root.dce-dark .csc-support-developer_supported { background: rgba(255,144,0,0.18); color: #FF9000; }
-:root.dce-dark .csc-support-community_supported { background: rgba(10,96,255,0.18); color: #02C8FF; }
+:root.dce-dark .csc-support-community_supported { background: var(--accent-muted-bg); color: var(--color-primary); }
 :root.dce-dark .csc-support-not_supported       { background: rgba(158,158,158,0.12); color: #757575; }
 
 /* ── Section Divider in Detail Panel ── */
@@ -3322,9 +3378,9 @@ html.dce-dark [data-view="views/shared/Page"] {
 
 /* Dark mode — Advanced Filters */
 :root.dce-dark .csc-support-pill-cisco-active {
-    background: rgba(76, 175, 80, 0.15) !important;
-    border-color: #02C8FF !important;
-    color: #02C8FF !important;
+    background: var(--accent-muted-bg) !important;
+    border-color: var(--color-primary) !important;
+    color: var(--color-primary) !important;
 }
 :root.dce-dark .csc-support-pill-splunk-active {
     background: rgba(228, 68, 156, 0.15) !important;
@@ -3342,9 +3398,9 @@ html.dce-dark [data-view="views/shared/Page"] {
     color: #bdbdbd !important;
 }
 :root.dce-dark .csc-visibility-pill-on {
-    background: rgba(102, 187, 106, 0.15) !important;
-    border-color: #02C8FF !important;
-    color: #02C8FF !important;
+    background: var(--accent-muted-bg) !important;
+    border-color: var(--color-primary) !important;
+    color: var(--color-primary) !important;
 }
 :root.dce-dark .csc-visibility-pill-off {
     background: rgba(30, 30, 30, 0.4) !important;
@@ -4043,7 +4099,7 @@ a.csc-dep-name-link:hover {
     font-size: 11px;
     line-height: 1.45;
     color: var(--text-secondary, #555);
-    background: var(--status-neutral-bg, #f0f4f8);
+    background: var(--status-neutral-bg, #eef1f4);
     border-left: 3px solid var(--text-tertiary, #90a4ae);
     border-radius: 3px;
 }
@@ -6679,149 +6735,149 @@ tr.scan-ts-ahead .scan-ts-name {
     background: rgba(0, 0, 0, 0.55);
 }
 :root.dce-dark .scan-drawer {
-    background: #1e262c;
-    border-right-color: #333d44;
+    background: var(--bg-surface);
+    border-right-color: var(--border-light);
     box-shadow: 8px 0 32px rgba(0, 0, 0, 0.4);
 }
 :root.dce-dark .scan-drawer-header {
-    background: #0d1a2a;
-    border-bottom-color: #1a3050;
+    background: var(--bg-secondary);
+    border-bottom-color: var(--border-light);
 }
 :root.dce-dark .scan-drawer-close {
-    background: rgba(255,255,255,0.1);
-    color: #02C8FF;
+    background: rgba(255,255,255,0.08);
+    color: var(--color-primary);
 }
 :root.dce-dark .scan-drawer-close:hover {
     background: rgba(255,255,255,0.2);
     color: #fff;
 }
 :root.dce-dark .scan-drawer-section-title {
-    color: #d4d4d4;
+    color: var(--text-primary);
 }
 :root.dce-dark .scan-drawer-divider {
-    background: #333d44;
+    background: var(--border-light);
 }
 :root.dce-dark .scan-drawer-pill:hover {
-    border-color: #02C8FF;
-    background: rgba(4, 159, 217, 0.12);
+    border-color: rgba(56, 189, 248, 0.48);
+    background: var(--accent-muted-bg);
 }
 :root.dce-dark .scan-drawer-pill-active {
-    border-color: #02C8FF;
-    background: rgba(4, 159, 217, 0.18);
-    color: #02C8FF;
+    border-color: rgba(56, 189, 248, 0.58);
+    background: var(--accent-muted-bg);
+    color: var(--color-primary);
 }
 :root.dce-dark .scan-drawer-pill-vis-on {
-    border-color: #02C8FF;
-    background: rgba(4, 159, 217, 0.18);
-    color: #02C8FF;
+    border-color: rgba(56, 189, 248, 0.58);
+    background: var(--accent-muted-bg);
+    color: var(--color-primary);
 }
 :root.dce-dark .scan-drawer-pill-vis-off {
     color: #666;
 }
 /* Dark mode card-style visibility items */
 :root.dce-dark .scan-drawer-vis-item {
-    border-color: #444e56;
-    background: #232d34;
+    border-color: var(--border-light);
+    background: var(--bg-secondary);
 }
 :root.dce-dark .scan-drawer-vis-item:hover {
-    border-color: #02C8FF;
+    border-color: rgba(56, 189, 248, 0.48);
 }
 :root.dce-dark .scan-drawer-vis-label {
-    color: #ccc;
+    color: var(--text-primary);
 }
 :root.dce-dark .scan-drawer-vis-count {
     background: rgba(255, 255, 255, 0.08);
-    color: #999;
+    color: var(--text-secondary);
 }
 :root.dce-dark .scan-drawer-vis-on {
-    border-color: #02C8FF;
-    background: rgba(4, 159, 217, 0.12);
+    border-color: rgba(56, 189, 248, 0.58);
+    background: var(--accent-muted-bg);
 }
 :root.dce-dark .scan-drawer-vis-on .scan-drawer-vis-count {
-    background: rgba(4, 159, 217, 0.2);
-    color: #02C8FF;
+    background: rgba(56, 189, 248, 0.18);
+    color: var(--color-primary-hover);
 }
 :root.dce-dark .scan-drawer-select {
-    background: #232d34;
-    border-color: #444e56;
-    color: #ccc;
+    background: var(--input-bg);
+    border-color: var(--border-light);
+    color: var(--text-primary);
 }
 :root.dce-dark .scan-drawer-select-active {
-    border-color: #02C8FF;
-    background: rgba(4, 159, 217, 0.15);
-    color: #02C8FF;
+    border-color: rgba(56, 189, 248, 0.58);
+    background: var(--accent-muted-bg);
+    color: var(--color-primary);
 }
 :root.dce-dark .scan-drawer-version-list {
-    background: #232d34;
-    border-color: #444e56;
+    background: var(--bg-secondary);
+    border-color: var(--border-light);
 }
 :root.dce-dark .scan-drawer-version-header {
-    border-bottom-color: #444e56;
+    border-bottom-color: var(--border-light);
 }
 :root.dce-dark .scan-drawer-version-label {
-    color: #888;
+    color: var(--text-tertiary);
 }
 :root.dce-dark .scan-drawer-version-clear {
-    color: #02C8FF;
+    color: var(--color-primary);
 }
 :root.dce-dark .scan-drawer-version-group-label {
     color: #777;
 }
 :root.dce-dark .scan-drawer-version-group-divider {
-    background: #444e56;
+    background: var(--border-light);
 }
 :root.dce-dark .scan-drawer-version-item {
-    color: #ccc;
+    color: var(--text-primary);
 }
 :root.dce-dark .scan-drawer-version-item:hover {
-    background: rgba(4, 159, 217, 0.1);
+    background: var(--accent-muted-bg);
 }
 :root.dce-dark .scan-drawer-version-item-active {
-    background: linear-gradient(90deg, rgba(4,159,217,0.18), rgba(4,159,217,0.06));
-    border-left-color: #02C8FF;
-    color: #02C8FF;
+    background: linear-gradient(90deg, rgba(56,189,248,0.18), rgba(56,189,248,0.06));
+    border-left-color: var(--color-primary);
+    color: var(--color-primary);
 }
 :root.dce-dark .scan-drawer-version-item input[type="checkbox"] {
     border-color: #666;
 }
 :root.dce-dark .scan-drawer-version-item input[type="checkbox"]:checked {
-    background: #02C8FF;
-    border-color: #02C8FF;
+    background: var(--color-primary);
+    border-color: var(--color-primary);
 }
 :root.dce-dark .scan-drawer-version-item input[type="checkbox"]:checked::after {
-    border-color: #1e262c;
+    border-color: var(--bg-primary);
 }
 :root.dce-dark .scan-drawer-version-item input[type="checkbox"]:hover {
-    border-color: #02C8FF;
+    border-color: var(--color-primary);
 }
 :root.dce-dark .scan-drawer-version-prefix {
     color: #777;
 }
 :root.dce-dark .scan-drawer-addon-list {
-    background: #232d34;
-    border-color: #444e56;
+    background: var(--bg-secondary);
+    border-color: var(--border-light);
 }
 :root.dce-dark .scan-drawer-addon-divider {
-    background: #444e56;
+    background: var(--border-light);
 }
 :root.dce-dark .scan-drawer-addon-item {
-    color: #ccc;
+    color: var(--text-primary);
 }
 :root.dce-dark .scan-drawer-addon-item:hover {
-    background: rgba(4, 159, 217, 0.08);
+    background: var(--accent-muted-bg);
 }
 :root.dce-dark .scan-drawer-addon-item-active {
-    background: linear-gradient(90deg, rgba(4,159,217,0.18), rgba(4,159,217,0.06));
-    border-left-color: #02C8FF;
-    color: #02C8FF;
+    background: linear-gradient(90deg, rgba(56,189,248,0.18), rgba(56,189,248,0.06));
+    border-left-color: var(--color-primary);
+    color: var(--color-primary);
 }
 :root.dce-dark .scan-drawer-addon-count {
     background: rgba(255,255,255,0.08);
     color: #aaa;
 }
 :root.dce-dark .scan-drawer-addon-item-active .scan-drawer-addon-count {
-    background: #02C8FF;
-    color: #1e262c;
+    background: var(--color-primary);
+    color: var(--bg-primary);
 }
 
 /* ── Reset Filters button ── */
@@ -6844,24 +6900,24 @@ tr.scan-ts-ahead .scan-ts-name {
     color: var(--page-color, #333);
 }
 :root.dce-dark .scan-drawer-reset-btn {
-    background: rgba(255,255,255,0.06);
-    border-color: #444e56;
-    color: #aab;
+    background: var(--bg-secondary);
+    border-color: var(--border-light);
+    color: var(--text-secondary);
 }
 :root.dce-dark .scan-drawer-reset-btn:hover {
-    background: rgba(255,255,255,0.12);
-    border-color: #667;
-    color: #ddd;
+    background: var(--accent-muted-bg);
+    border-color: rgba(56, 189, 248, 0.48);
+    color: var(--color-primary);
 }
 
 :root.dce-dark .scan-filter-trigger:hover {
-    border-color: #02C8FF;
-    background: rgba(4, 159, 217, 0.1);
+    border-color: rgba(56, 189, 248, 0.48);
+    background: var(--accent-muted-bg);
 }
 :root.dce-dark .scan-filter-trigger-active {
-    border-color: #02C8FF;
-    background: rgba(2, 200, 255, 0.12);
-    color: #02C8FF;
+    border-color: rgba(56, 189, 248, 0.58);
+    background: var(--accent-muted-bg);
+    color: var(--color-primary);
 }
 :root.dce-dark .scan-active-chip {
     background: rgba(176, 190, 197, 0.12);
@@ -6875,13 +6931,13 @@ tr.scan-ts-ahead .scan-ts-name {
 :root.dce-dark .scan-active-chip-close:hover {
     background: rgba(176, 190, 197, 0.3);
 }
-:root.dce-dark .scan-drawer-pill { background: #1e262c; border-color: #444e56; color: #d4d4d4; }
-:root.dce-dark .scan-drawer-pill:hover { border-color: #02C8FF; background: rgba(2, 200, 255, 0.08); }
-:root.dce-dark .scan-drawer-pill-active { background: #02C8FF; border-color: #02C8FF; color: #07182D; }
+:root.dce-dark .scan-drawer-pill { background: var(--bg-surface); border-color: var(--border-light); color: var(--text-secondary); }
+:root.dce-dark .scan-drawer-pill:hover { border-color: rgba(56, 189, 248, 0.48); background: var(--accent-muted-bg); }
+:root.dce-dark .scan-drawer-pill-active { background: var(--accent-muted-bg); border-color: rgba(56, 189, 248, 0.58); color: var(--color-primary); }
 :root.dce-dark .scan-drawer-pill-secnet-active { border-color: #26a69a; background: rgba(38,166,154,0.18); color: #80cbc4; }
 :root.dce-dark .scan-drawer-pill-soar-active { border-color: #ffa726; background: rgba(255,167,38,0.15); color: #ffcc80; }
 :root.dce-dark .scan-drawer-pill-alert-active { border-color: #42a5f5; background: rgba(66,165,245,0.15); color: #90caf9; }
-:root.dce-dark .scan-drawer-pill-cisco-active { border-color: #02C8FF; background: rgba(102,187,106,0.15); color: #a5d6a7; }
+:root.dce-dark .scan-drawer-pill-cisco-active { border-color: var(--color-primary); background: var(--accent-muted-bg); color: var(--color-primary); }
 :root.dce-dark .scan-drawer-pill-splunk-active { border-color: #42a5f5; background: rgba(66,165,245,0.15); color: #90caf9; }
 :root.dce-dark .scan-drawer-pill-dev-active { border-color: #ff7043; background: rgba(255,112,67,0.15); color: #FF9000; }
 :root.dce-dark .scan-drawer-pill-unsupported-active { border-color: #666; background: rgba(100,100,100,0.2); color: #aaa; }
@@ -6928,30 +6984,28 @@ tr.scan-ts-ahead .scan-ts-name {
     background:
         linear-gradient(135deg,
             rgba(255,255,255,0)     0%,
-            rgba(255,255,255,0.04)  8%,
-            rgba(0,0,0,0.06)        16%,
-            rgba(255,255,255,0.03)  26%,
-            rgba(0,0,0,0.05)        36%,
-            rgba(255,255,255,0.025) 46%,
-            rgba(0,0,0,0.04)        56%,
-            rgba(255,255,255,0.02)  68%,
-            rgba(0,0,0,0.03)        80%,
-            rgba(255,255,255,0.015) 90%,
+            rgba(255,255,255,0.035) 10%,
+            rgba(0,0,0,0.055)       20%,
+            rgba(255,255,255,0.026) 32%,
+            rgba(0,0,0,0.045)       44%,
+            rgba(255,255,255,0.02)  58%,
+            rgba(0,0,0,0.035)       72%,
+            rgba(255,255,255,0.014) 86%,
             rgba(255,255,255,0)    100%
         ),
-        linear-gradient(180deg, var(--bg-surface) 0%, var(--bg-secondary) 100%) !important;
-    border-color: rgba(255, 255, 255, 0.08) !important;
+        linear-gradient(180deg, #252c34 0%, var(--bg-surface) 100%) !important;
+    border-color: rgba(148, 163, 184, 0.20) !important;
     box-shadow:
-        rgba(0, 0, 0, 0.4) 0px 2px 6px,
-        rgba(0, 0, 0, 0.3) 0px 0px 2px !important;
+        rgba(0, 0, 0, 0.34) 0px 2px 8px,
+        rgba(0, 0, 0, 0.26) 0px 0px 1px !important;
 }
 
 :root.dce-dark .csc-card:hover {
-    border-color: #02C8FF !important;
+    border-color: rgba(56, 189, 248, 0.56) !important;
     box-shadow:
-        rgba(0, 0, 0, 0.5) 0px 6px 16px,
-        rgba(0, 0, 0, 0.35) 0px 2px 4px,
-        rgba(2, 200, 255, 0.1) 0px 0px 0px 1px !important;
+        rgba(0, 0, 0, 0.44) 0px 6px 16px,
+        rgba(0, 0, 0, 0.32) 0px 2px 4px,
+        rgba(56, 189, 248, 0.12) 0px 0px 0px 1px !important;
 }
 
 /* Support indicator: colored bar at bottom of card */
@@ -7096,37 +7150,37 @@ tr.scan-ts-ahead .scan-ts-name {
 :root.dce-dark .csc-category-pill,
 :root.dce-dark .csc-subcategory-pill,
 :root.dce-dark .scan-filter-trigger {
-    background: #1e262c !important;
-    border-color: rgba(148, 163, 184, 0.26) !important;
-    color: #d9e2ec !important;
+    background: var(--bg-surface) !important;
+    border-color: var(--border-light) !important;
+    color: var(--text-secondary) !important;
     box-shadow: none !important;
 }
 
 :root.dce-dark .csc-category-pill:hover,
 :root.dce-dark .csc-subcategory-pill:hover,
 :root.dce-dark .scan-filter-trigger:hover {
-    border-color: rgba(110, 160, 255, 0.55) !important;
-    background: rgba(10, 96, 255, 0.12) !important;
-    color: #9dc0ff !important;
+    border-color: rgba(56, 189, 248, 0.48) !important;
+    background: var(--accent-muted-bg) !important;
+    color: var(--color-primary) !important;
 }
 
 :root.dce-dark .csc-category-pill-active,
 :root.dce-dark .csc-subcategory-pill-active {
-    background: #2b7cff !important;
-    border-color: #2b7cff !important;
-    color: #ffffff !important;
+    background: var(--accent-muted-bg) !important;
+    border-color: rgba(56, 189, 248, 0.58) !important;
+    color: var(--color-primary) !important;
 }
 
 :root.dce-dark .csc-category-count,
 :root.dce-dark .csc-subcategory-count {
-    background: rgba(255, 255, 255, 0.12) !important;
-    color: #d9e2ec !important;
+    background: rgba(255, 255, 255, 0.08) !important;
+    color: var(--text-secondary) !important;
 }
 
 :root.dce-dark .csc-category-pill-active .csc-category-count,
 :root.dce-dark .csc-subcategory-pill-active .csc-subcategory-count {
-    background: rgba(255, 255, 255, 0.22) !important;
-    color: #ffffff !important;
+    background: rgba(56, 189, 248, 0.18) !important;
+    color: var(--color-primary-hover) !important;
 }
 
 /* Hide the icons inside the top pills */
@@ -7218,12 +7272,12 @@ tr.scan-ts-ahead .scan-ts-name {
 }
 /* Restore primary / destructive appearance (class added in JSX) */
 :root.dce-dark .scan-btn-primary {
-    background: #0A60FF !important;
-    color: #ffffff !important;
-    border-color: #0A60FF !important;
+    background: var(--color-primary) !important;
+    color: var(--bg-primary) !important;
+    border-color: var(--color-primary) !important;
 }
 :root.dce-dark .scan-btn-primary:hover {
-    background: #0850DD !important;
+    background: var(--color-primary-hover) !important;
 }
 :root.dce-dark .scan-btn-destructive {
     background: #d32f2f !important;
@@ -7580,7 +7634,7 @@ tr.scan-ts-ahead .scan-ts-name {
 
 /* Live preview card */
 .csc-custom-preview {
-    background: linear-gradient(145deg, #f0f4f8 0%, #e2e8f0 100%); border-radius: 12px;
+    background: linear-gradient(145deg, #f6f7f9 0%, #e6ebf0 100%); border-radius: 12px;
     border: 1px solid #e5e7eb; padding: 22px 24px;
     position: relative; overflow: hidden;
     box-shadow: 0 2px 8px rgba(0,0,0,0.06);
@@ -7792,17 +7846,18 @@ tr.scan-ts-ahead .scan-ts-name {
 
 /* Dark mode stats */
 :root.dce-dark .csc-stat-card {
-    background: rgba(255, 255, 255, 0.03);
-    border-color: rgba(255, 255, 255, 0.08);
+    background: var(--bg-surface);
+    border-color: var(--border-light);
 }
 :root.dce-dark .csc-stat-card:hover {
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+    border-color: rgba(56, 189, 248, 0.42);
+    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.28);
 }
 :root.dce-dark .csc-stat-value {
-    color: #f0f0f0;
+    color: var(--color-primary);
 }
 :root.dce-dark .csc-stat-label {
-    color: #888;
+    color: var(--text-secondary);
 }
 
 /* ── Issues Badge (in stats bar) ── */
@@ -8007,7 +8062,7 @@ tr.scan-ts-ahead .scan-ts-name {
 :root.dce-dark .csc-issues-panel-close { color: #FCD34D; }
 :root.dce-dark .csc-issue-row:hover { background: rgba(255, 255, 255, 0.03); }
 :root.dce-dark .csc-issue-row:not(:last-child) { border-bottom-color: rgba(255, 255, 255, 0.06); }
-:root.dce-dark .csc-issue-title { color: #f0f0f0; }
+:root.dce-dark .csc-issue-title { color: var(--text-primary); }
 :root.dce-dark .csc-issue-detail { color: #999; }
 :root.dce-dark .csc-issue-action-link { color: #60A5FA; }
 :root.dce-dark .csc-issue-action-link:hover { color: #93C5FD; }
@@ -8307,21 +8362,21 @@ tr.scan-ts-ahead .scan-ts-name {
     letter-spacing: 0;
     color: var(--color-primary, #0369a1);
     font-size: 21px;
-    margin-right: 8px;
+    line-height: 21px;
 }
 .scan-logo-full {
     font-size: 12px;
     font-weight: 500;
     letter-spacing: 0;
     color: var(--text-secondary, #64748b);
-    vertical-align: middle;
+    line-height: 14px;
 }
 
 :root.dce-dark .scan-logo-mark {
-    color: #f0f0f0;
+    color: var(--color-primary);
 }
 :root.dce-dark .scan-logo-full {
-    color: #888;
+    color: var(--text-secondary);
 }
 
 /* ═══════════════════════════════════════════════════════════════════════════

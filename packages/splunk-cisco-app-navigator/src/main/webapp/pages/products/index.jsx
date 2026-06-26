@@ -50,6 +50,9 @@ import TrashCan from '@splunk/react-icons/TrashCanCross';
 import ShieldIcon from '@splunk/react-icons/Shield';
 import PulseIcon from '@splunk/react-icons/Pulse';
 import LayoutIcon from '@splunk/react-icons/Layout';
+import PaletteIcon from '@splunk/react-icons/Palette';
+import SunIcon from '@splunk/react-icons/Sun';
+import MoonIcon from '@splunk/react-icons/Moon';
 import Button from '@splunk/react-ui/Button';
 import CollapsiblePanel from '@splunk/react-ui/CollapsiblePanel';
 import WaitSpinner from '@splunk/react-ui/WaitSpinner';
@@ -657,6 +660,25 @@ function buildSourcetypeMetadataSPL(sourcetypes) {
     return `| metadata type=sourcetypes index=* | where match(sourcetype, "${splPattern}") | convert ctime(*Time) | table sourcetype recentTime firstTime lastTime totalCount | eventstats sum(totalCount) as GrandTotal | sort - totalCount`;
 }
 
+function buildAppSearchUrl(spl) {
+    const query = spl ? `?q=${encodeURIComponent(spl)}` : '';
+    return createURL(`/app/${APP_ID}/search${query}`);
+}
+
+function splString(value) {
+    return String(value || '').replace(/\\/g, '\\\\').replace(/"/g, '\\"');
+}
+
+function buildMagicEightSavedSearchSPL({ sourcetypes, addonApp, appViz, appViz2 }) {
+    const appArg = addonApp || appViz || appViz2 || '*';
+    const parts = [`| savedsearch "SCAN - Magic Eight Audit" scope="environment" app="${splString(appArg)}"`];
+    const stPattern = buildSourcetypeMatchRegex(sourcetypes);
+    if (stPattern) {
+        parts.push(`| where match(Sourcetype, "${splString(stPattern)}")`);
+    }
+    return parts.join(' ');
+}
+
 /**
  * Detect sourcetype data for ALL products in a single metadata search.
  *
@@ -846,7 +868,7 @@ function buildSourcetypeSearchUrl(sourcetypes) {
     if (!sourcetypes || sourcetypes.length === 0) return null;
     const spl = buildSourcetypeMetadataSPL(sourcetypes);
     if (!spl) return null;
-    return createURL(`/app/search/search?q=${encodeURIComponent(spl)}`);
+    return buildAppSearchUrl(spl);
 }
 
 /**
@@ -2347,21 +2369,24 @@ function MagicEightModal({ open, onClose, sourcetypes, productName, addonApp, ad
                                     </div>
                                 )}
                                 <div style={{ marginTop: '6px', textAlign: 'right' }}>
-                                    <a
-                                        href={`/app/search/search?q=${encodeURIComponent(
-                                            '| rest splunk_server=* /servicesNS/-/-/apps/local f=title f=version f=disabled count=0'
+                                    {(() => {
+                                        const auditSearchSpl = '| rest splunk_server=* /servicesNS/-/-/apps/local f=title f=version f=disabled count=0'
                                             + ` | search title IN (${tierRows.map(r => `"${r.id}"`).join(', ')})`
                                             + ' | join splunk_server [| rest splunk_server=* /services/server/info f=server_roles | where match(server_roles, "search_head|indexer") | fields splunk_server server_roles]'
                                             + ' | eval server_roles=mvjoin(server_roles, ", ")'
                                             + ' | fields splunk_server server_roles title version disabled'
-                                            + ' | sort server_roles title'
-                                        )}`}
-                                        target="_blank"
-                                        rel="noopener noreferrer"
-                                        style={{ fontSize: '11px', color: 'var(--text-link, #0066cc)', textDecoration: 'none' }}
-                                    >
-                                        Open in Search ↗
-                                    </a>
+                                            + ' | sort server_roles title';
+                                        return (
+                                            <a
+                                                href={buildAppSearchUrl(auditSearchSpl)}
+                                                target="_blank"
+                                                rel="noopener noreferrer"
+                                                style={{ fontSize: '11px', color: 'var(--text-link, #0066cc)', textDecoration: 'none' }}
+                                            >
+                                                Open in Search ↗
+                                            </a>
+                                        );
+                                    })()}
                                 </div>
                             </div>
                         );
@@ -2613,11 +2638,8 @@ function MagicEightModal({ open, onClose, sourcetypes, productName, addonApp, ad
                             appearance="secondary"
                             label="Open in Search"
                             onClick={() => {
-                                const stFilter = sourcetypes && sourcetypes.length > 0
-                                    ? sourcetypes.map(s => `"${s}"`).join(', ')
-                                    : null;
-                                const savedSearchSpl = `| savedsearch "SCAN - Magic Eight Audit" scope="environment"${stFilter ? ` | search Sourcetype IN (${stFilter})` : ''}`;
-                                window.open(createURL(`/app/${APP_ID}/search?q=${encodeURIComponent(savedSearchSpl)}`), '_blank');
+                                const savedSearchSpl = buildMagicEightSavedSearchSPL({ sourcetypes, addonApp, appViz, appViz2 });
+                                window.open(buildAppSearchUrl(savedSearchSpl), '_blank');
                             }}
                             style={{ marginRight: 'auto' }}
                         />
@@ -3897,15 +3919,15 @@ function ProductCard({ product, installedApps, appStatuses, indexerApps, sourcet
         const sts = product.sourcetypes || [];
         if (sts.length > 0) {
             const spl = buildSourcetypeMetadataSPL(sts);
-            if (spl) window.open(createURL(`/app/search/search?q=${encodeURIComponent(spl)}`), '_blank');
-            else window.open(createURL('/app/search/search'), '_blank');
+            if (spl) window.open(buildAppSearchUrl(spl), '_blank');
+            else window.open(buildAppSearchUrl(), '_blank');
         } else {
-            window.open(createURL('/app/search/search'), '_blank');
+            window.open(buildAppSearchUrl(), '_blank');
         }
     };
 
     const handleCreateDashboard = () => {
-        window.open(createURL('/app/search/dashboards'), '_blank');
+        window.open(createURL(`/app/${APP_ID}/dashboards`), '_blank');
     };
 
     const handleSaveCustomDashboard = async () => {
@@ -8477,9 +8499,10 @@ function SCANProductsPage() {
                         className="scan-util-pill scan-util-theme"
                         onClick={handleThemeCycle}
                         title={`Theme: ${themeOverride === 'auto' ? 'Auto (Splunk)' : themeOverride === 'light' ? 'Light' : 'Dark'} — click to cycle`}
+                        aria-label={`Theme: ${themeOverride === 'auto' ? 'Auto (Splunk)' : themeOverride === 'light' ? 'Light' : 'Dark'}`}
                     >
                         <span className="scan-util-theme-label">
-                            {themeOverride === 'auto' ? '◐' : themeOverride === 'light' ? '☀' : '☾'}
+                            {React.createElement(themeOverride === 'auto' ? PaletteIcon : themeOverride === 'light' ? SunIcon : MoonIcon, { size: 14, 'aria-hidden': true })}
                         </span>
                     </button>
                     <InfoTooltip
