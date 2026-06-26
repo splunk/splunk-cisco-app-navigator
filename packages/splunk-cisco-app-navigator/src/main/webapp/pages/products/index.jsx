@@ -6275,7 +6275,7 @@ function UniversalFinderBar({ onSearch, resultCount, totalCount, products, exter
                 <input
                     type="text"
                     className="products-search-input"
-                    placeholder='Search: "Firewall", "Duo", "XDR", "ISE", "SD-WAN"…'
+                    placeholder="Search products..."
                     value={query}
                     onChange={handleChange}
                     onKeyDown={handleKeyDown}
@@ -7198,7 +7198,7 @@ function CategoryFilterBar({
     const totalCount = categoryCounts ? Object.keys(categoryCounts).reduce((sum, k) => (CROSS_CUT_IDS.includes(k)) ? sum : sum + categoryCounts[k], 0) : null;
 
     return (<>
-        <div style={{ display: 'flex', gap: '8px', overflowX: 'auto', paddingBottom: '4px', scrollBehavior: 'smooth', alignItems: 'center' }}>
+        <div className="csc-category-bar" style={{ display: 'flex', gap: '8px', overflowX: 'auto', paddingBottom: '4px', scrollBehavior: 'smooth', alignItems: 'center' }}>
             <button
                 onClick={() => onSelectCategory(null)}
                 className={`csc-category-pill ${!selectedCategory ? 'csc-category-pill-active' : ''}`}
@@ -7231,7 +7231,7 @@ function CategoryFilterBar({
                 );
             })}
             {/* ── Filters drawer trigger ── */}
-            <span style={{ width: '2px', height: '28px', background: 'var(--pill-divider, #b0b0b0)', flexShrink: 0, margin: '0 4px', borderRadius: '1px' }} />
+            <span className="csc-category-divider" style={{ width: '2px', height: '28px', background: 'var(--pill-divider, #b0b0b0)', flexShrink: 0, margin: '0 4px', borderRadius: '1px' }} />
             <button
                 className={`scan-filter-trigger ${activeFilterCount > 0 ? 'scan-filter-trigger-active' : ''}`}
                 onClick={onOpenFilterDrawer}
@@ -8619,14 +8619,15 @@ function SCANProductsPage() {
                 </Message>
             )}
 
-            <UniversalFinderBar
-                onSearch={handleSearchInput}
-                resultCount={filteredProducts.length}
-                totalCount={portfolioProducts.length}
-                products={portfolioProducts}
-                externalQuery={searchBarQuery}
-            />
-            <div style={{ marginBottom: '20px' }}>
+            <div className="scan-top-filter-row">
+                <UniversalFinderBar
+                    onSearch={handleSearchInput}
+                    resultCount={filteredProducts.length}
+                    totalCount={portfolioProducts.length}
+                    products={portfolioProducts}
+                    externalQuery={searchBarQuery}
+                />
+                <div className="scan-category-panel">
                 <CategoryFilterBar
                     selectedCategory={selectedCategory}
                     onSelectCategory={(cat) => {
@@ -8676,6 +8677,7 @@ function SCANProductsPage() {
                     showVault={showVault}
                     onToggleShowVault={setShowVault}
                 />
+                </div>
             </div>
 
             <FilterDrawer
@@ -9040,18 +9042,19 @@ function SCANProductsPage() {
 
             {/* Section 1: Configured */}
             <div id="configured_products">
-            {configuredProducts.length > 0 && (
-                <button
-                    ref={removeAllReturnRef}
-                    className={`csc-btn csc-btn-remove-all csc-section-header-action ${configuredProducts.length <= 3 ? 'csc-section-header-action-near' : ''}`}
-                    onClick={() => setRemoveAllModalOpen(true)}
-                    title="Remove all products from your configured list"
-                >
-                    Remove All
-                </button>
-            )}
             <CollapsiblePanel title={renderSectionTitle('Configured Products', configuredProducts.length, configuredProducts)} open={effectivePanelOpen.configured_products} onChange={handlePanelToggle} panelId="configured_products">
                 {configuredProducts.length > 0 ? (
+                    <>
+                    <div className="csc-section-toolbar">
+                        <button
+                            ref={removeAllReturnRef}
+                            className="csc-btn csc-btn-remove-all"
+                            onClick={() => setRemoveAllModalOpen(true)}
+                            title="Remove all products from your configured list"
+                        >
+                            Remove All
+                        </button>
+                    </div>
                     <div className="csc-card-grid">
                         {configuredProducts.map((p) => (
                             <div key={p.product_id} style={{ position: 'relative' }}>
@@ -9074,6 +9077,7 @@ function SCANProductsPage() {
                             </div>
                         ))}
                     </div>
+                    </>
                 ) : (
                     <div className="empty-section">
                         No products configured yet. Browse the catalog below and click <strong>Add to My Products</strong> to get started.
