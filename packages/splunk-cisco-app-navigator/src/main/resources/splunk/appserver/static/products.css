@@ -266,21 +266,23 @@ html.dce-dark [data-view="views/shared/Page"] {
     display: flex;
     align-items: center;
     flex-wrap: wrap;
-    gap: 10px;
+    column-gap: 8px;
+    row-gap: 4px;
+    line-height: 1;
 }
 
 .products-page .page-title {
     margin: 0 !important;
-    font-size: 24px !important;
+    font-size: 21px !important;
     font-weight: 800 !important;
     color: var(--heading-color) !important;
-    letter-spacing: -0.5px;
-    line-height: 1;
+    letter-spacing: 0;
+    line-height: 21px;
     font-family: 'CiscoSansTT', 'Splunk Platform Sans', 'Proxima Nova', 'Helvetica Neue', Helvetica, Arial, sans-serif;
     display: inline-flex;
     align-items: center;
-    gap: 8px;
     flex-shrink: 0;
+    height: 21px;
 }
 
 .products-page-subtitle {
@@ -293,8 +295,23 @@ html.dce-dark [data-view="views/shared/Page"] {
     opacity: 1;
     display: inline-flex;
     align-items: center;
-    padding-left: 10px;
-    border-left: 1px solid var(--border-light);
+    height: 21px;
+    border: 0 !important;
+    padding-left: 0 !important;
+}
+
+.products-page .scan-logo-full,
+.products-page .products-page-subtitle {
+    border-left: 0 !important;
+    border-right: 0 !important;
+}
+
+.products-page .scan-logo-full::before,
+.products-page .scan-logo-full::after,
+.products-page .products-page-subtitle::before,
+.products-page .products-page-subtitle::after {
+    content: none !important;
+    display: none !important;
 }
 
 .products-page-instructions {
@@ -8363,6 +8380,9 @@ tr.scan-ts-ahead .scan-ts-name {
     color: var(--color-primary, #0369a1);
     font-size: 21px;
     line-height: 21px;
+    display: inline-flex;
+    align-items: center;
+    height: 21px;
 }
 .scan-logo-full {
     font-size: 12px;
@@ -8370,6 +8390,9 @@ tr.scan-ts-ahead .scan-ts-name {
     letter-spacing: 0;
     color: var(--text-secondary, #64748b);
     line-height: 14px;
+    display: inline-flex;
+    align-items: center;
+    height: 21px;
 }
 
 :root.dce-dark .scan-logo-mark {

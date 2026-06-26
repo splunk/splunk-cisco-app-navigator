@@ -8415,8 +8415,8 @@ function SCANProductsPage() {
                 <div className="header-left">
                     <h1 className="page-title">
                         <span className="scan-logo-mark">SCAN</span>
-                        <span className="scan-logo-full">Splunk Cisco App Navigator</span>
                     </h1>
+                    <span className="scan-logo-full">Splunk Cisco App Navigator</span>
                     <p className="products-page-subtitle">
                         The Front Door to the Cisco-Splunk Ecosystem
                     </p>
