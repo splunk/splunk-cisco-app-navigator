@@ -2958,7 +2958,7 @@ export const PRODUCT_CATALOG = [
       "cisco:multicloud:defense:av",
       "cisco:multicloud:defense:dlp",
       "cisco:multicloud:defense:dpi",
-      "cisco:multicloud:defense:fqdn_resoleve",
+      "cisco:multicloud:defense:fqdn_resolve",
       "cisco:multicloud:defense:fqdnfilter",
       "cisco:multicloud:defense:l4_fw",
       "cisco:multicloud:defense:l7dos",
@@ -4975,7 +4975,8 @@ export const PRODUCT_CATALOG = [
     "legacy_uids": [],
     "community_uids": [],
     "sourcetypes": [
-      "cisco:spaces:firehose"
+      "cisco:spaces:firehose",
+      "cisco:spaces:firehose:health"
     ],
     "dashboards": [],
     "custom_dashboard": "",
@@ -7649,6 +7650,7 @@ export const PRODUCT_CATALOG = [
     ],
     "community_uids": [],
     "sourcetypes": [
+      "cisco:thousandeyes:account-group",
       "cisco:thousandeyes:activity",
       "cisco:thousandeyes:alerts",
       "cisco:thousandeyes:event",
