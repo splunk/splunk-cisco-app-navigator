@@ -1934,7 +1934,9 @@ export const PRODUCT_CATALOG = [
     "legacy_uids": [],
     "community_uids": [],
     "sourcetypes": [
-      "cisco:talos"
+      "talos:domain",
+      "talos:ip",
+      "talos:url"
     ],
     "dashboards": [
       "talos_logs"
@@ -2490,6 +2492,7 @@ export const PRODUCT_CATALOG = [
       "cisco:cloud_security:fileevent",
       "cisco:cloud_security:firewall",
       "cisco:cloud_security:intrusion",
+      "cisco:cloud_security:ntg",
       "cisco:cloud_security:privateapps",
       "cisco:cloud_security:proxy",
       "cisco:cloud_security:ravpn",
@@ -2497,9 +2500,13 @@ export const PRODUCT_CATALOG = [
       "cisco:cloud_security:ztnaenrollment",
       "cisco:cloud_security:ztnaflow",
       "cisco:secure_access:*",
-      "cisco:secure_access:security_events_andalerts",
+      "cisco:secure_access:alerts_accessrulechanges",
+      "cisco:secure_access:alerts_apianomaly",
+      "cisco:secure_access:alerts_behavioranalytics",
+      "cisco:secure_access:alerts_connectivity_tunnels",
       "cisco:secure_access:security_events_dlp",
       "cisco:secure_access:security_events_dns",
+      "cisco:secure_access:security_events_firewall",
       "cisco:secure_access:security_events_intrusion",
       "cisco:secure_access:security_events_ravpn",
       "cisco:secure_access:security_events_web",
@@ -2621,12 +2628,10 @@ export const PRODUCT_CATALOG = [
     ],
     "community_uids": [],
     "sourcetypes": [
-      "cisco:cloud_security:appdiscovery",
       "cisco:cloud_security:audit",
       "cisco:cloud_security:dlp",
       "cisco:cloud_security:dns",
       "cisco:cloud_security:firewall",
-      "cisco:cloud_security:ip",
       "cisco:cloud_security:proxy"
     ],
     "dashboards": [
@@ -6436,11 +6441,9 @@ export const PRODUCT_CATALOG = [
       "cisco:dc:nd:anomalies",
       "cisco:dc:nd:congestion",
       "cisco:dc:nd:endpoints",
-      "cisco:dc:nd:fabrics",
       "cisco:dc:nd:flows",
       "cisco:dc:nd:mso",
       "cisco:dc:nd:protocols",
-      "cisco:dc:nd:switches",
       "cisco:dc:nd:syslog"
     ],
     "dashboards": [
