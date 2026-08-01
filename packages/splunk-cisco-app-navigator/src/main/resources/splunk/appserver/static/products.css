@@ -8435,3 +8435,107 @@ tr.scan-ts-ahead .scan-ts-name {
     from { opacity: 0; transform: translateY(8px); }
     to { opacity: 1; transform: translateY(0); }
 }
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   DEVELOPER MODE — DATA DETECTION DIAGNOSTICS
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+.scan-util-detection-success {
+    border-color: #2e7d32 !important;
+    color: #2e7d32 !important;
+}
+.scan-util-detection-empty {
+    border-color: #b7791f !important;
+    color: #8a5b13 !important;
+}
+.scan-util-detection-error {
+    border-color: #c62828 !important;
+    color: #c62828 !important;
+}
+.scan-detection-status {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    margin-bottom: 16px;
+    padding: 12px 14px;
+    border: 1px solid var(--border-light, #d8d8d8);
+    border-left-width: 4px;
+    border-radius: 6px;
+    color: var(--page-color, #333);
+    background: var(--card-bg, #fff);
+}
+.scan-detection-status-running { border-left-color: #0a60ff; }
+.scan-detection-status-success { border-left-color: #2e7d32; }
+.scan-detection-status-empty,
+.scan-detection-status-skipped { border-left-color: #b7791f; }
+.scan-detection-status-error { border-left-color: #c62828; }
+.scan-detection-status > strong {
+    font-size: 14px;
+}
+.scan-detection-status > span {
+    font-size: 12px;
+    color: var(--text-secondary, #5f5a56);
+}
+.scan-detection-grid {
+    display: grid;
+    grid-template-columns: minmax(135px, 0.7fr) minmax(180px, 1.6fr);
+    margin-bottom: 16px;
+    overflow: hidden;
+    border: 1px solid var(--border-light, #dedede);
+    border-radius: 6px;
+}
+.scan-detection-label,
+.scan-detection-value {
+    padding: 7px 10px;
+    border-bottom: 1px solid var(--border-light, #ececec);
+    font-size: 12px;
+}
+.scan-detection-label {
+    font-weight: 600;
+    color: var(--text-secondary, #5f5a56);
+    background: var(--subtle-bg, #f7f7f7);
+}
+.scan-detection-value {
+    overflow-wrap: anywhere;
+    color: var(--page-color, #333);
+}
+.scan-detection-grid > :nth-last-child(-n + 2) {
+    border-bottom: 0;
+}
+.scan-detection-block {
+    margin-top: 12px;
+}
+.scan-detection-block-title {
+    margin-bottom: 5px;
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--text-secondary, #5f5a56);
+}
+.scan-detection-block pre {
+    max-height: 170px;
+    margin: 0;
+    padding: 10px 12px;
+    overflow: auto;
+    border: 1px solid var(--border-light, #dedede);
+    border-radius: 5px;
+    color: var(--page-color, #333);
+    background: var(--subtle-bg, #f7f7f7);
+    font-family: SFMono-Regular, Consolas, "Liberation Mono", monospace;
+    font-size: 11px;
+    line-height: 1.5;
+    white-space: pre-wrap;
+    overflow-wrap: anywhere;
+}
+.scan-detection-console-hint {
+    margin: 14px 0 0;
+    color: var(--text-secondary, #5f5a56);
+    font-size: 11px;
+}
+.scan-detection-search-link {
+    display: inline-flex;
+    align-items: center;
+    text-decoration: none;
+}
+:root.dce-dark .scan-util-detection-success { color: #7ee787 !important; }
+:root.dce-dark .scan-util-detection-empty { color: #f2cc60 !important; }
+:root.dce-dark .scan-util-detection-error { color: #ff7b72 !important; }

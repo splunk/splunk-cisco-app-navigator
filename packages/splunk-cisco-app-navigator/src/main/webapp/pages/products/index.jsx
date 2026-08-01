@@ -280,6 +280,38 @@ function csvToArray(val) {
 }
 
 /**
+ * Keep product IDs unique at data-source boundaries.  During app upgrades or
+ * conf reloads Splunk can briefly expose the same stanza more than once (for
+ * example, while default/local layers are reconciling).  Allowing those rows
+ * into React produces duplicate cards and duplicate-key warnings.
+ */
+function uniqueProductsById(productList, source = 'catalog') {
+    const seen = new Set();
+    const duplicateIds = new Set();
+    const unique = (productList || []).filter((product) => {
+        const id = product && product.product_id;
+        if (!id || seen.has(id)) {
+            if (id) {
+                duplicateIds.add(id);
+            }
+            return false;
+        }
+        seen.add(id);
+        return true;
+    });
+    if (duplicateIds.size > 0) {
+        // This warning is intentional: it records the upstream IDs that would
+        // otherwise become duplicate React keys.
+        // eslint-disable-next-line no-console
+        console.warn(
+            `[SCAN][Catalog] Removed ${productList.length - unique.length} duplicate product row(s) from ${source}:`,
+            [...duplicateIds]
+        );
+    }
+    return unique;
+}
+
+/**
  * Word-boundary keyword match: returns true when the query appears as a
  * complete word (or multi-word phrase) within the keyword string, avoiding
  * false positives like "enterprise" matching a query of "ise".
@@ -445,7 +477,7 @@ function sortVersionsDesc(versions) {
 async function loadProductsFromConf() {
     const res = await splunkFetch(`${CONF_ENDPOINT}?output_mode=json&count=0`);
     const data = await res.json();
-    return (data.entry || []).map(entry => {
+    const normalized = (data.entry || []).map(entry => {
         const c = entry.content || {};
         const d = c.disabled;
         const isDisabled = d === true || d === "true" || d === "1" || d === 1;
@@ -540,6 +572,7 @@ async function loadProductsFromConf() {
         };
     }).sort((a, b) => a.sort_order - b.sort_order || a.display_name.localeCompare(b.display_name))
       .filter(p => CATEGORY_IDS.has(p.category));
+    return uniqueProductsById(normalized, 'conf-products');
 }
 
 /**
@@ -691,52 +724,144 @@ function buildMagicEightSavedSearchSPL({ sourcetypes, addonApp, appViz, appViz2 
  * Then matches each product's sourcetype patterns client-side.
  * This replaces the previous per-product approach (52 searches → 1).
  */
-async function detectAllSourcetypeData(products) {
+async function detectAllSourcetypeData(products, onDiagnostic = () => {}) {
     const noData = { hasData: false, eventCount: 0, detail: 'No sourcetypes defined' };
     const withST = products.filter(p => p.sourcetypes && p.sourcetypes.length > 0);
-    if (withST.length === 0) { /* console.log('[SCAN] Detection skipped — no products have sourcetypes'); */ return {}; }
+    const searchStr = '| metadata type=sourcetypes index=* | where lastTime > relative_time(now(), "-7d") | fields sourcetype totalCount';
+    const startedAtMs = Date.now();
+    const baseDiagnostic = {
+        status: 'running',
+        startedAt: new Date(startedAtMs).toISOString(),
+        completedAt: null,
+        durationMs: null,
+        endpoint: SEARCH_ENDPOINT,
+        search: searchStr,
+        csrfTokenAvailable: !!getCSRFToken(),
+        catalogProducts: products.length,
+        productsChecked: withST.length,
+        catalogSourcetypePatterns: new Set(withST.flatMap(p => p.sourcetypes || [])).size,
+        httpStatus: null,
+        metadataRows: null,
+        matchedSourcetypes: null,
+        detectedProducts: null,
+        splunkMessages: [],
+        message: 'Data detection search is running.',
+    };
+    const finishDiagnostic = (updates) => {
+        const completedAtMs = Date.now();
+        const diagnostic = {
+            ...baseDiagnostic,
+            ...updates,
+            completedAt: new Date(completedAtMs).toISOString(),
+            durationMs: completedAtMs - startedAtMs,
+        };
+        onDiagnostic(diagnostic);
+        return diagnostic;
+    };
+
+    // These messages intentionally remain visible outside developer mode so a
+    // customer can capture the search lifecycle without changing app settings.
+    // eslint-disable-next-line no-console
+    console.info(
+        `[SCAN][Data Detection] Starting for ${withST.length} product(s) `
+        + `and ${baseDiagnostic.catalogSourcetypePatterns} sourcetype pattern(s).`
+    );
+    // eslint-disable-next-line no-console
+    console.info(`[SCAN][Data Detection] SPL: ${searchStr}`);
+    onDiagnostic(baseDiagnostic);
+
+    if (withST.length === 0) {
+        const diagnostic = finishDiagnostic({
+            status: 'skipped',
+            metadataRows: 0,
+            matchedSourcetypes: 0,
+            detectedProducts: 0,
+            message: 'Detection skipped because no products define sourcetypes.',
+        });
+        // eslint-disable-next-line no-console
+        console.warn(`[SCAN][Data Detection] ${diagnostic.message}`);
+        return { results: {}, diagnostic };
+    }
     const csrf = getCSRFToken();
     if (!csrf) {
-        console.warn('[SCAN] Detection skipped — CSRF token unavailable');
-        const r = {};
-        withST.forEach(p => { r[p.product_id] = { hasData: false, eventCount: 0, detail: 'CSRF token unavailable' }; });
-        return r;
+        // Do not pre-emptively skip. Some Splunk proxies accept the authenticated
+        // session without a form key; if not, the HTTP response below now tells us
+        // exactly what failed.
+        // eslint-disable-next-line no-console
+        console.warn('[SCAN][Data Detection] CSRF token unavailable; attempting the search with the active session.');
     }
-    // console.log(`[SCAN] Starting sourcetype detection for ${withST.length} products with sourcetypes...`);
     try {
-        const searchStr = '| metadata type=sourcetypes index=* | where lastTime > relative_time(now(), "-7d") | fields sourcetype totalCount';
-        // console.log(`[SCAN] Search: ${searchStr}`);
         const res = await splunkFetch(SEARCH_ENDPOINT, {
             method: 'POST',
             headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
             body: `search=${encodeURIComponent(searchStr)}&output_mode=json&exec_mode=oneshot&count=0&timeout=120`,
         });
-        // console.log(`[SCAN] Response status: ${res.status} ${res.statusText}`);
         if (!res.ok) {
             const errText = await res.text();
-            console.error(`[SCAN] Search failed (HTTP ${res.status}):`, errText.substring(0, 500));
+            const diagnostic = finishDiagnostic({
+                status: 'error',
+                httpStatus: res.status,
+                metadataRows: 0,
+                matchedSourcetypes: 0,
+                detectedProducts: 0,
+                message: `Search failed (HTTP ${res.status} ${res.statusText || ''})`.trim(),
+                responsePreview: errText.substring(0, 500),
+            });
+            // eslint-disable-next-line no-console
+            console.error(`[SCAN][Data Detection] ${diagnostic.message}:`, diagnostic.responsePreview);
             const r = {};
             withST.forEach(p => { r[p.product_id] = { hasData: false, eventCount: 0, detail: `Search error (HTTP ${res.status})` }; });
-            return r;
+            return { results: r, diagnostic };
         }
         const rawText = await res.text();
         let data;
         try { data = JSON.parse(rawText); } catch (parseErr) {
-            console.error('[SCAN] Failed to parse JSON response:', rawText.substring(0, 500));
+            const diagnostic = finishDiagnostic({
+                status: 'error',
+                httpStatus: res.status,
+                metadataRows: 0,
+                matchedSourcetypes: 0,
+                detectedProducts: 0,
+                message: 'Search succeeded, but Splunk returned invalid JSON.',
+                responsePreview: rawText.substring(0, 500),
+            });
+            // eslint-disable-next-line no-console
+            console.error('[SCAN][Data Detection] Failed to parse JSON response:', diagnostic.responsePreview);
             const r = {};
             withST.forEach(p => { r[p.product_id] = { hasData: false, eventCount: 0, detail: 'Invalid response from Splunk' }; });
-            return r;
+            return { results: r, diagnostic };
         }
-        // console.log(`[SCAN] Response keys: ${Object.keys(data).join(', ')}`);
+        const splunkMessages = (data.messages || []).map(message => ({
+            type: message.type || 'INFO',
+            text: message.text || String(message),
+        }));
+        const splunkErrors = splunkMessages.filter(message => ['ERROR', 'FATAL'].includes(String(message.type).toUpperCase()));
+        if (splunkErrors.length > 0) {
+            const messageText = splunkErrors.map(message => message.text).join(' | ');
+            const diagnostic = finishDiagnostic({
+                status: 'error',
+                httpStatus: res.status,
+                metadataRows: 0,
+                matchedSourcetypes: 0,
+                detectedProducts: 0,
+                splunkMessages,
+                message: `Splunk reported a search error: ${messageText}`,
+            });
+            // eslint-disable-next-line no-console
+            console.error(`[SCAN][Data Detection] ${diagnostic.message}`);
+            const r = {};
+            withST.forEach(p => { r[p.product_id] = { hasData: false, eventCount: 0, detail: 'Splunk reported a search error' }; });
+            return { results: r, diagnostic };
+        }
         const rows = data.results || [];
-        // console.log(`[SCAN] Sourcetype metadata returned ${rows.length} active sourcetypes from Splunk`);
-        if (rows.length > 0) {
-            // console.log(`[SCAN] Sample row: ${JSON.stringify(rows[0])}`);
-        }
 
         // Build a quick lookup: sourcetype → totalCount
         const stMap = new Map();
-        rows.forEach(r => stMap.set(r.sourcetype, parseInt(r.totalCount, 10) || 0));
+        rows.forEach(r => {
+            if (r.sourcetype) {
+                stMap.set(r.sourcetype, parseInt(r.totalCount, 10) || 0);
+            }
+        });
 
         // Match each product's patterns against the result set
         const results = {};
@@ -760,9 +885,6 @@ async function detectAllSourcetypeData(products) {
             });
 
             const stCount = matchedCatalogSTs.length;
-            if (stCount > 0) {
-                // console.log(`[SCAN] ${p.product_id}: ${stCount} sourcetype(s) matched — ${matchedSTs.join(', ')}`);
-            }
             const totalSTs = p.sourcetypes.length;
             results[p.product_id] = stCount > 0
                 ? { hasData: true, eventCount, matchedSTs, matchedCatalogSTs, totalSourcetypes: totalSTs, detail: `${stCount} of ${totalSTs} sourcetype${totalSTs !== 1 ? 's' : ''} · ~${formatCount(eventCount)} events · last 7d` }
@@ -770,18 +892,49 @@ async function detectAllSourcetypeData(products) {
         });
 
         const detected = Object.values(results).filter(r => r.hasData).length;
-        // console.log(`[SCAN] Detection complete: ${detected} product(s) with active data out of ${withST.length} checked`);
+        const matchedSourcetypes = new Set(
+            Object.values(results).flatMap(result => result.matchedSTs || [])
+        ).size;
+        const diagnostic = finishDiagnostic({
+            status: rows.length > 0 ? 'success' : 'empty',
+            httpStatus: res.status,
+            metadataRows: rows.length,
+            matchedSourcetypes,
+            detectedProducts: detected,
+            splunkMessages,
+            sampleSourcetypes: [...stMap.keys()].slice(0, 20),
+            message: rows.length > 0
+                ? `Search succeeded and returned ${rows.length} sourcetype metadata row(s); ${detected} product(s) matched.`
+                : 'Search succeeded but returned 0 sourcetype metadata rows.',
+        });
+        // eslint-disable-next-line no-console
+        console.info(
+            `[SCAN][Data Detection] ${diagnostic.message} `
+            + `Duration: ${diagnostic.durationMs} ms. HTTP ${diagnostic.httpStatus}.`
+        );
+        // eslint-disable-next-line no-console
+        console.info('[SCAN][Data Detection] Diagnostic snapshot:', diagnostic);
 
         // Fill in products that have no sourcetypes
         products.forEach(p => {
-            if (!results[p.product_id]) results[p.product_id] = noData;
+            if (!results[p.product_id]) {
+                results[p.product_id] = noData;
+            }
         });
-        return results;
+        return { results, diagnostic };
     } catch (e) {
-        console.error('[SCAN] Sourcetype detection failed:', e);
+        const diagnostic = finishDiagnostic({
+            status: 'error',
+            metadataRows: 0,
+            matchedSourcetypes: 0,
+            detectedProducts: 0,
+            message: `Sourcetype detection failed: ${e.message || String(e)}`,
+        });
+        // eslint-disable-next-line no-console
+        console.error('[SCAN][Data Detection] Sourcetype detection failed:', e);
         const r = {};
         withST.forEach(p => { r[p.product_id] = { hasData: false, eventCount: 0, detail: 'Could not query sourcetypes' }; });
-        return r;
+        return { results: r, diagnostic };
     }
 }
 
@@ -5563,6 +5716,139 @@ function ConfigViewerModal({ open, onClose, products, initialProductId, installe
     );
 }
 
+// ─────────────────  DATA DETECTION DIAGNOSTICS MODAL  ─────────────────
+
+/* eslint-disable react/prop-types */
+function DataDetectionDiagnosticsModal({ open, onClose, diagnostic, onRerun }) {
+    const returnFocusRef = useRef(null);
+    const [copied, setCopied] = useState(false);
+
+    useEffect(() => {
+        if (!open) {
+            setCopied(false);
+        }
+    }, [open]);
+
+    if (!open) {
+        return null;
+    }
+
+    const status = diagnostic?.status || 'not-run';
+    const statusLabels = {
+        running: 'Running',
+        success: 'Succeeded',
+        empty: 'Succeeded — no rows',
+        error: 'Failed',
+        skipped: 'Skipped',
+        'not-run': 'Not run yet',
+    };
+    let csrfStatus = '—';
+    if (diagnostic) {
+        csrfStatus = diagnostic.csrfTokenAvailable ? 'Available' : 'Unavailable';
+    }
+    const markCopied = () => {
+        setCopied(true);
+        setTimeout(() => setCopied(false), 2000);
+    };
+    const fallbackCopy = (text) => {
+        const textarea = document.createElement('textarea');
+        textarea.value = text;
+        textarea.style.position = 'fixed';
+        textarea.style.left = '-9999px';
+        document.body.appendChild(textarea);
+        textarea.select();
+        try {
+            document.execCommand('copy');
+            markCopied();
+        } catch (_e) { /* copy is a convenience action */ }
+        document.body.removeChild(textarea);
+    };
+    const copyDiagnostic = () => {
+        const text = JSON.stringify(diagnostic || { status: 'not-run' }, null, 2);
+        if (navigator.clipboard?.writeText && window.isSecureContext) {
+            navigator.clipboard.writeText(text).then(markCopied).catch(() => fallbackCopy(text));
+        } else {
+            fallbackCopy(text);
+        }
+    };
+    const diagnosticRows = [
+        ['Status', statusLabels[status] || status],
+        ['Started', diagnostic?.startedAt || '—'],
+        ['Duration', diagnostic?.durationMs != null ? `${diagnostic.durationMs} ms` : '—'],
+        ['HTTP', diagnostic?.httpStatus != null ? diagnostic.httpStatus : '—'],
+        ['CSRF token', csrfStatus],
+        ['Products checked', diagnostic?.productsChecked ?? '—'],
+        ['Catalog patterns', diagnostic?.catalogSourcetypePatterns ?? '—'],
+        ['Metadata rows', diagnostic?.metadataRows ?? '—'],
+        ['Matched sourcetypes', diagnostic?.matchedSourcetypes ?? '—'],
+        ['Detected products', diagnostic?.detectedProducts ?? '—'],
+    ];
+
+    return (
+        <Modal open returnFocus={returnFocusRef} onRequestClose={onClose} style={{ maxWidth: '820px', width: '94vw' }}>
+            <Modal.Header title="Data Detection Diagnostics — Developer Mode" />
+            <Modal.Body>
+                <div className={`scan-detection-status scan-detection-status-${status}`}>
+                    <strong>{statusLabels[status] || status}</strong>
+                    <span>{diagnostic?.message || 'The data detection search has not run yet.'}</span>
+                </div>
+                <div className="scan-detection-grid">
+                    {diagnosticRows.map(([label, value]) => (
+                        <React.Fragment key={label}>
+                            <span className="scan-detection-label">{label}</span>
+                            <span className="scan-detection-value">{String(value)}</span>
+                        </React.Fragment>
+                    ))}
+                </div>
+                <div className="scan-detection-block">
+                    <div className="scan-detection-block-title">Search that ran</div>
+                    <pre>{diagnostic?.search || '—'}</pre>
+                </div>
+                {diagnostic?.splunkMessages?.length > 0 && (
+                    <div className="scan-detection-block">
+                        <div className="scan-detection-block-title">Messages from Splunk</div>
+                        <pre>{diagnostic.splunkMessages.map(message => `[${message.type}] ${message.text}`).join('\n')}</pre>
+                    </div>
+                )}
+                {diagnostic?.responsePreview && (
+                    <div className="scan-detection-block">
+                        <div className="scan-detection-block-title">Response preview</div>
+                        <pre>{diagnostic.responsePreview}</pre>
+                    </div>
+                )}
+                {diagnostic?.sampleSourcetypes?.length > 0 && (
+                    <div className="scan-detection-block">
+                        <div className="scan-detection-block-title">Sample returned sourcetypes (up to 20)</div>
+                        <pre>{diagnostic.sampleSourcetypes.join('\n')}</pre>
+                    </div>
+                )}
+                <p className="scan-detection-console-hint">
+                    The same snapshot is available in the browser console as
+                    {' '}
+                    <code>window.scanDiagnostics.dataDetection</code>
+                    .
+                </p>
+            </Modal.Body>
+            <Modal.Footer>
+                {diagnostic?.search && (
+                    <a
+                        className="csc-btn csc-btn-outline scan-detection-search-link"
+                        href={buildAppSearchUrl(diagnostic.search)}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                    >
+                        Open SPL in Search
+                    </a>
+                )}
+                <Button appearance="secondary" label={copied ? 'Copied!' : 'Copy Diagnostic'} onClick={copyDiagnostic} />
+                <Button appearance="primary" label={status === 'running' ? 'Running…' : 'Run Again'} onClick={onRerun} disabled={status === 'running'} />
+                <Button appearance="secondary" label="Close" onClick={onClose} />
+            </Modal.Footer>
+        </Modal>
+    );
+}
+/* eslint-enable react/prop-types */
+
 // ─────────────────  TECH STACK MODAL  ─────────────────
 
 /**
@@ -7313,8 +7599,14 @@ function CategoryFilterBar({
 // Each card shows support (Cisco/Splunk), links, and actions (configure, best practices, etc.).
 
 function SCANProductsPage() {
-    const [products, setProducts] = useState(PRODUCT_CATALOG.filter(p => CATEGORY_IDS.has(p.category) && !p.catalog_disabled));
-    const [vaultProducts, setVaultProducts] = useState(PRODUCT_CATALOG.filter(p => CATEGORY_IDS.has(p.category) && p.catalog_disabled));
+    const [products, setProducts] = useState(() => uniqueProductsById(
+        PRODUCT_CATALOG.filter(p => CATEGORY_IDS.has(p.category) && !p.catalog_disabled),
+        'built-in catalog'
+    ));
+    const [vaultProducts, setVaultProducts] = useState(() => uniqueProductsById(
+        PRODUCT_CATALOG.filter(p => CATEGORY_IDS.has(p.category) && p.catalog_disabled),
+        'built-in vault'
+    ));
     const [customProducts, setCustomProducts] = useState([]);
     const [showVault, setShowVault] = useState(false);
     const [customFormOpen, setCustomFormOpen] = useState(false);
@@ -7325,6 +7617,9 @@ function SCANProductsPage() {
     const [installedApps, setInstalledApps] = useState({});
     const [appStatuses, setAppStatuses] = useState({});
     const [sourcetypeData, setSourcetypeData] = useState({});
+    const [detectionDiagnostic, setDetectionDiagnostic] = useState(null);
+    const [detectionDiagnosticsOpen, setDetectionDiagnosticsOpen] = useState(false);
+    const [detectionRunToken, setDetectionRunToken] = useState(0);
     const [indexerApps, setIndexerApps] = useState(null);        // null (not loaded) | {} (no peers) | { appid: { version, disabled, indexerCount } }
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
@@ -7861,13 +8156,35 @@ function SCANProductsPage() {
 
     // ── Sourcetype detection — single batched metadata search for all products ──
     useEffect(() => {
-        if (loading || products.length === 0) return;
+        if (loading || products.length === 0) {
+            return undefined;
+        }
+        let cancelled = false;
+        const updateDiagnostic = (diagnostic) => {
+            if (cancelled) {
+                return;
+            }
+            setDetectionDiagnostic(diagnostic);
+            try {
+                window.scanDiagnostics = {
+                    ...(window.scanDiagnostics || {}),
+                    dataDetection: diagnostic,
+                };
+            } catch (_e) { /* diagnostic convenience only */ }
+        };
         const detect = async () => {
-            const results = await detectAllSourcetypeData(products);
-            setSourcetypeData((prev) => ({ ...prev, ...results }));
+            const { results } = await detectAllSourcetypeData(products, updateDiagnostic);
+            if (!cancelled) {
+                setSourcetypeData(results);
+            }
         };
         detect();
-    }, [products, loading]);
+        return () => { cancelled = true; };
+    }, [products, loading, detectionRunToken]);
+
+    const handleRerunDetection = useCallback(() => {
+        setDetectionRunToken(token => token + 1);
+    }, []);
 
     // ── Indexer tier detection — unified across all platforms ──
     // Runs on Enterprise standalone, distributed, AND Splunk Cloud.
@@ -8379,6 +8696,15 @@ function SCANProductsPage() {
         return counts;
     }, [portfolioProducts, searchQuery, platformFilter, versionFilter, splunkbaseData, selectedAddon, appidToUidMap]);
 
+    const detectionStatus = detectionDiagnostic?.status || 'not-run';
+    const detectionStatusMark = {
+        running: '…',
+        success: '✓',
+        empty: '0',
+        error: '!',
+    }[detectionStatus] || '';
+    const detectionButtonLabel = ['Data Check', detectionStatusMark].filter(Boolean).join(' ');
+
     // ── Render ──
     if (loading) {
         return (
@@ -8612,6 +8938,14 @@ function SCANProductsPage() {
                         >
                             Update
                         </button>
+                            <button
+                                type="button"
+                                className={`scan-util-pill scan-util-devmode scan-util-detection scan-util-detection-${detectionStatus}`}
+                                onClick={() => setDetectionDiagnosticsOpen(true)}
+                                title={detectionDiagnostic?.message || 'Open data detection diagnostics'}
+                            >
+                                {detectionButtonLabel}
+                            </button>
                         <button
                             className="scan-util-pill scan-util-devmode"
                             onClick={() => handleOpenConfigViewer(null)}
@@ -9439,6 +9773,14 @@ function SCANProductsPage() {
                 <TechStackModal
                     open={techStackOpen}
                     onClose={() => setTechStackOpen(false)}
+                />
+            )}
+            {devMode && (
+                <DataDetectionDiagnosticsModal
+                    open={detectionDiagnosticsOpen}
+                    onClose={() => setDetectionDiagnosticsOpen(false)}
+                    diagnostic={detectionDiagnostic}
+                    onRerun={handleRerunDetection}
                 />
             )}
             <PersonaModal
