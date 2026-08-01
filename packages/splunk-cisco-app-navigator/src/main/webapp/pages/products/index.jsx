@@ -64,7 +64,7 @@ import Tooltip from '@splunk/react-ui/Tooltip';
 // ─────────────────────────────  CONSTANTS  ─────────────────────────────
 
 const APP_ID = 'splunk-cisco-app-navigator';
-const CONF_ENDPOINT = `/splunkd/__raw/servicesNS/-/${APP_ID}/configs/conf-products`;
+const CONF_ENDPOINT = `/splunkd/__raw/servicesNS/nobody/${APP_ID}/configs/conf-products`;
 const CONF_RELOAD_ENDPOINT = `/splunkd/__raw/servicesNS/nobody/${APP_ID}/configs/conf-products/_reload`;
 const APPS_LOCAL_ENDPOINT = '/splunkd/__raw/services/apps/local';
 const SERVER_INFO_ENDPOINT = '/splunkd/__raw/services/server/info';
