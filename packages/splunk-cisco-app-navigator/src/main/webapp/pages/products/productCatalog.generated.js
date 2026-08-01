@@ -62,7 +62,21 @@ export const PRODUCT_CATALOG = [
     "community_uids": [],
     "sourcetypes": [
       "cisco:asa",
-      "cisco:ftd:syslog",
+      "cisco:ftd:adv:conn",
+      "cisco:ftd:adv:dns",
+      "cisco:ftd:adv:ftp",
+      "cisco:ftd:adv:http",
+      "cisco:ftd:adv:notice",
+      "cisco:ftd:adv:weird",
+      "cisco:ftd:connection",
+      "cisco:ftd:connection:security",
+      "cisco:ftd:correlation",
+      "cisco:ftd:discovery",
+      "cisco:ftd:file",
+      "cisco:ftd:intrusion",
+      "cisco:ftd:intrusionpacket",
+      "cisco:ftd:malware",
+      "cisco:ftd:useractivity",
       "cisco:sfw:estreamer",
       "cisco:sfw:policy"
     ],
@@ -1000,7 +1014,6 @@ export const PRODUCT_CATALOG = [
     ],
     "community_uids": [],
     "sourcetypes": [
-      "cisco:duo",
       "cisco:duo:*",
       "cisco:duo:account",
       "cisco:duo:activity",
@@ -1629,7 +1642,10 @@ export const PRODUCT_CATALOG = [
     "legacy_uids": [],
     "community_uids": [],
     "sourcetypes": [
+      "cisco:evm:authentication",
+      "cisco:evm:dns_activity",
       "cisco:evm:file_activity",
+      "cisco:evm:http_activity",
       "cisco:evm:process_activity",
       "cisco:evm:registry_key_activity",
       "cisco:evm:registry_value_activity",
@@ -2975,8 +2991,7 @@ export const PRODUCT_CATALOG = [
       "cisco:multicloud:defense:tls_log",
       "cisco:multicloud:defense:urlfilter",
       "cisco:multicloud:defense:valtix_internal",
-      "cisco:multicloud:defense:waf",
-      "gateway"
+      "cisco:multicloud:defense:waf"
     ],
     "dashboards": [
       "mcd_dashboard"
@@ -3602,7 +3617,6 @@ export const PRODUCT_CATALOG = [
     "legacy_uids": [],
     "community_uids": [],
     "sourcetypes": [
-      "cisco:isovalent",
       "cisco:isovalent:alert",
       "cisco:isovalent:processconnect",
       "cisco:isovalent:processexec",
@@ -3737,7 +3751,6 @@ export const PRODUCT_CATALOG = [
     "legacy_uids": [],
     "community_uids": [],
     "sourcetypes": [
-      "cisco:isovalent:edge_processor",
       "cisco:isovalent:edge_processor:alert",
       "cisco:isovalent:edge_processor:processconnect",
       "cisco:isovalent:edge_processor:processexec",
@@ -5086,6 +5099,7 @@ export const PRODUCT_CATALOG = [
       "cisco:sdwan:alert:on",
       "cisco:sdwan:audit:logs",
       "cisco:sdwan:block:host",
+      "cisco:sdwan:custom:*",
       "cisco:sdwan:dmi:cli:engine:write:fail",
       "cisco:sdwan:drop:pkt",
       "cisco:sdwan:energy:stats",
@@ -5101,6 +5115,7 @@ export const PRODUCT_CATALOG = [
       "cisco:sdwan:smart:lic:platform:error",
       "cisco:sdwan:ssetunnelhealth",
       "cisco:sdwan:ssetunnels",
+      "cisco:sdwan:syslog",
       "cisco:sdwan:system:logs",
       "cisco:sdwan:tunnelhealth",
       "cisco:sdwan:unblock:host",
@@ -7549,7 +7564,8 @@ export const PRODUCT_CATALOG = [
       "cisco:cybervision:events",
       "cisco:cybervision:flows",
       "cisco:cybervision:syslog",
-      "cisco:cybervision:vulnerabilities"
+      "cisco:cybervision:vulnerabilities",
+      "cisco:cybervision:custom:*"
     ],
     "dashboards": [
       "overview"
@@ -9906,9 +9922,7 @@ export const PRODUCT_CATALOG = [
     "legacy_uids": [],
     "community_uids": [],
     "sourcetypes": [
-      "cisco:ips:input",
-      "cisco:ips:syslog",
-      "sdee_connection"
+      "cisco:ips:syslog"
     ],
     "dashboards": [],
     "custom_dashboard": "",

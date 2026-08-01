@@ -1,0 +1,568 @@
+SPLUNK APP ROOTS SCANNED
+  /opt/splunk/etc/apps
+  /opt/splunk/etc/archived-apps
+  /opt/splunk/etc/cisco-supported-apps
+  /opt/splunk/etc/deployment-apps
+  /opt/splunk/etc/developer-apps
+  /opt/splunk/etc/disabled-apps
+  /opt/splunk/etc/good-apps
+  /opt/splunk/etc/manager-apps
+  /opt/splunk/etc/master-apps
+  /opt/splunk/etc/not_supported-apps
+  /opt/splunk/etc/other-apps
+  /opt/splunk/etc/splunk-supported-apps
+
+Cisco addons scanned: 79
+Unique TA-onboarded sourcetypes: 344
+Unique parser-only sourcetypes: 144
+products.conf entries: 355
+
+=== ADDON INVENTORY ===
+
+[TA-meraki-cim-fix] (apps)
+  ONBOARDED (0): 
+  PARSER-ONLY (2): meraki:accesspoints, meraki:airmarshal
+
+[cisco_fdem_exec_dashboards] (apps)
+  ONBOARDED (0): 
+  PARSER-ONLY (5): cisco:dnac:client, cisco:dnac:clienthealth, cisco:dnac:devicehealth, cisco:dnac:issue, cisco:dnac:networkhealth
+
+[sample_app] (apps)
+  ONBOARDED (1): sendmail
+
+[Cisco_Bug_Search_and_Analytics] (archived-apps)
+  ONBOARDED (2): cisco:bugs:csv, cisco:bugs:json
+
+[Cisco_CWS_TA] (archived-apps)
+  ONBOARDED (1): ciscocws
+
+[Cisco_WSA_Insight] (archived-apps)
+  ONBOARDED (2): cisco:wsa:shd, cisco:wsa:systemlogs
+  PARSER-ONLY (1): cisco:wsa:prox_track
+
+[Splunk-TA-cisco-dnacenter] (archived-apps)
+  ONBOARDED (6): cisco:dnac:clienthealth, cisco:dnac:compliance, cisco:dnac:devicehealth, cisco:dnac:issue, cisco:dnac:networkhealth, cisco:dnac:securityadvisory
+
+[Splunk_CiscoSecuritySuite] (archived-apps)
+  ONBOARDED (1): cisco:wsa:squid
+  PARSER-ONLY (4): cisco:asa, cisco:esa:textmail, cisco:fwsm, cisco:pix
+
+[Splunk_TA_CCX_Cisco_Secure_Network_Analytics] (archived-apps)
+  ONBOARDED (0): 
+  PARSER-ONLY (1): ccx:cisco:sna:syslog
+
+[Splunk_TA_cisco-estreamer_Enosys] (archived-apps)
+  ONBOARDED (0): 
+  PARSER-ONLY (2): cisco:estreamer:data, cisco:firepower:syslog
+
+[Splunk_TA_cisco-ips] (archived-apps)
+  ONBOARDED (3): cisco:ips:input, cisco:ips:syslog, sdee_connection
+  PARSER-ONLY (1): cisco_ips_syslog
+
+[TA-DP-webex-teams] (archived-apps)
+  ONBOARDED (2): webex:teams:adminaudit:events, webex:teams:events
+
+[TA-DUOSecurity2FA] (archived-apps)
+  ONBOARDED (1): duo:info_summary
+  PARSER-ONLY (1): duo:authentication
+
+[TA-Umbrella] (archived-apps)
+  ONBOARDED (0): 
+  PARSER-ONLY (1): opendns:dnslog
+
+[TA-add-on-for-cisco-prime-infrastructure] (archived-apps)
+  ONBOARDED (7): cisco:pi:data:accesspoints, cisco:pi:data:alarms, cisco:pi:data:clients, cisco:pi:data:clientsessions, cisco:pi:data:devices, cisco:pi:data:events, cisco:pi:data:inventorydetails
+
+[TA-cisco-cloud-security-umbrella-addon] (archived-apps)
+  ONBOARDED (0): 
+  PARSER-ONLY (6): cisco:umbrella:audit, cisco:umbrella:dlp, cisco:umbrella:dns, cisco:umbrella:firewall, cisco:umbrella:ip, cisco:umbrella:proxy
+
+[TA-cisco-etd-connector] (archived-apps)
+  ONBOARDED (1): etd_input_python
+
+[TA-cisco-firepower-threat-defense-ftd-sourcetype] (archived-apps)
+  ONBOARDED (0): 
+  PARSER-ONLY (1): cisco:ftd
+
+[TA-cisco-secure-malware-analytics] (archived-apps)
+  ONBOARDED (1): cisco:sma:data
+
+[TA-cisco-stealthwatch] (archived-apps)
+  ONBOARDED (0): 
+  PARSER-ONLY (1): cisco:stealthwatch:alert
+
+[TA-cisco-threat-grid] (archived-apps)
+  ONBOARDED (1): cisco:tg:data
+
+[TA-cisco-threat-response] (archived-apps)
+  ONBOARDED (1): cisco:tr:data
+
+[TA-cisco_DP_PD] (archived-apps)
+  ONBOARDED (8): cisco:app:events, cisco:app:messages, cisco:app:policy_events, cisco:app:status, cisco:dp:alerts, cisco:dp:failures, cisco:dp:status, cisco:dp:threatfeeds
+
+[TA-cisco_acs] (archived-apps)
+  ONBOARDED (0): 
+  PARSER-ONLY (1): cisco:acs
+
+[TA-cisco_meraki_operations] (archived-apps)
+  ONBOARDED (4): meraki:devices, meraki:networkdevices, meraki:uplinks, meraki:uplinksLossAndLatency
+
+[TA-cisco_umbrella] (archived-apps)
+  ONBOARDED (6): opendns:auditlogs, opendns:dnslogs, opendns:firewalllogs, opendns:iplogs, opendns:proxylogs, opendns:s3
+
+[TA-meraki] (archived-apps)
+  ONBOARDED (1): meraki
+
+[TA-stealthwatch_dataexporter] (archived-apps)
+  ONBOARDED (1): stealthwatch:fc:flow
+
+[TA_Meraki_SNMP_trap] (archived-apps)
+  ONBOARDED (0): 
+  PARSER-ONLY (1): meraki_syslog
+
+[TA_cisco-NI] (archived-apps)
+  ONBOARDED (1): cisco:ni
+  PARSER-ONLY (2): cisco:ni:advisories, cisco:ni:anomalies
+
+[TA_cisco-Nexus-9k] (archived-apps)
+  ONBOARDED (0): 
+  PARSER-ONLY (1): cisco:nexus:json
+
+[TA_cisco-candid] (archived-apps)
+  ONBOARDED (1): cisco:candid:events
+
+[amp4e_events_input] (archived-apps)
+  ONBOARDED (1): cisco:amp:event
+
+[cisco-app-Nexus-9k] (archived-apps)
+  ONBOARDED (1): cisco:app:nexus:9k:collect
+
+[cisco_thousandeyes_alerting_app_for_splunk] (archived-apps)
+  ONBOARDED (0): 
+  PARSER-ONLY (4): snmptrap, snow:incident, thousandeyes:alerts, thousandeyes:enriched_alerts
+
+[ta-cisco-sdwan] (archived-apps)
+  ONBOARDED (15): cisco:firewall:logs, cisco:sdwan:alert:off, cisco:sdwan:alert:on, cisco:sdwan:block:host, cisco:sdwan:dmi:cli:engine:write:fail, cisco:sdwan:drop:pkt, cisco:sdwan:host:tcp:alert:on, cisco:sdwan:log:summary, cisco:sdwan:pass:pkt, cisco:sdwan:session:audit:trail, cisco:sdwan:session:audit:trail:start, cisco:sdwan:sessions:maximum, cisco:sdwan:smart:lic:platform:error, cisco:sdwan:unblock:host, cisco:sdwan:utd:logs
+  PARSER-ONLY (1): stream:netflow
+
+[ta-cisco-webex-meetings-add-on-for-splunk] (archived-apps)
+  ONBOARDED (10): cisco:webex:meetings:general:summarysession, cisco:webex:meetings:history:eventattendeehistory, cisco:webex:meetings:history:eventsessionhistory, cisco:webex:meetings:history:meetingattendeehistory, cisco:webex:meetings:history:meetingusagehistory, cisco:webex:meetings:history:recordaccesshistory, cisco:webex:meetings:history:supportattendeehistory, cisco:webex:meetings:history:supportsessionhistory, cisco:webex:meetings:history:trainingattendeehistory, cisco:webex:meetings:history:trainingsessionhistory
+
+[ti-cisco-vuln] (archived-apps)
+  ONBOARDED (1): cisco:vuln:advisories
+  PARSER-ONLY (4): cisco:vuln:advisories:cvrf:note, cisco:vuln:advisories:cvrf:product, cisco:vuln:advisories:cvrf:summary, cisco:vuln:advisories:cvrf:vuln
+
+[CiscoSecurityCloud] (cisco-supported-apps)
+  ONBOARDED (74): cisco:ai:defense, cisco:asa, cisco:cii, cisco:cvi, cisco:duo, cisco:duo:account, cisco:duo:activity, cisco:duo:administrator, cisco:duo:authentication, cisco:duo:authentication_v2, cisco:duo:endpoint, cisco:duo:telephony, cisco:duo:telephony_v2, cisco:duo:trust_monitor, cisco:duo:user, cisco:etd, cisco:ftd:adv:conn, cisco:ftd:adv:dns, cisco:ftd:adv:ftp, cisco:ftd:adv:http, cisco:ftd:adv:notice, cisco:ftd:adv:weird, cisco:ftd:connection, cisco:ftd:connection:security, cisco:ftd:correlation, cisco:ftd:discovery, cisco:ftd:file, cisco:ftd:intrusion, cisco:ftd:intrusionpacket, cisco:ftd:malware, cisco:ftd:syslog, cisco:ftd:syslog:json, cisco:ftd:useractivity, cisco:isovalent, cisco:isovalent:alert, cisco:isovalent:edge_processor, cisco:isovalent:edge_processor:alert, cisco:isovalent:edge_processor:processConnect, cisco:isovalent:edge_processor:processExec, cisco:isovalent:edge_processor:telemetry:network, cisco:isovalent:edge_processor:telemetry:process, cisco:isovalent:processConnect, cisco:isovalent:processExec, cisco:isovalent:telemetry:network, cisco:isovalent:telemetry:process, cisco:multicloud:defense, cisco:multicloud:defense:appid, cisco:multicloud:defense:auditlogs, cisco:multicloud:defense:av, cisco:multicloud:defense:dlp, cisco:multicloud:defense:dpi, cisco:multicloud:defense:fqdn_resolve, cisco:multicloud:defense:fqdnfilter, cisco:multicloud:defense:l4_fw, cisco:multicloud:defense:l7dos, cisco:multicloud:defense:malicious_src, cisco:multicloud:defense:session_summary, cisco:multicloud:defense:systemlogs, cisco:multicloud:defense:tls_error, cisco:multicloud:defense:tls_log, cisco:multicloud:defense:urlfilter, cisco:multicloud:defense:valtix_internal, cisco:multicloud:defense:waf, cisco:se, cisco:secure:workload, cisco:sfw:estreamer, cisco:sfw:policy, cisco:sma:submissions, cisco:sna, cisco:sna:notable, cisco:sna:risk, cisco:xdr:incidents, cisco:xdr:incidents-summary:notable, gateway
+  PARSER-ONLY (14): cisco:ai:defense:notable, cisco:evm:file_activity, cisco:evm:process_activity, cisco:evm:registry_key_activity, cisco:evm:registry_value_activity, cisco:evm:windows_service_activity, cisco:multicloud:defense:sni, cisco:nvm:eve:v2, cisco:nvm:flowdata:v2, cisco:nvm:ifdata:v2, cisco:nvm:osquery:v2, cisco:nvm:processinfodata:v2, cisco:nvm:sysdata:v2, cisco:xdr:incidents-summary
+
+[Splunk_TA_Cisco_Intersight] (cisco-supported-apps)
+  ONBOARDED (0): 
+  PARSER-ONLY (21): cisco:intersight:advisories, cisco:intersight:alarms, cisco:intersight:auditRecords, cisco:intersight:auditrecords, cisco:intersight:compute, cisco:intersight:contract, cisco:intersight:contracts, cisco:intersight:custom:inventory, cisco:intersight:custom:metrics, cisco:intersight:fabric, cisco:intersight:license, cisco:intersight:licenses, cisco:intersight:metrics, cisco:intersight:network, cisco:intersight:networkObjects, cisco:intersight:networkelements, cisco:intersight:networkobjects, cisco:intersight:pools, cisco:intersight:profiles, cisco:intersight:target, cisco:intersight:targets
+
+[Splunk_TA_cisco_meraki] (cisco-supported-apps)
+  ONBOARDED (43): meraki:accesspoints, meraki:airmarshal, meraki:apirequestshistory, meraki:apirequestsoverview, meraki:apirequestsresponsecodes, meraki:appliancesdwanstatistics, meraki:appliancesdwanstatuses, meraki:assurancealerts, meraki:audit, meraki:cameras, meraki:devices, meraki:devicesavailabilities, meraki:devicesavailabilitieschangehistory, meraki:devicesuplinksaddressesbydevice, meraki:devicesuplinkslossandlatency, meraki:firmwareupgrades, meraki:licensescotermlicenses, meraki:licensesoverview, meraki:licensessubscriptionentitlements, meraki:licensessubscriptions, meraki:organizations, meraki:organizationsecurity, meraki:organizationsnetworks, meraki:portstransceiversreadingshistorybyswitch, meraki:powermodulesstatusesbydevice, meraki:securityappliances, meraki:sensorreadingshistory, meraki:summaryswitchpowerhistory, meraki:summarytopappliancesbyutilization, meraki:summarytopclientsbyusage, meraki:summarytopdevicesbyusage, meraki:summarytopswitchesbyenergyusage, meraki:switches, meraki:switchportsbyswitch, meraki:switchportsoverview, meraki:webhook, meraki:webhooklogs:api, meraki:wirelesscontrolleravailabilitieschangehistory, meraki:wirelesscontrollerdevicesinterfacespacketsoverviewbydevice, meraki:wirelesscontrollerdevicesinterfacesusagehistorybyinterval, meraki:wirelessdevicesethernetstatuses, meraki:wirelessdevicespacketlossbydevice, meraki:wirelessdeviceswirelesscontrollersbydevice
+
+[TA-cisco-cloud-security-addon] (cisco-supported-apps)
+  ONBOARDED (12): cisco:cloud_security:audit, cisco:cloud_security:dlp, cisco:cloud_security:dns, cisco:cloud_security:fileevent, cisco:cloud_security:firewall, cisco:cloud_security:intrusion, cisco:cloud_security:ntg, cisco:cloud_security:proxy, cisco:cloud_security:ravpn, cisco:cloud_security:ztna, cisco:cloud_security:ztnaenrollment, cisco:cloud_security:ztnaflow
+  PARSER-ONLY (11): cisco:secure_access:alerts_accessrulechanges, cisco:secure_access:alerts_apianomaly, cisco:secure_access:alerts_behavioranalytics, cisco:secure_access:alerts_connectivity_tunnels, cisco:secure_access:security_events_dlp, cisco:secure_access:security_events_dns, cisco:secure_access:security_events_firewall, cisco:secure_access:security_events_intrusion, cisco:secure_access:security_events_ravpn, cisco:secure_access:security_events_web, cisco:secure_access:security_events_ztna
+
+[TA_cisco_catalyst] (cisco-supported-apps)
+  ONBOARDED (68): cisco:catalyst:center:compliance:report, cisco:catalyst:center:inventory:report, cisco:catalyst:syslog, cisco:cybervision:activities, cisco:cybervision:components, cisco:cybervision:devices, cisco:cybervision:events, cisco:cybervision:flows, cisco:cybervision:vulnerabilities, cisco:dnac:application:traffic, cisco:dnac:audit:logs, cisco:dnac:client, cisco:dnac:clienthealth, cisco:dnac:compliance, cisco:dnac:custom, cisco:dnac:devicehealth, cisco:dnac:devicehealth:interface, cisco:dnac:issue, cisco:dnac:networkhealth, cisco:dnac:securityadvisory, cisco:dnac:site:topology, cisco:dnac:swim, cisco:firewall:logs, cisco:ios, cisco:ios:traceback, cisco:ise:analytics, cisco:ise:analytics:applications, cisco:ise:analytics:fullreport, cisco:ise:analytics:hardware, cisco:ise:analytics:registry, cisco:ise:custom, cisco:ise:radius:authz:policy, cisco:ise:radius:policyset, cisco:ise:securitygroups, cisco:ise:sgtbindings, cisco:ise:syslog, cisco:ise:tacacs:authz:policy, cisco:ise:tacacs:policyset, cisco:sdwan:acl:logs, cisco:sdwan:alert:off, cisco:sdwan:alert:on, cisco:sdwan:audit:logs, cisco:sdwan:block:host, cisco:sdwan:custom, cisco:sdwan:devicehealth, cisco:sdwan:dmi:cli:engine:write:fail, cisco:sdwan:drop:pkt, cisco:sdwan:energy:stats, cisco:sdwan:host:tcp:alert:on, cisco:sdwan:linkhealth, cisco:sdwan:log:summary, cisco:sdwan:networkhealth, cisco:sdwan:pass:pkt, cisco:sdwan:session:audit:trail, cisco:sdwan:session:audit:trail:start, cisco:sdwan:sessions:maximum, cisco:sdwan:sgacl:logs, cisco:sdwan:sitehealth, cisco:sdwan:smart:lic:platform:error, cisco:sdwan:ssetunnelhealth, cisco:sdwan:ssetunnels, cisco:sdwan:system:logs, cisco:sdwan:sytem:logs, cisco:sdwan:tunnelhealth, cisco:sdwan:unblock:host, cisco:sdwan:utd:logs, cisco:sdwan:utdhealth, cisco:telemetry
+  PARSER-ONLY (12): Cisco:ISE:Syslog, cisco:catalyst:client, cisco:catalyst:clienthealth, cisco:catalyst:compliance, cisco:catalyst:devicehealth, cisco:catalyst:issue, cisco:catalyst:networkhealth, cisco:catalyst:securityadvisory, cisco:cybervision:syslog, cisco:ise, cisco:sgacl:logs, stream:netflow
+
+[cisco-catalyst-app] (cisco-supported-apps)
+  ONBOARDED (0): 
+  PARSER-ONLY (1): cisco:ise:syslog
+
+[cisco-cloud-security] (cisco-supported-apps)
+  ONBOARDED (10): cisco:cloud_security:alerts, cisco:cloud_security:appdiscovery, cisco:cloud_security:cloudlock, cisco:cloud_security:fileevent, cisco:cloud_security:intrusion, cisco:cloud_security:investigated, cisco:cloud_security:privateapps, cisco:cloud_security:ztna, cisco:cloud_security:ztnaenrollment, cisco:cloud_security:ztnaflow
+  PARSER-ONLY (7): cisco:cloud_security:audit, cisco:cloud_security:dlp, cisco:cloud_security:dns, cisco:cloud_security:firewall, cisco:cloud_security:ip, cisco:cloud_security:proxy, cisco:cloud_security:ravpn
+
+[cisco_dc_networking_app_for_splunk] (cisco-supported-apps)
+  ONBOARDED (8): cisco:dc:aci:authentication, cisco:dc:aci:class, cisco:dc:aci:health, cisco:dc:aci:managed_object, cisco:dc:aci:stats, cisco:dc:nd:mso, cisco:dc:nexus9k, cisco:dc:nexus9k:dme
+  PARSER-ONLY (10): cisco:dc:aci:syslog, cisco:dc:mso:syslog, cisco:dc:nd:advisories, cisco:dc:nd:anomalies, cisco:dc:nd:congestion, cisco:dc:nd:endpoints, cisco:dc:nd:flows, cisco:dc:nd:protocols, cisco:dc:nd:syslog, cisco:dc:nexus9k:syslog
+
+[ta_cisco_thousandeyes] (cisco-supported-apps)
+  ONBOARDED (7): cisco:thousandeyes:activity, cisco:thousandeyes:alerts, cisco:thousandeyes:event, cisco:thousandeyes:metric, cisco:thousandeyes:path-vis, cisco:thousandeyes:refresh-tokens, cisco:thousandeyes:trace
+
+[SA_cisco_cdr_axl] (developer-apps)
+  ONBOARDED (1): SA_cisco_cdr_axl_log
+
+[SA_cisco_meeting_server] (developer-apps)
+  ONBOARDED (1): cms_cdr
+
+[SA_sideview_webex] (developer-apps)
+  ONBOARDED (3): cisco:webex:call:detailed_history, cisco:webex:meeting:qualities, cisco:webex:meetings
+  PARSER-ONLY (3): cisco:webex:admin:audit:events, cisco:webex:meeting:attendee:reports, cisco:webex:meeting:usage:reports
+
+[Splunk-TA-cisco-catalyst-center] (developer-apps)
+  ONBOARDED (7): cisco:catalyst:client, cisco:catalyst:clienthealth, cisco:catalyst:compliance, cisco:catalyst:devicehealth, cisco:catalyst:issue, cisco:catalyst:networkhealth, cisco:catalyst:securityadvisory
+
+[Splunk_TA_CCX_Cisco_ISE] (developer-apps)
+  ONBOARDED (1): cisco:ise:syslog
+  PARSER-ONLY (2): Cisco:ISE:Syslog, cisco:ise
+
+[Splunk_TA_CCX_Cisco_Meraki] (developer-apps)
+  ONBOARDED (5): ccx:meraki:sc4s, ccx:meraki:sc4s:events, ccx:meraki:sc4s:firewall, ccx:meraki:sc4s:flows, ccx:meraki:sc4s:urls
+  PARSER-ONLY (6): meraki:accesspoints, meraki:audit, meraki:cameras, meraki:organizationsecurity, meraki:securityappliances, meraki:switches
+
+[Splunk_TA_CCX_Cisco_Secure_Endpoint] (developer-apps)
+  ONBOARDED (5): cisco:secureendpoint, cisco:secureendpoint:alerts, cisco:secureendpoint:audit, cisco:secureendpoint:threat, cisco:secureendpoint:vuln
+
+[Splunk_TA_CCX_DUO_Connector_Support] (developer-apps)
+  ONBOARDED (0): 
+  PARSER-ONLY (5): cisco:duo:account, cisco:duo:activity, cisco:duo:administrator, cisco:duo:authentication, duo
+
+[Splunk_TA_CCX_Unified_Cisco_Firepower_eStreamer] (developer-apps)
+  ONBOARDED (0): 
+  PARSER-ONLY (2): cisco:estreamer:data, cisco:firepower:syslog
+
+[TA-cisco_cybervision] (developer-apps)
+  ONBOARDED (7): cisco:cybervision:activities, cisco:cybervision:components, cisco:cybervision:devices, cisco:cybervision:events, cisco:cybervision:flows, cisco:cybervision:sensors, cisco:cybervision:vulnerabilities
+  PARSER-ONLY (1): cisco:cybervision:syslog
+
+[TA_cisco-ACI] (developer-apps)
+  ONBOARDED (7): cisco:apic:, cisco:apic:authentication, cisco:apic:class, cisco:apic:cloud, cisco:apic:health, cisco:apic:stats, cisco:mso
+
+[TA_cisco_cdr] (developer-apps)
+  ONBOARDED (4): cube_cdr, cube_cdr_compact, cucm_cdr, cucm_cmr
+  PARSER-ONLY (2): cube_syslog, cucm_audit
+
+[cisco_cdr] (developer-apps)
+  ONBOARDED (5): cube_cdr, cube_cdr_compact, cucm_cdr, cucm_cmr, cucm_kiwi_syslog
+  PARSER-ONLY (2): cucm_audit, cvp_log
+
+[cisco_cybervision_app_for_splunk] (developer-apps)
+  ONBOARDED (0): 
+  PARSER-ONLY (1): cisco:cybervision:events
+
+[firepower_dashboard] (developer-apps)
+  ONBOARDED (0): 
+  PARSER-ONLY (2): cisco:estreamer:data, cisco:firepower:syslog
+
+[ta_cisco_spaces] (developer-apps)
+  ONBOARDED (2): cisco:spaces:firehose, cisco:spaces:firehose:health
+
+[ta_cisco_webex_add_on_for_splunk] (developer-apps)
+  ONBOARDED (12): cisco:webex:admin:audit:events, cisco:webex:call:detailed_history, cisco:webex:contact:center, cisco:webex:contact:center:AAR, cisco:webex:contact:center:ASR, cisco:webex:contact:center:CAR, cisco:webex:contact:center:CSR, cisco:webex:meeting:attendee:reports, cisco:webex:meeting:qualities, cisco:webex:meeting:usage:reports, cisco:webex:meetings, cisco:webex:security:audit:events
+
+[TA_cisco_catalyst] (disabled-apps)
+  ONBOARDED (68): cisco:catalyst:center:compliance:report, cisco:catalyst:center:inventory:report, cisco:catalyst:syslog, cisco:cybervision:activities, cisco:cybervision:components, cisco:cybervision:devices, cisco:cybervision:events, cisco:cybervision:flows, cisco:cybervision:vulnerabilities, cisco:dnac:application:traffic, cisco:dnac:audit:logs, cisco:dnac:client, cisco:dnac:clienthealth, cisco:dnac:compliance, cisco:dnac:custom, cisco:dnac:devicehealth, cisco:dnac:devicehealth:interface, cisco:dnac:issue, cisco:dnac:networkhealth, cisco:dnac:securityadvisory, cisco:dnac:site:topology, cisco:dnac:swim, cisco:firewall:logs, cisco:ios, cisco:ios:traceback, cisco:ise:analytics, cisco:ise:analytics:applications, cisco:ise:analytics:fullreport, cisco:ise:analytics:hardware, cisco:ise:analytics:registry, cisco:ise:custom, cisco:ise:radius:authz:policy, cisco:ise:radius:policyset, cisco:ise:securitygroups, cisco:ise:sgtbindings, cisco:ise:syslog, cisco:ise:tacacs:authz:policy, cisco:ise:tacacs:policyset, cisco:sdwan:acl:logs, cisco:sdwan:alert:off, cisco:sdwan:alert:on, cisco:sdwan:audit:logs, cisco:sdwan:block:host, cisco:sdwan:custom, cisco:sdwan:devicehealth, cisco:sdwan:dmi:cli:engine:write:fail, cisco:sdwan:drop:pkt, cisco:sdwan:energy:stats, cisco:sdwan:host:tcp:alert:on, cisco:sdwan:linkhealth, cisco:sdwan:log:summary, cisco:sdwan:networkhealth, cisco:sdwan:pass:pkt, cisco:sdwan:session:audit:trail, cisco:sdwan:session:audit:trail:start, cisco:sdwan:sessions:maximum, cisco:sdwan:sgacl:logs, cisco:sdwan:sitehealth, cisco:sdwan:smart:lic:platform:error, cisco:sdwan:ssetunnelhealth, cisco:sdwan:ssetunnels, cisco:sdwan:system:logs, cisco:sdwan:sytem:logs, cisco:sdwan:tunnelhealth, cisco:sdwan:unblock:host, cisco:sdwan:utd:logs, cisco:sdwan:utdhealth, cisco:telemetry
+  PARSER-ONLY (12): Cisco:ISE:Syslog, cisco:catalyst:client, cisco:catalyst:clienthealth, cisco:catalyst:compliance, cisco:catalyst:devicehealth, cisco:catalyst:issue, cisco:catalyst:networkhealth, cisco:catalyst:securityadvisory, cisco:cybervision:syslog, cisco:ise, cisco:sgacl:logs, stream:netflow
+
+[custom_ta_cisco_spaces] (good-apps)
+  ONBOARDED (1): cisco:spaces:firehose
+
+[Cisco-suite-for-splunk] (not_supported-apps)
+  ONBOARDED (0): 
+  PARSER-ONLY (1): cisco:ise:syslog
+
+[CiscoNVM] (not_supported-apps)
+  ONBOARDED (0): 
+  PARSER-ONLY (2): cisco:nvm:flowdata, cisco:nvm:processinfodata
+
+[TA-Cisco-NVM] (not_supported-apps)
+  ONBOARDED (0): 
+  PARSER-ONLY (6): cisco:nvm:eve, cisco:nvm:flowdata, cisco:nvm:ifdata, cisco:nvm:osquery, cisco:nvm:processinfodata, cisco:nvm:sysdata
+
+[TA-cisco-amp4e] (not_supported-apps)
+  ONBOARDED (0): 
+  PARSER-ONLY (1): cisco:amp:event
+
+[TA-cisco_ios] (not_supported-apps)
+  ONBOARDED (3): cisco:ios, cisco:ios:traceback, cisco:telemetry
+
+[cisco_ios] (not_supported-apps)
+  ONBOARDED (0): 
+  PARSER-ONLY (1): cisco:ios
+
+[cloudlock] (not_supported-apps)
+  ONBOARDED (0): 
+  PARSER-ONLY (1): incident
+
+[TA-tripwire_enterprise] (other-apps)
+  ONBOARDED (7): te_api, te_assets, te_ecr_csv, te_fim_csv, te_scm_csv, te_script, te_syslog
+
+[Splunk_TA_cisco-asa] (splunk-supported-apps)
+  ONBOARDED (2): cisco:asa, cisco:ftd
+  PARSER-ONLY (1): cisco_asa
+
+[Splunk_TA_cisco-esa] (splunk-supported-apps)
+  ONBOARDED (11): cisco:esa:amp, cisco:esa:antispam, cisco:esa:authentication, cisco:esa:bounce, cisco:esa:cef, cisco:esa:content_scanner, cisco:esa:delivery, cisco:esa:error_logs, cisco:esa:http, cisco:esa:system_logs, cisco:esa:textmail
+  PARSER-ONLY (3): cisco:esa, cisco:esa:legacy, cisco_esa
+
+[Splunk_TA_cisco-ise] (splunk-supported-apps)
+  ONBOARDED (1): cisco:ise:syslog
+  PARSER-ONLY (2): Cisco:ISE:Syslog, cisco:ise
+
+[Splunk_TA_cisco-ucs] (splunk-supported-apps)
+  ONBOARDED (1): cisco:ucs
+
+[Splunk_TA_cisco-wsa] (splunk-supported-apps)
+  ONBOARDED (4): cisco:wsa:l4tm, cisco:wsa:squid, cisco:wsa:w3c, cisco:wsa:w3c:recommended
+  PARSER-ONLY (2): cisco:wsa:squid:new, cisco:wsa:syslog
+
+
+=== ONBOARDED ON DISK, NOT IN products.conf (CANDIDATES TO ADD) ===
+ccx:meraki:sc4s	Splunk_TA_CCX_Cisco_Meraki	developer-apps
+ccx:meraki:sc4s:events	Splunk_TA_CCX_Cisco_Meraki	developer-apps
+ccx:meraki:sc4s:firewall	Splunk_TA_CCX_Cisco_Meraki	developer-apps
+ccx:meraki:sc4s:flows	Splunk_TA_CCX_Cisco_Meraki	developer-apps
+ccx:meraki:sc4s:urls	Splunk_TA_CCX_Cisco_Meraki	developer-apps
+cisco:amp:event	amp4e_events_input	archived-apps
+cisco:apic:	TA_cisco-ACI	developer-apps
+cisco:apic:authentication	TA_cisco-ACI	developer-apps
+cisco:apic:class	TA_cisco-ACI	developer-apps
+cisco:apic:cloud	TA_cisco-ACI	developer-apps
+cisco:apic:health	TA_cisco-ACI	developer-apps
+cisco:apic:stats	TA_cisco-ACI	developer-apps
+cisco:app:nexus:9k:collect	cisco-app-Nexus-9k	archived-apps
+cisco:catalyst:client	Splunk-TA-cisco-catalyst-center	developer-apps
+cisco:catalyst:clienthealth	Splunk-TA-cisco-catalyst-center	developer-apps
+cisco:catalyst:compliance	Splunk-TA-cisco-catalyst-center	developer-apps
+cisco:catalyst:devicehealth	Splunk-TA-cisco-catalyst-center	developer-apps
+cisco:catalyst:issue	Splunk-TA-cisco-catalyst-center	developer-apps
+cisco:catalyst:networkhealth	Splunk-TA-cisco-catalyst-center	developer-apps
+cisco:catalyst:securityadvisory	Splunk-TA-cisco-catalyst-center	developer-apps
+cisco:catalyst:syslog	TA_cisco_catalyst	cisco-supported-apps
+cisco:cloud_security:alerts	cisco-cloud-security	cisco-supported-apps
+cisco:cybervision:sensors	TA-cisco_cybervision	developer-apps
+cisco:dnac:custom	TA_cisco_catalyst	cisco-supported-apps
+cisco:firewall:logs	ta-cisco-sdwan	archived-apps
+cisco:ftd	Splunk_TA_cisco-asa	splunk-supported-apps
+cisco:ftd:adv:conn	CiscoSecurityCloud	cisco-supported-apps
+cisco:ftd:adv:dns	CiscoSecurityCloud	cisco-supported-apps
+cisco:ftd:adv:ftp	CiscoSecurityCloud	cisco-supported-apps
+cisco:ftd:adv:http	CiscoSecurityCloud	cisco-supported-apps
+cisco:ftd:adv:notice	CiscoSecurityCloud	cisco-supported-apps
+cisco:ftd:adv:weird	CiscoSecurityCloud	cisco-supported-apps
+cisco:ftd:connection	CiscoSecurityCloud	cisco-supported-apps
+cisco:ftd:connection:security	CiscoSecurityCloud	cisco-supported-apps
+cisco:ftd:correlation	CiscoSecurityCloud	cisco-supported-apps
+cisco:ftd:discovery	CiscoSecurityCloud	cisco-supported-apps
+cisco:ftd:file	CiscoSecurityCloud	cisco-supported-apps
+cisco:ftd:intrusion	CiscoSecurityCloud	cisco-supported-apps
+cisco:ftd:intrusionpacket	CiscoSecurityCloud	cisco-supported-apps
+cisco:ftd:malware	CiscoSecurityCloud	cisco-supported-apps
+cisco:ftd:syslog:json	CiscoSecurityCloud	cisco-supported-apps
+cisco:ftd:useractivity	CiscoSecurityCloud	cisco-supported-apps
+cisco:ise:custom	TA_cisco_catalyst	cisco-supported-apps
+cisco:mso	TA_cisco-ACI	developer-apps
+cisco:ni	TA_cisco-NI	archived-apps
+cisco:sdwan:custom	TA_cisco_catalyst	cisco-supported-apps
+cisco:sdwan:devicehealth	TA_cisco_catalyst	cisco-supported-apps
+cisco:sdwan:networkhealth	TA_cisco_catalyst	cisco-supported-apps
+cisco:sdwan:sytem:logs	TA_cisco_catalyst	cisco-supported-apps
+cisco:secureendpoint	Splunk_TA_CCX_Cisco_Secure_Endpoint	developer-apps
+cisco:secureendpoint:alerts	Splunk_TA_CCX_Cisco_Secure_Endpoint	developer-apps
+cisco:secureendpoint:audit	Splunk_TA_CCX_Cisco_Secure_Endpoint	developer-apps
+cisco:secureendpoint:threat	Splunk_TA_CCX_Cisco_Secure_Endpoint	developer-apps
+cisco:secureendpoint:vuln	Splunk_TA_CCX_Cisco_Secure_Endpoint	developer-apps
+cisco:sma:data	TA-cisco-secure-malware-analytics	archived-apps
+cisco:tg:data	TA-cisco-threat-grid	archived-apps
+cisco:webex:meetings:general:summarysession	ta-cisco-webex-meetings-add-on-for-splunk	archived-apps
+cisco:webex:meetings:history:eventattendeehistory	ta-cisco-webex-meetings-add-on-for-splunk	archived-apps
+cisco:webex:meetings:history:eventsessionhistory	ta-cisco-webex-meetings-add-on-for-splunk	archived-apps
+cisco:webex:meetings:history:meetingattendeehistory	ta-cisco-webex-meetings-add-on-for-splunk	archived-apps
+cisco:webex:meetings:history:meetingusagehistory	ta-cisco-webex-meetings-add-on-for-splunk	archived-apps
+cisco:webex:meetings:history:recordaccesshistory	ta-cisco-webex-meetings-add-on-for-splunk	archived-apps
+cisco:webex:meetings:history:supportattendeehistory	ta-cisco-webex-meetings-add-on-for-splunk	archived-apps
+cisco:webex:meetings:history:supportsessionhistory	ta-cisco-webex-meetings-add-on-for-splunk	archived-apps
+cisco:webex:meetings:history:trainingattendeehistory	ta-cisco-webex-meetings-add-on-for-splunk	archived-apps
+cisco:webex:meetings:history:trainingsessionhistory	ta-cisco-webex-meetings-add-on-for-splunk	archived-apps
+cisco:wsa:shd	Cisco_WSA_Insight	archived-apps
+cisco:wsa:systemlogs	Cisco_WSA_Insight	archived-apps
+cms_cdr	SA_cisco_meeting_server	developer-apps
+cube_cdr	TA_cisco_cdr	developer-apps
+cube_cdr_compact	TA_cisco_cdr	developer-apps
+cucm_cdr	TA_cisco_cdr	developer-apps
+cucm_cmr	TA_cisco_cdr	developer-apps
+cucm_kiwi_syslog	cisco_cdr	developer-apps
+duo:info_summary	TA-DUOSecurity2FA	archived-apps
+etd_input_python	TA-cisco-etd-connector	archived-apps
+meraki	TA-meraki	archived-apps
+meraki:networkdevices	TA-cisco_meraki_operations	archived-apps
+meraki:uplinks	TA-cisco_meraki_operations	archived-apps
+meraki:uplinksLossAndLatency	TA-cisco_meraki_operations	archived-apps
+opendns:auditlogs	TA-cisco_umbrella	archived-apps
+opendns:dnslogs	TA-cisco_umbrella	archived-apps
+opendns:firewalllogs	TA-cisco_umbrella	archived-apps
+opendns:iplogs	TA-cisco_umbrella	archived-apps
+opendns:proxylogs	TA-cisco_umbrella	archived-apps
+opendns:s3	TA-cisco_umbrella	archived-apps
+SA_cisco_cdr_axl_log	SA_cisco_cdr_axl	developer-apps
+sendmail	sample_app	apps
+stealthwatch:fc:flow	TA-stealthwatch_dataexporter	archived-apps
+te_api	TA-tripwire_enterprise	other-apps
+te_assets	TA-tripwire_enterprise	other-apps
+te_ecr_csv	TA-tripwire_enterprise	other-apps
+te_fim_csv	TA-tripwire_enterprise	other-apps
+te_scm_csv	TA-tripwire_enterprise	other-apps
+te_script	TA-tripwire_enterprise	other-apps
+te_syslog	TA-tripwire_enterprise	other-apps
+webex:teams:adminaudit:events	TA-DP-webex-teams	archived-apps
+webex:teams:events	TA-DP-webex-teams	archived-apps
+
+=== CLAIMED IN products.conf, NOT ONBOARDED ON DISK (LIKELY BOGUS/STALE) ===
+appdynamics_analytics	not-onboarded	cisco_appdynamics
+appdynamics_audit	not-onboarded	cisco_appdynamics
+appdynamics_custom_metrics	not-onboarded	cisco_appdynamics
+appdynamics_databases	not-onboarded	cisco_appdynamics
+appdynamics_events	not-onboarded	cisco_appdynamics
+appdynamics_hardware	not-onboarded	cisco_appdynamics
+appdynamics_licenses	not-onboarded	cisco_appdynamics
+appdynamics_security	not-onboarded	cisco_appdynamics
+appdynamics_snapshots	not-onboarded	cisco_appdynamics
+appdynamics_status	not-onboarded	cisco_appdynamics
+cisco:ace	not-onboarded	cisco_ace
+cisco:acs	not-onboarded	cisco_acs
+cisco:ai:defense:notable	not-onboarded	cisco_ai_defense
+cisco:catalyst:center:report	not-onboarded	cisco_catalyst_center
+cisco:cybervision:syslog	not-onboarded	cisco_cyber_vision
+cisco:dc:aci:syslog	not-onboarded	cisco_aci
+cisco:dc:mso:syslog	not-onboarded	cisco_nexus_dashboard
+cisco:dc:nd:advisories	not-onboarded	cisco_nexus_dashboard
+cisco:dc:nd:anomalies	not-onboarded	cisco_nexus_dashboard
+cisco:dc:nd:congestion	not-onboarded	cisco_nexus_dashboard
+cisco:dc:nd:endpoints	not-onboarded	cisco_nexus_dashboard
+cisco:dc:nd:flows	not-onboarded	cisco_nexus_dashboard
+cisco:dc:nd:protocols	not-onboarded	cisco_nexus_dashboard
+cisco:dc:nd:syslog	not-onboarded	cisco_nexus_dashboard
+cisco:dc:nexus9k:syslog	not-onboarded	cisco_nexus
+cisco:dnac:custom:*	wildcard-no-disk-match	cisco_catalyst_center
+cisco:esa:legacy	not-onboarded	cisco_esa
+cisco:evm:file_activity	not-onboarded	cisco_evm
+cisco:evm:process_activity	not-onboarded	cisco_evm
+cisco:evm:registry_key_activity	not-onboarded	cisco_evm
+cisco:evm:registry_value_activity	not-onboarded	cisco_evm
+cisco:evm:windows_service_activity	not-onboarded	cisco_evm
+cisco:infraops	not-onboarded	cisco_imc
+cisco:intersight:advisories	not-onboarded	cisco_intersight
+cisco:intersight:alarms	not-onboarded	cisco_intersight
+cisco:intersight:auditrecords	not-onboarded	cisco_intersight
+cisco:intersight:compute	not-onboarded	cisco_intersight
+cisco:intersight:contract	not-onboarded	cisco_intersight
+cisco:intersight:contracts	not-onboarded	cisco_intersight
+cisco:intersight:custom:inventory	not-onboarded	cisco_intersight
+cisco:intersight:custom:metrics	not-onboarded	cisco_intersight
+cisco:intersight:fabric	not-onboarded	cisco_intersight
+cisco:intersight:license	not-onboarded	cisco_intersight
+cisco:intersight:licenses	not-onboarded	cisco_intersight
+cisco:intersight:metrics	not-onboarded	cisco_intersight
+cisco:intersight:network	not-onboarded	cisco_intersight
+cisco:intersight:networkelements	not-onboarded	cisco_intersight
+cisco:intersight:networkobjects	not-onboarded	cisco_intersight
+cisco:intersight:pools	not-onboarded	cisco_intersight
+cisco:intersight:profiles	not-onboarded	cisco_intersight
+cisco:intersight:target	not-onboarded	cisco_intersight
+cisco:intersight:targets	not-onboarded	cisco_intersight
+cisco:ise:custom:*	wildcard-no-disk-match	cisco_ise
+cisco:mm:audit	not-onboarded	cisco_meeting_management
+cisco:mm:system:*	wildcard-no-disk-match	cisco_meeting_management
+cisco:ms	not-onboarded	cisco_meeting_server
+cisco:multicloud:defense:sni	not-onboarded	cisco_multicloud_defense
+cisco:nvm:eve:v2	not-onboarded	cisco_nvm
+cisco:nvm:flowdata:v2	not-onboarded	cisco_nvm
+cisco:nvm:ifdata:v2	not-onboarded	cisco_nvm
+cisco:nvm:osquery:v2	not-onboarded	cisco_nvm
+cisco:nvm:processinfodata:v2	not-onboarded	cisco_nvm
+cisco:nvm:sysdata:v2	not-onboarded	cisco_nvm
+cisco:secure_access:*	wildcard-no-disk-match	cisco_secure_access
+cisco:secure_access:alerts_accessrulechanges	not-onboarded	cisco_secure_access
+cisco:secure_access:alerts_apianomaly	not-onboarded	cisco_secure_access
+cisco:secure_access:alerts_behavioranalytics	not-onboarded	cisco_secure_access
+cisco:secure_access:alerts_connectivity_tunnels	not-onboarded	cisco_secure_access
+cisco:secure_access:security_events_dlp	not-onboarded	cisco_secure_access
+cisco:secure_access:security_events_dns	not-onboarded	cisco_secure_access
+cisco:secure_access:security_events_firewall	not-onboarded	cisco_secure_access
+cisco:secure_access:security_events_intrusion	not-onboarded	cisco_secure_access
+cisco:secure_access:security_events_ravpn	not-onboarded	cisco_secure_access
+cisco:secure_access:security_events_web	not-onboarded	cisco_secure_access
+cisco:secure_access:security_events_ztna	not-onboarded	cisco_secure_access
+cisco:thousandeyes:account-group	not-onboarded	cisco_thousandeyes
+cisco:tvcs	not-onboarded	cisco_expressway,cisco_tvcs
+cisco:ucm	not-onboarded	cisco_cucm
+cisco:vuln:advisories:cvrf:note	not-onboarded	cisco_psirt
+cisco:vuln:advisories:cvrf:product	not-onboarded	cisco_psirt
+cisco:vuln:advisories:cvrf:summary	not-onboarded	cisco_psirt
+cisco:vuln:advisories:cvrf:vuln	not-onboarded	cisco_psirt
+cisco:wsa:squid:new	not-onboarded	cisco_wsa
+cisco:wsa:syslog	not-onboarded	cisco_wsa
+cisco:xdr:incidents-summary	not-onboarded	cisco_xdr
+cmxactive	not-onboarded	cisco_cmx
+cmxanalytics	not-onboarded	cisco_cmx
+cmxfloor	not-onboarded	cisco_cmx
+cmxhttp	not-onboarded	cisco_cmx
+cmxmap	not-onboarded	cisco_cmx
+skylight:alexa	not-onboarded	cisco_provider_connectivity_assurance
+skylight:citrix	not-onboarded	cisco_provider_connectivity_assurance
+skylight:cleanevent	not-onboarded	cisco_provider_connectivity_assurance
+skylight:dga_ml	not-onboarded	cisco_provider_connectivity_assurance
+skylight:dns	not-onboarded	cisco_provider_connectivity_assurance
+skylight:http	not-onboarded	cisco_provider_connectivity_assurance
+skylight:ml	not-onboarded	cisco_provider_connectivity_assurance
+skylight:smb	not-onboarded	cisco_provider_connectivity_assurance
+skylight:sql	not-onboarded	cisco_provider_connectivity_assurance
+skylight:tcp	not-onboarded	cisco_provider_connectivity_assurance
+skylight:ti	not-onboarded	cisco_provider_connectivity_assurance
+skylight:ti_domain	not-onboarded	cisco_provider_connectivity_assurance
+skylight:tls	not-onboarded	cisco_provider_connectivity_assurance
+skylight:udp	not-onboarded	cisco_provider_connectivity_assurance
+skylight:voip	not-onboarded	cisco_provider_connectivity_assurance
+talos:domain	not-onboarded	cisco_talos
+talos:ip	not-onboarded	cisco_talos
+talos:url	not-onboarded	cisco_talos
+
+=== PARSER-ONLY ON DISK, NOT CLAIMED (REVIEW — OFTEN BOGUS FOR SCAN) ===
+ccx:cisco:sna:syslog	Splunk_TA_CCX_Cisco_Secure_Network_Analytics	archived-apps
+cisco:amp:event	TA-cisco-amp4e	not_supported-apps
+cisco:catalyst:client	TA_cisco_catalyst	cisco-supported-apps
+cisco:catalyst:clienthealth	TA_cisco_catalyst	cisco-supported-apps
+cisco:catalyst:compliance	TA_cisco_catalyst	cisco-supported-apps
+cisco:catalyst:devicehealth	TA_cisco_catalyst	cisco-supported-apps
+cisco:catalyst:issue	TA_cisco_catalyst	cisco-supported-apps
+cisco:catalyst:networkhealth	TA_cisco_catalyst	cisco-supported-apps
+cisco:catalyst:securityadvisory	TA_cisco_catalyst	cisco-supported-apps
+cisco:cloud_security:ip	cisco-cloud-security	cisco-supported-apps
+cisco:esa	Splunk_TA_cisco-esa	splunk-supported-apps
+cisco:estreamer:data	Splunk_TA_cisco-estreamer_Enosys	archived-apps
+cisco:firepower:syslog	Splunk_TA_cisco-estreamer_Enosys	archived-apps
+cisco:ftd	TA-cisco-firepower-threat-defense-ftd-sourcetype	archived-apps
+cisco:fwsm	Splunk_CiscoSecuritySuite	archived-apps
+cisco:ise	TA_cisco_catalyst	cisco-supported-apps
+cisco:nexus:json	TA_cisco-Nexus-9k	archived-apps
+cisco:ni:advisories	TA_cisco-NI	archived-apps
+cisco:ni:anomalies	TA_cisco-NI	archived-apps
+cisco:nvm:eve	TA-Cisco-NVM	not_supported-apps
+cisco:nvm:flowdata	CiscoNVM	not_supported-apps
+cisco:nvm:ifdata	TA-Cisco-NVM	not_supported-apps
+cisco:nvm:osquery	TA-Cisco-NVM	not_supported-apps
+cisco:nvm:processinfodata	CiscoNVM	not_supported-apps
+cisco:nvm:sysdata	TA-Cisco-NVM	not_supported-apps
+cisco:pix	Splunk_CiscoSecuritySuite	archived-apps
+cisco:sgacl:logs	TA_cisco_catalyst	cisco-supported-apps
+cisco:stealthwatch:alert	TA-cisco-stealthwatch	archived-apps
+cisco:umbrella:audit	TA-cisco-cloud-security-umbrella-addon	archived-apps
+cisco:umbrella:dlp	TA-cisco-cloud-security-umbrella-addon	archived-apps
+cisco:umbrella:dns	TA-cisco-cloud-security-umbrella-addon	archived-apps
+cisco:umbrella:firewall	TA-cisco-cloud-security-umbrella-addon	archived-apps
+cisco:umbrella:ip	TA-cisco-cloud-security-umbrella-addon	archived-apps
+cisco:umbrella:proxy	TA-cisco-cloud-security-umbrella-addon	archived-apps
+cisco:wsa:prox_track	Cisco_WSA_Insight	archived-apps
+cisco_asa	Splunk_TA_cisco-asa	splunk-supported-apps
+cisco_esa	Splunk_TA_cisco-esa	splunk-supported-apps
+cisco_ips_syslog	Splunk_TA_cisco-ips	archived-apps
+cube_syslog	TA_cisco_cdr	developer-apps
+cucm_audit	TA_cisco_cdr	developer-apps
+cvp_log	cisco_cdr	developer-apps
+duo	Splunk_TA_CCX_DUO_Connector_Support	developer-apps
+duo:authentication	TA-DUOSecurity2FA	archived-apps
+incident	cloudlock	not_supported-apps
+meraki_syslog	TA_Meraki_SNMP_trap	archived-apps
+opendns:dnslog	TA-Umbrella	archived-apps
+snmptrap	cisco_thousandeyes_alerting_app_for_splunk	archived-apps
+snow:incident	cisco_thousandeyes_alerting_app_for_splunk	archived-apps
+stream:netflow	ta-cisco-sdwan	archived-apps
+thousandeyes:alerts	cisco_thousandeyes_alerting_app_for_splunk	archived-apps
+thousandeyes:enriched_alerts	cisco_thousandeyes_alerting_app_for_splunk	archived-apps
