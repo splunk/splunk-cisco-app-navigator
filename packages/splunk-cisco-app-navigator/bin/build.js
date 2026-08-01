@@ -12,8 +12,21 @@ const fs = require('fs');
 const glob = require('glob');
 
 const cmd = process.argv[2] || 'build';
+const commandArgs = process.argv.slice(3);
 const pkgRoot = path.join(__dirname, '..');
 const rootDir = path.join(pkgRoot, '..', '..');
+
+const invalidBuildArgs = commandArgs.filter((arg) => arg !== '--minify');
+if (cmd === 'build' && invalidBuildArgs.length > 0) {
+  console.error(`ERROR: unsupported build option: ${invalidBuildArgs[0]}`);
+  console.error('Usage: node bin/build.js build [--minify]');
+  process.exit(2);
+}
+if (cmd !== 'build' && commandArgs.includes('--minify')) {
+  console.error('ERROR: --minify is supported only by the build command.');
+  process.exit(2);
+}
+const minify = cmd === 'build' && commandArgs.includes('--minify');
 
 function readBuildVersion() {
   const versionPath = path.join(rootDir, 'VERSION');
@@ -131,11 +144,34 @@ if (cmd === 'build') {
     console.error('generate-catalog failed');
     process.exit(genResult.status || 1);
   }
-  // 2. Run webpack (suppress npm config warnings, Babel deopt notice, and verbose asset output)
-  const r = spawnSync('npx', ['--loglevel=error', 'webpack', '--config', path.join(pkgRoot, 'webpack.config.js')], {
+  // 2. Run webpack with production React. Keep normal development packages
+  // unminified for fast iteration; --minify opts into the smaller release build.
+  const webpackArgs = [
+    '--loglevel=error',
+    'webpack',
+    '--config',
+    path.join(pkgRoot, 'webpack.config.js'),
+    '--mode',
+    'production',
+  ];
+  if (!minify) webpackArgs.push('--no-optimization-minimize');
+  if (process.env.SCAN_WEBPACK_PROGRESS === '1') webpackArgs.push('--progress');
+
+  console.log(
+    minify
+      ? '\x1b[36m[build]\x1b[0m webpack production build with minification enabled'
+      : '\x1b[36m[build]\x1b[0m webpack production build with minification disabled'
+  );
+  const r = spawnSync('npx', webpackArgs, {
     stdio: 'inherit',
     cwd: pkgRoot,
-    env: { ...process.env, NPM_CONFIG_LOGLEVEL: 'error', BABEL_COMPACT: 'true' },
+    env: {
+      ...process.env,
+      NPM_CONFIG_LOGLEVEL: 'error',
+      BABEL_COMPACT: 'true',
+      NODE_ENV: 'production',
+      BABEL_ENV: 'production',
+    },
   });
   if (r.status !== 0) {
     process.exit(r.status != null ? r.status : 1);
@@ -149,6 +185,6 @@ if (cmd === 'build') {
   console.warn('link:app not implemented in minimal build. Symlink stage/ manually if needed.');
   process.exit(0);
 } else {
-  console.error('Usage: node bin/build.js [build|link]');
+  console.error('Usage: node bin/build.js [build [--minify]|link]');
   process.exit(1);
 }
