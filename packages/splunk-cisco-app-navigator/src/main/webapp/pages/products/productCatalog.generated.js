@@ -4142,19 +4142,30 @@ export const PRODUCT_CATALOG = [
       "cisco:catalyst:center:compliance:report",
       "cisco:catalyst:center:inventory:report",
       "cisco:catalyst:center:report",
+      "cisco:catalyst:client",
+      "cisco:catalyst:clienthealth",
+      "cisco:catalyst:compliance",
+      "cisco:catalyst:devicehealth",
+      "cisco:catalyst:issue",
+      "cisco:catalyst:networkhealth",
+      "cisco:catalyst:securityadvisory",
       "cisco:dnac:application:traffic",
       "cisco:dnac:audit:logs",
       "cisco:dnac:client",
       "cisco:dnac:clienthealth",
       "cisco:dnac:compliance",
+      "cisco:dnac:compliance:report",
+      "cisco:dnac:custom",
+      "cisco:dnac:custom:*",
       "cisco:dnac:devicehealth",
       "cisco:dnac:devicehealth:interface",
+      "cisco:dnac:inventory:report",
       "cisco:dnac:issue",
       "cisco:dnac:networkhealth",
+      "cisco:dnac:report",
       "cisco:dnac:securityadvisory",
       "cisco:dnac:site:topology",
-      "cisco:dnac:swim",
-      "cisco:dnac:custom:*"
+      "cisco:dnac:swim"
     ],
     "dashboards": [
       "overview",
@@ -4447,19 +4458,22 @@ export const PRODUCT_CATALOG = [
     ],
     "community_uids": [],
     "sourcetypes": [
+      "cisco:ise",
       "cisco:ise:analytics",
       "cisco:ise:analytics:applications",
       "cisco:ise:analytics:fullreport",
       "cisco:ise:analytics:hardware",
       "cisco:ise:analytics:registry",
+      "cisco:ise:custom",
+      "cisco:ise:custom:*",
+      "cisco:ise:policy",
       "cisco:ise:radius:authz:policy",
       "cisco:ise:radius:policyset",
       "cisco:ise:securitygroups",
       "cisco:ise:sgtbindings",
       "cisco:ise:syslog",
       "cisco:ise:tacacs:authz:policy",
-      "cisco:ise:tacacs:policyset",
-      "cisco:ise:custom:*"
+      "cisco:ise:tacacs:policyset"
     ],
     "dashboards": [
       "security_insights"
@@ -5094,19 +5108,24 @@ export const PRODUCT_CATALOG = [
     ],
     "community_uids": [],
     "sourcetypes": [
+      "cisco:firewall:logs",
+      "cisco:sdwan:access:logs",
       "cisco:sdwan:acl:logs",
       "cisco:sdwan:alert:off",
       "cisco:sdwan:alert:on",
       "cisco:sdwan:audit:logs",
       "cisco:sdwan:block:host",
+      "cisco:sdwan:custom",
       "cisco:sdwan:custom:*",
       "cisco:sdwan:dmi:cli:engine:write:fail",
       "cisco:sdwan:drop:pkt",
       "cisco:sdwan:energy:stats",
+      "cisco:sdwan:firewall:logs",
       "cisco:sdwan:host:tcp:alert:on",
       "cisco:sdwan:linkhealth",
       "cisco:sdwan:log:summary",
       "cisco:sdwan:pass:pkt",
+      "cisco:sdwan:realtime",
       "cisco:sdwan:session:audit:trail",
       "cisco:sdwan:session:audit:trail:start",
       "cisco:sdwan:sessions:maximum",
@@ -5117,10 +5136,12 @@ export const PRODUCT_CATALOG = [
       "cisco:sdwan:ssetunnels",
       "cisco:sdwan:syslog",
       "cisco:sdwan:system:logs",
+      "cisco:sdwan:sytem:logs",
       "cisco:sdwan:tunnelhealth",
       "cisco:sdwan:unblock:host",
       "cisco:sdwan:utd:logs",
-      "cisco:sdwan:utdhealth"
+      "cisco:sdwan:utdhealth",
+      "cisco:sgacl:logs"
     ],
     "dashboards": [
       "performance"
@@ -7560,12 +7581,13 @@ export const PRODUCT_CATALOG = [
     "sourcetypes": [
       "cisco:cybervision:activities",
       "cisco:cybervision:components",
+      "cisco:cybervision:custom",
+      "cisco:cybervision:custom:*",
       "cisco:cybervision:devices",
       "cisco:cybervision:events",
       "cisco:cybervision:flows",
       "cisco:cybervision:syslog",
-      "cisco:cybervision:vulnerabilities",
-      "cisco:cybervision:custom:*"
+      "cisco:cybervision:vulnerabilities"
     ],
     "dashboards": [
       "overview"

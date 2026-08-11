@@ -1,5 +1,11 @@
 # Change Log
 
+Unreleased
+-------
+
+### Catalog Fixes
+* **Cisco Catalyst sourcetype alignment** — Added current and legacy Catalyst Center, SD-WAN, ISE, and Cyber Vision sourcetypes from the revised Cisco Catalyst TA sourcetype catalog, including stable custom/API, report, policy, firewall/access, realtime, and historical compatibility names.
+
 1.0.27 — May 9, 2026
 -------
 
