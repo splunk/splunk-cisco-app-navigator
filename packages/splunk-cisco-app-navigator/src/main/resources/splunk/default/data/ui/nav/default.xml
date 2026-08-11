@@ -1,9 +1,18 @@
 <nav search_view="search" color="#049fd9">
-    <view name="products" default="true" label="Cisco Products" />
+    <view
+        name="products"
+        default="true"
+        label="Cisco Products"
+        icon="layerstriple"
+    />
     <!-- <view name="cisco_glass_pane" label="The Glass Pane" /> -->
-    <view name="ecosystem_intelligence" label="Ecosystem Intelligence" />
+    <view
+        name="ecosystem_intelligence"
+        label="Ecosystem Intelligence"
+        icon="pulse"
+    />
 
-    <collection label="Analytics &amp; Reports">
+    <collection label="Analytics &amp; Reports" icon="chartcolumnpanel">
 
       <!-- ── Ecosystem Overview ── -->
       <collection label="Ecosystem Overview">
@@ -75,5 +84,5 @@
     </collection>
 
     <a href="search" target="_blank" rel="noopener"></a>
-    <view name="datasets" />
+    <view name="datasets" icon="cylinderindex" />
 </nav>

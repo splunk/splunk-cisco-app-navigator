@@ -50,6 +50,9 @@ import TrashCan from '@splunk/react-icons/TrashCanCross';
 import ShieldIcon from '@splunk/react-icons/Shield';
 import PulseIcon from '@splunk/react-icons/Pulse';
 import LayoutIcon from '@splunk/react-icons/Layout';
+import PaletteIcon from '@splunk/react-icons/Palette';
+import SunIcon from '@splunk/react-icons/Sun';
+import MoonIcon from '@splunk/react-icons/Moon';
 import Button from '@splunk/react-ui/Button';
 import CollapsiblePanel from '@splunk/react-ui/CollapsiblePanel';
 import WaitSpinner from '@splunk/react-ui/WaitSpinner';
@@ -61,7 +64,7 @@ import Tooltip from '@splunk/react-ui/Tooltip';
 // ─────────────────────────────  CONSTANTS  ─────────────────────────────
 
 const APP_ID = 'splunk-cisco-app-navigator';
-const CONF_ENDPOINT = `/splunkd/__raw/servicesNS/-/${APP_ID}/configs/conf-products`;
+const CONF_ENDPOINT = `/splunkd/__raw/servicesNS/nobody/${APP_ID}/configs/conf-products`;
 const CONF_RELOAD_ENDPOINT = `/splunkd/__raw/servicesNS/nobody/${APP_ID}/configs/conf-products/_reload`;
 const APPS_LOCAL_ENDPOINT = '/splunkd/__raw/services/apps/local';
 const SERVER_INFO_ENDPOINT = '/splunkd/__raw/services/server/info';
@@ -277,6 +280,38 @@ function csvToArray(val) {
 }
 
 /**
+ * Keep product IDs unique at data-source boundaries.  During app upgrades or
+ * conf reloads Splunk can briefly expose the same stanza more than once (for
+ * example, while default/local layers are reconciling).  Allowing those rows
+ * into React produces duplicate cards and duplicate-key warnings.
+ */
+function uniqueProductsById(productList, source = 'catalog') {
+    const seen = new Set();
+    const duplicateIds = new Set();
+    const unique = (productList || []).filter((product) => {
+        const id = product && product.product_id;
+        if (!id || seen.has(id)) {
+            if (id) {
+                duplicateIds.add(id);
+            }
+            return false;
+        }
+        seen.add(id);
+        return true;
+    });
+    if (duplicateIds.size > 0) {
+        // This warning is intentional: it records the upstream IDs that would
+        // otherwise become duplicate React keys.
+        // eslint-disable-next-line no-console
+        console.warn(
+            `[SCAN][Catalog] Removed ${productList.length - unique.length} duplicate product row(s) from ${source}:`,
+            [...duplicateIds]
+        );
+    }
+    return unique;
+}
+
+/**
  * Word-boundary keyword match: returns true when the query appears as a
  * complete word (or multi-word phrase) within the keyword string, avoiding
  * false positives like "enterprise" matching a query of "ise".
@@ -442,7 +477,7 @@ function sortVersionsDesc(versions) {
 async function loadProductsFromConf() {
     const res = await splunkFetch(`${CONF_ENDPOINT}?output_mode=json&count=0`);
     const data = await res.json();
-    return (data.entry || []).map(entry => {
+    const normalized = (data.entry || []).map(entry => {
         const c = entry.content || {};
         const d = c.disabled;
         const isDisabled = d === true || d === "true" || d === "1" || d === 1;
@@ -537,6 +572,7 @@ async function loadProductsFromConf() {
         };
     }).sort((a, b) => a.sort_order - b.sort_order || a.display_name.localeCompare(b.display_name))
       .filter(p => CATEGORY_IDS.has(p.category));
+    return uniqueProductsById(normalized, 'conf-products');
 }
 
 /**
@@ -608,14 +644,72 @@ function buildSplunkbaseLookupSPL(productList) {
     return `| inputlookup scan_splunkbase_apps where ${whereClause} | fields uid appid version_compatibility product_compatibility app_version title archive_status`;
 }
 
+function escapeRegexLiteral(value) {
+    return String(value || '').replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+}
+
+function sourcetypePatternToRegex(pattern) {
+    const escaped = escapeRegexLiteral(pattern).replace(/\\\*/g, '.*');
+    return new RegExp(`^${escaped}$`);
+}
+
+function sourcetypeMatchesPattern(sourcetype, pattern) {
+    if (!sourcetype || !pattern) return false;
+    if (!String(pattern).includes('*')) return sourcetype === pattern;
+    return sourcetypePatternToRegex(pattern).test(sourcetype);
+}
+
+function sourcetypeMatchesAnyPattern(sourcetype, patterns) {
+    return (patterns || []).some(pattern => sourcetypeMatchesPattern(sourcetype, pattern));
+}
+
+function catalogSourcetypeHasFlow(catalogSourcetype, sourcetypeInfo) {
+    const matchedCatalogSTs = sourcetypeInfo?.matchedCatalogSTs || [];
+    if (matchedCatalogSTs.includes(catalogSourcetype)) return true;
+    return (sourcetypeInfo?.matchedSTs || []).some(st => sourcetypeMatchesPattern(st, catalogSourcetype));
+}
+
 /**
- * Build the prefix-match patterns for a product's sourcetypes list.
- * Shared by detectAllSourcetypeData and buildSourcetypeSearchUrl.
+ * Build sourcetype patterns for data detection and search links.
+ * A catalog entry may be exact (cisco:dnac:client) or wildcarded
+ * (cisco:dnac:custom:*). Wildcards represent one catalog chip even
+ * when multiple concrete sourcetypes match behind it.
  */
 function buildSourcetypePatterns(sourcetypes) {
-    // Strict exact-match only — no prefix collapsing or wildcard rollup.
-    // Each sourcetype listed in products.conf is matched individually.
-    return [...new Set(sourcetypes)];
+    return [...new Set((sourcetypes || []).filter(Boolean))];
+}
+
+function buildSourcetypeMatchRegex(patterns) {
+    const alternates = buildSourcetypePatterns(patterns).map(pattern => (
+        escapeRegexLiteral(pattern).replace(/\\\*/g, '.*')
+    ));
+    return alternates.length > 0 ? `^(${alternates.join('|')})$` : null;
+}
+
+function buildSourcetypeMetadataSPL(sourcetypes) {
+    const pattern = buildSourcetypeMatchRegex(sourcetypes);
+    if (!pattern) return null;
+    const splPattern = pattern.replace(/\\/g, '\\\\').replace(/"/g, '\\"');
+    return `| metadata type=sourcetypes index=* | where match(sourcetype, "${splPattern}") | convert ctime(*Time) | table sourcetype recentTime firstTime lastTime totalCount | eventstats sum(totalCount) as GrandTotal | sort - totalCount`;
+}
+
+function buildAppSearchUrl(spl) {
+    const query = spl ? `?q=${encodeURIComponent(spl)}` : '';
+    return createURL(`/app/${APP_ID}/search${query}`);
+}
+
+function splString(value) {
+    return String(value || '').replace(/\\/g, '\\\\').replace(/"/g, '\\"');
+}
+
+function buildMagicEightSavedSearchSPL({ sourcetypes, addonApp, appViz, appViz2 }) {
+    const appArg = addonApp || appViz || appViz2 || '*';
+    const parts = [`| savedsearch "SCAN - Magic Eight Audit" scope="environment" app="${splString(appArg)}"`];
+    const stPattern = buildSourcetypeMatchRegex(sourcetypes);
+    if (stPattern) {
+        parts.push(`| where match(Sourcetype, "${splString(stPattern)}")`);
+    }
+    return parts.join(' ');
 }
 
 /**
@@ -630,89 +724,217 @@ function buildSourcetypePatterns(sourcetypes) {
  * Then matches each product's sourcetype patterns client-side.
  * This replaces the previous per-product approach (52 searches → 1).
  */
-async function detectAllSourcetypeData(products) {
+async function detectAllSourcetypeData(products, onDiagnostic = () => {}) {
     const noData = { hasData: false, eventCount: 0, detail: 'No sourcetypes defined' };
     const withST = products.filter(p => p.sourcetypes && p.sourcetypes.length > 0);
-    if (withST.length === 0) { /* console.log('[SCAN] Detection skipped — no products have sourcetypes'); */ return {}; }
+    const searchStr = '| metadata type=sourcetypes index=* | where lastTime > relative_time(now(), "-7d") | fields sourcetype totalCount';
+    const startedAtMs = Date.now();
+    const baseDiagnostic = {
+        status: 'running',
+        startedAt: new Date(startedAtMs).toISOString(),
+        completedAt: null,
+        durationMs: null,
+        endpoint: SEARCH_ENDPOINT,
+        search: searchStr,
+        csrfTokenAvailable: !!getCSRFToken(),
+        catalogProducts: products.length,
+        productsChecked: withST.length,
+        catalogSourcetypePatterns: new Set(withST.flatMap(p => p.sourcetypes || [])).size,
+        httpStatus: null,
+        metadataRows: null,
+        matchedSourcetypes: null,
+        detectedProducts: null,
+        splunkMessages: [],
+        message: 'Data detection search is running.',
+    };
+    const finishDiagnostic = (updates) => {
+        const completedAtMs = Date.now();
+        const diagnostic = {
+            ...baseDiagnostic,
+            ...updates,
+            completedAt: new Date(completedAtMs).toISOString(),
+            durationMs: completedAtMs - startedAtMs,
+        };
+        onDiagnostic(diagnostic);
+        return diagnostic;
+    };
+
+    // These messages intentionally remain visible outside developer mode so a
+    // customer can capture the search lifecycle without changing app settings.
+    // eslint-disable-next-line no-console
+    console.info(
+        `[SCAN][Data Detection] Starting for ${withST.length} product(s) `
+        + `and ${baseDiagnostic.catalogSourcetypePatterns} sourcetype pattern(s).`
+    );
+    // eslint-disable-next-line no-console
+    console.info(`[SCAN][Data Detection] SPL: ${searchStr}`);
+    onDiagnostic(baseDiagnostic);
+
+    if (withST.length === 0) {
+        const diagnostic = finishDiagnostic({
+            status: 'skipped',
+            metadataRows: 0,
+            matchedSourcetypes: 0,
+            detectedProducts: 0,
+            message: 'Detection skipped because no products define sourcetypes.',
+        });
+        // eslint-disable-next-line no-console
+        console.warn(`[SCAN][Data Detection] ${diagnostic.message}`);
+        return { results: {}, diagnostic };
+    }
     const csrf = getCSRFToken();
     if (!csrf) {
-        console.warn('[SCAN] Detection skipped — CSRF token unavailable');
-        const r = {};
-        withST.forEach(p => { r[p.product_id] = { hasData: false, eventCount: 0, detail: 'CSRF token unavailable' }; });
-        return r;
+        // Do not pre-emptively skip. Some Splunk proxies accept the authenticated
+        // session without a form key; if not, the HTTP response below now tells us
+        // exactly what failed.
+        // eslint-disable-next-line no-console
+        console.warn('[SCAN][Data Detection] CSRF token unavailable; attempting the search with the active session.');
     }
-    // console.log(`[SCAN] Starting sourcetype detection for ${withST.length} products with sourcetypes...`);
     try {
-        const searchStr = '| metadata type=sourcetypes index=* | where lastTime > relative_time(now(), "-7d") | fields sourcetype totalCount';
-        // console.log(`[SCAN] Search: ${searchStr}`);
         const res = await splunkFetch(SEARCH_ENDPOINT, {
             method: 'POST',
             headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
             body: `search=${encodeURIComponent(searchStr)}&output_mode=json&exec_mode=oneshot&count=0&timeout=120`,
         });
-        // console.log(`[SCAN] Response status: ${res.status} ${res.statusText}`);
         if (!res.ok) {
             const errText = await res.text();
-            console.error(`[SCAN] Search failed (HTTP ${res.status}):`, errText.substring(0, 500));
+            const diagnostic = finishDiagnostic({
+                status: 'error',
+                httpStatus: res.status,
+                metadataRows: 0,
+                matchedSourcetypes: 0,
+                detectedProducts: 0,
+                message: `Search failed (HTTP ${res.status} ${res.statusText || ''})`.trim(),
+                responsePreview: errText.substring(0, 500),
+            });
+            // eslint-disable-next-line no-console
+            console.error(`[SCAN][Data Detection] ${diagnostic.message}:`, diagnostic.responsePreview);
             const r = {};
             withST.forEach(p => { r[p.product_id] = { hasData: false, eventCount: 0, detail: `Search error (HTTP ${res.status})` }; });
-            return r;
+            return { results: r, diagnostic };
         }
         const rawText = await res.text();
         let data;
         try { data = JSON.parse(rawText); } catch (parseErr) {
-            console.error('[SCAN] Failed to parse JSON response:', rawText.substring(0, 500));
+            const diagnostic = finishDiagnostic({
+                status: 'error',
+                httpStatus: res.status,
+                metadataRows: 0,
+                matchedSourcetypes: 0,
+                detectedProducts: 0,
+                message: 'Search succeeded, but Splunk returned invalid JSON.',
+                responsePreview: rawText.substring(0, 500),
+            });
+            // eslint-disable-next-line no-console
+            console.error('[SCAN][Data Detection] Failed to parse JSON response:', diagnostic.responsePreview);
             const r = {};
             withST.forEach(p => { r[p.product_id] = { hasData: false, eventCount: 0, detail: 'Invalid response from Splunk' }; });
-            return r;
+            return { results: r, diagnostic };
         }
-        // console.log(`[SCAN] Response keys: ${Object.keys(data).join(', ')}`);
+        const splunkMessages = (data.messages || []).map(message => ({
+            type: message.type || 'INFO',
+            text: message.text || String(message),
+        }));
+        const splunkErrors = splunkMessages.filter(message => ['ERROR', 'FATAL'].includes(String(message.type).toUpperCase()));
+        if (splunkErrors.length > 0) {
+            const messageText = splunkErrors.map(message => message.text).join(' | ');
+            const diagnostic = finishDiagnostic({
+                status: 'error',
+                httpStatus: res.status,
+                metadataRows: 0,
+                matchedSourcetypes: 0,
+                detectedProducts: 0,
+                splunkMessages,
+                message: `Splunk reported a search error: ${messageText}`,
+            });
+            // eslint-disable-next-line no-console
+            console.error(`[SCAN][Data Detection] ${diagnostic.message}`);
+            const r = {};
+            withST.forEach(p => { r[p.product_id] = { hasData: false, eventCount: 0, detail: 'Splunk reported a search error' }; });
+            return { results: r, diagnostic };
+        }
         const rows = data.results || [];
-        // console.log(`[SCAN] Sourcetype metadata returned ${rows.length} active sourcetypes from Splunk`);
-        if (rows.length > 0) {
-            // console.log(`[SCAN] Sample row: ${JSON.stringify(rows[0])}`);
-        }
 
         // Build a quick lookup: sourcetype → totalCount
         const stMap = new Map();
-        rows.forEach(r => stMap.set(r.sourcetype, parseInt(r.totalCount, 10) || 0));
+        rows.forEach(r => {
+            if (r.sourcetype) {
+                stMap.set(r.sourcetype, parseInt(r.totalCount, 10) || 0);
+            }
+        });
 
         // Match each product's patterns against the result set
         const results = {};
         withST.forEach(p => {
             const patterns = buildSourcetypePatterns(p.sourcetypes);
-            let stCount = 0;
             let eventCount = 0;
             const matchedSTs = [];
+            const matchedCatalogSTs = [];
+
             stMap.forEach((count, st) => {
-                if (patterns.some(pat => st === pat)) {
-                    stCount++;
+                if (sourcetypeMatchesAnyPattern(st, patterns)) {
                     eventCount += count;
                     matchedSTs.push(st);
                 }
             });
-            if (stCount > 0) {
-                // console.log(`[SCAN] ${p.product_id}: ${stCount} sourcetype(s) matched — ${matchedSTs.join(', ')}`);
-            }
+
+            patterns.forEach(pattern => {
+                if (matchedSTs.some(st => sourcetypeMatchesPattern(st, pattern))) {
+                    matchedCatalogSTs.push(pattern);
+                }
+            });
+
+            const stCount = matchedCatalogSTs.length;
             const totalSTs = p.sourcetypes.length;
             results[p.product_id] = stCount > 0
-                ? { hasData: true, eventCount, matchedSTs, totalSourcetypes: totalSTs, detail: `${stCount} of ${totalSTs} sourcetype${totalSTs !== 1 ? 's' : ''} · ~${formatCount(eventCount)} events · last 7d` }
-                : { hasData: false, eventCount: 0, matchedSTs: [], totalSourcetypes: totalSTs, detail: 'No data in the last 7 days' };
+                ? { hasData: true, eventCount, matchedSTs, matchedCatalogSTs, totalSourcetypes: totalSTs, detail: `${stCount} of ${totalSTs} sourcetype${totalSTs !== 1 ? 's' : ''} · ~${formatCount(eventCount)} events · last 7d` }
+                : { hasData: false, eventCount: 0, matchedSTs: [], matchedCatalogSTs: [], totalSourcetypes: totalSTs, detail: 'No data in the last 7 days' };
         });
 
         const detected = Object.values(results).filter(r => r.hasData).length;
-        // console.log(`[SCAN] Detection complete: ${detected} product(s) with active data out of ${withST.length} checked`);
+        const matchedSourcetypes = new Set(
+            Object.values(results).flatMap(result => result.matchedSTs || [])
+        ).size;
+        const diagnostic = finishDiagnostic({
+            status: rows.length > 0 ? 'success' : 'empty',
+            httpStatus: res.status,
+            metadataRows: rows.length,
+            matchedSourcetypes,
+            detectedProducts: detected,
+            splunkMessages,
+            sampleSourcetypes: [...stMap.keys()].slice(0, 20),
+            message: rows.length > 0
+                ? `Search succeeded and returned ${rows.length} sourcetype metadata row(s); ${detected} product(s) matched.`
+                : 'Search succeeded but returned 0 sourcetype metadata rows.',
+        });
+        // eslint-disable-next-line no-console
+        console.info(
+            `[SCAN][Data Detection] ${diagnostic.message} `
+            + `Duration: ${diagnostic.durationMs} ms. HTTP ${diagnostic.httpStatus}.`
+        );
+        // eslint-disable-next-line no-console
+        console.info('[SCAN][Data Detection] Diagnostic snapshot:', diagnostic);
 
         // Fill in products that have no sourcetypes
         products.forEach(p => {
-            if (!results[p.product_id]) results[p.product_id] = noData;
+            if (!results[p.product_id]) {
+                results[p.product_id] = noData;
+            }
         });
-        return results;
+        return { results, diagnostic };
     } catch (e) {
-        console.error('[SCAN] Sourcetype detection failed:', e);
+        const diagnostic = finishDiagnostic({
+            status: 'error',
+            metadataRows: 0,
+            matchedSourcetypes: 0,
+            detectedProducts: 0,
+            message: `Sourcetype detection failed: ${e.message || String(e)}`,
+        });
+        // eslint-disable-next-line no-console
+        console.error('[SCAN][Data Detection] Sourcetype detection failed:', e);
         const r = {};
         withST.forEach(p => { r[p.product_id] = { hasData: false, eventCount: 0, detail: 'Could not query sourcetypes' }; });
-        return r;
+        return { results: r, diagnostic };
     }
 }
 
@@ -797,12 +1019,9 @@ async function detectIndexerTierApps() {
  */
 function buildSourcetypeSearchUrl(sourcetypes) {
     if (!sourcetypes || sourcetypes.length === 0) return null;
-    const filtered = buildSourcetypePatterns(sourcetypes);
-    // Anchor regex to exact-match each sourcetype (no substring/prefix matching)
-    const escaped = filtered.map(s => s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'));
-    const pattern = '^(' + escaped.join('|') + ')$';
-    const spl = `| metadata type=sourcetypes index=* | where match(sourcetype, "${pattern}") | convert ctime(*Time) | table sourcetype recentTime firstTime lastTime totalCount | eventstats sum(totalCount) as GrandTotal | sort - totalCount`;
-    return createURL(`/app/search/search?q=${encodeURIComponent(spl)}`);
+    const spl = buildSourcetypeMetadataSPL(sourcetypes);
+    if (!spl) return null;
+    return buildAppSearchUrl(spl);
 }
 
 /**
@@ -2303,21 +2522,24 @@ function MagicEightModal({ open, onClose, sourcetypes, productName, addonApp, ad
                                     </div>
                                 )}
                                 <div style={{ marginTop: '6px', textAlign: 'right' }}>
-                                    <a
-                                        href={`/app/search/search?q=${encodeURIComponent(
-                                            '| rest splunk_server=* /servicesNS/-/-/apps/local f=title f=version f=disabled count=0'
+                                    {(() => {
+                                        const auditSearchSpl = '| rest splunk_server=* /servicesNS/-/-/apps/local f=title f=version f=disabled count=0'
                                             + ` | search title IN (${tierRows.map(r => `"${r.id}"`).join(', ')})`
                                             + ' | join splunk_server [| rest splunk_server=* /services/server/info f=server_roles | where match(server_roles, "search_head|indexer") | fields splunk_server server_roles]'
                                             + ' | eval server_roles=mvjoin(server_roles, ", ")'
                                             + ' | fields splunk_server server_roles title version disabled'
-                                            + ' | sort server_roles title'
-                                        )}`}
-                                        target="_blank"
-                                        rel="noopener noreferrer"
-                                        style={{ fontSize: '11px', color: 'var(--text-link, #0066cc)', textDecoration: 'none' }}
-                                    >
-                                        Open in Search ↗
-                                    </a>
+                                            + ' | sort server_roles title';
+                                        return (
+                                            <a
+                                                href={buildAppSearchUrl(auditSearchSpl)}
+                                                target="_blank"
+                                                rel="noopener noreferrer"
+                                                style={{ fontSize: '11px', color: 'var(--text-link, #0066cc)', textDecoration: 'none' }}
+                                            >
+                                                Open in Search ↗
+                                            </a>
+                                        );
+                                    })()}
                                 </div>
                             </div>
                         );
@@ -2569,11 +2791,8 @@ function MagicEightModal({ open, onClose, sourcetypes, productName, addonApp, ad
                             appearance="secondary"
                             label="Open in Search"
                             onClick={() => {
-                                const stFilter = sourcetypes && sourcetypes.length > 0
-                                    ? sourcetypes.map(s => `"${s}"`).join(', ')
-                                    : null;
-                                const savedSearchSpl = `| savedsearch "SCAN - Magic Eight Audit" scope="environment"${stFilter ? ` | search Sourcetype IN (${stFilter})` : ''}`;
-                                window.open(createURL(`/app/${APP_ID}/search?q=${encodeURIComponent(savedSearchSpl)}`), '_blank');
+                                const savedSearchSpl = buildMagicEightSavedSearchSPL({ sourcetypes, addonApp, appViz, appViz2 });
+                                window.open(buildAppSearchUrl(savedSearchSpl), '_blank');
                             }}
                             style={{ marginRight: 'auto' }}
                         />
@@ -3852,17 +4071,16 @@ function ProductCard({ product, installedApps, appStatuses, indexerApps, sourcet
     const handleExploreData = () => {
         const sts = product.sourcetypes || [];
         if (sts.length > 0) {
-            const escaped = sts.map(s => s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'));
-            const pattern = '^(' + escaped.join('|') + ')$';
-            const spl = `| metadata type=sourcetypes index=* | where match(sourcetype, "${pattern}") | convert ctime(*Time) | table sourcetype recentTime firstTime lastTime totalCount | eventstats sum(totalCount) as GrandTotal | sort - totalCount`;
-            window.open(createURL(`/app/search/search?q=${encodeURIComponent(spl)}`), '_blank');
+            const spl = buildSourcetypeMetadataSPL(sts);
+            if (spl) window.open(buildAppSearchUrl(spl), '_blank');
+            else window.open(buildAppSearchUrl(), '_blank');
         } else {
-            window.open(createURL('/app/search/search'), '_blank');
+            window.open(buildAppSearchUrl(), '_blank');
         }
     };
 
     const handleCreateDashboard = () => {
-        window.open(createURL('/app/search/dashboards'), '_blank');
+        window.open(createURL(`/app/${APP_ID}/dashboards`), '_blank');
     };
 
     const handleSaveCustomDashboard = async () => {
@@ -3991,50 +4209,50 @@ function ProductCard({ product, installedApps, appStatuses, indexerApps, sourcet
                         <div className="csc-title-content">
                             <span className="csc-card-name">
                                 {display_name}
-                                {description && (
-                                    <InfoTooltip
-                                        placement="right"
-                                        width={420}
-                                        delay={300}
-                                        persistent
-                                        title={display_name}
-                                        content={
-                                            <div>
-                                                <div className="csc-info-popover-section">
-                                                    <div className="csc-info-popover-label">Description</div>
-                                                    <div className="csc-info-popover-text">{renderFormattedText(description)}</div>
-                                                </div>
-                                                {value_proposition && (
-                                                    <div className="csc-info-popover-section csc-info-popover-value">
-                                                        <div className="csc-info-popover-label">Value</div>
-                                                        <div className="csc-info-popover-text">{renderFormattedText(value_proposition)}</div>
-                                                    </div>
-                                                )}
-                                                {support_level && (
-                                                    <div className="csc-info-popover-section">
-                                                        <div className="csc-info-popover-label">Support</div>
-                                                        <div className="csc-info-popover-text">
-                                                            {support_level === 'cisco_supported' && 'Cisco Supported'}
-                                                            {support_level === 'splunk_supported' && 'Splunk Supported'}
-                                                            {support_level === 'developer_supported' && 'Developer Supported'}
-                                                            {support_level === 'community_supported' && 'Community Supported'}
-                                                            {support_level === 'not_supported' && 'Not Supported'}
-                                                        </div>
-                                                    </div>
-                                                )}
-                                                {product.aliases && product.aliases.length > 0 && (
-                                                    <div className="csc-info-popover-section csc-info-popover-aliases">
-                                                        <div className="csc-info-popover-label">Former Names</div>
-                                                        <div className="csc-info-popover-text">{product.aliases.join(', ')}</div>
-                                                    </div>
-                                                )}
-                                            </div>
-                                        }
-                                    >
-                                        <span className="csc-info-trigger" title="Hover for product details"><InfoCircle size={15} /></span>
-                                    </InfoTooltip>
-                                )}
                             </span>
+                            {description && (
+                                <InfoTooltip
+                                    placement="right"
+                                    width={420}
+                                    delay={300}
+                                    persistent
+                                    title={display_name}
+                                    content={
+                                        <div>
+                                            <div className="csc-info-popover-section">
+                                                <div className="csc-info-popover-label">Description</div>
+                                                <div className="csc-info-popover-text">{renderFormattedText(description)}</div>
+                                            </div>
+                                            {value_proposition && (
+                                                <div className="csc-info-popover-section csc-info-popover-value">
+                                                    <div className="csc-info-popover-label">Value</div>
+                                                    <div className="csc-info-popover-text">{renderFormattedText(value_proposition)}</div>
+                                                </div>
+                                            )}
+                                            {support_level && (
+                                                <div className="csc-info-popover-section">
+                                                    <div className="csc-info-popover-label">Support</div>
+                                                    <div className="csc-info-popover-text">
+                                                        {support_level === 'cisco_supported' && 'Cisco Supported'}
+                                                        {support_level === 'splunk_supported' && 'Splunk Supported'}
+                                                        {support_level === 'developer_supported' && 'Developer Supported'}
+                                                        {support_level === 'community_supported' && 'Community Supported'}
+                                                        {support_level === 'not_supported' && 'Not Supported'}
+                                                    </div>
+                                                </div>
+                                            )}
+                                            {product.aliases && product.aliases.length > 0 && (
+                                                <div className="csc-info-popover-section csc-info-popover-aliases">
+                                                    <div className="csc-info-popover-label">Former Names</div>
+                                                    <div className="csc-info-popover-text">{product.aliases.join(', ')}</div>
+                                                </div>
+                                            )}
+                                        </div>
+                                    }
+                                >
+                                    <span className="csc-info-trigger" title="Hover for product details"><InfoCircle size={15} /></span>
+                                </InfoTooltip>
+                            )}
                         </div>
                         <div className="csc-header-badges">
                             {sc4s_supported && (
@@ -4477,7 +4695,7 @@ function ProductCard({ product, installedApps, appStatuses, indexerApps, sourcet
                                             {product.sourcetypes.map(st => {
                                                 const peers = sharedSourcetypeMap && sharedSourcetypeMap[st];
                                                 const isShared = peers && peers.length > 1;
-                                                const hasFlow = sourcetypeInfo?.matchedSTs?.includes(st);
+                                                const hasFlow = catalogSourcetypeHasFlow(st, sourcetypeInfo);
                                                 return (
                                                     <span
                                                         key={st}
@@ -5498,6 +5716,139 @@ function ConfigViewerModal({ open, onClose, products, initialProductId, installe
     );
 }
 
+// ─────────────────  DATA DETECTION DIAGNOSTICS MODAL  ─────────────────
+
+/* eslint-disable react/prop-types */
+function DataDetectionDiagnosticsModal({ open, onClose, diagnostic, onRerun }) {
+    const returnFocusRef = useRef(null);
+    const [copied, setCopied] = useState(false);
+
+    useEffect(() => {
+        if (!open) {
+            setCopied(false);
+        }
+    }, [open]);
+
+    if (!open) {
+        return null;
+    }
+
+    const status = diagnostic?.status || 'not-run';
+    const statusLabels = {
+        running: 'Running',
+        success: 'Succeeded',
+        empty: 'Succeeded — no rows',
+        error: 'Failed',
+        skipped: 'Skipped',
+        'not-run': 'Not run yet',
+    };
+    let csrfStatus = '—';
+    if (diagnostic) {
+        csrfStatus = diagnostic.csrfTokenAvailable ? 'Available' : 'Unavailable';
+    }
+    const markCopied = () => {
+        setCopied(true);
+        setTimeout(() => setCopied(false), 2000);
+    };
+    const fallbackCopy = (text) => {
+        const textarea = document.createElement('textarea');
+        textarea.value = text;
+        textarea.style.position = 'fixed';
+        textarea.style.left = '-9999px';
+        document.body.appendChild(textarea);
+        textarea.select();
+        try {
+            document.execCommand('copy');
+            markCopied();
+        } catch (_e) { /* copy is a convenience action */ }
+        document.body.removeChild(textarea);
+    };
+    const copyDiagnostic = () => {
+        const text = JSON.stringify(diagnostic || { status: 'not-run' }, null, 2);
+        if (navigator.clipboard?.writeText && window.isSecureContext) {
+            navigator.clipboard.writeText(text).then(markCopied).catch(() => fallbackCopy(text));
+        } else {
+            fallbackCopy(text);
+        }
+    };
+    const diagnosticRows = [
+        ['Status', statusLabels[status] || status],
+        ['Started', diagnostic?.startedAt || '—'],
+        ['Duration', diagnostic?.durationMs != null ? `${diagnostic.durationMs} ms` : '—'],
+        ['HTTP', diagnostic?.httpStatus != null ? diagnostic.httpStatus : '—'],
+        ['CSRF token', csrfStatus],
+        ['Products checked', diagnostic?.productsChecked ?? '—'],
+        ['Catalog patterns', diagnostic?.catalogSourcetypePatterns ?? '—'],
+        ['Metadata rows', diagnostic?.metadataRows ?? '—'],
+        ['Matched sourcetypes', diagnostic?.matchedSourcetypes ?? '—'],
+        ['Detected products', diagnostic?.detectedProducts ?? '—'],
+    ];
+
+    return (
+        <Modal open returnFocus={returnFocusRef} onRequestClose={onClose} style={{ maxWidth: '820px', width: '94vw' }}>
+            <Modal.Header title="Data Detection Diagnostics — Developer Mode" />
+            <Modal.Body>
+                <div className={`scan-detection-status scan-detection-status-${status}`}>
+                    <strong>{statusLabels[status] || status}</strong>
+                    <span>{diagnostic?.message || 'The data detection search has not run yet.'}</span>
+                </div>
+                <div className="scan-detection-grid">
+                    {diagnosticRows.map(([label, value]) => (
+                        <React.Fragment key={label}>
+                            <span className="scan-detection-label">{label}</span>
+                            <span className="scan-detection-value">{String(value)}</span>
+                        </React.Fragment>
+                    ))}
+                </div>
+                <div className="scan-detection-block">
+                    <div className="scan-detection-block-title">Search that ran</div>
+                    <pre>{diagnostic?.search || '—'}</pre>
+                </div>
+                {diagnostic?.splunkMessages?.length > 0 && (
+                    <div className="scan-detection-block">
+                        <div className="scan-detection-block-title">Messages from Splunk</div>
+                        <pre>{diagnostic.splunkMessages.map(message => `[${message.type}] ${message.text}`).join('\n')}</pre>
+                    </div>
+                )}
+                {diagnostic?.responsePreview && (
+                    <div className="scan-detection-block">
+                        <div className="scan-detection-block-title">Response preview</div>
+                        <pre>{diagnostic.responsePreview}</pre>
+                    </div>
+                )}
+                {diagnostic?.sampleSourcetypes?.length > 0 && (
+                    <div className="scan-detection-block">
+                        <div className="scan-detection-block-title">Sample returned sourcetypes (up to 20)</div>
+                        <pre>{diagnostic.sampleSourcetypes.join('\n')}</pre>
+                    </div>
+                )}
+                <p className="scan-detection-console-hint">
+                    The same snapshot is available in the browser console as
+                    {' '}
+                    <code>window.scanDiagnostics.dataDetection</code>
+                    .
+                </p>
+            </Modal.Body>
+            <Modal.Footer>
+                {diagnostic?.search && (
+                    <a
+                        className="csc-btn csc-btn-outline scan-detection-search-link"
+                        href={buildAppSearchUrl(diagnostic.search)}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                    >
+                        Open SPL in Search
+                    </a>
+                )}
+                <Button appearance="secondary" label={copied ? 'Copied!' : 'Copy Diagnostic'} onClick={copyDiagnostic} />
+                <Button appearance="primary" label={status === 'running' ? 'Running…' : 'Run Again'} onClick={onRerun} disabled={status === 'running'} />
+                <Button appearance="secondary" label="Close" onClick={onClose} />
+            </Modal.Footer>
+        </Modal>
+    );
+}
+/* eslint-enable react/prop-types */
+
 // ─────────────────  TECH STACK MODAL  ─────────────────
 
 /**
@@ -6232,7 +6583,7 @@ function UniversalFinderBar({ onSearch, resultCount, totalCount, products, exter
                 <input
                     type="text"
                     className="products-search-input"
-                    placeholder='Search: "Firewall", "Duo", "XDR", "ISE", "SD-WAN"…'
+                    placeholder="Search products..."
                     value={query}
                     onChange={handleChange}
                     onKeyDown={handleKeyDown}
@@ -7140,25 +7491,10 @@ function CategoryFilterBar({
             style: { width: '18px', height: '18px', filter: active ? (isDark ? 'brightness(0.15)' : 'brightness(0) invert(1)') : 'none', transition: 'filter 0.2s' },
         });
     };
-    const btnStyle = (active) => {
-        if (isDark) {
-            return {
-                display: 'flex', alignItems: 'center', gap: '6px', whiteSpace: 'nowrap',
-                padding: '7px 14px', borderRadius: '9999px', border: '1px solid',
-                borderColor: active ? '#0A60FF' : 'rgba(10, 96, 255, 0.3)',
-                background: active ? '#0A60FF' : '#1e262c',
-                color: active ? '#ffffff' : '#d4d4d4',
-                boxShadow: 'none',
-                cursor: 'pointer', fontWeight: 600, fontSize: '13px',
-                transition: 'all 0.2s', flexShrink: 0,
-            };
-        }
+    const btnStyle = () => {
         return {
             display: 'flex', alignItems: 'center', gap: '6px', whiteSpace: 'nowrap',
             padding: '7px 14px', borderRadius: '9999px', border: '1px solid',
-            borderColor: active ? '#342f2c' : '#e3ddd8',
-            background: active ? '#342f2c' : '#FFFFFF',
-            color: active ? '#fff' : 'var(--page-color, #333)',
             boxShadow: 'none',
             cursor: 'pointer', fontWeight: 600, fontSize: '13px',
             transition: 'all 0.2s', flexShrink: 0,
@@ -7170,14 +7506,15 @@ function CategoryFilterBar({
     const totalCount = categoryCounts ? Object.keys(categoryCounts).reduce((sum, k) => (CROSS_CUT_IDS.includes(k)) ? sum : sum + categoryCounts[k], 0) : null;
 
     return (<>
-        <div style={{ display: 'flex', gap: '8px', overflowX: 'auto', paddingBottom: '4px', scrollBehavior: 'smooth', alignItems: 'center' }}>
-            <button onClick={() => onSelectCategory(null)} style={btnStyle(!selectedCategory)}>
+        <div className="csc-category-bar" style={{ display: 'flex', gap: '8px', overflowX: 'auto', paddingBottom: '4px', scrollBehavior: 'smooth', alignItems: 'center' }}>
+            <button
+                onClick={() => onSelectCategory(null)}
+                className={`csc-category-pill ${!selectedCategory ? 'csc-category-pill-active' : ''}`}
+                style={btnStyle(!selectedCategory)}
+            >
                 All
                 {totalCount != null && (
-                    <span style={isDark
-                        ? { fontSize: '10px', background: !selectedCategory ? 'rgba(255,255,255,0.22)' : 'rgba(255,255,255,0.15)', color: !selectedCategory ? '#ffffff' : '#d4d4d4', padding: '1px 6px', borderRadius: '10px' }
-                        : { fontSize: '10px', background: !selectedCategory ? '#5a5450' : 'var(--version-bg, #e8e8e8)', color: !selectedCategory ? '#fff' : undefined, padding: '1px 6px', borderRadius: '10px' }
-                    }>
+                    <span className="csc-category-count">
                         {totalCount}
                     </span>
                 )}
@@ -7185,13 +7522,16 @@ function CategoryFilterBar({
             {CATEGORIES.map((cat) => {
                 const active = selectedCategory === cat.id;
                 return (
-                    <button key={cat.id} onClick={() => onSelectCategory(cat.id)} title={cat.description} style={btnStyle(active)}>
+                    <button
+                        key={cat.id}
+                        onClick={() => onSelectCategory(cat.id)}
+                        title={cat.description}
+                        className={`csc-category-pill ${active ? 'csc-category-pill-active' : ''}`}
+                        style={btnStyle(active)}
+                    >
                         {cat.name}
                         {categoryCounts?.[cat.id] != null && (
-                            <span style={isDark
-                                ? { fontSize: '10px', background: active ? 'rgba(255,255,255,0.22)' : 'rgba(255,255,255,0.15)', color: active ? '#ffffff' : '#d4d4d4', padding: '1px 6px', borderRadius: '10px' }
-                                : { fontSize: '10px', background: active ? '#5a5450' : 'var(--version-bg, #e8e8e8)', color: active ? '#fff' : undefined, padding: '1px 6px', borderRadius: '10px' }
-                            }>
+                            <span className="csc-category-count">
                                 {categoryCounts[cat.id]}
                             </span>
                         )}
@@ -7199,7 +7539,7 @@ function CategoryFilterBar({
                 );
             })}
             {/* ── Filters drawer trigger ── */}
-            <span style={{ width: '2px', height: '28px', background: 'var(--pill-divider, #b0b0b0)', flexShrink: 0, margin: '0 4px', borderRadius: '1px' }} />
+            <span className="csc-category-divider" style={{ width: '2px', height: '28px', background: 'var(--pill-divider, #b0b0b0)', flexShrink: 0, margin: '0 4px', borderRadius: '1px' }} />
             <button
                 className={`scan-filter-trigger ${activeFilterCount > 0 ? 'scan-filter-trigger-active' : ''}`}
                 onClick={onOpenFilterDrawer}
@@ -7259,8 +7599,14 @@ function CategoryFilterBar({
 // Each card shows support (Cisco/Splunk), links, and actions (configure, best practices, etc.).
 
 function SCANProductsPage() {
-    const [products, setProducts] = useState(PRODUCT_CATALOG.filter(p => CATEGORY_IDS.has(p.category) && !p.catalog_disabled));
-    const [vaultProducts, setVaultProducts] = useState(PRODUCT_CATALOG.filter(p => CATEGORY_IDS.has(p.category) && p.catalog_disabled));
+    const [products, setProducts] = useState(() => uniqueProductsById(
+        PRODUCT_CATALOG.filter(p => CATEGORY_IDS.has(p.category) && !p.catalog_disabled),
+        'built-in catalog'
+    ));
+    const [vaultProducts, setVaultProducts] = useState(() => uniqueProductsById(
+        PRODUCT_CATALOG.filter(p => CATEGORY_IDS.has(p.category) && p.catalog_disabled),
+        'built-in vault'
+    ));
     const [customProducts, setCustomProducts] = useState([]);
     const [showVault, setShowVault] = useState(false);
     const [customFormOpen, setCustomFormOpen] = useState(false);
@@ -7271,6 +7617,9 @@ function SCANProductsPage() {
     const [installedApps, setInstalledApps] = useState({});
     const [appStatuses, setAppStatuses] = useState({});
     const [sourcetypeData, setSourcetypeData] = useState({});
+    const [detectionDiagnostic, setDetectionDiagnostic] = useState(null);
+    const [detectionDiagnosticsOpen, setDetectionDiagnosticsOpen] = useState(false);
+    const [detectionRunToken, setDetectionRunToken] = useState(0);
     const [indexerApps, setIndexerApps] = useState(null);        // null (not loaded) | {} (no peers) | { appid: { version, disabled, indexerCount } }
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
@@ -7807,13 +8156,35 @@ function SCANProductsPage() {
 
     // ── Sourcetype detection — single batched metadata search for all products ──
     useEffect(() => {
-        if (loading || products.length === 0) return;
+        if (loading || products.length === 0) {
+            return undefined;
+        }
+        let cancelled = false;
+        const updateDiagnostic = (diagnostic) => {
+            if (cancelled) {
+                return;
+            }
+            setDetectionDiagnostic(diagnostic);
+            try {
+                window.scanDiagnostics = {
+                    ...(window.scanDiagnostics || {}),
+                    dataDetection: diagnostic,
+                };
+            } catch (_e) { /* diagnostic convenience only */ }
+        };
         const detect = async () => {
-            const results = await detectAllSourcetypeData(products);
-            setSourcetypeData((prev) => ({ ...prev, ...results }));
+            const { results } = await detectAllSourcetypeData(products, updateDiagnostic);
+            if (!cancelled) {
+                setSourcetypeData(results);
+            }
         };
         detect();
-    }, [products, loading]);
+        return () => { cancelled = true; };
+    }, [products, loading, detectionRunToken]);
+
+    const handleRerunDetection = useCallback(() => {
+        setDetectionRunToken(token => token + 1);
+    }, []);
 
     // ── Indexer tier detection — unified across all platforms ──
     // Runs on Enterprise standalone, distributed, AND Splunk Cloud.
@@ -8325,6 +8696,15 @@ function SCANProductsPage() {
         return counts;
     }, [portfolioProducts, searchQuery, platformFilter, versionFilter, splunkbaseData, selectedAddon, appidToUidMap]);
 
+    const detectionStatus = detectionDiagnostic?.status || 'not-run';
+    const detectionStatusMark = {
+        running: '…',
+        success: '✓',
+        empty: '0',
+        error: '!',
+    }[detectionStatus] || '';
+    const detectionButtonLabel = ['Data Check', detectionStatusMark].filter(Boolean).join(' ');
+
     // ── Render ──
     if (loading) {
         return (
@@ -8361,8 +8741,8 @@ function SCANProductsPage() {
                 <div className="header-left">
                     <h1 className="page-title">
                         <span className="scan-logo-mark">SCAN</span>
-                        <span className="scan-logo-full">Splunk Cisco App Navigator</span>
                     </h1>
+                    <span className="scan-logo-full">Splunk Cisco App Navigator</span>
                     <p className="products-page-subtitle">
                         The Front Door to the Cisco-Splunk Ecosystem
                     </p>
@@ -8404,6 +8784,9 @@ function SCANProductsPage() {
                         onClick={handlePortfolioToggle}
                         title={showFullPortfolio ? 'Showing all products — click to show supported only' : 'Showing supported products only — click to show all'}
                     >
+                        <span className="scan-util-portfolio-switch" aria-hidden="true">
+                            <span className="scan-util-portfolio-knob" />
+                        </span>
                         <span className="scan-util-portfolio-label">
                             {showFullPortfolio ? 'All Products' : 'Supported Only'}
                         </span>
@@ -8442,9 +8825,10 @@ function SCANProductsPage() {
                         className="scan-util-pill scan-util-theme"
                         onClick={handleThemeCycle}
                         title={`Theme: ${themeOverride === 'auto' ? 'Auto (Splunk)' : themeOverride === 'light' ? 'Light' : 'Dark'} — click to cycle`}
+                        aria-label={`Theme: ${themeOverride === 'auto' ? 'Auto (Splunk)' : themeOverride === 'light' ? 'Light' : 'Dark'}`}
                     >
                         <span className="scan-util-theme-label">
-                            {themeOverride === 'auto' ? '◐' : themeOverride === 'light' ? '☀' : '☾'}
+                            {React.createElement(themeOverride === 'auto' ? PaletteIcon : themeOverride === 'light' ? SunIcon : MoonIcon, { size: 14, 'aria-hidden': true })}
                         </span>
                     </button>
                     <InfoTooltip
@@ -8554,6 +8938,14 @@ function SCANProductsPage() {
                         >
                             Update
                         </button>
+                            <button
+                                type="button"
+                                className={`scan-util-pill scan-util-devmode scan-util-detection scan-util-detection-${detectionStatus}`}
+                                onClick={() => setDetectionDiagnosticsOpen(true)}
+                                title={detectionDiagnostic?.message || 'Open data detection diagnostics'}
+                            >
+                                {detectionButtonLabel}
+                            </button>
                         <button
                             className="scan-util-pill scan-util-devmode"
                             onClick={() => handleOpenConfigViewer(null)}
@@ -8584,14 +8976,15 @@ function SCANProductsPage() {
                 </Message>
             )}
 
-            <UniversalFinderBar
-                onSearch={handleSearchInput}
-                resultCount={filteredProducts.length}
-                totalCount={portfolioProducts.length}
-                products={portfolioProducts}
-                externalQuery={searchBarQuery}
-            />
-            <div style={{ marginBottom: '20px' }}>
+            <div className="scan-top-filter-row">
+                <UniversalFinderBar
+                    onSearch={handleSearchInput}
+                    resultCount={filteredProducts.length}
+                    totalCount={portfolioProducts.length}
+                    products={portfolioProducts}
+                    externalQuery={searchBarQuery}
+                />
+                <div className="scan-category-panel">
                 <CategoryFilterBar
                     selectedCategory={selectedCategory}
                     onSelectCategory={(cat) => {
@@ -8641,6 +9034,7 @@ function SCANProductsPage() {
                     showVault={showVault}
                     onToggleShowVault={setShowVault}
                 />
+                </div>
             </div>
 
             <FilterDrawer
@@ -9006,9 +9400,11 @@ function SCANProductsPage() {
             {/* Section 1: Configured */}
             <div id="configured_products">
             <CollapsiblePanel title={renderSectionTitle('Configured Products', configuredProducts.length, configuredProducts)} open={effectivePanelOpen.configured_products} onChange={handlePanelToggle} panelId="configured_products">
-                {configuredProducts.length > 0 && (
+                {configuredProducts.length > 0 ? (
+                    <>
                     <div className="csc-section-toolbar">
                         <button
+                            ref={removeAllReturnRef}
                             className="csc-btn csc-btn-remove-all"
                             onClick={() => setRemoveAllModalOpen(true)}
                             title="Remove all products from your configured list"
@@ -9016,8 +9412,6 @@ function SCANProductsPage() {
                             Remove All
                         </button>
                     </div>
-                )}
-                {configuredProducts.length > 0 ? (
                     <div className="csc-card-grid">
                         {configuredProducts.map((p) => (
                             <div key={p.product_id} style={{ position: 'relative' }}>
@@ -9040,6 +9434,7 @@ function SCANProductsPage() {
                             </div>
                         ))}
                     </div>
+                    </>
                 ) : (
                     <div className="empty-section">
                         No products configured yet. Browse the catalog below and click <strong>Add to My Products</strong> to get started.
@@ -9378,6 +9773,14 @@ function SCANProductsPage() {
                 <TechStackModal
                     open={techStackOpen}
                     onClose={() => setTechStackOpen(false)}
+                />
+            )}
+            {devMode && (
+                <DataDetectionDiagnosticsModal
+                    open={detectionDiagnosticsOpen}
+                    onClose={() => setDetectionDiagnosticsOpen(false)}
+                    diagnostic={detectionDiagnostic}
+                    onRerun={handleRerunDetection}
                 />
             )}
             <PersonaModal

@@ -8,10 +8,18 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 PKG_ROOT="${SCRIPT_DIR}/.."
 DIST_DIR="${PKG_ROOT}/../../dist"
 APP_NAME="splunk-cisco-app-navigator"
+VERSION_FILE="${PKG_ROOT}/../../VERSION"
 
-# Read version from app.conf
-APP_CONF="${PKG_ROOT}/src/main/resources/splunk/default/app.conf"
-VERSION=$(grep -E '^\s*version\s*=' "$APP_CONF" | head -1 | sed 's/.*=\s*//' | xargs)
+# Read version from repo-root VERSION
+if [[ ! -f "$VERSION_FILE" ]]; then
+  echo "ERROR: VERSION file not found: ${VERSION_FILE}" >&2
+  exit 1
+fi
+VERSION=$(tr -d '[:space:]' < "$VERSION_FILE")
+if [[ -z "$VERSION" ]]; then
+  echo "ERROR: VERSION file is empty: ${VERSION_FILE}" >&2
+  exit 1
+fi
 PKG_PATH="${DIST_DIR}/${APP_NAME}-${VERSION}.tar.gz"
 
 # ── Pre-flight: validate products.conf for duplicate keys ──
