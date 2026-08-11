@@ -1,0 +1,22 @@
+<?xml version="1.0"?>
+<!--
+    Full in-app user guide for Splunk Cisco App Navigator.
+
+    Simple XML provides the Splunk shell. user_guide_bootstrap.js loads the
+    webpack bundle, which mounts into #scan-root. Keep version="1.1" for
+    Splunk 9.x custom-JavaScript dashboard support.
+-->
+<dashboard version="1.1" hideEdit="true" hideExport="true" hideTitle="true"
+           stylesheet="user_guide.css" script="user_guide_bootstrap.js">
+    <label>User Guide</label>
+    <description>Discover, deploy, operate, and troubleshoot Cisco integrations with Splunk Cisco App Navigator.</description>
+    <row>
+        <panel>
+            <html>
+                <div id="scan-root">
+                    <div class="scan-guide-loading">Loading User Guide…</div>
+                </div>
+            </html>
+        </panel>
+    </row>
+</dashboard>
