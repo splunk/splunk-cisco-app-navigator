@@ -6,6 +6,9 @@ Unreleased
 ### Catalog Fixes
 * **Cisco Catalyst sourcetype alignment** — Added current and legacy Catalyst Center, SD-WAN, ISE, and Cyber Vision sourcetypes from the revised Cisco Catalyst TA sourcetype catalog, including stable custom/API, report, policy, firewall/access, realtime, and historical compatibility names.
 
+### Documentation
+* **In-app User Guide** — Added a searchable, responsive React guide with task-based setup, catalog, deployment, operations, Splunk Cloud, troubleshooting, and configuration guidance; light/dark themes; print-to-PDF support; live build metadata; and a dedicated notebook icon in the app navigation rail that replaces the duplicate toolbar guide modal.
+
 1.0.27 — May 9, 2026
 -------
 

@@ -22,16 +22,23 @@ Object.entries(allDeps).forEach(([name, range]) => {
 // Read build hash from app.conf (stamped by build.js before webpack runs)
 const fs = require('fs');
 const appConfPath = path.join(__dirname, 'src/main/resources/splunk/default/app.conf');
+const versionPath = path.join(__dirname, '..', '..', 'VERSION');
 let buildHash = '';
+let appVersion = pkg.version;
 try {
   const appConf = fs.readFileSync(appConfPath, 'utf8');
   const m = appConf.match(/^build\s*=\s*(\S+)/m);
   if (m) buildHash = m[1].trim();
 } catch { /* ok */ }
+try {
+  const version = fs.readFileSync(versionPath, 'utf8').trim();
+  if (version) appVersion = version;
+} catch { /* ok */ }
 
 const commonConfig = webpackMerge(baseConfig, {
   entry: {
     products: path.join(__dirname, 'src/main/webapp/pages/products/render.jsx'),
+    user_guide: path.join(__dirname, 'src/main/webapp/pages/user_guide/render.jsx'),
   },
   output: {
     path: path.join(__dirname, 'stage', 'appserver', 'static', 'pages'),
@@ -61,6 +68,7 @@ const commonConfig = webpackMerge(baseConfig, {
     new webpack.DefinePlugin({
       SCAN_DEPENDENCY_VERSIONS: JSON.stringify(depVersions),
       SCAN_BUILD_HASH: JSON.stringify(buildHash),
+      SCAN_APP_VERSION: JSON.stringify(appVersion),
     }),
     new CopyPlugin({
       patterns: [

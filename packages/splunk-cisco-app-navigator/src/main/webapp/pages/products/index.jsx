@@ -7634,12 +7634,10 @@ function SCANProductsPage() {
     const [feedbackOpen, setFeedbackOpen] = useState(false);
     const [removeAllModalOpen, setRemoveAllModalOpen] = useState(false);
     const removeAllReturnRef = useRef(null);
-    const [cardLegendOpen, setCardLegendOpen] = useState(false);
     const [issuesPanelOpen, setIssuesPanelOpen] = useState(false);
     const [welcomeDismissed, setWelcomeDismissed] = useState(() => {
         try { return localStorage.getItem('scan_welcome_dismissed') === '1'; } catch (_e) { return false; }
     });
-    const guideReturnRef = useRef(null);
     const [appVersion, setAppVersion] = useState('');
     const [appBuild, setAppBuild] = useState(() =>
         typeof SCAN_BUILD_HASH !== 'undefined' ? SCAN_BUILD_HASH : ''
@@ -8876,14 +8874,6 @@ function SCANProductsPage() {
                         {allPanelsCollapsed ? 'Expand All' : 'Collapse All'}
                     </button>
                     <button
-                        className="scan-util-pill"
-                        ref={guideReturnRef}
-                        onClick={() => setCardLegendOpen(true)}
-                        title="How to use Splunk Cisco App Navigator"
-                    >
-                        Guide
-                    </button>
-                    <button
                         className="scan-util-pill scan-util-persona"
                         onClick={() => setPersonaModalOpen(true)}
                         title="Quick Start — Choose or change your role"
@@ -9790,83 +9780,6 @@ function SCANProductsPage() {
                 products={products}
             />
             <FeedbackModal open={feedbackOpen} onClose={() => setFeedbackOpen(false)} platformType={effectivePlatformType} appVersion={appVersion} />
-
-            {/* Usage Guide Modal */}
-            {cardLegendOpen && (
-                <Modal open returnFocus={guideReturnRef} onRequestClose={() => setCardLegendOpen(false)} style={{ maxWidth: '680px', width: '92vw' }}>
-                    <Modal.Header title="How to Use SCAN" />
-                    <Modal.Body>
-                        <div className="csc-sc4s-info scan-guide" style={{ fontSize: '14px', lineHeight: '1.7', color: 'var(--page-color, #333)' }}>
-
-                            {/* Quick-start cheat sheet — always visible */}
-                            <div className="scan-guide-quick">
-                                <div className="scan-guide-quick-row"><span className="scan-guide-key">Category tabs</span><span className="scan-guide-val">Filter by Security, Networking, etc.</span></div>
-                                <div className="scan-guide-quick-row"><span className="scan-guide-key">Subcategory pills</span><span className="scan-guide-val">Narrow within a category</span></div>
-                                <div className="scan-guide-quick-row"><span className="scan-guide-key">Search bar</span><span className="scan-guide-val">Matches names, keywords, aliases, sourcetypes</span></div>
-                                <div className="scan-guide-quick-row"><span className="scan-guide-key">+ Details</span><span className="scan-guide-val">Expand deployment guide with tier chips</span></div>
-                                <div className="scan-guide-quick-row"><span className="scan-guide-key">Filters sidebar</span><span className="scan-guide-val">Platform, Version, SC4S, NetFlow, support level</span></div>
-                                <div className="scan-guide-quick-row"><span className="scan-guide-key">Add to My Products</span><span className="scan-guide-val">Pin cards to the Configured section</span></div>
-                            </div>
-
-                            {/* Expandable details */}
-                            <details className="scan-guide-section">
-                                <summary className="scan-guide-summary">Product Cards</summary>
-                                <ul className="scan-guide-list">
-                                    <li>Intelligence badges show <strong>install status</strong>, <strong>updates</strong>, <strong>data flowing</strong> (7d), and <strong>legacy apps</strong>.</li>
-                                    <li>Header badges (<span className="csc-badge-btn csc-badge-sc4s" style={{ fontSize: '12px', padding: '3px 8px' }}>SC4S</span> <span className="csc-badge-btn csc-badge-netflow" style={{ fontSize: '12px', padding: '3px 8px' }}>NetFlow</span> <span className="csc-badge-btn csc-badge-soar" style={{ fontSize: '12px', padding: '3px 8px' }}>SOAR</span> <span className="csc-badge-btn csc-badge-itops" style={{ fontSize: '12px', padding: '3px 8px' }}><PulseIcon size="0.85em" style={{ verticalAlign: '-0.1em', marginRight: '3px' }} />ITOps</span> <span className="csc-badge-btn csc-badge-secops" style={{ fontSize: '12px', padding: '3px 8px' }}><ShieldIcon size="0.85em" style={{ verticalAlign: '-0.1em', marginRight: '3px' }} />SecOps</span> <span className="csc-badge-btn csc-badge-alert" style={{ fontSize: '12px', padding: '3px 8px' }}>Alert Actions</span>) open info panels.</li>
-                                    <li>Hover <strong>ⓘ</strong> for description, value proposition, and former names.</li>
-                                </ul>
-                            </details>
-
-                            <details className="scan-guide-section">
-                                <summary className="scan-guide-summary">Deployment Details</summary>
-                                <ul className="scan-guide-list">
-                                    <li>Tier chips: <strong>Search Head</strong>, <strong>Indexers</strong> (✓ deployed, ≠ mismatch, ✗ missing, ⊘ disabled), <strong>Heavy Forwarder</strong>.</li>
-                                    <li>Each component links to <strong>Splunkbase</strong>, <strong>Docs</strong>, and <strong>Troubleshoot</strong>.</li>
-                                    <li><strong>SC4S</strong> and <strong>NetFlow</strong> sections appear inline when applicable.</li>
-                                </ul>
-                            </details>
-
-                            <details className="scan-guide-section">
-                                <summary className="scan-guide-summary">Filters &amp; Compatibility</summary>
-                                <ul className="scan-guide-list">
-                                    <li>Click <strong>Filters</strong> to open the sidebar with support level, visibility, and onboarding filters.</li>
-                                    <li><strong>Platform</strong> and <strong>Version</strong> checkboxes filter by Splunkbase compatibility.</li>
-                                    <li>Toggle <strong>Include / Exclude</strong> to find products <em>not yet compatible</em> with a version.</li>
-                                    <li>Use <strong>Supported Only / All Products</strong> to show the full portfolio.</li>
-                                </ul>
-                            </details>
-
-                            <details className="scan-guide-section">
-                                <summary className="scan-guide-summary">Actions &amp; Personalization</summary>
-                                <ul className="scan-guide-list">
-                                    <li>Click <strong>Launch ▾</strong> to open an installed app's dashboard directly. For TA-only products (no built-in UI), the button changes to <strong>Explore ▾</strong> with options to search your data or create a dashboard.</li>
-                                    <li><strong>? Best Practices</strong> provides platform-specific tips and SC4S links.</li>
-                                    <li><strong>Sync Catalog</strong> checks S3 for a newer product catalog (<code>products.conf</code>) and downloads the latest Splunkbase app lookup. Runs nightly, but click for on-demand sync.</li>
-                                    <li><strong>Role</strong> picks a persona for a curated quick-start.</li>
-                                    <li>Cycle through <strong>Light / Dark / Auto</strong> themes.</li>
-                                    <li>Use <strong>Expand / Collapse All</strong> (next to the search bar) to open or close every section at once.</li>
-                                </ul>
-                            </details>
-
-                            <details className="scan-guide-section">
-                                <summary className="scan-guide-summary">Sections &amp; Visibility</summary>
-                                <ul className="scan-guide-list">
-                                    <li><strong>Configured Products</strong> — cards you've pinned to your workspace.</li>
-                                    <li><strong>Data Detected</strong> — products with active sourcetype data flowing (not yet configured).</li>
-                                    <li><strong>Available Products</strong> — all supported products you haven't added yet.</li>
-                                    <li><strong>Custom Products</strong> — cards you've created beyond the official catalog.</li>
-                                    <li>Toggle visibility in <strong>Filters → Visibility</strong>: Retired and Deprecated products can be shown or hidden.</li>
-                                </ul>
-                            </details>
-
-                        </div>
-                    </Modal.Body>
-                    <Modal.Footer>
-                        <Button appearance="secondary" label="Close" onClick={() => setCardLegendOpen(false)} />
-                    </Modal.Footer>
-                </Modal>
-            )}
 
             {/* Remove All Confirmation Modal */}
             {removeAllModalOpen && (
