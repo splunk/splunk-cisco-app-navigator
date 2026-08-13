@@ -3,6 +3,9 @@
 Unreleased
 -------
 
+### UI & Card Enhancements
+* **Grouped sourcetype lists** — Product cards can now show current and previous sourcetypes as separate groups while preserving the combined list for data detection, search links, and props.conf audits.
+
 ### Catalog Fixes
 * **Cisco Catalyst sourcetype alignment** — Added current and legacy Catalyst Center, SD-WAN, ISE, and Cyber Vision sourcetypes from the revised Cisco Catalyst TA sourcetype catalog, including stable custom/API, report, policy, firewall/access, realtime, and historical compatibility names.
 

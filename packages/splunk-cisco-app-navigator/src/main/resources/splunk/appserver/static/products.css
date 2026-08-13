@@ -137,6 +137,29 @@
     --status-info-border: rgba(3,105,161,0.26);
     --status-neutral-bg: #eef1f4;
     --status-neutral-border: #d8dee6;
+
+    /* ── Sourcetype grouping tokens ── */
+    --sourcetype-group-gap: 8px;
+    --sourcetype-group-margin-top: 6px;
+    --sourcetype-group-header-gap: 6px;
+    --sourcetype-group-header-min-height: 18px;
+    --sourcetype-group-title-font-size: 10px;
+    --sourcetype-group-title-letter-spacing: 0.3px;
+    --sourcetype-group-title-color: var(--text-secondary);
+    --sourcetype-group-count-min-width: 16px;
+    --sourcetype-group-count-height: 14px;
+    --sourcetype-group-count-padding: 0 4px;
+    --sourcetype-group-count-radius: 7px;
+    --sourcetype-group-count-font-size: 9px;
+    --sourcetype-group-count-color: var(--muted-color);
+    --sourcetype-group-count-bg: var(--status-neutral-bg);
+    --sourcetype-chips-grouped-margin-top: 2px;
+    --sourcetype-current-bg: rgba(21,128,61,0.08);
+    --sourcetype-current-color: var(--color-success);
+    --sourcetype-current-border: rgba(21,128,61,0.34);
+    --sourcetype-legacy-bg: var(--status-warning-bg);
+    --sourcetype-legacy-color: var(--color-warning);
+    --sourcetype-legacy-border: var(--status-warning-border);
 }
 
 /* --- Dark Theme Overrides ---
@@ -208,6 +231,17 @@
     --status-info-border: rgba(56,189,248,0.32);
     --status-neutral-bg: #20262d;
     --status-neutral-border: #343d48;
+
+    /* ── Sourcetype grouping tokens (dark) ── */
+    --sourcetype-group-title-color: #c7cbd1;
+    --sourcetype-group-count-color: #b0bec5;
+    --sourcetype-group-count-bg: rgba(255,255,255,0.06);
+    --sourcetype-current-bg: rgba(34,197,94,0.15);
+    --sourcetype-current-color: var(--color-success);
+    --sourcetype-current-border: rgba(34,197,94,0.42);
+    --sourcetype-legacy-bg: var(--status-warning-bg);
+    --sourcetype-legacy-color: var(--color-warning);
+    --sourcetype-legacy-border: var(--status-warning-border);
 }
 
 /* Body / Splunk chrome background — scoped to the app content area only.
@@ -3979,6 +4013,46 @@ a.csc-dep-name-link:hover {
 :root.dce-dark .csc-sourcetypes-chips {
     border-top-color: var(--border-color, #444);
 }
+.csc-st-groups {
+    display: flex;
+    flex-direction: column;
+    gap: var(--sourcetype-group-gap);
+    margin-top: var(--sourcetype-group-margin-top);
+}
+.csc-st-group {
+    min-width: 0;
+}
+.csc-st-group-header {
+    display: flex;
+    align-items: center;
+    gap: var(--sourcetype-group-header-gap);
+    min-height: var(--sourcetype-group-header-min-height);
+}
+.csc-st-group-title {
+    font-size: var(--sourcetype-group-title-font-size);
+    font-weight: 700;
+    color: var(--sourcetype-group-title-color);
+    text-transform: uppercase;
+    letter-spacing: var(--sourcetype-group-title-letter-spacing);
+}
+.csc-st-group-count {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: var(--sourcetype-group-count-min-width);
+    height: var(--sourcetype-group-count-height);
+    padding: var(--sourcetype-group-count-padding);
+    border-radius: var(--sourcetype-group-count-radius);
+    font-size: var(--sourcetype-group-count-font-size);
+    font-weight: 700;
+    color: var(--sourcetype-group-count-color);
+    background: var(--sourcetype-group-count-bg);
+}
+.csc-sourcetypes-chips-grouped {
+    margin-top: var(--sourcetype-chips-grouped-margin-top);
+    padding-top: 0;
+    border-top: 0;
+}
 .csc-st-chip {
     display: inline-block;
     font-size: 10px;
@@ -4104,6 +4178,20 @@ a.csc-dep-name-link:hover {
     text-transform: none;
     font-weight: 600;
 }
+.csc-dp-tag-current {
+    background: var(--sourcetype-current-bg);
+    color: var(--sourcetype-current-color);
+    border: 1px solid var(--sourcetype-current-border);
+    text-transform: none;
+    font-weight: 600;
+}
+.csc-dp-tag-legacy {
+    background: var(--sourcetype-legacy-bg);
+    color: var(--sourcetype-legacy-color);
+    border: 1px solid var(--sourcetype-legacy-border);
+    text-transform: none;
+    font-weight: 600;
+}
 :root.dce-dark .csc-dp-tag-sc4s {
     background: rgba(46,125,50,0.15);
     color: #81c784;
@@ -4118,6 +4206,16 @@ a.csc-dep-name-link:hover {
     background: rgba(255,255,255,0.06);
     color: #999;
     border-color: #444;
+}
+:root.dce-dark .csc-dp-tag-current {
+    background: var(--sourcetype-current-bg);
+    color: var(--sourcetype-current-color);
+    border-color: var(--sourcetype-current-border);
+}
+:root.dce-dark .csc-dp-tag-legacy {
+    background: var(--sourcetype-legacy-bg);
+    color: var(--sourcetype-legacy-color);
+    border-color: var(--sourcetype-legacy-border);
 }
 
 /* ── Data Paths group styling ── */
