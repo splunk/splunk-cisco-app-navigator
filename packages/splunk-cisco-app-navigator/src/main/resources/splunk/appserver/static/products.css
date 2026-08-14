@@ -8549,3 +8549,580 @@ tr.scan-ts-ahead .scan-ts-name {
 :root.dce-dark .scan-util-detection-success { color: #7ee787 !important; }
 :root.dce-dark .scan-util-detection-empty { color: #f2cc60 !important; }
 :root.dce-dark .scan-util-detection-error { color: #ff7b72 !important; }
+
+/* =====================================================================
+   ONE CISCO DESIGN / C3 WORKSPACE PRESENTATION
+
+   This final layer intentionally owns only composition and atmosphere.
+   Product data, actions, filters, and navigation remain unchanged.
+   ===================================================================== */
+
+:root {
+    --background: #eef3f8;
+    --foreground: #111827;
+    --card: #ffffff;
+    --primary: #056ea7;
+    --accent: #e7f2f8;
+    --muted: #e8eef4;
+    --border: #ccd8e5;
+    --accent-muted-bg: rgba(4, 159, 217, 0.10);
+
+    --bg-primary: #eef3f8;
+    --bg-secondary: #e6edf5;
+    --bg-surface: #ffffff;
+    --text-primary: #172033;
+    --text-secondary: #53647a;
+    --text-tertiary: #6b7c91;
+    --border-light: #d3deea;
+    --border-medium: #b9c8d8;
+    --color-primary: #056ea7;
+    --color-primary-hover: #034f7b;
+    --color-success: #16834a;
+    --color-warning: #9a6700;
+    --color-error: #c93744;
+
+    --card-shadow:
+        0 10px 28px rgba(29, 52, 78, 0.11),
+        inset 0 1px 0 rgba(255, 255, 255, 0.82);
+    --card-shadow-hover:
+        0 16px 34px rgba(29, 52, 78, 0.17),
+        inset 0 1px 0 rgba(255, 255, 255, 0.92);
+    --section-bg: linear-gradient(135deg, rgba(255, 255, 255, 0.76), rgba(239, 247, 253, 0.56));
+    --section-alt-bg: rgba(246, 249, 252, 0.92);
+    --section-border: #cbd8e5;
+    --card-footer-bg: #f5f8fb;
+    --card-footer-border: #d7e1eb;
+    --scan-canvas-top: rgba(4, 159, 217, 0.22);
+    --scan-canvas-side: rgba(0, 188, 235, 0.13);
+    --scan-canvas-bloom: rgba(111, 74, 160, 0.17);
+    --scan-canvas-lower: rgba(126, 87, 194, 0.13);
+    --scan-header-surface: linear-gradient(110deg, rgba(255, 255, 255, 0.80), rgba(241, 248, 253, 0.66));
+    --scan-toolbar-surface: linear-gradient(110deg, rgba(255, 255, 255, 0.72), rgba(242, 249, 254, 0.58));
+    --scan-panel-surface: linear-gradient(135deg, rgba(255, 255, 255, 0.74), rgba(238, 247, 253, 0.54));
+    --scan-card-surface: linear-gradient(145deg, rgba(255, 255, 255, 0.94), rgba(246, 251, 255, 0.84));
+    --scan-card-footer-surface: linear-gradient(110deg, rgba(244, 249, 253, 0.84), rgba(235, 244, 251, 0.72));
+    --scan-glass-border: rgba(130, 160, 188, 0.42);
+    --scan-glass-divider: rgba(117, 146, 175, 0.34);
+    --scan-glass-highlight: rgba(255, 255, 255, 0.82);
+    --scan-glass-filter: blur(18px) saturate(135%);
+    --scan-focus: #0a84c6;
+}
+
+:root.dce-dark {
+    --background: #08111f;
+    --foreground: #ecf4ff;
+    --card: #121d2c;
+    --primary: #63b9f2;
+    --accent: #172638;
+    --muted: #0f1a29;
+    --border: #293a4f;
+    --accent-muted-bg: rgba(0, 188, 235, 0.13);
+
+    --bg-primary: #08111f;
+    --bg-secondary: #0d1726;
+    --bg-surface: #121d2c;
+    --text-primary: #ecf4ff;
+    --text-secondary: #a8b8cb;
+    --text-tertiary: #7f91a7;
+    --border-light: #293a4f;
+    --border-medium: #3a506b;
+    --color-primary: #63b9f2;
+    --color-primary-hover: #9bd8ff;
+    --color-success: #4cbf7f;
+    --color-warning: #f0c243;
+    --color-error: #fa5762;
+
+    --card-shadow:
+        0 12px 30px rgba(0, 0, 0, 0.34),
+        inset 0 1px 0 rgba(255, 255, 255, 0.08);
+    --card-shadow-hover:
+        0 18px 38px rgba(0, 0, 0, 0.44),
+        inset 0 1px 0 rgba(255, 255, 255, 0.12);
+    --section-bg: linear-gradient(135deg, rgba(22, 36, 55, 0.78), rgba(8, 17, 29, 0.64));
+    --section-alt-bg: rgba(10, 19, 32, 0.94);
+    --section-border: #293a4f;
+    --card-footer-bg: #0d1724;
+    --card-footer-border: #28384d;
+    --input-bg: #0d1724;
+    --code-bg: #09121f;
+    --scan-canvas-top: rgba(0, 118, 192, 0.34);
+    --scan-canvas-side: rgba(0, 188, 235, 0.17);
+    --scan-canvas-bloom: rgba(111, 74, 160, 0.30);
+    --scan-canvas-lower: rgba(126, 87, 194, 0.22);
+    --scan-header-surface: linear-gradient(110deg, rgba(17, 31, 49, 0.82), rgba(8, 17, 30, 0.66));
+    --scan-toolbar-surface: linear-gradient(110deg, rgba(17, 31, 49, 0.72), rgba(7, 15, 27, 0.58));
+    --scan-panel-surface: linear-gradient(135deg, rgba(25, 41, 62, 0.74), rgba(9, 19, 33, 0.58));
+    --scan-card-surface: linear-gradient(145deg, rgba(20, 33, 50, 0.96), rgba(12, 24, 39, 0.90));
+    --scan-card-footer-surface: linear-gradient(110deg, rgba(15, 28, 44, 0.90), rgba(8, 18, 31, 0.82));
+    --scan-glass-border: rgba(124, 158, 192, 0.30);
+    --scan-glass-divider: rgba(108, 143, 178, 0.26);
+    --scan-glass-highlight: rgba(255, 255, 255, 0.09);
+    --scan-glass-filter: blur(18px) saturate(125%);
+    --scan-focus: #63b9f2;
+}
+
+.main-section-body,
+.dashboard-body,
+.dashboard-row,
+.dashboard-cell,
+.splunk-view,
+[data-view="views/shared/Page"] {
+    background-color: var(--bg-primary) !important;
+}
+
+.products-page {
+    min-height: calc(100vh - 44px);
+    padding: 0 28px 36px;
+    overflow-x: clip;
+    color: var(--text-primary);
+    background-color: var(--bg-primary) !important;
+    background-image:
+        radial-gradient(68% 40% at 8% -4%, var(--scan-canvas-top) 0, transparent 62%),
+        radial-gradient(52% 42% at 96% 18%, var(--scan-canvas-side) 0, transparent 66%),
+        radial-gradient(58% 48% at 44% 72%, var(--scan-canvas-lower) 0, transparent 70%),
+        radial-gradient(48% 38% at 82% 42%, var(--scan-canvas-bloom) 0, transparent 72%),
+        linear-gradient(180deg, transparent 0, var(--bg-primary) 820px) !important;
+    background-attachment: scroll;
+    font-family: 'Splunk Platform Sans', 'Proxima Nova', 'CiscoSansTT', 'Helvetica Neue', Arial, sans-serif;
+}
+
+/* Keep the established product identity compact and on one line at desktop widths. */
+.products-page-header {
+    margin-right: -28px;
+    margin-left: -28px;
+    padding-right: 28px;
+    padding-left: 28px;
+    background: var(--scan-header-surface);
+    border-bottom: 1px solid var(--scan-glass-divider);
+    box-shadow: inset 0 1px 0 var(--scan-glass-highlight);
+    -webkit-backdrop-filter: var(--scan-glass-filter);
+    backdrop-filter: var(--scan-glass-filter);
+}
+
+.products-page-header .header-left {
+    flex-wrap: nowrap;
+}
+
+/* Controls read as one toolbar, while retaining every existing action. */
+.scan-utility-strip {
+    min-height: 48px !important;
+    margin: 0 -28px 18px !important;
+    padding: 9px 28px !important;
+    flex-wrap: wrap !important;
+    gap: 10px 18px !important;
+    background: var(--scan-toolbar-surface) !important;
+    border-bottom: 1px solid var(--scan-glass-divider) !important;
+    box-shadow:
+        0 10px 28px rgba(22, 44, 70, 0.10),
+        inset 0 1px 0 var(--scan-glass-highlight);
+    -webkit-backdrop-filter: var(--scan-glass-filter);
+    backdrop-filter: var(--scan-glass-filter);
+}
+
+:root.dce-dark .scan-utility-strip {
+    background: var(--scan-toolbar-surface) !important;
+}
+
+.scan-utility-left,
+.scan-utility-right {
+    flex-wrap: wrap;
+    gap: 7px !important;
+}
+
+.scan-util-pill,
+.scan-info-pill {
+    min-height: 32px !important;
+    border-radius: 7px !important;
+}
+
+.scan-info-pill {
+    padding: 5px 10px;
+    color: var(--text-secondary);
+    border-color: transparent;
+}
+
+.scan-util-pill {
+    height: 32px !important;
+    color: var(--text-secondary) !important;
+    background: rgba(255, 255, 255, 0.58) !important;
+    border-color: var(--border-light) !important;
+}
+
+:root.dce-dark .scan-util-pill {
+    color: var(--text-secondary) !important;
+    background: rgba(18, 29, 44, 0.84) !important;
+}
+
+.scan-util-pill:hover,
+:root.dce-dark .scan-util-pill:hover {
+    color: var(--color-primary) !important;
+    background: var(--accent-muted-bg) !important;
+    border-color: rgba(4, 159, 217, 0.48) !important;
+}
+
+/* Finder and primary facets form the workspace command surface. */
+.scan-top-filter-row {
+    margin: 0 0 16px;
+    padding: 13px 14px;
+    gap: 12px;
+    background: var(--scan-panel-surface);
+    border: 1px solid var(--scan-glass-border);
+    border-radius: 10px;
+    box-shadow: var(--card-shadow);
+    -webkit-backdrop-filter: var(--scan-glass-filter);
+    backdrop-filter: var(--scan-glass-filter);
+}
+
+.scan-top-filter-row .products-search-bar {
+    flex-basis: 260px;
+    min-width: 240px;
+}
+
+.scan-top-filter-row .products-search-bar > div {
+    flex-basis: 260px !important;
+    max-width: 260px !important;
+}
+
+.products-search-input,
+.csc-category-pill,
+.csc-subcategory-pill,
+.scan-filter-trigger {
+    min-height: 34px !important;
+    height: 34px !important;
+    border-radius: 7px !important;
+}
+
+.csc-category-bar {
+    min-height: 34px !important;
+    height: auto !important;
+}
+
+/* Command metrics echo C3 status tiles without turning the page into a chart wall. */
+.csc-stats-bar {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(104px, 1fr));
+    gap: 10px;
+    margin: 0 0 18px;
+    padding: 0;
+    background: transparent;
+    border: 0;
+}
+
+.csc-stat-card {
+    width: auto;
+    min-width: 0;
+    min-height: 72px;
+    padding: 12px 13px;
+    overflow: visible;
+    background: var(--scan-panel-surface);
+    border: 1px solid var(--scan-glass-border);
+    border-top: 2px solid var(--stat-accent, var(--color-primary));
+    border-radius: 9px;
+    box-shadow: var(--card-shadow);
+    -webkit-backdrop-filter: var(--scan-glass-filter);
+    backdrop-filter: var(--scan-glass-filter);
+}
+
+.csc-stat-card:hover,
+:root.dce-dark .csc-stat-card:hover {
+    transform: translateY(-2px);
+    border-color: rgba(4, 159, 217, 0.42);
+    border-top-color: var(--stat-accent, var(--color-primary));
+    box-shadow: var(--card-shadow-hover);
+}
+
+:root.dce-dark .csc-stat-card {
+    background: var(--scan-panel-surface);
+    border-color: var(--scan-glass-border);
+    border-top-color: var(--stat-accent, var(--color-primary));
+}
+
+.csc-stat-value {
+    color: var(--text-primary);
+    font-family: 'Splunk Platform Sans', 'Proxima Nova', 'Helvetica Neue', Arial, sans-serif;
+    font-size: 23px;
+    font-weight: 650;
+    letter-spacing: -0.025em;
+}
+
+:root.dce-dark .csc-stat-value {
+    color: var(--text-primary);
+}
+
+.csc-stat-label {
+    margin-top: 7px;
+    color: var(--text-secondary);
+    font-size: 9px;
+    letter-spacing: 0.105em;
+}
+
+/* C3 section surfaces: clear containment, quiet headers, semantic accent only. */
+#configured_products,
+#detected_products,
+#available_products,
+#unsupported_products,
+#coming_soon_products,
+#deprecated_products,
+#retired_products,
+#gtm_coverage_gaps,
+#custom_products,
+#vault_products {
+    margin-bottom: 12px;
+    overflow: hidden;
+    background: var(--section-bg) !important;
+    border: 1px solid var(--scan-glass-border) !important;
+    border-radius: 10px !important;
+    box-shadow: var(--card-shadow) !important;
+    -webkit-backdrop-filter: var(--scan-glass-filter);
+    backdrop-filter: var(--scan-glass-filter);
+}
+
+#configured_products > div,
+#detected_products > div,
+#available_products > div,
+#unsupported_products > div,
+#coming_soon_products > div,
+#deprecated_products > div,
+#retired_products > div,
+#gtm_coverage_gaps > div,
+#custom_products > div,
+#vault_products > div,
+#configured_products [data-test='body'],
+#detected_products [data-test='body'],
+#available_products [data-test='body'],
+#unsupported_products [data-test='body'],
+#coming_soon_products [data-test='body'],
+#deprecated_products [data-test='body'],
+#retired_products [data-test='body'],
+#gtm_coverage_gaps [data-test='body'],
+#custom_products [data-test='body'],
+#vault_products [data-test='body'],
+#configured_products [data-test='body'] > div,
+#detected_products [data-test='body'] > div,
+#available_products [data-test='body'] > div,
+#unsupported_products [data-test='body'] > div,
+#coming_soon_products [data-test='body'] > div,
+#deprecated_products [data-test='body'] > div,
+#retired_products [data-test='body'] > div,
+#gtm_coverage_gaps [data-test='body'] > div,
+#custom_products [data-test='body'] > div,
+#vault_products [data-test='body'] > div {
+    background: transparent !important;
+}
+
+#configured_products button[data-test='toggle'],
+#detected_products button[data-test='toggle'],
+#available_products button[data-test='toggle'],
+#unsupported_products button[data-test='toggle'],
+#coming_soon_products button[data-test='toggle'],
+#deprecated_products button[data-test='toggle'],
+#retired_products button[data-test='toggle'],
+#gtm_coverage_gaps button[data-test='toggle'],
+#custom_products button[data-test='toggle'],
+#vault_products button[data-test='toggle'] {
+    min-height: 48px;
+    padding: 12px 16px 12px 42px;
+    background: linear-gradient(90deg, var(--accent-muted-bg), transparent 48%) !important;
+    border-left-width: 4px;
+    border-radius: 0 !important;
+    transition: background 0.15s ease !important;
+}
+
+#configured_products button[data-test='toggle']:hover,
+#detected_products button[data-test='toggle']:hover,
+#available_products button[data-test='toggle']:hover,
+#unsupported_products button[data-test='toggle']:hover,
+#coming_soon_products button[data-test='toggle']:hover,
+#deprecated_products button[data-test='toggle']:hover,
+#retired_products button[data-test='toggle']:hover,
+#gtm_coverage_gaps button[data-test='toggle']:hover,
+#custom_products button[data-test='toggle']:hover,
+#vault_products button[data-test='toggle']:hover,
+:root.dce-dark #configured_products button[data-test='toggle']:hover,
+:root.dce-dark #detected_products button[data-test='toggle']:hover,
+:root.dce-dark #available_products button[data-test='toggle']:hover,
+:root.dce-dark #unsupported_products button[data-test='toggle']:hover,
+:root.dce-dark #coming_soon_products button[data-test='toggle']:hover,
+:root.dce-dark #deprecated_products button[data-test='toggle']:hover,
+:root.dce-dark #retired_products button[data-test='toggle']:hover,
+:root.dce-dark #gtm_coverage_gaps button[data-test='toggle']:hover,
+:root.dce-dark #custom_products button[data-test='toggle']:hover,
+:root.dce-dark #vault_products button[data-test='toggle']:hover {
+    transform: none;
+    background: linear-gradient(90deg, rgba(4, 159, 217, 0.15), transparent 58%) !important;
+    box-shadow: none;
+}
+
+/* Product cards: near-opaque operational surfaces with a restrained glass edge. */
+.csc-card,
+:root.dce-dark .csc-card {
+    overflow: visible;
+    background: var(--scan-card-surface) !important;
+    border: 1px solid var(--scan-glass-border) !important;
+    border-radius: 10px !important;
+    box-shadow: var(--card-shadow) !important;
+    -webkit-backdrop-filter: blur(10px) saturate(115%);
+    backdrop-filter: blur(10px) saturate(115%);
+    transition: transform 0.16s ease, border-color 0.16s ease, box-shadow 0.16s ease;
+}
+
+.csc-card:hover,
+:root.dce-dark .csc-card:hover {
+    z-index: 20;
+    transform: translateY(-2px) !important;
+    border-color: rgba(4, 159, 217, 0.58) !important;
+    box-shadow: var(--card-shadow-hover) !important;
+}
+
+.csc-card.csc-card-cisco-supported,
+:root.dce-dark .csc-card.csc-card-cisco-supported,
+.csc-card[data-support-level="cisco_supported"] {
+    border-bottom: 3px solid #049fd9 !important;
+}
+
+.csc-card.csc-card-splunk-supported,
+:root.dce-dark .csc-card.csc-card-splunk-supported,
+.csc-card[data-support-level="splunk_supported"] {
+    border-bottom: 3px solid #c64a96 !important;
+}
+
+.csc-card.csc-card-unsupported-tier,
+:root.dce-dark .csc-card.csc-card-unsupported-tier {
+    border-bottom: 3px solid var(--color-error) !important;
+}
+
+.csc-card.csc-card-custom,
+:root.dce-dark .csc-card.csc-card-custom {
+    border-bottom: 3px solid var(--color-warning) !important;
+}
+
+.csc-card-header {
+    padding: 18px 18px 9px;
+}
+
+.csc-card-description {
+    padding-right: 18px;
+    padding-left: 18px;
+}
+
+.csc-card-footer,
+:root.dce-dark .csc-card-footer {
+    padding: 12px 18px;
+    background: var(--scan-card-footer-surface);
+    border-top-color: var(--card-footer-border);
+}
+
+.csc-card-grid {
+    gap: 16px;
+    padding: 16px;
+}
+
+.csc-welcome-card,
+:root.dce-dark .csc-welcome-card,
+.csc-issues-panel,
+:root.dce-dark .csc-issues-panel {
+    background: var(--scan-panel-surface);
+    border-color: var(--scan-glass-border);
+    border-radius: 10px;
+    box-shadow: var(--card-shadow);
+    -webkit-backdrop-filter: var(--scan-glass-filter);
+    backdrop-filter: var(--scan-glass-filter);
+}
+
+.csc-welcome-card {
+    border-left: 3px solid var(--color-primary);
+}
+
+.csc-welcome-step,
+:root.dce-dark .csc-welcome-step {
+    background: var(--scan-card-surface);
+    border-color: var(--scan-glass-border);
+    box-shadow: inset 0 1px 0 var(--scan-glass-highlight);
+    -webkit-backdrop-filter: blur(10px) saturate(115%);
+    backdrop-filter: blur(10px) saturate(115%);
+}
+
+/* A closed fixed drawer must not widen the document at narrow viewports. */
+.scan-drawer:not(.scan-drawer-open) {
+    display: none;
+}
+
+/* Reliable keyboard focus for the page's native controls. */
+.products-page button:focus-visible,
+.products-page a:focus-visible,
+.products-page input:focus-visible,
+.products-page select:focus-visible,
+.products-page textarea:focus-visible,
+.products-page [role='button']:focus-visible {
+    outline: 2px solid var(--scan-focus) !important;
+    outline-offset: 2px !important;
+}
+
+@media (max-width: 1120px) {
+    .scan-utility-strip {
+        align-items: flex-start !important;
+    }
+
+    .scan-utility-right {
+        flex: 1 1 100%;
+    }
+
+    .scan-top-filter-row {
+        align-items: stretch;
+        flex-direction: column;
+    }
+
+    .scan-top-filter-row .products-search-bar,
+    .scan-top-filter-row .products-search-bar > div {
+        flex-basis: auto !important;
+        width: 100%;
+        max-width: none !important;
+    }
+
+    .products-search-input {
+        max-width: none;
+    }
+}
+
+@media (max-width: 760px) {
+    .products-page {
+        padding-right: 16px;
+        padding-left: 16px;
+    }
+
+    .products-page-header,
+    .scan-utility-strip {
+        margin-right: -16px !important;
+        margin-left: -16px !important;
+        padding-right: 16px !important;
+        padding-left: 16px !important;
+    }
+
+    .products-page-header .header-left {
+        flex-wrap: wrap;
+    }
+
+    .scan-utility-left,
+    .scan-utility-right {
+        flex: 1 1 100%;
+    }
+
+    .csc-stats-bar {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .csc-card-grid {
+        padding: 12px;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .products-page *,
+    .products-page *::before,
+    .products-page *::after {
+        scroll-behavior: auto !important;
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+    }
+}
