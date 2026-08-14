@@ -3,8 +3,17 @@
 Unreleased
 -------
 
+### UI & Card Enhancements
+* **C3 catalog presentation** — Refined the Cisco Products dashboard with a layered atmospheric canvas, restrained frosted-glass command and section surfaces, command-style metrics, responsive control grouping, and simplified product cards in light and dark modes while preserving the established SCAN product identity.
+* **Unified React theme boundary** — Synchronized Splunk UI components and portal-rendered dialogs with the dashboard's Auto, Light, and Dark preference, and added semantic level-two headings to product sections.
+* **Grouped sourcetype lists** — Product cards can now show current and previous sourcetypes as separate groups while preserving the combined list for data detection, search links, and props.conf audits.
+* **Catalyst TA user guide links** — Cisco Catalyst Add-on Docs links now open the shipped `TA_cisco_catalyst` user guide instead of the Splunkbase listing.
+
 ### Catalog Fixes
 * **Cisco Catalyst sourcetype alignment** — Added current and legacy Catalyst Center, SD-WAN, ISE, and Cyber Vision sourcetypes from the revised Cisco Catalyst TA sourcetype catalog, including stable custom/API, report, policy, firewall/access, realtime, and historical compatibility names.
+
+### Security
+* **Build dependency hardening** — Refreshed the Yarn lockfile and added bounded security resolutions for Nx, Axios, nanoid, js-yaml, PostCSS, ip-address, brace-expansion, tar, form-data, and tmp.
 
 ### Documentation
 * **In-app User Guide** — Added a searchable, responsive React guide with task-based setup, catalog, deployment, operations, Splunk Cloud, troubleshooting, and configuration guidance; light/dark themes; print-to-PDF support; live build metadata; and a dedicated notebook icon in the app navigation rail that replaces the duplicate toolbar guide modal.

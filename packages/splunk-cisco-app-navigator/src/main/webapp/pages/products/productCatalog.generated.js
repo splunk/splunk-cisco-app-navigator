@@ -59,6 +59,7 @@ export const PRODUCT_CATALOG = [
       "5743",
       "5543"
     ],
+    "legacy_viz_uids": [],
     "community_uids": [],
     "sourcetypes": [
       "cisco:asa",
@@ -80,6 +81,8 @@ export const PRODUCT_CATALOG = [
       "cisco:sfw:estreamer",
       "cisco:sfw:policy"
     ],
+    "current_sourcetypes": [],
+    "legacy_sourcetypes": [],
     "dashboards": [
       "secure_firewall_dashboard",
       "asa_dashboard"
@@ -337,12 +340,15 @@ export const PRODUCT_CATALOG = [
       "6398",
       "7092"
     ],
+    "legacy_viz_uids": [],
     "community_uids": [],
     "sourcetypes": [
       "cisco:sna",
       "cisco:sna:notable",
       "cisco:sna:risk"
     ],
+    "current_sourcetypes": [],
+    "legacy_sourcetypes": [],
     "dashboards": [
       "sna_dashboard"
     ],
@@ -448,8 +454,11 @@ export const PRODUCT_CATALOG = [
     "app_viz_2_install_url": "",
     "learn_more_url": "https://www.cisco.com/site/us/en/products/security/security-cloud-control/index.html",
     "legacy_uids": [],
+    "legacy_viz_uids": [],
     "community_uids": [],
     "sourcetypes": [],
+    "current_sourcetypes": [],
+    "legacy_sourcetypes": [],
     "dashboards": [],
     "custom_dashboard": "",
     "icon_emoji": "control",
@@ -541,8 +550,11 @@ export const PRODUCT_CATALOG = [
     "app_viz_2_install_url": "",
     "learn_more_url": "https://www.cisco.com/site/us/en/products/security/security-analytics/telemetry-broker/index.html",
     "legacy_uids": [],
+    "legacy_viz_uids": [],
     "community_uids": [],
     "sourcetypes": [],
+    "current_sourcetypes": [],
+    "legacy_sourcetypes": [],
     "dashboards": [],
     "custom_dashboard": "",
     "icon_emoji": "zap",
@@ -636,8 +648,11 @@ export const PRODUCT_CATALOG = [
     "app_viz_2_install_url": "",
     "learn_more_url": "https://www.cisco.com/site/us/en/products/security/hypershield/index.html",
     "legacy_uids": [],
+    "legacy_viz_uids": [],
     "community_uids": [],
     "sourcetypes": [],
+    "current_sourcetypes": [],
+    "legacy_sourcetypes": [],
     "dashboards": [],
     "custom_dashboard": "",
     "icon_emoji": "shield",
@@ -728,8 +743,11 @@ export const PRODUCT_CATALOG = [
     "app_viz_2_install_url": "",
     "learn_more_url": "",
     "legacy_uids": [],
+    "legacy_viz_uids": [],
     "community_uids": [],
     "sourcetypes": [],
+    "current_sourcetypes": [],
+    "legacy_sourcetypes": [],
     "dashboards": [],
     "custom_dashboard": "",
     "icon_emoji": "lock",
@@ -820,8 +838,11 @@ export const PRODUCT_CATALOG = [
     "app_viz_2_install_url": "",
     "learn_more_url": "https://www.cisco.com/site/us/en/products/security/security-analytics/secure-cloud-analytics/index.html",
     "legacy_uids": [],
+    "legacy_viz_uids": [],
     "community_uids": [],
     "sourcetypes": [],
+    "current_sourcetypes": [],
+    "legacy_sourcetypes": [],
     "dashboards": [],
     "custom_dashboard": "",
     "icon_emoji": "cloud",
@@ -918,8 +939,11 @@ export const PRODUCT_CATALOG = [
     "app_viz_2_install_url": "",
     "learn_more_url": "",
     "legacy_uids": [],
+    "legacy_viz_uids": [],
     "community_uids": [],
     "sourcetypes": [],
+    "current_sourcetypes": [],
+    "legacy_sourcetypes": [],
     "dashboards": [],
     "custom_dashboard": "",
     "icon_emoji": "eye",
@@ -1012,6 +1036,7 @@ export const PRODUCT_CATALOG = [
       "3194",
       "6544"
     ],
+    "legacy_viz_uids": [],
     "community_uids": [],
     "sourcetypes": [
       "cisco:duo:*",
@@ -1026,6 +1051,8 @@ export const PRODUCT_CATALOG = [
       "cisco:duo:trust_monitor",
       "cisco:duo:user"
     ],
+    "current_sourcetypes": [],
+    "legacy_sourcetypes": [],
     "dashboards": [
       "duo_overview"
     ],
@@ -1164,10 +1191,13 @@ export const PRODUCT_CATALOG = [
     "app_viz_2_install_url": "",
     "learn_more_url": "https://www.cisco.com/site/us/en/solutions/security/identity-intelligence/index.html",
     "legacy_uids": [],
+    "legacy_viz_uids": [],
     "community_uids": [],
     "sourcetypes": [
       "cisco:cii"
     ],
+    "current_sourcetypes": [],
+    "legacy_sourcetypes": [],
     "dashboards": [
       "cii_dashboard"
     ],
@@ -1263,8 +1293,11 @@ export const PRODUCT_CATALOG = [
     "app_viz_2_install_url": "",
     "learn_more_url": "https://developer.cisco.com/docs/pxgrid/",
     "legacy_uids": [],
+    "legacy_viz_uids": [],
     "community_uids": [],
     "sourcetypes": [],
+    "current_sourcetypes": [],
+    "legacy_sourcetypes": [],
     "dashboards": [],
     "custom_dashboard": "",
     "icon_emoji": "handshake",
@@ -1360,10 +1393,13 @@ export const PRODUCT_CATALOG = [
       "3670",
       "6481"
     ],
+    "legacy_viz_uids": [],
     "community_uids": [],
     "sourcetypes": [
       "cisco:se"
     ],
+    "current_sourcetypes": [],
+    "legacy_sourcetypes": [],
     "dashboards": [
       "cse_dashboard"
     ],
@@ -1483,6 +1519,7 @@ export const PRODUCT_CATALOG = [
       "2992",
       "5420"
     ],
+    "legacy_viz_uids": [],
     "community_uids": [],
     "sourcetypes": [
       "cisco:nvm:eve:v2",
@@ -1492,6 +1529,8 @@ export const PRODUCT_CATALOG = [
       "cisco:nvm:processinfodata:v2",
       "cisco:nvm:sysdata:v2"
     ],
+    "current_sourcetypes": [],
+    "legacy_sourcetypes": [],
     "dashboards": [
       "nvm_dashboard"
     ],
@@ -1640,6 +1679,7 @@ export const PRODUCT_CATALOG = [
     "app_viz_2_install_url": "",
     "learn_more_url": "https://www.cisco.com/site/us/en/products/security/secure-client/index.html",
     "legacy_uids": [],
+    "legacy_viz_uids": [],
     "community_uids": [],
     "sourcetypes": [
       "cisco:evm:authentication",
@@ -1651,6 +1691,8 @@ export const PRODUCT_CATALOG = [
       "cisco:evm:registry_value_activity",
       "cisco:evm:windows_service_activity"
     ],
+    "current_sourcetypes": [],
+    "legacy_sourcetypes": [],
     "dashboards": [
       "cse_dashboard"
     ],
@@ -1744,8 +1786,11 @@ export const PRODUCT_CATALOG = [
     "app_viz_2_install_url": "",
     "learn_more_url": "https://www.cisco.com/site/us/en/products/security/secure-client/index.html",
     "legacy_uids": [],
+    "legacy_viz_uids": [],
     "community_uids": [],
     "sourcetypes": [],
+    "current_sourcetypes": [],
+    "legacy_sourcetypes": [],
     "dashboards": [],
     "custom_dashboard": "",
     "icon_emoji": "laptop",
@@ -1843,12 +1888,15 @@ export const PRODUCT_CATALOG = [
     "app_viz_2_install_url": "",
     "learn_more_url": "https://www.cisco.com/site/us/en/products/security/xdr/index.html",
     "legacy_uids": [],
+    "legacy_viz_uids": [],
     "community_uids": [],
     "sourcetypes": [
       "cisco:xdr:incidents",
       "cisco:xdr:incidents-summary",
       "cisco:xdr:incidents-summary:notable"
     ],
+    "current_sourcetypes": [],
+    "legacy_sourcetypes": [],
     "dashboards": [
       "xdr_dashboard"
     ],
@@ -1948,12 +1996,15 @@ export const PRODUCT_CATALOG = [
     "app_viz_2_install_url": "",
     "learn_more_url": "https://talosintelligence.com/",
     "legacy_uids": [],
+    "legacy_viz_uids": [],
     "community_uids": [],
     "sourcetypes": [
       "talos:domain",
       "talos:ip",
       "talos:url"
     ],
+    "current_sourcetypes": [],
+    "legacy_sourcetypes": [],
     "dashboards": [
       "talos_logs"
     ],
@@ -2053,10 +2104,13 @@ export const PRODUCT_CATALOG = [
     "app_viz_2_install_url": "",
     "learn_more_url": "https://www.cisco.com/c/en/us/products/collateral/security/vulnerability-management/vulnerability-intelligence-aag.html",
     "legacy_uids": [],
+    "legacy_viz_uids": [],
     "community_uids": [],
     "sourcetypes": [
       "cisco:cvi"
     ],
+    "current_sourcetypes": [],
+    "legacy_sourcetypes": [],
     "dashboards": [
       "cvi_dashboard"
     ],
@@ -2154,10 +2208,13 @@ export const PRODUCT_CATALOG = [
       "7219",
       "4251"
     ],
+    "legacy_viz_uids": [],
     "community_uids": [],
     "sourcetypes": [
       "cisco:sma:submissions"
     ],
+    "current_sourcetypes": [],
+    "legacy_sourcetypes": [],
     "dashboards": [
       "sma_dashboard"
     ],
@@ -2259,10 +2316,13 @@ export const PRODUCT_CATALOG = [
     "legacy_uids": [
       "7243"
     ],
+    "legacy_viz_uids": [],
     "community_uids": [],
     "sourcetypes": [
       "cisco:etd"
     ],
+    "current_sourcetypes": [],
+    "legacy_sourcetypes": [],
     "dashboards": [
       "etd_dashboard"
     ],
@@ -2360,6 +2420,7 @@ export const PRODUCT_CATALOG = [
     "legacy_uids": [
       "5116"
     ],
+    "legacy_viz_uids": [],
     "community_uids": [],
     "sourcetypes": [
       "cisco:esa:amp",
@@ -2375,6 +2436,8 @@ export const PRODUCT_CATALOG = [
       "cisco:esa:system_logs",
       "cisco:esa:textmail"
     ],
+    "current_sourcetypes": [],
+    "legacy_sourcetypes": [],
     "dashboards": [
       "application"
     ],
@@ -2499,6 +2562,7 @@ export const PRODUCT_CATALOG = [
     "app_viz_2_install_url": "",
     "learn_more_url": "https://www.cisco.com/site/us/en/products/security/secure-access/index.html",
     "legacy_uids": [],
+    "legacy_viz_uids": [],
     "community_uids": [],
     "sourcetypes": [
       "cisco:cloud_security:appdiscovery",
@@ -2528,6 +2592,8 @@ export const PRODUCT_CATALOG = [
       "cisco:secure_access:security_events_web",
       "cisco:secure_access:security_events_ztna"
     ],
+    "current_sourcetypes": [],
+    "legacy_sourcetypes": [],
     "dashboards": [
       "access"
     ],
@@ -2642,6 +2708,7 @@ export const PRODUCT_CATALOG = [
       "3926",
       "3324"
     ],
+    "legacy_viz_uids": [],
     "community_uids": [],
     "sourcetypes": [
       "cisco:cloud_security:audit",
@@ -2650,6 +2717,8 @@ export const PRODUCT_CATALOG = [
       "cisco:cloud_security:firewall",
       "cisco:cloud_security:proxy"
     ],
+    "current_sourcetypes": [],
+    "legacy_sourcetypes": [],
     "dashboards": [
       "dns"
     ],
@@ -2767,10 +2836,13 @@ export const PRODUCT_CATALOG = [
     "legacy_uids": [
       "3324"
     ],
+    "legacy_viz_uids": [],
     "community_uids": [],
     "sourcetypes": [
       "cisco:cloud_security:investigated"
     ],
+    "current_sourcetypes": [],
+    "legacy_sourcetypes": [],
     "dashboards": [
       "investigate"
     ],
@@ -2869,10 +2941,13 @@ export const PRODUCT_CATALOG = [
     "legacy_uids": [
       "3043"
     ],
+    "legacy_viz_uids": [],
     "community_uids": [],
     "sourcetypes": [
       "cisco:cloud_security:cloudlock"
     ],
+    "current_sourcetypes": [],
+    "legacy_sourcetypes": [],
     "dashboards": [
       "cloudlock"
     ],
@@ -2971,6 +3046,7 @@ export const PRODUCT_CATALOG = [
     "app_viz_2_install_url": "",
     "learn_more_url": "https://www.cisco.com/site/us/en/products/security/multicloud-defense/index.html",
     "legacy_uids": [],
+    "legacy_viz_uids": [],
     "community_uids": [],
     "sourcetypes": [
       "cisco:multicloud:defense",
@@ -2993,6 +3069,8 @@ export const PRODUCT_CATALOG = [
       "cisco:multicloud:defense:valtix_internal",
       "cisco:multicloud:defense:waf"
     ],
+    "current_sourcetypes": [],
+    "legacy_sourcetypes": [],
     "dashboards": [
       "mcd_dashboard"
     ],
@@ -3094,8 +3172,11 @@ export const PRODUCT_CATALOG = [
     "app_viz_2_install_url": "",
     "learn_more_url": "",
     "legacy_uids": [],
+    "legacy_viz_uids": [],
     "community_uids": [],
     "sourcetypes": [],
+    "current_sourcetypes": [],
+    "legacy_sourcetypes": [],
     "dashboards": [],
     "custom_dashboard": "",
     "icon_emoji": "cloud",
@@ -3194,8 +3275,11 @@ export const PRODUCT_CATALOG = [
     "app_viz_2_install_url": "",
     "learn_more_url": "https://appomni.com",
     "legacy_uids": [],
+    "legacy_viz_uids": [],
     "community_uids": [],
     "sourcetypes": [],
+    "current_sourcetypes": [],
+    "legacy_sourcetypes": [],
     "dashboards": [],
     "custom_dashboard": "",
     "icon_emoji": "cloud_lock",
@@ -3288,6 +3372,7 @@ export const PRODUCT_CATALOG = [
     "legacy_uids": [
       "5524"
     ],
+    "legacy_viz_uids": [],
     "community_uids": [],
     "sourcetypes": [
       "cisco:wsa:l4tm",
@@ -3297,6 +3382,8 @@ export const PRODUCT_CATALOG = [
       "cisco:wsa:w3c",
       "cisco:wsa:w3c:recommended"
     ],
+    "current_sourcetypes": [],
+    "legacy_sourcetypes": [],
     "dashboards": [
       "application"
     ],
@@ -3411,10 +3498,13 @@ export const PRODUCT_CATALOG = [
     "app_viz_2_install_url": "",
     "learn_more_url": "https://www.cisco.com/site/us/en/products/security/secure-workload/index.html",
     "legacy_uids": [],
+    "legacy_viz_uids": [],
     "community_uids": [],
     "sourcetypes": [
       "cisco:secure:workload"
     ],
+    "current_sourcetypes": [],
+    "legacy_sourcetypes": [],
     "dashboards": [
       "csw_dashboard"
     ],
@@ -3512,11 +3602,14 @@ export const PRODUCT_CATALOG = [
     "app_viz_2_install_url": "",
     "learn_more_url": "https://www.cisco.com/site/us/en/products/security/ai-defense/index.html",
     "legacy_uids": [],
+    "legacy_viz_uids": [],
     "community_uids": [],
     "sourcetypes": [
       "cisco:ai:defense",
       "cisco:ai:defense:notable"
     ],
+    "current_sourcetypes": [],
+    "legacy_sourcetypes": [],
     "dashboards": [
       "aid_dashboard"
     ],
@@ -3615,6 +3708,7 @@ export const PRODUCT_CATALOG = [
     "app_viz_2_install_url": "",
     "learn_more_url": "https://isovalent.com",
     "legacy_uids": [],
+    "legacy_viz_uids": [],
     "community_uids": [],
     "sourcetypes": [
       "cisco:isovalent:alert",
@@ -3623,6 +3717,8 @@ export const PRODUCT_CATALOG = [
       "cisco:isovalent:telemetry:network",
       "cisco:isovalent:telemetry:process"
     ],
+    "current_sourcetypes": [],
+    "legacy_sourcetypes": [],
     "dashboards": [
       "irs_dashboard"
     ],
@@ -3749,6 +3845,7 @@ export const PRODUCT_CATALOG = [
     "app_viz_2_install_url": "",
     "learn_more_url": "https://isovalent.com",
     "legacy_uids": [],
+    "legacy_viz_uids": [],
     "community_uids": [],
     "sourcetypes": [
       "cisco:isovalent:edge_processor:alert",
@@ -3757,6 +3854,8 @@ export const PRODUCT_CATALOG = [
       "cisco:isovalent:edge_processor:telemetry:network",
       "cisco:isovalent:edge_processor:telemetry:process"
     ],
+    "current_sourcetypes": [],
+    "legacy_sourcetypes": [],
     "dashboards": [
       "irs_dashboard"
     ],
@@ -3848,8 +3947,11 @@ export const PRODUCT_CATALOG = [
     "app_viz_2_install_url": "",
     "learn_more_url": "https://www.radware.com",
     "legacy_uids": [],
+    "legacy_viz_uids": [],
     "community_uids": [],
     "sourcetypes": [],
+    "current_sourcetypes": [],
+    "legacy_sourcetypes": [],
     "dashboards": [],
     "custom_dashboard": "",
     "icon_emoji": "stop_sign",
@@ -3943,8 +4045,11 @@ export const PRODUCT_CATALOG = [
     "app_viz_2_install_url": "",
     "learn_more_url": "https://www.cisco.com/site/us/en/products/security/attack-surface-management/index.html",
     "legacy_uids": [],
+    "legacy_viz_uids": [],
     "community_uids": [],
     "sourcetypes": [],
+    "current_sourcetypes": [],
+    "legacy_sourcetypes": [],
     "dashboards": [],
     "custom_dashboard": "",
     "icon_emoji": "globe",
@@ -4039,8 +4144,11 @@ export const PRODUCT_CATALOG = [
     "app_viz_2_install_url": "",
     "learn_more_url": "https://www.cisco.com/site/us/en/products/security/industrial-security/secure-equipment-access/index.html",
     "legacy_uids": [],
+    "legacy_viz_uids": [],
     "community_uids": [],
     "sourcetypes": [],
+    "current_sourcetypes": [],
+    "legacy_sourcetypes": [],
     "dashboards": [],
     "custom_dashboard": "",
     "icon_emoji": "factory",
@@ -4114,7 +4222,7 @@ export const PRODUCT_CATALOG = [
     "gap_type": "",
     "gtm_pillar": "",
     "addon_splunkbase_uid": "7538",
-    "addon_docs_url": "https://splunkbase.splunk.com/app/7538",
+    "addon_docs_url": "/app/TA_cisco_catalyst/user_guide",
     "addon_troubleshoot_url": "",
     "addon_install_url": "/manager/launcher/appsremote?order=relevance&query=Catalyst&offset=0&category=network_security&type=addon&support=cisco",
     "app_viz": "cisco-catalyst-app",
@@ -4137,6 +4245,7 @@ export const PRODUCT_CATALOG = [
       "7859",
       "7581"
     ],
+    "legacy_viz_uids": [],
     "community_uids": [],
     "sourcetypes": [
       "cisco:catalyst:center:compliance:report",
@@ -4166,6 +4275,37 @@ export const PRODUCT_CATALOG = [
       "cisco:dnac:securityadvisory",
       "cisco:dnac:site:topology",
       "cisco:dnac:swim"
+    ],
+    "current_sourcetypes": [
+      "cisco:dnac:application:traffic",
+      "cisco:dnac:audit:logs",
+      "cisco:dnac:client",
+      "cisco:dnac:clienthealth",
+      "cisco:dnac:compliance",
+      "cisco:dnac:compliance:report",
+      "cisco:dnac:custom",
+      "cisco:dnac:devicehealth",
+      "cisco:dnac:devicehealth:interface",
+      "cisco:dnac:inventory:report",
+      "cisco:dnac:issue",
+      "cisco:dnac:networkhealth",
+      "cisco:dnac:report",
+      "cisco:dnac:securityadvisory",
+      "cisco:dnac:site:topology",
+      "cisco:dnac:swim"
+    ],
+    "legacy_sourcetypes": [
+      "cisco:catalyst:center:compliance:report",
+      "cisco:catalyst:center:inventory:report",
+      "cisco:catalyst:center:report",
+      "cisco:catalyst:client",
+      "cisco:catalyst:clienthealth",
+      "cisco:catalyst:compliance",
+      "cisco:catalyst:devicehealth",
+      "cisco:catalyst:issue",
+      "cisco:catalyst:networkhealth",
+      "cisco:catalyst:securityadvisory",
+      "cisco:dnac:custom:*"
     ],
     "dashboards": [
       "overview",
@@ -4266,7 +4406,7 @@ export const PRODUCT_CATALOG = [
     "gap_type": "",
     "gtm_pillar": "",
     "addon_splunkbase_uid": "7538",
-    "addon_docs_url": "https://splunkbase.splunk.com/app/7538",
+    "addon_docs_url": "/app/TA_cisco_catalyst/user_guide",
     "addon_troubleshoot_url": "",
     "addon_install_url": "/manager/launcher/appsremote?order=relevance&query=Catalyst&offset=0&category=network_security&type=addon&support=cisco",
     "app_viz": "cisco-catalyst-app",
@@ -4285,12 +4425,15 @@ export const PRODUCT_CATALOG = [
     "legacy_uids": [
       "1467"
     ],
+    "legacy_viz_uids": [],
     "community_uids": [],
     "sourcetypes": [
       "cisco:ios",
       "cisco:ios:traceback",
       "cisco:telemetry"
     ],
+    "current_sourcetypes": [],
+    "legacy_sourcetypes": [],
     "dashboards": [
       "network_insights"
     ],
@@ -4435,7 +4578,7 @@ export const PRODUCT_CATALOG = [
     "gap_type": "",
     "gtm_pillar": "",
     "addon_splunkbase_uid": "7538",
-    "addon_docs_url": "https://splunkbase.splunk.com/app/7538",
+    "addon_docs_url": "/app/TA_cisco_catalyst/user_guide",
     "addon_troubleshoot_url": "",
     "addon_install_url": "/manager/launcher/appsremote?order=relevance&query=Catalyst&offset=0&category=network_security&type=addon&support=cisco",
     "app_viz": "cisco-catalyst-app",
@@ -4456,6 +4599,7 @@ export const PRODUCT_CATALOG = [
       "1589",
       "6460"
     ],
+    "legacy_viz_uids": [],
     "community_uids": [],
     "sourcetypes": [
       "cisco:ise",
@@ -4472,6 +4616,26 @@ export const PRODUCT_CATALOG = [
       "cisco:ise:securitygroups",
       "cisco:ise:sgtbindings",
       "cisco:ise:syslog",
+      "cisco:ise:tacacs:authz:policy",
+      "cisco:ise:tacacs:policyset"
+    ],
+    "current_sourcetypes": [
+      "cisco:ise:analytics",
+      "cisco:ise:custom",
+      "cisco:ise:policy",
+      "cisco:ise:sgtbindings",
+      "cisco:ise:syslog"
+    ],
+    "legacy_sourcetypes": [
+      "cisco:ise",
+      "cisco:ise:analytics:applications",
+      "cisco:ise:analytics:fullreport",
+      "cisco:ise:analytics:hardware",
+      "cisco:ise:analytics:registry",
+      "cisco:ise:custom:*",
+      "cisco:ise:radius:authz:policy",
+      "cisco:ise:radius:policyset",
+      "cisco:ise:securitygroups",
       "cisco:ise:tacacs:authz:policy",
       "cisco:ise:tacacs:policyset"
     ],
@@ -4575,7 +4739,7 @@ export const PRODUCT_CATALOG = [
     "gap_type": "",
     "gtm_pillar": "",
     "addon_splunkbase_uid": "7538",
-    "addon_docs_url": "https://splunkbase.splunk.com/app/7538",
+    "addon_docs_url": "/app/TA_cisco_catalyst/user_guide",
     "addon_troubleshoot_url": "",
     "addon_install_url": "/manager/launcher/appsremote?order=relevance&query=Catalyst&offset=0&category=network_security&type=addon&support=cisco",
     "app_viz": "cisco-catalyst-app",
@@ -4594,12 +4758,15 @@ export const PRODUCT_CATALOG = [
     "legacy_uids": [
       "1467"
     ],
+    "legacy_viz_uids": [],
     "community_uids": [],
     "sourcetypes": [
       "cisco:ios",
       "cisco:ios:traceback",
       "cisco:telemetry"
     ],
+    "current_sourcetypes": [],
+    "legacy_sourcetypes": [],
     "dashboards": [
       "endpoint"
     ],
@@ -4688,7 +4855,7 @@ export const PRODUCT_CATALOG = [
     "gap_type": "",
     "gtm_pillar": "",
     "addon_splunkbase_uid": "7538",
-    "addon_docs_url": "https://splunkbase.splunk.com/app/7538",
+    "addon_docs_url": "/app/TA_cisco_catalyst/user_guide",
     "addon_troubleshoot_url": "",
     "addon_install_url": "/manager/launcher/appsremote?order=relevance&query=Catalyst&offset=0&category=network_security&type=addon&support=cisco",
     "app_viz": "cisco-catalyst-app",
@@ -4707,12 +4874,15 @@ export const PRODUCT_CATALOG = [
     "legacy_uids": [
       "1467"
     ],
+    "legacy_viz_uids": [],
     "community_uids": [],
     "sourcetypes": [
       "cisco:ios",
       "cisco:ios:traceback",
       "cisco:telemetry"
     ],
+    "current_sourcetypes": [],
+    "legacy_sourcetypes": [],
     "dashboards": [
       "network_insights"
     ],
@@ -4832,6 +5002,7 @@ export const PRODUCT_CATALOG = [
       "1711",
       "7365"
     ],
+    "legacy_viz_uids": [],
     "community_uids": [],
     "sourcetypes": [
       "meraki:accesspoints",
@@ -4878,6 +5049,8 @@ export const PRODUCT_CATALOG = [
       "meraki:wirelessdevicespacketlossbydevice",
       "meraki:wirelessdeviceswirelesscontrollersbydevice"
     ],
+    "current_sourcetypes": [],
+    "legacy_sourcetypes": [],
     "dashboards": [
       "sensors",
       "network_insights"
@@ -5005,11 +5178,14 @@ export const PRODUCT_CATALOG = [
     "app_viz_2_install_url": "",
     "learn_more_url": "https://www.cisco.com/c/en/us/solutions/enterprise-networks/dna-spaces/index.html",
     "legacy_uids": [],
+    "legacy_viz_uids": [],
     "community_uids": [],
     "sourcetypes": [
       "cisco:spaces:firehose",
       "cisco:spaces:firehose:health"
     ],
+    "current_sourcetypes": [],
+    "legacy_sourcetypes": [],
     "dashboards": [],
     "custom_dashboard": "",
     "icon_emoji": "globe",
@@ -5087,7 +5263,7 @@ export const PRODUCT_CATALOG = [
     "gap_type": "",
     "gtm_pillar": "",
     "addon_splunkbase_uid": "7538",
-    "addon_docs_url": "https://splunkbase.splunk.com/app/7538",
+    "addon_docs_url": "/app/TA_cisco_catalyst/user_guide",
     "addon_troubleshoot_url": "",
     "addon_install_url": "/manager/launcher/appsremote?order=relevance&query=Catalyst&offset=0&category=network_security&type=addon&support=cisco",
     "app_viz": "cisco-catalyst-app",
@@ -5105,6 +5281,9 @@ export const PRODUCT_CATALOG = [
     "learn_more_url": "https://www.cisco.com/site/us/en/solutions/networking/sdwan/index.html",
     "legacy_uids": [
       "6656"
+    ],
+    "legacy_viz_uids": [
+      "6657"
     ],
     "community_uids": [],
     "sourcetypes": [
@@ -5141,6 +5320,44 @@ export const PRODUCT_CATALOG = [
       "cisco:sdwan:unblock:host",
       "cisco:sdwan:utd:logs",
       "cisco:sdwan:utdhealth",
+      "cisco:sgacl:logs"
+    ],
+    "current_sourcetypes": [
+      "cisco:firewall:logs",
+      "cisco:sdwan:access:logs",
+      "cisco:sdwan:audit:logs",
+      "cisco:sdwan:custom",
+      "cisco:sdwan:energy:stats",
+      "cisco:sdwan:firewall:logs",
+      "cisco:sdwan:linkhealth",
+      "cisco:sdwan:realtime",
+      "cisco:sdwan:sitehealth",
+      "cisco:sdwan:ssetunnelhealth",
+      "cisco:sdwan:ssetunnels",
+      "cisco:sdwan:syslog",
+      "cisco:sdwan:system:logs",
+      "cisco:sdwan:tunnelhealth",
+      "cisco:sdwan:utd:logs",
+      "cisco:sdwan:utdhealth"
+    ],
+    "legacy_sourcetypes": [
+      "cisco:sdwan:acl:logs",
+      "cisco:sdwan:alert:off",
+      "cisco:sdwan:alert:on",
+      "cisco:sdwan:block:host",
+      "cisco:sdwan:custom:*",
+      "cisco:sdwan:dmi:cli:engine:write:fail",
+      "cisco:sdwan:drop:pkt",
+      "cisco:sdwan:host:tcp:alert:on",
+      "cisco:sdwan:log:summary",
+      "cisco:sdwan:pass:pkt",
+      "cisco:sdwan:session:audit:trail",
+      "cisco:sdwan:session:audit:trail:start",
+      "cisco:sdwan:sessions:maximum",
+      "cisco:sdwan:sgacl:logs",
+      "cisco:sdwan:smart:lic:platform:error",
+      "cisco:sdwan:sytem:logs",
+      "cisco:sdwan:unblock:host",
       "cisco:sgacl:logs"
     ],
     "dashboards": [
@@ -5255,7 +5472,7 @@ export const PRODUCT_CATALOG = [
     "gap_type": "",
     "gtm_pillar": "",
     "addon_splunkbase_uid": "7538",
-    "addon_docs_url": "https://splunkbase.splunk.com/app/7538",
+    "addon_docs_url": "/app/TA_cisco_catalyst/user_guide",
     "addon_troubleshoot_url": "",
     "addon_install_url": "/manager/launcher/appsremote?order=relevance&query=Catalyst&offset=0&category=network_security&type=addon&support=cisco",
     "app_viz": "cisco-catalyst-app",
@@ -5274,12 +5491,15 @@ export const PRODUCT_CATALOG = [
     "legacy_uids": [
       "1467"
     ],
+    "legacy_viz_uids": [],
     "community_uids": [],
     "sourcetypes": [
       "cisco:ios",
       "cisco:ios:traceback",
       "cisco:telemetry"
     ],
+    "current_sourcetypes": [],
+    "legacy_sourcetypes": [],
     "dashboards": [
       "network_insights"
     ],
@@ -5395,8 +5615,11 @@ export const PRODUCT_CATALOG = [
     "app_viz_2_install_url": "",
     "learn_more_url": "https://www.cisco.com/site/us/en/products/networking/software/crosswork-network-controller/index.html",
     "legacy_uids": [],
+    "legacy_viz_uids": [],
     "community_uids": [],
     "sourcetypes": [],
+    "current_sourcetypes": [],
+    "legacy_sourcetypes": [],
     "dashboards": [],
     "custom_dashboard": "",
     "icon_emoji": "globe",
@@ -5477,7 +5700,7 @@ export const PRODUCT_CATALOG = [
     "gap_type": "",
     "gtm_pillar": "",
     "addon_splunkbase_uid": "7538",
-    "addon_docs_url": "https://splunkbase.splunk.com/app/7538",
+    "addon_docs_url": "/app/TA_cisco_catalyst/user_guide",
     "addon_troubleshoot_url": "",
     "addon_install_url": "/manager/launcher/appsremote?order=relevance&query=Catalyst&offset=0&category=network_security&type=addon&support=cisco",
     "app_viz": "cisco-catalyst-app",
@@ -5496,12 +5719,15 @@ export const PRODUCT_CATALOG = [
     "legacy_uids": [
       "1467"
     ],
+    "legacy_viz_uids": [],
     "community_uids": [],
     "sourcetypes": [
       "cisco:ios",
       "cisco:ios:traceback",
       "cisco:telemetry"
     ],
+    "current_sourcetypes": [],
+    "legacy_sourcetypes": [],
     "dashboards": [
       "network_insights"
     ],
@@ -5599,7 +5825,7 @@ export const PRODUCT_CATALOG = [
     "gap_type": "",
     "gtm_pillar": "",
     "addon_splunkbase_uid": "7538",
-    "addon_docs_url": "https://splunkbase.splunk.com/app/7538",
+    "addon_docs_url": "/app/TA_cisco_catalyst/user_guide",
     "addon_troubleshoot_url": "",
     "addon_install_url": "/manager/launcher/appsremote?order=relevance&query=Catalyst&offset=0&category=network_security&type=addon&support=cisco",
     "app_viz": "cisco-catalyst-app",
@@ -5618,12 +5844,15 @@ export const PRODUCT_CATALOG = [
     "legacy_uids": [
       "1467"
     ],
+    "legacy_viz_uids": [],
     "community_uids": [],
     "sourcetypes": [
       "cisco:ios",
       "cisco:ios:traceback",
       "cisco:telemetry"
     ],
+    "current_sourcetypes": [],
+    "legacy_sourcetypes": [],
     "dashboards": [
       "network_insights"
     ],
@@ -5738,8 +5967,11 @@ export const PRODUCT_CATALOG = [
     "app_viz_2_install_url": "",
     "learn_more_url": "https://www.cisco.com/c/en/us/products/cloud-systems-management/network-services-orchestrator/index.html",
     "legacy_uids": [],
+    "legacy_viz_uids": [],
     "community_uids": [],
     "sourcetypes": [],
+    "current_sourcetypes": [],
+    "legacy_sourcetypes": [],
     "dashboards": [],
     "custom_dashboard": "",
     "icon_emoji": "gear",
@@ -5837,8 +6069,11 @@ export const PRODUCT_CATALOG = [
     "app_viz_2_install_url": "",
     "learn_more_url": "https://www.cisco.com/site/us/en/products/networking/sdwan-routers/8000-series/index.html",
     "legacy_uids": [],
+    "legacy_viz_uids": [],
     "community_uids": [],
     "sourcetypes": [],
+    "current_sourcetypes": [],
+    "legacy_sourcetypes": [],
     "dashboards": [],
     "custom_dashboard": "",
     "icon_emoji": "satellite",
@@ -5929,8 +6164,11 @@ export const PRODUCT_CATALOG = [
     "app_viz_2_install_url": "",
     "learn_more_url": "https://www.cisco.com/site/us/en/products/networking/sdwan-routers/network-convergence-system-5700-series/index.html",
     "legacy_uids": [],
+    "legacy_viz_uids": [],
     "community_uids": [],
     "sourcetypes": [],
+    "current_sourcetypes": [],
+    "legacy_sourcetypes": [],
     "dashboards": [],
     "custom_dashboard": "",
     "icon_emoji": "satellite_antenna",
@@ -6034,8 +6272,11 @@ export const PRODUCT_CATALOG = [
     "app_viz_2_install_url": "",
     "learn_more_url": "https://www.cisco.com/site/us/en/products/networking/sdwan-routers/network-convergence-system-5700-series/index.html",
     "legacy_uids": [],
+    "legacy_viz_uids": [],
     "community_uids": [],
     "sourcetypes": [],
+    "current_sourcetypes": [],
+    "legacy_sourcetypes": [],
     "dashboards": [],
     "custom_dashboard": "",
     "icon_emoji": "satellite_antenna",
@@ -6128,8 +6369,11 @@ export const PRODUCT_CATALOG = [
     "app_viz_2_install_url": "",
     "learn_more_url": "https://www.cisco.com/c/en/us/products/ios-nx-os-software/ios-netflow/index.html",
     "legacy_uids": [],
+    "legacy_viz_uids": [],
     "community_uids": [],
     "sourcetypes": [],
+    "current_sourcetypes": [],
+    "legacy_sourcetypes": [],
     "dashboards": [],
     "custom_dashboard": "",
     "icon_emoji": "chart",
@@ -6224,6 +6468,7 @@ export const PRODUCT_CATALOG = [
       "1897",
       "1896"
     ],
+    "legacy_viz_uids": [],
     "community_uids": [],
     "sourcetypes": [
       "cisco:dc:aci:authentication",
@@ -6233,6 +6478,8 @@ export const PRODUCT_CATALOG = [
       "cisco:dc:aci:stats",
       "cisco:dc:aci:syslog"
     ],
+    "current_sourcetypes": [],
+    "legacy_sourcetypes": [],
     "dashboards": [
       "home_page",
       "fabric_dashboard",
@@ -6351,12 +6598,15 @@ export const PRODUCT_CATALOG = [
       "1916",
       "6117"
     ],
+    "legacy_viz_uids": [],
     "community_uids": [],
     "sourcetypes": [
       "cisco:dc:nexus9k",
       "cisco:dc:nexus9k:dme",
       "cisco:dc:nexus9k:syslog"
     ],
+    "current_sourcetypes": [],
+    "legacy_sourcetypes": [],
     "dashboards": [
       "n9k_syslog",
       "dashboard"
@@ -6470,6 +6720,7 @@ export const PRODUCT_CATALOG = [
     "app_viz_2_install_url": "",
     "learn_more_url": "https://www.cisco.com/site/us/en/products/networking/cloud-networking/nexus-platform/index.html",
     "legacy_uids": [],
+    "legacy_viz_uids": [],
     "community_uids": [],
     "sourcetypes": [
       "cisco:dc:mso:syslog",
@@ -6482,6 +6733,8 @@ export const PRODUCT_CATALOG = [
       "cisco:dc:nd:protocols",
       "cisco:dc:nd:syslog"
     ],
+    "current_sourcetypes": [],
+    "legacy_sourcetypes": [],
     "dashboards": [
       "nd_flow_overview",
       "anomalies"
@@ -6582,8 +6835,11 @@ export const PRODUCT_CATALOG = [
     "app_viz_2_install_url": "",
     "learn_more_url": "https://www.cisco.com/c/en/us/support/data-center-networking/nexus-hyperfabric/series.html",
     "legacy_uids": [],
+    "legacy_viz_uids": [],
     "community_uids": [],
     "sourcetypes": [],
+    "current_sourcetypes": [],
+    "legacy_sourcetypes": [],
     "dashboards": [],
     "custom_dashboard": "",
     "icon_emoji": "cloud",
@@ -6673,8 +6929,11 @@ export const PRODUCT_CATALOG = [
     "app_viz_2_install_url": "",
     "learn_more_url": "https://www.cisco.com/site/us/en/products/networking/cloud-networking-switches/storage-area-networking/index.html",
     "legacy_uids": [],
+    "legacy_viz_uids": [],
     "community_uids": [],
     "sourcetypes": [],
+    "current_sourcetypes": [],
+    "legacy_sourcetypes": [],
     "dashboards": [],
     "custom_dashboard": "",
     "icon_emoji": "server",
@@ -6767,8 +7026,11 @@ export const PRODUCT_CATALOG = [
     "app_viz_2_install_url": "",
     "learn_more_url": "https://www.cisco.com/site/us/en/products/networking/optics-transceiver-modules/index.html",
     "legacy_uids": [],
+    "legacy_viz_uids": [],
     "community_uids": [],
     "sourcetypes": [],
+    "current_sourcetypes": [],
+    "legacy_sourcetypes": [],
     "dashboards": [],
     "custom_dashboard": "",
     "icon_emoji": "flashlight",
@@ -6864,8 +7126,11 @@ export const PRODUCT_CATALOG = [
     "app_viz_2_install_url": "",
     "learn_more_url": "https://www.cisco.com/site/us/en/solutions/artificial-intelligence/infrastructure/index.html",
     "legacy_uids": [],
+    "legacy_viz_uids": [],
     "community_uids": [],
     "sourcetypes": [],
+    "current_sourcetypes": [],
+    "legacy_sourcetypes": [],
     "dashboards": [],
     "custom_dashboard": "",
     "icon_emoji": "factory",
@@ -6955,8 +7220,11 @@ export const PRODUCT_CATALOG = [
     "app_viz_2_install_url": "",
     "learn_more_url": "https://www.cisco.com/site/us/en/products/networking/sdwan-routers/8000-series/sonic/index.html",
     "legacy_uids": [],
+    "legacy_viz_uids": [],
     "community_uids": [],
     "sourcetypes": [],
+    "current_sourcetypes": [],
+    "legacy_sourcetypes": [],
     "dashboards": [],
     "custom_dashboard": "",
     "icon_emoji": "package",
@@ -7054,10 +7322,13 @@ export const PRODUCT_CATALOG = [
     "app_viz_2_install_url": "",
     "learn_more_url": "https://www.cisco.com/site/us/en/products/computing/servers-unified-computing-systems/index.html",
     "legacy_uids": [],
+    "legacy_viz_uids": [],
     "community_uids": [],
     "sourcetypes": [
       "cisco:ucs"
     ],
+    "current_sourcetypes": [],
+    "legacy_sourcetypes": [],
     "dashboards": [
       "dashboard"
     ],
@@ -7165,6 +7436,7 @@ export const PRODUCT_CATALOG = [
     "legacy_uids": [
       "6482"
     ],
+    "legacy_viz_uids": [],
     "community_uids": [],
     "sourcetypes": [
       "cisco:intersight:advisories",
@@ -7187,6 +7459,8 @@ export const PRODUCT_CATALOG = [
       "cisco:intersight:target",
       "cisco:intersight:targets"
     ],
+    "current_sourcetypes": [],
+    "legacy_sourcetypes": [],
     "dashboards": [
       "activity_monitor"
     ],
@@ -7282,8 +7556,11 @@ export const PRODUCT_CATALOG = [
     "app_viz_2_install_url": "",
     "learn_more_url": "https://www.cisco.com/site/us/en/products/computing/hyperconverged-infrastructure/index.html",
     "legacy_uids": [],
+    "legacy_viz_uids": [],
     "community_uids": [],
     "sourcetypes": [],
+    "current_sourcetypes": [],
+    "legacy_sourcetypes": [],
     "dashboards": [],
     "custom_dashboard": "",
     "icon_emoji": "database",
@@ -7375,10 +7652,13 @@ export const PRODUCT_CATALOG = [
     "app_viz_2_install_url": "",
     "learn_more_url": "https://www.cisco.com/c/en/us/products/collateral/servers-unified-computing/ucs-b-series-blade-servers/data_sheet_c78-728802.html",
     "legacy_uids": [],
+    "legacy_viz_uids": [],
     "community_uids": [],
     "sourcetypes": [
       "cisco:infraops"
     ],
+    "current_sourcetypes": [],
+    "legacy_sourcetypes": [],
     "dashboards": [],
     "custom_dashboard": "",
     "icon_emoji": "wrench",
@@ -7475,8 +7755,11 @@ export const PRODUCT_CATALOG = [
     "app_viz_2_install_url": "",
     "learn_more_url": "https://www.cisco.com/site/us/en/products/networking/industrial-switches/index.html",
     "legacy_uids": [],
+    "legacy_viz_uids": [],
     "community_uids": [],
     "sourcetypes": [],
+    "current_sourcetypes": [],
+    "legacy_sourcetypes": [],
     "dashboards": [],
     "custom_dashboard": "",
     "icon_emoji": "factory",
@@ -7557,7 +7840,7 @@ export const PRODUCT_CATALOG = [
     "gap_type": "",
     "gtm_pillar": "",
     "addon_splunkbase_uid": "7538",
-    "addon_docs_url": "https://splunkbase.splunk.com/app/7538",
+    "addon_docs_url": "/app/TA_cisco_catalyst/user_guide",
     "addon_troubleshoot_url": "",
     "addon_install_url": "/manager/launcher/appsremote?order=relevance&query=Catalyst&offset=0&category=network_security&type=addon&support=cisco",
     "app_viz": "cisco-catalyst-app",
@@ -7577,6 +7860,7 @@ export const PRODUCT_CATALOG = [
       "5748",
       "5747"
     ],
+    "legacy_viz_uids": [],
     "community_uids": [],
     "sourcetypes": [
       "cisco:cybervision:activities",
@@ -7588,6 +7872,19 @@ export const PRODUCT_CATALOG = [
       "cisco:cybervision:flows",
       "cisco:cybervision:syslog",
       "cisco:cybervision:vulnerabilities"
+    ],
+    "current_sourcetypes": [
+      "cisco:cybervision:activities",
+      "cisco:cybervision:components",
+      "cisco:cybervision:custom",
+      "cisco:cybervision:devices",
+      "cisco:cybervision:events",
+      "cisco:cybervision:flows",
+      "cisco:cybervision:syslog",
+      "cisco:cybervision:vulnerabilities"
+    ],
+    "legacy_sourcetypes": [
+      "cisco:cybervision:custom:*"
     ],
     "dashboards": [
       "overview"
@@ -7689,6 +7986,7 @@ export const PRODUCT_CATALOG = [
     "legacy_uids": [
       "5737"
     ],
+    "legacy_viz_uids": [],
     "community_uids": [],
     "sourcetypes": [
       "cisco:thousandeyes:account-group",
@@ -7700,6 +7998,8 @@ export const PRODUCT_CATALOG = [
       "cisco:thousandeyes:refresh-tokens",
       "cisco:thousandeyes:trace"
     ],
+    "current_sourcetypes": [],
+    "legacy_sourcetypes": [],
     "dashboards": [
       "ta_cisco_thousandeyes/application",
       "cisco-catalyst-app/network",
@@ -7811,6 +8111,7 @@ export const PRODUCT_CATALOG = [
       "1297",
       "3472"
     ],
+    "legacy_viz_uids": [],
     "community_uids": [],
     "sourcetypes": [
       "appdynamics_analytics",
@@ -7824,6 +8125,8 @@ export const PRODUCT_CATALOG = [
       "appdynamics_snapshots",
       "appdynamics_status"
     ],
+    "current_sourcetypes": [],
+    "legacy_sourcetypes": [],
     "dashboards": [
       "dashboard"
     ],
@@ -7937,6 +8240,7 @@ export const PRODUCT_CATALOG = [
       "4434",
       "669"
     ],
+    "legacy_viz_uids": [],
     "community_uids": [],
     "sourcetypes": [
       "cisco:webex:admin:audit:events",
@@ -7952,6 +8256,8 @@ export const PRODUCT_CATALOG = [
       "cisco:webex:meetings",
       "cisco:webex:security:audit:events"
     ],
+    "current_sourcetypes": [],
+    "legacy_sourcetypes": [],
     "dashboards": [],
     "custom_dashboard": "",
     "icon_emoji": "video",
@@ -8052,10 +8358,13 @@ export const PRODUCT_CATALOG = [
     "app_viz_2_install_url": "",
     "learn_more_url": "https://www.webex.com/cloud-calling.html",
     "legacy_uids": [],
+    "legacy_viz_uids": [],
     "community_uids": [],
     "sourcetypes": [
       "cisco:ucm"
     ],
+    "current_sourcetypes": [],
+    "legacy_sourcetypes": [],
     "dashboards": [],
     "custom_dashboard": "",
     "icon_emoji": "phone",
@@ -8161,8 +8470,11 @@ export const PRODUCT_CATALOG = [
     "app_viz_2_install_url": "",
     "learn_more_url": "https://admin.webex.com",
     "legacy_uids": [],
+    "legacy_viz_uids": [],
     "community_uids": [],
     "sourcetypes": [],
+    "current_sourcetypes": [],
+    "legacy_sourcetypes": [],
     "dashboards": [],
     "custom_dashboard": "",
     "icon_emoji": "gear",
@@ -8259,10 +8571,13 @@ export const PRODUCT_CATALOG = [
     "app_viz_2_install_url": "",
     "learn_more_url": "https://www.cisco.com/c/en/us/products/conferencing/meeting-server/index.html",
     "legacy_uids": [],
+    "legacy_viz_uids": [],
     "community_uids": [],
     "sourcetypes": [
       "cisco:ms"
     ],
+    "current_sourcetypes": [],
+    "legacy_sourcetypes": [],
     "dashboards": [],
     "custom_dashboard": "",
     "icon_emoji": "video",
@@ -8359,11 +8674,14 @@ export const PRODUCT_CATALOG = [
     "app_viz_2_install_url": "",
     "learn_more_url": "https://www.cisco.com/c/en/us/products/collateral/conferencing/meeting-server/datasheet-c78-742168.html",
     "legacy_uids": [],
+    "legacy_viz_uids": [],
     "community_uids": [],
     "sourcetypes": [
       "cisco:mm:system:*",
       "cisco:mm:audit"
     ],
+    "current_sourcetypes": [],
+    "legacy_sourcetypes": [],
     "dashboards": [],
     "custom_dashboard": "",
     "icon_emoji": "clipboard",
@@ -8459,10 +8777,13 @@ export const PRODUCT_CATALOG = [
     "app_viz_2_install_url": "",
     "learn_more_url": "https://www.cisco.com/c/en/us/products/collateral/unified-communications/telepresence-video-communication-server-vcs/eos-eol-notice-c51-743969.html",
     "legacy_uids": [],
+    "legacy_viz_uids": [],
     "community_uids": [],
     "sourcetypes": [
       "cisco:tvcs"
     ],
+    "current_sourcetypes": [],
+    "legacy_sourcetypes": [],
     "dashboards": [],
     "custom_dashboard": "",
     "icon_emoji": "tv",
@@ -8559,8 +8880,11 @@ export const PRODUCT_CATALOG = [
     "app_viz_2_install_url": "",
     "learn_more_url": "https://www.cisco.com/c/en/us/products/collaboration-endpoints/index.html",
     "legacy_uids": [],
+    "legacy_viz_uids": [],
     "community_uids": [],
     "sourcetypes": [],
+    "current_sourcetypes": [],
+    "legacy_sourcetypes": [],
     "dashboards": [],
     "custom_dashboard": "",
     "icon_emoji": "desktop_computer",
@@ -8653,8 +8977,11 @@ export const PRODUCT_CATALOG = [
     "app_viz_2_install_url": "",
     "learn_more_url": "https://www.webex.com/contact-center.html",
     "legacy_uids": [],
+    "legacy_viz_uids": [],
     "community_uids": [],
     "sourcetypes": [],
+    "current_sourcetypes": [],
+    "legacy_sourcetypes": [],
     "dashboards": [],
     "custom_dashboard": "",
     "icon_emoji": "headphone",
@@ -8757,10 +9084,13 @@ export const PRODUCT_CATALOG = [
     "app_viz_2_install_url": "",
     "learn_more_url": "https://www.cisco.com/c/en/us/products/unified-communications/expressway-series/index.html",
     "legacy_uids": [],
+    "legacy_viz_uids": [],
     "community_uids": [],
     "sourcetypes": [
       "cisco:tvcs"
     ],
+    "current_sourcetypes": [],
+    "legacy_sourcetypes": [],
     "dashboards": [],
     "custom_dashboard": "",
     "icon_emoji": "video",
@@ -8864,8 +9194,11 @@ export const PRODUCT_CATALOG = [
     "app_viz_2_install_url": "",
     "learn_more_url": "https://www.cisco.com/c/en/us/products/contact-center/unified-contact-center-enterprise/index.html",
     "legacy_uids": [],
+    "legacy_viz_uids": [],
     "community_uids": [],
     "sourcetypes": [],
+    "current_sourcetypes": [],
+    "legacy_sourcetypes": [],
     "dashboards": [],
     "custom_dashboard": "",
     "icon_emoji": "headphone",
@@ -8968,8 +9301,11 @@ export const PRODUCT_CATALOG = [
     "app_viz_2_install_url": "",
     "learn_more_url": "https://www.cisco.com/c/en/us/products/contact-center/unified-contact-center-express/index.html",
     "legacy_uids": [],
+    "legacy_viz_uids": [],
     "community_uids": [],
     "sourcetypes": [],
+    "current_sourcetypes": [],
+    "legacy_sourcetypes": [],
     "dashboards": [],
     "custom_dashboard": "",
     "icon_emoji": "headphone",
@@ -9062,8 +9398,11 @@ export const PRODUCT_CATALOG = [
     "app_viz_2_install_url": "",
     "learn_more_url": "https://www.cisco.com/c/en/us/products/unified-communications/broadworks/index.html",
     "legacy_uids": [],
+    "legacy_viz_uids": [],
     "community_uids": [],
     "sourcetypes": [],
+    "current_sourcetypes": [],
+    "legacy_sourcetypes": [],
     "dashboards": [],
     "custom_dashboard": "",
     "icon_emoji": "phone",
@@ -9161,10 +9500,13 @@ export const PRODUCT_CATALOG = [
     "app_viz_2_install_url": "",
     "learn_more_url": "https://www.cisco.com/c/en/us/support/security/retired.html",
     "legacy_uids": [],
+    "legacy_viz_uids": [],
     "community_uids": [],
     "sourcetypes": [
       "cisco:ace"
     ],
+    "current_sourcetypes": [],
+    "legacy_sourcetypes": [],
     "dashboards": [],
     "custom_dashboard": "",
     "icon_emoji": "balance_scale",
@@ -9259,10 +9601,13 @@ export const PRODUCT_CATALOG = [
     "app_viz_2_install_url": "",
     "learn_more_url": "https://www.cisco.com/c/en/us/support/security/retired.html",
     "legacy_uids": [],
+    "legacy_viz_uids": [],
     "community_uids": [],
     "sourcetypes": [
       "ciscocws"
     ],
+    "current_sourcetypes": [],
+    "legacy_sourcetypes": [],
     "dashboards": [],
     "custom_dashboard": "",
     "icon_emoji": "umbrella",
@@ -9352,6 +9697,7 @@ export const PRODUCT_CATALOG = [
     "app_viz_2_install_url": "",
     "learn_more_url": "https://www.cisco.com/c/en/us/support/security/retired.html",
     "legacy_uids": [],
+    "legacy_viz_uids": [],
     "community_uids": [],
     "sourcetypes": [
       "cisco:app:events",
@@ -9363,6 +9709,8 @@ export const PRODUCT_CATALOG = [
       "cisco:dp:status",
       "cisco:dp:threatfeeds"
     ],
+    "current_sourcetypes": [],
+    "legacy_sourcetypes": [],
     "dashboards": [],
     "custom_dashboard": "",
     "icon_emoji": "email",
@@ -9454,10 +9802,13 @@ export const PRODUCT_CATALOG = [
     "app_viz_2_install_url": "",
     "learn_more_url": "https://www.cisco.com/c/en/us/support/security/retired.html",
     "legacy_uids": [],
+    "legacy_viz_uids": [],
     "community_uids": [],
     "sourcetypes": [
       "cisco:candid:events"
     ],
+    "current_sourcetypes": [],
+    "legacy_sourcetypes": [],
     "dashboards": [],
     "custom_dashboard": "",
     "icon_emoji": "chart",
@@ -9548,6 +9899,7 @@ export const PRODUCT_CATALOG = [
     "app_viz_2_install_url": "",
     "learn_more_url": "https://www.cisco.com/c/en/us/support/security/retired.html",
     "legacy_uids": [],
+    "legacy_viz_uids": [],
     "community_uids": [],
     "sourcetypes": [
       "cisco:pi:data:accesspoints",
@@ -9558,6 +9910,8 @@ export const PRODUCT_CATALOG = [
       "cisco:pi:data:events",
       "cisco:pi:data:inventorydetails"
     ],
+    "current_sourcetypes": [],
+    "legacy_sourcetypes": [],
     "dashboards": [],
     "custom_dashboard": "",
     "icon_emoji": "dashboard",
@@ -9647,6 +10001,7 @@ export const PRODUCT_CATALOG = [
     "app_viz_2_install_url": "",
     "learn_more_url": "https://developer.cisco.com/psirt/",
     "legacy_uids": [],
+    "legacy_viz_uids": [],
     "community_uids": [],
     "sourcetypes": [
       "cisco:vuln:advisories",
@@ -9655,6 +10010,8 @@ export const PRODUCT_CATALOG = [
       "cisco:vuln:advisories:cvrf:summary",
       "cisco:vuln:advisories:cvrf:vuln"
     ],
+    "current_sourcetypes": [],
+    "legacy_sourcetypes": [],
     "dashboards": [],
     "custom_dashboard": "",
     "icon_emoji": "eye",
@@ -9748,10 +10105,13 @@ export const PRODUCT_CATALOG = [
     "app_viz_2_install_url": "",
     "learn_more_url": "https://www.cisco.com/c/en/us/support/security/retired.html",
     "legacy_uids": [],
+    "legacy_viz_uids": [],
     "community_uids": [],
     "sourcetypes": [
       "cisco:acs"
     ],
+    "current_sourcetypes": [],
+    "legacy_sourcetypes": [],
     "dashboards": [],
     "custom_dashboard": "",
     "icon_emoji": "key",
@@ -9849,10 +10209,13 @@ export const PRODUCT_CATALOG = [
     "app_viz_2_install_url": "",
     "learn_more_url": "https://www.cisco.com/c/en/us/support/security/retired.html",
     "legacy_uids": [],
+    "legacy_viz_uids": [],
     "community_uids": [],
     "sourcetypes": [
       "cisco:tr:data"
     ],
+    "current_sourcetypes": [],
+    "legacy_sourcetypes": [],
     "dashboards": [],
     "custom_dashboard": "",
     "icon_emoji": "search",
@@ -9942,10 +10305,13 @@ export const PRODUCT_CATALOG = [
     "app_viz_2_install_url": "",
     "learn_more_url": "https://www.cisco.com/c/en/us/support/security/retired.html",
     "legacy_uids": [],
+    "legacy_viz_uids": [],
     "community_uids": [],
     "sourcetypes": [
       "cisco:ips:syslog"
     ],
+    "current_sourcetypes": [],
+    "legacy_sourcetypes": [],
     "dashboards": [],
     "custom_dashboard": "",
     "icon_emoji": "shield",
@@ -10040,6 +10406,7 @@ export const PRODUCT_CATALOG = [
     "legacy_uids": [
       "3497"
     ],
+    "legacy_viz_uids": [],
     "community_uids": [],
     "sourcetypes": [
       "cmxactive",
@@ -10048,6 +10415,8 @@ export const PRODUCT_CATALOG = [
       "cmxhttp",
       "cmxmap"
     ],
+    "current_sourcetypes": [],
+    "legacy_sourcetypes": [],
     "dashboards": [],
     "custom_dashboard": "",
     "icon_emoji": "globe",
@@ -10138,11 +10507,14 @@ export const PRODUCT_CATALOG = [
     "app_viz_2_install_url": "",
     "learn_more_url": "https://developer.cisco.com/docs/support-apis/bug/",
     "legacy_uids": [],
+    "legacy_viz_uids": [],
     "community_uids": [],
     "sourcetypes": [
       "cisco:bugs:csv",
       "cisco:bugs:json"
     ],
+    "current_sourcetypes": [],
+    "legacy_sourcetypes": [],
     "dashboards": [],
     "custom_dashboard": "",
     "icon_emoji": "detective",
@@ -10238,6 +10610,7 @@ export const PRODUCT_CATALOG = [
       "4691",
       "4851"
     ],
+    "legacy_viz_uids": [],
     "community_uids": [],
     "sourcetypes": [
       "skylight:alexa",
@@ -10256,6 +10629,8 @@ export const PRODUCT_CATALOG = [
       "skylight:udp",
       "skylight:voip"
     ],
+    "current_sourcetypes": [],
+    "legacy_sourcetypes": [],
     "dashboards": [],
     "custom_dashboard": "",
     "icon_emoji": "chart",

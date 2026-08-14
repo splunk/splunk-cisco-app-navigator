@@ -16,8 +16,16 @@
     "lerna": "^9.0.7"
   },
   "resolutions": {
-    "tar": ">=7.5.7",
-    "js-yaml": ">=4.1.1",
+    "tar": "^7.5.18",
+    "js-yaml": "^4.3.1",
+    "nanoid": "^3.3.17",
+    "postcss": "^8.5.23",
+    "nx": "^22.7.8",
+    "nx/brace-expansion": "^5.0.9",
+    "ip-address": "^10.3.1",
+    "axios": "^1.18.0",
+    "form-data": "^4.0.6",
+    "tmp": "^0.2.7",
     "uuid": ">=11.1.1",
     "serialize-javascript": ">=7.0.5"
   }

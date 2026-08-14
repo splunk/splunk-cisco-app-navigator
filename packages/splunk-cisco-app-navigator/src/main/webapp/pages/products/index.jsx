@@ -76,6 +76,7 @@ const DEVMODE_STORAGE_KEY = 'scan_devmode'; // 'true' | absent
 const PERSONA_STORAGE_KEY = 'scan_persona_shown'; // 'true' once persona modal dismissed
 const FILTERS_STORAGE_KEY = 'scan_filter_state';
 const PANELS_STORAGE_KEY = 'scan_panel_state';
+export const PRODUCTS_THEME_CHANGE_EVENT = 'scan-products-theme-change';
 
 const DEFAULT_PANEL_STATE = {
     configured_products: true,
@@ -525,6 +526,8 @@ async function loadProductsFromConf() {
             legacy_viz_uids: lvUids.filter(Boolean),
             community_uids: caUids.filter(Boolean),
             sourcetypes: csvToArray(c.sourcetypes),
+            current_sourcetypes: csvToArray(c.current_sourcetypes),
+            legacy_sourcetypes: csvToArray(c.legacy_sourcetypes),
             dashboards: csvToArray(c.dashboards),
             custom_dashboard: c.custom_dashboard || '',
             icon_emoji: c.icon_emoji || '',
@@ -4150,6 +4153,37 @@ function ProductCard({ product, installedApps, appStatuses, indexerApps, sourcet
     const sourcetypeSearchUrl = product.sourcetypes && product.sourcetypes.length > 0
         ? buildSourcetypeSearchUrl(product.sourcetypes)
         : null;
+    const currentSourcetypes = product.current_sourcetypes || [];
+    const legacySourcetypes = product.legacy_sourcetypes || [];
+    const hasSourcetypeGroups = currentSourcetypes.length > 0 || legacySourcetypes.length > 0;
+    const groupedSourcetypeValues = new Set([...currentSourcetypes, ...legacySourcetypes]);
+    const otherSourcetypes = hasSourcetypeGroups
+        ? (product.sourcetypes || []).filter(st => !groupedSourcetypeValues.has(st))
+        : [];
+    const sourcetypeGroups = hasSourcetypeGroups
+        ? [
+            { key: 'current', label: 'Current', summaryLabel: 'current', sourcetypes: currentSourcetypes },
+            { key: 'legacy', label: 'Previous', summaryLabel: 'previous', sourcetypes: legacySourcetypes },
+            { key: 'other', label: 'Other', summaryLabel: 'other', sourcetypes: otherSourcetypes },
+        ].filter(group => group.sourcetypes.length > 0)
+        : [];
+    const renderSourcetypeChip = (st, keyPrefix = 'all') => {
+        const peers = sharedSourcetypeMap && sharedSourcetypeMap[st];
+        const isShared = peers && peers.length > 1;
+        const hasFlow = catalogSourcetypeHasFlow(st, sourcetypeInfo);
+        return (
+            <span
+                key={`${keyPrefix}:${st}`}
+                className={`csc-st-chip ${hasFlow ? 'csc-st-chip-active' : 'csc-st-chip-inactive'} ${isShared ? 'csc-st-chip-shared' : ''}`}
+                title={`${st}${hasFlow ? '' : ' — no data in last 7d'}${isShared ? ` — shared with ${peers.filter(x => x.product_id !== product.product_id).map(x => x.display_name).join(', ')}` : ''}`}
+            >{st}{isShared && <span className="csc-st-shared-badge" title="Shared sourcetype">⇄</span>}</span>
+        );
+    };
+    const renderSourcetypeChips = (sourcetypes, keyPrefix = 'all') => (
+        <div className={`csc-sourcetypes-chips${hasSourcetypeGroups ? ' csc-sourcetypes-chips-grouped' : ''}`}>
+            {sourcetypes.map(st => renderSourcetypeChip(st, keyPrefix))}
+        </div>
+    );
 
     // Support indicator: colored bar at bottom of card.
     // Custom cards get a distinct teal border; catalog cards use Cisco blue / Splunk pink / red.
@@ -4688,23 +4722,32 @@ function ProductCard({ product, installedApps, appStatuses, indexerApps, sourcet
                                 <details className="csc-dep-details csc-section-sourcetypes">
                                     <summary className="csc-dep-details-summary">
                                         Sourcetypes
-                                        <span className="csc-dp-tag csc-dp-tag-neutral">{product.sourcetypes.length}</span>
+                                        {hasSourcetypeGroups ? (
+                                            sourcetypeGroups.map(group => (
+                                                <span key={group.key} className={`csc-dp-tag ${group.key === 'current' ? 'csc-dp-tag-current' : group.key === 'legacy' ? 'csc-dp-tag-legacy' : 'csc-dp-tag-neutral'}`}>
+                                                    {group.sourcetypes.length} {group.summaryLabel}
+                                                </span>
+                                            ))
+                                        ) : (
+                                            <span className="csc-dp-tag csc-dp-tag-neutral">{product.sourcetypes.length}</span>
+                                        )}
                                     </summary>
                                     <div className="csc-dep-details-body">
-                                        <div className="csc-sourcetypes-chips">
-                                            {product.sourcetypes.map(st => {
-                                                const peers = sharedSourcetypeMap && sharedSourcetypeMap[st];
-                                                const isShared = peers && peers.length > 1;
-                                                const hasFlow = catalogSourcetypeHasFlow(st, sourcetypeInfo);
-                                                return (
-                                                    <span
-                                                        key={st}
-                                                        className={`csc-st-chip ${hasFlow ? 'csc-st-chip-active' : 'csc-st-chip-inactive'} ${isShared ? 'csc-st-chip-shared' : ''}`}
-                                                        title={`${st}${hasFlow ? '' : ' — no data in last 7d'}${isShared ? ` — shared with ${peers.filter(x => x.product_id !== product.product_id).map(x => x.display_name).join(', ')}` : ''}`}
-                                                    >{st}{isShared && <span className="csc-st-shared-badge" title="Shared sourcetype">⇄</span>}</span>
-                                                );
-                                            })}
-                                        </div>
+                                        {hasSourcetypeGroups ? (
+                                            <div className="csc-st-groups">
+                                                {sourcetypeGroups.map(group => (
+                                                    <div key={group.key} className={`csc-st-group csc-st-group-${group.key}`}>
+                                                        <div className="csc-st-group-header">
+                                                            <span className="csc-st-group-title">{group.label}</span>
+                                                            <span className="csc-st-group-count">{group.sourcetypes.length}</span>
+                                                        </div>
+                                                        {renderSourcetypeChips(group.sourcetypes, group.key)}
+                                                    </div>
+                                                ))}
+                                            </div>
+                                        ) : (
+                                            renderSourcetypeChips(product.sourcetypes)
+                                        )}
                                         {(() => {
                                             if (!sharedSourcetypeMap) return null;
                                             const sharedSts = product.sourcetypes.filter(st => sharedSourcetypeMap[st] && sharedSourcetypeMap[st].length > 1);
@@ -5181,6 +5224,8 @@ function toSplunkConf(data) {
         if (p.sc4s_supported) lines.push('sc4s_supported = true');
         // CSV array fields
         if (p.sourcetypes && p.sourcetypes.length) lines.push(`sourcetypes = ${p.sourcetypes.join(',')}`);
+        if (p.current_sourcetypes && p.current_sourcetypes.length) lines.push(`current_sourcetypes = ${p.current_sourcetypes.join(',')}`);
+        if (p.legacy_sourcetypes && p.legacy_sourcetypes.length) lines.push(`legacy_sourcetypes = ${p.legacy_sourcetypes.join(',')}`);
         if (p.dashboards && p.dashboards.length) lines.push(`dashboards = ${p.dashboards.join(',')}`);
         if (p.custom_dashboard) lines.push(`custom_dashboard = ${p.custom_dashboard}`);
         if (p.keywords && p.keywords.length) lines.push(`keywords = ${p.keywords.join(',')}`);
@@ -7836,17 +7881,21 @@ function SCANProductsPage() {
     }, []);
 
     // ── Apply resolved theme (override > Splunk default) ──
+    const resolvedColorScheme = themeOverride === 'dark' ? 'dark'
+        : themeOverride === 'light' ? 'light'
+        : splunkTheme ? 'dark' : 'light';
+
     useEffect(() => {
-        const isDark = themeOverride === 'dark' ? true
-            : themeOverride === 'light' ? false
-            : !!splunkTheme; // 'auto' → follow Splunk
         const html = document.documentElement;
-        if (isDark) {
+        if (resolvedColorScheme === 'dark') {
             html.classList.add('dce-dark');
         } else {
             html.classList.remove('dce-dark');
         }
-    }, [themeOverride, splunkTheme]);
+        window.dispatchEvent(new CustomEvent(PRODUCTS_THEME_CHANGE_EVENT, {
+            detail: { colorScheme: resolvedColorScheme },
+        }));
+    }, [resolvedColorScheme]);
 
     const handleThemeCycle = useCallback(() => {
         setThemeOverride((prev) => {
@@ -9389,7 +9438,7 @@ function SCANProductsPage() {
 
             {/* Section 1: Configured */}
             <div id="configured_products">
-            <CollapsiblePanel title={renderSectionTitle('Configured Products', configuredProducts.length, configuredProducts)} open={effectivePanelOpen.configured_products} onChange={handlePanelToggle} panelId="configured_products">
+            <CollapsiblePanel headingLevel={2} title={renderSectionTitle('Configured Products', configuredProducts.length, configuredProducts)} open={effectivePanelOpen.configured_products} onChange={handlePanelToggle} panelId="configured_products">
                 {configuredProducts.length > 0 ? (
                     <>
                     <div className="csc-section-toolbar">
@@ -9436,7 +9485,7 @@ function SCANProductsPage() {
             {/* Section 1b: Data Detected — products with flowing sourcetypes not yet configured */}
             {detectedProducts.length > 0 && (
                 <div id="detected_products">
-                <CollapsiblePanel title={renderSectionTitle('Data Detected', detectedProducts.length, detectedProducts, { pulse: true })} open={effectivePanelOpen.detected_products} onChange={handlePanelToggle} panelId="detected_products">
+                <CollapsiblePanel headingLevel={2} title={renderSectionTitle('Data Detected', detectedProducts.length, detectedProducts, { pulse: true })} open={effectivePanelOpen.detected_products} onChange={handlePanelToggle} panelId="detected_products">
                     <div style={{ padding: '8px 12px', marginBottom: '12px', background: 'var(--status-info-bg, #f0f9ff)', borderLeft: '4px solid var(--color-primary-hover, #02C8FF)', borderRadius: '4px', fontSize: '13px', color: 'var(--page-color, #333)' }}>
                         These products have <strong>active sourcetype data flowing</strong> into your Splunk environment but haven't been added to your configured list yet. Click <strong>Add to My Products</strong> to start managing them.
                     </div>
@@ -9462,7 +9511,7 @@ function SCANProductsPage() {
 
             {/* Section 2: Available */}
             <div id="available_products">
-            <CollapsiblePanel title={renderSectionTitle('Available Products', availableProducts.length, availableProducts)} open={effectivePanelOpen.available_products} onChange={handlePanelToggle} panelId="available_products">
+            <CollapsiblePanel headingLevel={2} title={renderSectionTitle('Available Products', availableProducts.length, availableProducts)} open={effectivePanelOpen.available_products} onChange={handlePanelToggle} panelId="available_products">
                 {availableProducts.length > 0 ? (
                     <div className="csc-card-grid">
                         {availableProducts.map((p) => (
@@ -9495,7 +9544,7 @@ function SCANProductsPage() {
                 (unlike isComingSoon which displays "Coming Soon"). */}
             {showInternalContent && unsupportedProducts.length > 0 && (
                 <div id="unsupported_products">
-                <CollapsiblePanel title={renderSectionTitle('Integration Needed', unsupportedProducts.length, unsupportedProducts)} open={effectivePanelOpen.unsupported_products} onChange={handlePanelToggle} panelId="unsupported_products">
+                <CollapsiblePanel headingLevel={2} title={renderSectionTitle('Integration Needed', unsupportedProducts.length, unsupportedProducts)} open={effectivePanelOpen.unsupported_products} onChange={handlePanelToggle} panelId="unsupported_products">
                     <div style={{ padding: '8px 12px', marginBottom: '12px', background: 'var(--status-warning-bg)', borderLeft: '4px solid var(--status-warning-border)', borderRadius: '4px', fontSize: '13px', color: 'var(--text-primary, #333)' }}>
                         These Cisco products do not have a dedicated Splunk add-on or integration yet. They are listed here for awareness and tracking — a Splunk integration may be developed in the future.
                     </div>
@@ -9521,7 +9570,7 @@ function SCANProductsPage() {
 
             {/* Section 4: Coming Soon (gated behind gtmMode / devMode) */}
             {showInternalContent && <div id="coming_soon_products">
-            <CollapsiblePanel title={renderSectionTitle('Coming Soon', comingSoonProducts.length, comingSoonProducts)} open={effectivePanelOpen.coming_soon_products} onChange={handlePanelToggle} panelId="coming_soon_products">
+            <CollapsiblePanel headingLevel={2} title={renderSectionTitle('Coming Soon', comingSoonProducts.length, comingSoonProducts)} open={effectivePanelOpen.coming_soon_products} onChange={handlePanelToggle} panelId="coming_soon_products">
                 {comingSoonProducts.length > 0 ? (
                     <div className="csc-card-grid">
                         {comingSoonProducts.map((p) => (
@@ -9550,7 +9599,7 @@ function SCANProductsPage() {
                 correct rendering in both light and dark modes */}
             {deprecatedProducts.length > 0 && (
                 <div id="deprecated_products">
-                <CollapsiblePanel title={renderSectionTitle('Deprecated Products', deprecatedProducts.length, deprecatedProducts)} open={effectivePanelOpen.deprecated_products} onChange={handlePanelToggle} panelId="deprecated_products">
+                <CollapsiblePanel headingLevel={2} title={renderSectionTitle('Deprecated Products', deprecatedProducts.length, deprecatedProducts)} open={effectivePanelOpen.deprecated_products} onChange={handlePanelToggle} panelId="deprecated_products">
                     <div style={{ padding: '8px 12px', marginBottom: '12px', background: 'var(--status-warning-bg)', borderLeft: '4px solid var(--status-warning-border)', borderRadius: '4px', fontSize: '13px', color: 'var(--text-primary, #333)' }}>
                         These Splunk add-ons or apps have been <strong>deprecated</strong> — the Cisco product may still be active but the integration is being sunset or replaced by a newer add-on.
                     </div>
@@ -9577,7 +9626,7 @@ function SCANProductsPage() {
             {/* Section 6: Retired Products (Cisco EOL) */}
             {retiredProducts.length > 0 && (
                 <div id="retired_products">
-                <CollapsiblePanel title={renderSectionTitle('Retired Products', retiredProducts.length, retiredProducts)} open={effectivePanelOpen.retired_products} onChange={handlePanelToggle} panelId="retired_products">
+                <CollapsiblePanel headingLevel={2} title={renderSectionTitle('Retired Products', retiredProducts.length, retiredProducts)} open={effectivePanelOpen.retired_products} onChange={handlePanelToggle} panelId="retired_products">
                     <div style={{ padding: '8px 12px', marginBottom: '12px', background: 'var(--status-neutral-bg, #fce4ec)', borderLeft: '4px solid var(--color-error, #c62828)', borderRadius: '4px', fontSize: '13px', color: 'var(--page-color, #333)' }}>
                         These Cisco products have reached <strong>end-of-life / end-of-sale</strong> and have been superseded by newer offerings. Their Splunk add-ons may still function if already installed.
                     </div>
@@ -9604,7 +9653,7 @@ function SCANProductsPage() {
             {/* Section 6: GTM Roadmap — Coverage Gaps (only when user has turned on "GTM Roadmap" in filters) */}
             {showGtmRoadmap && gtmGapProducts.length > 0 && (
                 <div id="gtm_coverage_gaps">
-                <CollapsiblePanel title={renderSectionTitle('GTM Roadmap \u2014 Coverage Gaps', gtmGapProducts.length, gtmGapProducts)} open={effectivePanelOpen.gtm_coverage_gaps} onChange={handlePanelToggle} panelId="gtm_coverage_gaps">
+                <CollapsiblePanel headingLevel={2} title={renderSectionTitle('GTM Roadmap \u2014 Coverage Gaps', gtmGapProducts.length, gtmGapProducts)} open={effectivePanelOpen.gtm_coverage_gaps} onChange={handlePanelToggle} panelId="gtm_coverage_gaps">
                     <div style={{ padding: '8px 12px', marginBottom: '12px', background: 'var(--status-neutral-bg, #eceff1)', borderLeft: '4px solid var(--text-tertiary, #607d8b)', borderRadius: '4px', fontSize: '13px', color: 'var(--page-color, #333)' }}>
                         These Cisco products are on the <strong>Secure Networking GTM roadmap</strong> for Splunk integration. Items are ordered by GTM pillar — <strong>Campus &amp; Branch first</strong>, then WAN Edge, Data Center &amp; Cloud, Visibility &amp; Assurance, and Industrial/OT.
                     </div>
@@ -9638,6 +9687,7 @@ function SCANProductsPage() {
                 configured custom cards move to the "Configured Products" section above. */}
             <div id="custom_products">
             <CollapsiblePanel
+                headingLevel={2}
                 title={renderSectionTitle('Custom Products', unconfiguredCustomProducts.length, unconfiguredCustomProducts)}
                 open={effectivePanelOpen.custom_products}
                 onChange={handlePanelToggle}
@@ -9691,7 +9741,7 @@ function SCANProductsPage() {
             {/* Section 8: Catalog Vault — Disabled Products */}
             {showVault && vaultProducts.length > 0 && (
                 <div id="vault_products">
-                <CollapsiblePanel title={renderSectionTitle('Catalog Vault', vaultProducts.length, vaultProducts)} open={effectivePanelOpen.vault_products} onChange={handlePanelToggle} panelId="vault_products">
+                <CollapsiblePanel headingLevel={2} title={renderSectionTitle('Catalog Vault', vaultProducts.length, vaultProducts)} open={effectivePanelOpen.vault_products} onChange={handlePanelToggle} panelId="vault_products">
                     <div style={{ padding: '8px 12px', marginBottom: '12px', background: 'var(--status-neutral-bg, #f1f5f9)', borderLeft: '4px solid #64748b', borderRadius: '4px', fontSize: '13px', color: 'var(--page-color, #333)' }}>
                         These catalog entries are <strong>disabled</strong> in products.conf and hidden from the main view. They may be placeholders, duplicates, or products intentionally removed from the active catalog.
                     </div>

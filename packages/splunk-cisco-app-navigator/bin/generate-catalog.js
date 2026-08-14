@@ -72,6 +72,7 @@ function parseConf(text) {
 
 function buildProduct(name, c) {
     const laUids = csvToArray(c.legacy_uids);
+    const lvUids = csvToArray(c.legacy_viz_uids);
     const caUids = csvToArray(c.community_uids);
 
     return {
@@ -112,8 +113,11 @@ function buildProduct(name, c) {
         app_viz_2_install_url: c.app_viz_2_install_url || '',
         learn_more_url: c.learn_more_url || '',
         legacy_uids: laUids.filter(Boolean),
+        legacy_viz_uids: lvUids.filter(Boolean),
         community_uids: caUids.filter(Boolean),
         sourcetypes: csvToArray(c.sourcetypes),
+        current_sourcetypes: csvToArray(c.current_sourcetypes),
+        legacy_sourcetypes: csvToArray(c.legacy_sourcetypes),
         dashboards: csvToArray(c.dashboards),
         custom_dashboard: c.custom_dashboard || '',
         icon_emoji: c.icon_emoji || '',
