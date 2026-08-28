@@ -18,6 +18,9 @@ Unreleased
 ### Compatibility
 * **Python 3.13 command metadata** — Declared the required Python version for the `synclookup` and `synccatalog` custom search commands so future Splunk Cloud vetting remains compatible with Splunk 10.6.
 
+### Build & Release
+* **Remote SSH installation** — Added a validated `--remote-install` workflow that uploads the release archive over SSH and installs it as the configured Splunk OS account, with optional password-prompted splunkd authentication.
+
 ### Documentation
 * **In-app User Guide** — Added a searchable, responsive React guide with task-based setup, catalog, deployment, operations, Splunk Cloud, troubleshooting, and configuration guidance; light/dark themes; print-to-PDF support; live build metadata; and a dedicated notebook icon in the app navigation rail that replaces the duplicate toolbar guide modal.
 
