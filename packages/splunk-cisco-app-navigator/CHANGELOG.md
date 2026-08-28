@@ -8,9 +8,13 @@ Unreleased
 * **Unified React theme boundary** — Synchronized Splunk UI components and portal-rendered dialogs with the dashboard's Auto, Light, and Dark preference, and added semantic level-two headings to product sections.
 * **Grouped sourcetype lists** — Product cards can now show current and previous sourcetypes as separate groups while preserving the combined list for data detection, search links, and props.conf audits.
 * **Catalyst TA user guide links** — Cisco Catalyst Add-on Docs links now open the shipped `TA_cisco_catalyst` user guide instead of the Splunkbase listing.
+* **Catalyst TA guided setup links** — Added product-specific guided setup links to every card backed by Cisco Catalyst Add-on for Splunk, including controller-specific input pages and the shared syslog setup for device families.
 
 ### Catalog Fixes
 * **Cisco Catalyst sourcetype alignment** — Added current and legacy Catalyst Center, SD-WAN, ISE, and Cyber Vision sourcetypes from the revised Cisco Catalyst TA sourcetype catalog, including stable custom/API, report, policy, firewall/access, realtime, and historical compatibility names.
+* **Grouped sourcetype configuration validation** — Declared the `current_sourcetypes` and `legacy_sourcetypes` catalog fields in `products.conf.spec`, eliminating Splunk btool invalid-key errors for grouped sourcetype entries.
+* **Catalyst SD-WAN NetFlow guidance** — Linked the SD-WAN card to the guided NetFlow workflow and deployment guide in Cisco Catalyst Add-on for Splunk, corrected package placement and support boundaries, and aligned the modal with the production `stream:netflow` and `cisco_netflow` contracts.
+* **NetFlow exporter scope** — Removed the NetFlow badge from Catalyst Center because managed devices, not the controller, export flows; clarified Meraki MX and Z-Series scope; and corrected the ACI leaf-exporter comment.
 
 ### Security
 * **Build dependency hardening** — Refreshed the Yarn lockfile and added bounded security resolutions for Nx, Axios, nanoid, js-yaml, PostCSS, ip-address, brace-expansion, tar, form-data, and tmp.

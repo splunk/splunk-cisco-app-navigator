@@ -507,6 +507,7 @@ async function loadProductsFromConf() {
             gap_type: c.gap_type || '',
             addon_splunkbase_uid: c.addon_uid || c.addon_splunkbase_uid || extractSplunkbaseUid(c.addon_splunkbase_url) || '',
             addon_docs_url: c.addon_docs_url || '',
+            addon_setup_url: c.addon_setup_url || '',
             addon_troubleshoot_url: c.addon_troubleshoot_url || '',
             addon_install_url: c.addon_install_url || '',
             app_viz: c.app_viz || '',
@@ -553,6 +554,7 @@ async function loadProductsFromConf() {
             netflow_addon_label: c.netflow_addon_label || '',
             netflow_addon_splunkbase_id: c.netflow_addon_splunkbase_id || '',
             netflow_addon_docs_url: c.netflow_addon_docs_url || '',
+            netflow_setup_url: c.netflow_setup_url || '',
             stream_docs_url: c.stream_docs_url || '',
             netflow_sourcetypes: (c.netflow_sourcetypes || '').split(',').map(s => s.trim()).filter(Boolean),
             netflow_config_notes: (c.netflow_config_notes || '').split('|').map(s => s.trim()).filter(Boolean),
@@ -1636,12 +1638,14 @@ function NetFlowInfoModal({ open, onClose, installedApps, productContext }) {
     const returnFocusRef = useRef(null);
     if (!open) return null;
     const pc = productContext || null;
+    const setupUrl = pc?.netflowSetupUrl || pc?.addonSetupUrl || '';
+    const hasNetFlowSetup = Boolean(pc?.netflowSetupUrl);
 
     const streamTAs = [
         { id: 'splunk_app_stream', label: 'Splunk App for Stream', uid: '1809', vendor: 'Splunk' },
         { id: 'Splunk_TA_stream_wire_data', label: 'Splunk Add-on for Stream Wire Data', uid: '5234', vendor: 'Splunk' },
-        { id: 'Splunk_TA_stream', label: 'Splunk Add-on for Stream Forwarders', uid: '5238', vendor: 'Splunk', forwarderOnly: true },
-        { id: 'splunk_app_stream_ipfix_cisco_hsl', label: 'Cisco Catalyst Enhanced Netflow Add-on', uid: '6872', vendor: 'Cisco' },
+        { id: 'Splunk_TA_stream', label: 'Splunk Add-on for Stream Forwarders', uid: '5238', vendor: 'Splunk', remoteTier: 'verify on flow collectors' },
+        { id: 'splunk_app_stream_ipfix_cisco_hsl', label: 'Cisco Catalyst Enhanced NetFlow Add-on', uid: '6872', vendor: 'Cisco', remoteTier: 'verify on supported SD-WAN flow collectors' },
     ];
 
     return (
@@ -1665,6 +1669,19 @@ function NetFlowInfoModal({ open, onClose, installedApps, productContext }) {
                                     </span>
                                 </div>
                             )}
+                            {setupUrl && (
+                                <div className="scan-modal-pc-row">
+                                    <span className="scan-modal-pc-label">Guided setup</span>
+                                    <span className="scan-modal-pc-value">
+                                        {pc.setupAppLabel || 'Cisco Catalyst Add-on for Splunk'}
+                                        {pc.setupAppStatus?.installed && <span className="csc-dep-version" style={{marginLeft: 6}}>v{pc.setupAppStatus.version}</span>}
+                                        {pc.setupAppStatus && !pc.setupAppStatus.installed && <span className="csc-dep-status-missing" style={{marginLeft: 6}}>not installed</span>}
+                                        <a href={setupUrl} target="_blank" rel="noopener noreferrer" className="csc-split-pill-seg" style={{marginLeft: 6}}>
+                                            {hasNetFlowSetup ? 'Open SD-WAN NetFlow setup' : `Open Cisco Catalyst Add-on setup for ${pc.displayName}`}
+                                        </a>
+                                    </span>
+                                </div>
+                            )}
                             {pc.netflowConfigNotes && pc.netflowConfigNotes.length > 0 && (
                                 <ul className="scan-modal-pc-notes">
                                     {pc.netflowConfigNotes.map((note, i) => <li key={i}>{note}</li>)}
@@ -1672,7 +1689,7 @@ function NetFlowInfoModal({ open, onClose, installedApps, productContext }) {
                             )}
                             {pc.netflowAddonDocsUrl && (
                                 <a href={pc.netflowAddonDocsUrl} target="_blank" rel="noopener noreferrer" className="scan-modal-pc-link">
-                                    NetFlow Docs for {pc.displayName} ›
+                                    NetFlow deployment guide for {pc.displayName} ›
                                 </a>
                             )}
                         </div>
@@ -1680,29 +1697,29 @@ function NetFlowInfoModal({ open, onClose, installedApps, productContext }) {
                     <div className="csc-sc4s-info-hero">
                         <div className="csc-sc4s-info-hero-icon"></div>
                         <div className="csc-sc4s-info-hero-text">
-                            <h3>Technical Overview</h3>
-                            <p>The NetFlow / Splunk Stream solution provides network traffic visibility from Cisco devices using <strong>4 complementary packages</strong> — <strong>3 from Splunk</strong> (the Stream platform) and <strong>1 from Cisco</strong> (enhanced Netflow). Together they collect, parse, enrich, and visualize NetFlow v9, v10 (IPFIX), and wire data from your Cisco infrastructure.</p>
+                            <h3>Technical overview</h3>
+                            <p>The core NetFlow solution uses <strong>3 Splunk Stream packages</strong>. For supported Cisco Catalyst SD-WAN enterprise IPFIX or High Speed Logging (HSL) fields, also install <strong>Cisco Catalyst Enhanced NetFlow Add-on (6872)</strong> on the Stream Forwarder. <strong>Cisco Catalyst Add-on for Splunk (7538)</strong> provides the SD-WAN guided setup, deployment guide, <code>cisco_netflow</code> eventtype, and bounded Common Information Model (CIM) normalization.</p>
                         </div>
                     </div>
 
                     <div className="csc-sc4s-info-section">
-                        <h4>The 4-Package Ecosystem</h4>
-                        <p style={{ marginBottom: '12px', fontSize: '13px' }}>All 4 packages work together. The 3 Splunk packages form the core Stream platform; the Cisco package adds IOS-XE-specific enhancements.</p>
+                        <h4>NetFlow package ecosystem</h4>
+                        <p style={{ marginBottom: '12px', fontSize: '13px' }}>The 3 Splunk packages form the core Stream platform. Package 6872 is conditional: use it for supported Catalyst SD-WAN enterprise HSL and IPFIX templates, not as the default decoder for every IOS-XE or IOS-XR exporter.</p>
 
-                        {/* TA Install Status — all 4 packages */}
+                        {/* Package placement — three core Stream packages plus the conditional Cisco decoder */}
                         {installedApps && (
                             <div style={{ marginBottom: '14px', padding: '10px 14px', background: 'var(--bg-primary, #f4f4f4)', borderRadius: '8px', border: '1px solid var(--border-light, #e3ddd8)' }}>
-                                <div style={{ fontSize: '11px', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.3px', marginBottom: '6px', color: 'var(--faint-color, #888)' }}>Search Head Install Status</div>
+                                <div style={{ fontSize: '11px', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.3px', marginBottom: '6px', color: 'var(--faint-color, #888)' }}>Package placement check</div>
                                 <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
                                     {streamTAs.map(ta => {
                                         const info = installedApps[ta.id];
                                         return (
                                             <div key={ta.id} style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '12px' }}>
-                                                {ta.forwarderOnly ? (
+                                                {ta.remoteTier ? (
                                                     <>
                                                         <span className="scan-m8-faint" style={{ fontWeight: 700, width: '14px' }}>⬦</span>
                                                         <span style={{ flex: 1 }}>{ta.label} <span className="scan-m8-faint" style={{ fontSize: '10px' }}>({ta.vendor})</span></span>
-                                                        <span className="csc-dep-status-forwarder" style={{ fontSize: '10px' }}>forwarder-only</span>
+                                                        <span className="csc-dep-status-forwarder" style={{ fontSize: '10px' }}>{ta.remoteTier}</span>
                                                     </>
                                                 ) : (
                                                     <>
@@ -1736,63 +1753,59 @@ function NetFlowInfoModal({ open, onClose, installedApps, productContext }) {
                                 <span className="csc-sc4s-info-card-icon"></span>
                                 <strong>Splunk Add-on for Stream Wire Data</strong>
                                 <span style={{ fontSize: '11px', fontStyle: 'italic' }}><a href="https://splunkbase.splunk.com/app/5234" target="_blank" rel="noopener noreferrer">Splunkbase 5234</a> &middot; Splunk</span>
-                                <span>Companion add-on to App for Stream and Add-on for Stream Forwarders. Contains <strong>knowledge objects and CIM mappings</strong> for data generated by the Add-on for Stream Forwarders (5238). Installed on <strong>Indexers and Search Heads</strong> — required on both for full parsing and normalized fields (search-time on Search Heads, index-time on Indexers).</span>
+                                <span>Provides Stream parsing on <strong>indexers</strong> and search-time knowledge on <strong>search heads</strong>. Install package 5234 on both tiers so indexed Stream events and search-time fields use the same supported knowledge package.</span>
                             </div>
                             <div className="csc-sc4s-info-card">
                                 <span className="csc-sc4s-info-card-icon"></span>
-                                <strong>Cisco Catalyst Enhanced Netflow Add-on</strong>
+                                <strong>Cisco Catalyst Enhanced NetFlow Add-on</strong>
                                 <span style={{ fontSize: '11px', fontStyle: 'italic' }}><a href="https://splunkbase.splunk.com/app/6872" target="_blank" rel="noopener noreferrer">Splunkbase 6872</a> &middot; Cisco</span>
-                                <span>Provides <strong>Netflow element mapping</strong> for Cisco Netflow data (v9 and v10/IPFIX) from <strong>Cisco Catalyst SD-WAN</strong> devices (supported product per Splunkbase). Extends Stream with Cisco-specific IPFIX templates and field extractions. For Stream deployments, install on <strong>Search Heads</strong>.</span>
+                                <span>Provides <strong>NetFlow element mapping</strong> for supported Cisco Catalyst SD-WAN HSL and enterprise IPFIX templates. Install it on each <strong>Stream Forwarder</strong> that decodes those records. If Splunk App for Stream does not show the Cisco stream definition, also install package 6872 on its search head for management visibility.</span>
                             </div>
                         </div>
                     </div>
 
                     <div className="csc-sc4s-info-section">
-                        <h4>When Do You Need Each Package?</h4>
+                        <h4>When do you need each package?</h4>
                         <table className="csc-sc4s-info-table">
                             <thead>
                                 <tr>
-                                    <th className="csc-sc4s-info-table-label scan-nf-th" style={{ width: '28%' }}>Cisco Platform</th>
-                                    <th className="csc-sc4s-info-table-label scan-nf-th" style={{ width: '42%' }}>3 Splunk Stream Packages</th>
-                                    <th className="csc-sc4s-info-table-label scan-nf-th" style={{ width: '30%' }}>Cisco Enhanced Netflow</th>
+                                    <th scope="col" className="csc-sc4s-info-table-label scan-nf-th" style={{ width: '28%' }}>Cisco platform</th>
+                                    <th scope="col" className="csc-sc4s-info-table-label scan-nf-th" style={{ width: '42%' }}>3 Splunk Stream packages</th>
+                                    <th scope="col" className="csc-sc4s-info-table-label scan-nf-th" style={{ width: '30%' }}>Cisco Enhanced NetFlow</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 <tr>
-                                    <td className="csc-sc4s-info-table-label scan-nf-td-border">IOS-XE Devices</td>
+                                    <th scope="row" className="csc-sc4s-info-table-label scan-nf-td-border">
+                                        Catalyst SD-WAN edges
+                                        <span style={{ display: 'block', marginTop: '4px', fontSize: '12px', fontWeight: 400 }}><em>Use the Cisco Catalyst TA guided workflow for receiver 0 and validation.</em></span>
+                                    </th>
                                     <td><span className="scan-nf-badge-req">Required</span> core Stream platform</td>
-                                    <td><span className="scan-nf-badge-req">Required</span> decodes Cisco IPFIX templates</td>
-                                </tr>
-                                <tr style={{ fontSize: '12px' }}>
-                                    <td style={{ paddingLeft: '20px', border: 'none', paddingTop: 0, borderLeft: '3px solid transparent' }}></td>
-                                    <td colSpan="2" style={{ border: 'none', paddingTop: 0 }}><em>Catalyst SD-WAN, ISR, ASR, WLC, Catalyst Switches</em></td>
+                                    <td><span className="scan-nf-badge-req">Required</span> for supported enterprise HSL/IPFIX fields</td>
                                 </tr>
                                 <tr>
-                                    <td className="csc-sc4s-info-table-label scan-nf-td-border">NX-OS &amp; ACI Fabric</td>
+                                    <th scope="row" className="csc-sc4s-info-table-label scan-nf-td-border">
+                                        Other IOS-XE devices
+                                        <span style={{ display: 'block', marginTop: '4px', fontSize: '12px', fontWeight: 400 }}><em>Start with the standard Stream definition and validate the exact templates and release.</em></span>
+                                    </th>
                                     <td><span className="scan-nf-badge-req">Required</span> core Stream platform</td>
-                                    <td><span className="scan-nf-badge-na">Not needed</span> standard NetFlow v9</td>
-                                </tr>
-                                <tr style={{ fontSize: '12px' }}>
-                                    <td style={{ paddingLeft: '20px', border: 'none', paddingTop: 0, borderLeft: '3px solid transparent' }}></td>
-                                    <td colSpan="2" style={{ border: 'none', paddingTop: 0 }}><em>Nexus switches (standalone NX-OS) and ACI leaf/spine fabric (NetFlow v9 via APIC policy, ACI 4.1+)</em></td>
+                                    <td><span className="scan-nf-badge-na">Not a supported default</span></td>
                                 </tr>
                                 <tr>
-                                    <td className="csc-sc4s-info-table-label scan-nf-td-border-xr">IOS-XR Devices</td>
-                                    <td><span className="scan-nf-badge-req">Required</span> core Stream platform</td>
-                                    <td><span className="scan-nf-badge-opt">Optional</span> may enhance IPFIX decoding</td>
-                                </tr>
-                                <tr style={{ fontSize: '12px' }}>
-                                    <td style={{ paddingLeft: '20px', border: 'none', paddingTop: 0, borderLeft: '3px solid transparent' }}></td>
-                                    <td colSpan="2" style={{ border: 'none', paddingTop: 0 }}><em>CRS carrier routers, ASR 9000 (IPFIX-capable)</em></td>
+                                    <th scope="row" className="csc-sc4s-info-table-label scan-nf-td-border-xr">
+                                        NX-OS, ACI, and IOS-XR
+                                        <span style={{ display: 'block', marginTop: '4px', fontSize: '12px', fontWeight: 400 }}><em>Validate platform, line-card, release, record, and scale support.</em></span>
+                                    </th>
+                                    <td><span className="scan-nf-badge-req">Required</span> when NetFlow or IPFIX export is configured</td>
+                                    <td><span className="scan-nf-badge-na">Not supported</span></td>
                                 </tr>
                                 <tr>
-                                    <td className="csc-sc4s-info-table-label scan-nf-td-border-meraki">Meraki</td>
-                                    <td><span className="scan-nf-badge-req">Required</span> core Stream platform</td>
-                                    <td><span className="scan-nf-badge-na">Not needed</span> standard NetFlow v9</td>
-                                </tr>
-                                <tr style={{ fontSize: '12px' }}>
-                                    <td style={{ paddingLeft: '20px', border: 'none', paddingTop: 0, borderLeft: '3px solid transparent' }}></td>
-                                    <td colSpan="2" style={{ border: 'none', paddingTop: 0 }}><em>Cloud-managed — exports standard NetFlow v9 (not Cisco IPFIX)</em></td>
+                                    <th scope="row" className="csc-sc4s-info-table-label scan-nf-td-border-meraki">
+                                        Meraki
+                                        <span style={{ display: 'block', marginTop: '4px', fontSize: '12px', fontWeight: 400 }}><em>MX and Z-Series appliances export standard NetFlow v9.</em></span>
+                                    </th>
+                                    <td><span className="scan-nf-badge-req">Required</span> for appliance NetFlow v9</td>
+                                    <td><span className="scan-nf-badge-na">Not supported</span></td>
                                 </tr>
                             </tbody>
                         </table>
@@ -1805,92 +1818,99 @@ function NetFlowInfoModal({ open, onClose, installedApps, productContext }) {
                                 This data can be ingested into Splunk via the <strong>Cisco DC Networking TA</strong> (sourcetype <code>cisco:dc:nd:flows</code>).
                             </p>
                             <p style={{ margin: '6px 0 0', fontSize: '12px' }}>
-                                <em>Stream-based collection (above) and Nexus Dashboard are complementary — Stream captures raw NetFlow/SPAN at the packet level, while NDI provides Cisco-native application-level flow analytics and fabric assurance.</em>
+                                <em>Stream-based collection and Nexus Dashboard are separate telemetry paths. Stream decodes configured NetFlow metadata or captures mirrored packets, while NDI provides Cisco-native fabric analytics and assurance.</em>
                             </p>
                         </div>
                     </div>
 
                     <div className="csc-sc4s-info-section">
-                        <h4>Deployment Architecture</h4>
+                        <h4>Deployment architecture</h4>
                         <table className="csc-sc4s-info-table">
                             <thead>
                                 <tr>
-                                    <th className="csc-sc4s-info-table-label" style={{ width: '22%' }}>Splunk Tier</th>
-                                    <th className="csc-sc4s-info-table-label">What to Install</th>
+                                    <th scope="col" className="csc-sc4s-info-table-label" style={{ width: '22%' }}>Splunk tier</th>
+                                    <th scope="col" className="csc-sc4s-info-table-label">What to install</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 <tr>
-                                    <td className="csc-sc4s-info-table-label">Forwarders</td>
-                                    <td><strong>Add-on for Stream Forwarders</strong> (5238) — collects NetFlow/IPFIX/SPAN on configured UDP ports</td>
+                                    <th scope="row" className="csc-sc4s-info-table-label">Forwarders</th>
+                                    <td><strong>Splunk Add-on for Stream Forwarders</strong> (5238) on every flow collector. Add <strong>Cisco Catalyst Enhanced NetFlow Add-on</strong> (6872) on collectors that decode supported Catalyst SD-WAN enterprise HSL/IPFIX fields.</td>
                                 </tr>
                                 <tr>
-                                    <td className="csc-sc4s-info-table-label">Indexers</td>
-                                    <td><strong>Add-on for Stream Wire Data</strong> (5234) — required for index-time field extractions and CIM mappings</td>
+                                    <th scope="row" className="csc-sc4s-info-table-label">Indexers</th>
+                                    <td><strong>Splunk Add-on for Stream Wire Data</strong> (5234) for Stream parsing and index-time knowledge.</td>
                                 </tr>
                                 <tr>
-                                    <td className="csc-sc4s-info-table-label">Search Heads</td>
-                                    <td><strong>App for Stream</strong> (1809) + <strong>Add-on for Stream Wire Data</strong> (5234, required for search-time parsing and normalized fields) + <strong>Cisco Catalyst Enhanced Netflow Add-on</strong> (6872, for Cisco Catalyst SD-WAN)</td>
+                                    <th scope="row" className="csc-sc4s-info-table-label">Search heads</th>
+                                    <td><strong>Splunk App for Stream</strong> (1809) + <strong>Splunk Add-on for Stream Wire Data</strong> (5234). Install <strong>Cisco Catalyst Add-on for Splunk</strong> (7538) for SD-WAN setup and search-time knowledge. Add package 6872 here only when its Cisco stream definition is not visible in the Stream management UI.</td>
                                 </tr>
                             </tbody>
                         </table>
                     </div>
 
                     <div className="csc-sc4s-info-section">
-                        <h4>Key Technical Benefits</h4>
+                        <h4>Technical benefits</h4>
                         <div className="csc-sc4s-info-grid">
                             <div className="csc-sc4s-info-card">
                                 <span className="csc-sc4s-info-card-icon"></span>
-                                <strong>Deep Cisco Visibility</strong>
-                                <span>The Cisco Catalyst Enhanced Netflow Add-on decodes proprietary IPFIX information elements for Application Visibility, Performance Routing, SD-WAN, and media metrics from Cisco Catalyst SD-WAN devices (supported product per Splunkbase).</span>
+                                <strong>Cisco SD-WAN visibility</strong>
+                                <span>Cisco Catalyst Enhanced NetFlow Add-on decodes supported Cisco Catalyst SD-WAN enterprise HSL/IPFIX information elements. Cisco Catalyst Add-on for Splunk adds the <code>cisco_netflow</code> eventtype and bounded field normalization.</span>
                             </div>
                             <div className="csc-sc4s-info-card">
                                 <span className="csc-sc4s-info-card-icon"></span>
-                                <strong>Flow Aggregation</strong>
-                                <span>Stream's built-in aggregation reduces indexed volume while maintaining full network visibility — critical for high-volume environments with thousands of flows per second.</span>
+                                <strong>Flow aggregation</strong>
+                                <span>Stream aggregation can reduce indexed volume. Validate retained fields, event counts, and troubleshooting value with representative traffic before production use.</span>
                             </div>
                             <div className="csc-sc4s-info-card">
                                 <span className="csc-sc4s-info-card-icon"></span>
-                                <strong>Multi-Protocol</strong>
-                                <span>Supports NetFlow v5, v9, IPFIX, sFlow, jFlow, and SPAN/ERSPAN — covering IOS-XE, NX-OS, IOS-XR, and ACI platforms.</span>
+                                <strong>Multiple protocols</strong>
+                                <span>Splunk Stream supports NetFlow v5, NetFlow v9, IPFIX, sFlow v5, and jFlow over UDP. SPAN and ERSPAN are separate packet-mirroring inputs, not NetFlow protocol variants.</span>
                             </div>
                             <div className="csc-sc4s-info-card">
                                 <span className="csc-sc4s-info-card-icon"></span>
-                                <strong>CIM-Compliant</strong>
-                                <span>The Wire Data Add-on maps Stream data to the Splunk Common Information Model, enabling cross-product correlation in ES, ITSI, and custom dashboards.</span>
+                                <strong>CIM alignment</strong>
+                                <span>Splunk Add-on for Stream Wire Data supplies Stream parsing and search-time knowledge. Cisco Catalyst Add-on for Splunk adds the <code>cisco_netflow</code> eventtype, Network Traffic tags, and bounded field normalization; package 6872 does not make every enterprise field CIM-compliant.</span>
                             </div>
                         </div>
                     </div>
 
                     <div className="csc-sc4s-info-section">
-                        <h4>Best Practices</h4>
+                        <h4>Best practices</h4>
                         <div className="csc-sc4s-info-bp">
                             <div className="csc-sc4s-info-bp-item csc-sc4s-info-bp-good">
                                 <span className="csc-sc4s-info-bp-marker"></span>
                                 <div>
-                                    <strong>Install All 3 Stream Packages</strong>
-                                    <p>All three Splunk Stream packages are required: Add-on for Stream Forwarders (5238) on forwarders; App for Stream (1809) on search heads; Add-on for Stream Wire Data (5234) on <strong>indexers and search heads</strong> — 5234 on search heads is required for search-time parsing and normalized fields. Missing any one will result in incomplete or unnormalized data.</p>
+                                    <strong>Install all 3 Stream packages</strong>
+                                    <p>Install Splunk Add-on for Stream Forwarders (5238) on flow collectors, Splunk App for Stream (1809) on search heads, and Splunk Add-on for Stream Wire Data (5234) on indexers and search heads.</p>
                                 </div>
                             </div>
                             <div className="csc-sc4s-info-bp-item csc-sc4s-info-bp-good">
                                 <span className="csc-sc4s-info-bp-marker"></span>
                                 <div>
-                                    <strong>Add Cisco Enhanced Netflow for Catalyst SD-WAN</strong>
-                                    <p>The Cisco Catalyst Enhanced Netflow Add-on (6872) supports <strong>Cisco Catalyst SD-WAN</strong> per Splunkbase. Install it on search heads for Stream deployments. It is <em>not</em> needed for NX-OS (Nexus), ACI, or Meraki.</p>
+                                    <strong>Add Cisco Enhanced NetFlow for Catalyst SD-WAN</strong>
+                                    <p>Cisco Catalyst Enhanced NetFlow Add-on (6872) supports Cisco Catalyst SD-WAN HSL and IPFIX templates. Install it on Stream Forwarders that decode those records. Do not use it as the default enterprise decoder for other IOS-XE, IOS-XR, NX-OS, ACI, or Meraki exporters.</p>
                                 </div>
                             </div>
                             <div className="csc-sc4s-info-bp-item csc-sc4s-info-bp-good">
                                 <span className="csc-sc4s-info-bp-marker"></span>
                                 <div>
-                                    <strong>Use IPFIX over NetFlow v5</strong>
-                                    <p>IPFIX (based on NetFlow v9) provides richer metadata including application visibility and media flow data. Critical for Cisco Catalyst, SD-WAN, and ISR platforms.</p>
+                                    <strong>Use the Catalyst TA workflow for SD-WAN</strong>
+                                    <p>Open <strong>Application Setup → Cisco Catalyst SD-WAN → NetFlow</strong> in Cisco Catalyst Add-on for Splunk. Check dependencies, choose v9/HSL or v10/Unified Logging, configure receiver 0, confirm the destination index, and validate one canary edge.</p>
+                                </div>
+                            </div>
+                            <div className="csc-sc4s-info-bp-item csc-sc4s-info-bp-good">
+                                <span className="csc-sc4s-info-bp-marker"></span>
+                                <div>
+                                    <strong>Keep one production definition enabled</strong>
+                                    <p>Splunk Stream owns the production <code>stream:netflow</code> sourcetype. Use <code>eventtype=cisco_netflow</code> for CIM-scoped searches, and avoid duplicate indexing from overlapping enabled definitions.</p>
                                 </div>
                             </div>
                             <div className="csc-sc4s-info-bp-item">
                                 <span className="csc-sc4s-info-bp-marker"></span>
                                 <div>
-                                    <strong>Aggregation for Volume Control</strong>
-                                    <p>Use Stream's built-in aggregation to reduce NetFlow data volume before indexing. Especially important for high-volume environments with thousands of active flows per second.</p>
+                                    <strong>Validate capacity before expansion</strong>
+                                    <p>Start with one canary edge. Measure packet rate, decoded records, UDP receive loss, template misses, CPU, queue growth, indexed bytes, and indexing delay before expanding to the planned collector load.</p>
                                 </div>
                             </div>
                         </div>
@@ -1898,13 +1918,15 @@ function NetFlowInfoModal({ open, onClose, installedApps, productContext }) {
 
                     <div className="csc-sc4s-info-footer">
                         <a href="https://help.splunk.com/en/splunk-cloud-platform/collect-stream-data/install-and-configure-splunk-stream/8.1/introduction/about-splunk-stream" target="_blank" rel="noopener noreferrer" className="csc-sc4s-info-link" style={{ color: '#0A60FF' }}>
-                            Splunk Stream Documentation
+                            Splunk Stream documentation
                         </a>
-                        <a href="https://www.cisco.com/c/en/us/solutions/collateral/enterprise-networks/sd-wan/sd-wan-splunk-integration-ug.html" target="_blank" rel="noopener noreferrer" className="csc-sc4s-info-link" style={{ color: '#0A60FF' }}>
-                            Cisco Enhanced Netflow Guide
-                        </a>
+                        {pc?.netflowAddonDocsUrl && (
+                            <a href={pc.netflowAddonDocsUrl} target="_blank" rel="noopener noreferrer" className="csc-sc4s-info-link" style={{ color: '#0A60FF' }}>
+                                Cisco Catalyst NetFlow deployment guide
+                            </a>
+                        )}
                         <a href="https://splunkbase.splunk.com/app/6872" target="_blank" rel="noopener noreferrer" className="csc-sc4s-info-link" style={{ color: '#0A60FF' }}>
-                            Enhanced Netflow on Splunkbase
+                            Enhanced NetFlow on Splunkbase
                         </a>
                     </div>
                 </div>
@@ -3872,6 +3894,7 @@ function generateCustomerSummary(product, splunkbaseData) {
     const docs = [];
     if (product.learn_more_url) docs.push({ label: 'Product page', url: product.learn_more_url });
     if (product.addon_docs_url) docs.push({ label: 'Add-on documentation', url: product.addon_docs_url });
+    if (product.addon_setup_url) docs.push({ label: 'Add-on guided setup', url: product.addon_setup_url });
     if (product.addon_troubleshoot_url) docs.push({ label: 'Add-on troubleshooting', url: product.addon_troubleshoot_url });
     if (product.app_viz_docs_url) docs.push({ label: 'App documentation', url: product.app_viz_docs_url });
     if (product.app_viz_troubleshoot_url) docs.push({ label: 'App troubleshooting', url: product.app_viz_troubleshoot_url });
@@ -3919,7 +3942,7 @@ function generateCustomerSummary(product, splunkbaseData) {
 function ProductCard({ product, installedApps, appStatuses, indexerApps, sourcetypeData, splunkbaseData, appidToUidMap, isConfigured, isComingSoon, noIntegration, platformType, onToggleConfigured, onShowBestPractices, onViewLegacy, onSetCustomDashboard, devMode, onViewConfig, showGtmRibbon = false, onEditCustom, onCloneCustom, onDeleteCustom, sharedSourcetypeMap }) {
     const {
         product_id, display_name, version, status, description, value_proposition, vendor, tagline,
-        icon_svg, icon_emoji, learn_more_url, addon_docs_url, addon_troubleshoot_url, addon_install_url,
+        icon_svg, icon_emoji, learn_more_url, addon_docs_url, addon_setup_url, addon_troubleshoot_url, addon_install_url,
         addon, addon_label,
         app_viz, app_viz_label, app_viz_docs_url, app_viz_troubleshoot_url, app_viz_install_url,
         app_viz_2, app_viz_2_label, app_viz_2_docs_url, app_viz_2_troubleshoot_url, app_viz_2_install_url,
@@ -3929,7 +3952,7 @@ function ProductCard({ product, installedApps, appStatuses, indexerApps, sourcet
         sc4s_search_head_ta_splunkbase_id, sc4s_sourcetypes, sc4s_config_notes,
         netflow_supported, netflow_addon, netflow_addon_label,
         netflow_addon_splunkbase_id, netflow_addon_docs_url,
-        stream_docs_url, netflow_sourcetypes, netflow_config_notes,
+        netflow_setup_url, stream_docs_url, netflow_sourcetypes, netflow_config_notes,
         es_compatible, es_cim_data_models, escu_analytic_stories, escu_detection_count, escu_detections,
     } = product;
 
@@ -4376,7 +4399,7 @@ function ProductCard({ product, installedApps, appStatuses, indexerApps, sourcet
                                     ) : (
                                         <span className="csc-dep-name" title={appStatus?.installed ? `${addon} — TA only (no UI)` : addon}>{_addonLabel}</span>
                                     )}
-                                    {(addon_splunkbase_uid || addon_docs_url || addon_troubleshoot_url) && (
+                                    {(addon_splunkbase_uid || addon_docs_url || addon_setup_url || addon_troubleshoot_url) && (
                                         <span className="csc-split-pill">
                                             {addon_splunkbase_uid && (
                                                 <a href={generateSplunkbaseUrl(addon_splunkbase_uid)} target="_blank" rel="noopener noreferrer" className="csc-split-pill-seg" title={`Splunkbase UID ${addon_splunkbase_uid}`}>
@@ -4386,6 +4409,11 @@ function ProductCard({ product, installedApps, appStatuses, indexerApps, sourcet
                                             {addon_docs_url && (
                                                 <a href={addon_docs_url} target="_blank" rel="noopener noreferrer" className="csc-split-pill-seg" title="Documentation">
                                                     Docs
+                                                </a>
+                                            )}
+                                            {addon_setup_url && (
+                                                <a href={addon_setup_url} target="_blank" rel="noopener noreferrer" className="csc-split-pill-seg" aria-label={`Guided setup for ${display_name}`} title={`Open guided setup for ${display_name}`}>
+                                                    Guided setup
                                                 </a>
                                             )}
                                             {addon_troubleshoot_url && (
@@ -5169,8 +5197,12 @@ function ProductCard({ product, installedApps, appStatuses, indexerApps, sourcet
                 netflowAddonLabel: _netflowLabel,
                 netflowAddonSplunkbaseId: netflow_addon_splunkbase_id,
                 netflowAddonDocsUrl: netflow_addon_docs_url,
+                netflowSetupUrl: netflow_setup_url,
+                addonSetupUrl: addon_setup_url,
                 netflowAddonStatus: netflowAddonStatus,
                 netflowConfigNotes: netflow_config_notes,
+                setupAppLabel: _addonLabel,
+                setupAppStatus: appStatus,
             }} />}
             <HFInfoModal open={hfInfoOpen} onClose={() => setHfInfoOpen(false)} isCloud={platformType === 'cloud'} />
             <MagicEightModal open={magicEightOpen} onClose={() => setMagicEightOpen(false)} sourcetypes={product.sourcetypes} productName={display_name} addonApp={addon} addonLabel={_addonLabel} appViz={app_viz} appViz2={app_viz_2} installedApps={installedApps} indexerApps={indexerApps} platformType={platformType} />
@@ -5202,7 +5234,7 @@ function toSplunkConf(data) {
             'display_name', 'description', 'value_proposition', 'vendor', 'tagline',
             'category', 'version', 'status',
             'addon', 'addon_label', 'addon_family', 'addon_splunkbase_uid',
-            'addon_docs_url', 'addon_troubleshoot_url', 'addon_install_url',
+            'addon_docs_url', 'addon_setup_url', 'addon_troubleshoot_url', 'addon_install_url',
             'app_viz', 'app_viz_label', 'app_viz_splunkbase_uid', 'app_viz_docs_url',
             'app_viz_troubleshoot_url', 'app_viz_install_url',
             'app_viz_2', 'app_viz_2_label', 'app_viz_2_splunkbase_uid',
