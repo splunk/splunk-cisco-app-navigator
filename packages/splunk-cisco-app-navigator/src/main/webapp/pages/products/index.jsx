@@ -4179,15 +4179,16 @@ function ProductCard({ product, installedApps, appStatuses, indexerApps, sourcet
     const currentSourcetypes = product.current_sourcetypes || [];
     const legacySourcetypes = product.legacy_sourcetypes || [];
     const hasSourcetypeGroups = currentSourcetypes.length > 0 || legacySourcetypes.length > 0;
-    const groupedSourcetypeValues = new Set([...currentSourcetypes, ...legacySourcetypes]);
-    const otherSourcetypes = hasSourcetypeGroups
-        ? (product.sourcetypes || []).filter(st => !groupedSourcetypeValues.has(st))
-        : [];
     const sourcetypeGroups = hasSourcetypeGroups
         ? [
             { key: 'current', label: 'Current', summaryLabel: 'current', sourcetypes: currentSourcetypes },
-            { key: 'legacy', label: 'Previous', summaryLabel: 'previous', sourcetypes: legacySourcetypes },
-            { key: 'other', label: 'Other', summaryLabel: 'other', sourcetypes: otherSourcetypes },
+            {
+                key: 'legacy',
+                label: 'Legacy',
+                summaryLabel: 'legacy',
+                description: 'Older TA sourcetypes retained for historical searches.',
+                sourcetypes: legacySourcetypes,
+            },
         ].filter(group => group.sourcetypes.length > 0)
         : [];
     const renderSourcetypeChip = (st, keyPrefix = 'all') => {
@@ -4768,6 +4769,9 @@ function ProductCard({ product, installedApps, appStatuses, indexerApps, sourcet
                                                         <div className="csc-st-group-header">
                                                             <span className="csc-st-group-title">{group.label}</span>
                                                             <span className="csc-st-group-count">{group.sourcetypes.length}</span>
+                                                            {group.description && (
+                                                                <span className="csc-st-group-description">{group.description}</span>
+                                                            )}
                                                         </div>
                                                         {renderSourcetypeChips(group.sourcetypes, group.key)}
                                                     </div>

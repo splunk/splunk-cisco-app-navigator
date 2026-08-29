@@ -6,12 +6,12 @@ Unreleased
 ### UI & Card Enhancements
 * **C3 catalog presentation** — Refined the Cisco Products dashboard with a layered atmospheric canvas, restrained frosted-glass command and section surfaces, command-style metrics, responsive control grouping, and simplified product cards in light and dark modes while preserving the established SCAN product identity.
 * **Unified React theme boundary** — Synchronized Splunk UI components and portal-rendered dialogs with the dashboard's Auto, Light, and Dark preference, and added semantic level-two headings to product sections.
-* **Grouped sourcetype lists** — Product cards can now show current and previous sourcetypes as separate groups while preserving the combined list for data detection, search links, and props.conf audits.
+* **Grouped sourcetype lists** — Product cards can now show Current and Legacy sourcetypes as separate groups, explain that Legacy represents older TA sourcetypes retained for historical searches, and preserve the combined list for data detection, search links, and props.conf audits.
 * **Catalyst TA user guide links** — Cisco Catalyst Add-on Docs links now open the shipped `TA_cisco_catalyst` user guide instead of the Splunkbase listing.
 * **Catalyst TA guided setup links** — Added product-specific guided setup links to every card backed by Cisco Catalyst Add-on for Splunk, including controller-specific input pages and the shared syslog setup for device families.
 
 ### Catalog Fixes
-* **Cisco Catalyst sourcetype alignment** — Reconciled current and previous Catalyst Center, SD-WAN, ISE, and Cyber Vision sourcetypes with the TA reference tables; added SD-WAN Security Advisories plus ISE Endpoint Context, Guest, Vulnerability, and Threat, and kept detection-only wildcard and ingress patterns out of the current/previous groups.
+* **Cisco Catalyst sourcetype alignment** — Reconciled Current and Legacy Catalyst Center, SD-WAN, ISE, and Cyber Vision sourcetypes with the TA reference tables; added SD-WAN Security Advisories plus ISE Endpoint Context, Guest, Vulnerability, and Threat; and classified every catalog sourcetype as either Current or Legacy with no ambiguous Other group.
 * **Grouped sourcetype configuration validation** — Declared the `current_sourcetypes` and `legacy_sourcetypes` catalog fields in `products.conf.spec`, eliminating Splunk btool invalid-key errors for grouped sourcetype entries.
 * **Catalyst SD-WAN NetFlow guidance** — Linked the SD-WAN card to the guided NetFlow workflow and deployment guide in Cisco Catalyst Add-on for Splunk, corrected package placement and support boundaries, and aligned the modal with the production `stream:netflow` and `cisco_netflow` contracts.
 * **NetFlow exporter scope** — Removed the NetFlow badge from Catalyst Center because managed devices, not the controller, export flows; clarified Meraki MX and Z-Series scope; and corrected the ACI leaf-exporter comment.

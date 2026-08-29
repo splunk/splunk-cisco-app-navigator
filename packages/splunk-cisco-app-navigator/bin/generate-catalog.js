@@ -166,6 +166,29 @@ function buildProduct(name, c) {
     };
 }
 
+function validateSourcetypeGroups(product) {
+    const current = product.current_sourcetypes || [];
+    const legacy = product.legacy_sourcetypes || [];
+    if (current.length === 0 && legacy.length === 0) return;
+
+    const aggregate = product.sourcetypes || [];
+    const currentSet = new Set(current);
+    const legacySet = new Set(legacy);
+    const aggregateSet = new Set(aggregate);
+    const overlap = current.filter(st => legacySet.has(st));
+    const unclassified = aggregate.filter(st => !currentSet.has(st) && !legacySet.has(st));
+    const absentFromAggregate = [...current, ...legacy].filter(st => !aggregateSet.has(st));
+
+    if (overlap.length || unclassified.length || absentFromAggregate.length) {
+        throw new Error([
+            `${product.product_id}: sourcetypes must be partitioned into Current or Legacy`,
+            overlap.length ? `overlap=${overlap.join(',')}` : '',
+            unclassified.length ? `unclassified=${unclassified.join(',')}` : '',
+            absentFromAggregate.length ? `absent_from_sourcetypes=${absentFromAggregate.join(',')}` : '',
+        ].filter(Boolean).join(' '));
+    }
+}
+
 // ── Main ──
 
 // Categories that are metadata-only and should NOT render as product cards.
@@ -179,6 +202,7 @@ const stanzas = parseConf(confText);
 const products = stanzas
     .map(s => {
         const prod = buildProduct(s.name, s.fields);
+        validateSourcetypeGroups(prod);
         prod.catalog_disabled = s.fields.disabled === "1" || s.fields.disabled === "true";
         return prod;
     })

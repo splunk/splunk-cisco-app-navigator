@@ -4377,7 +4377,8 @@ export const PRODUCT_CATALOG = [
       "cisco:catalyst:client",
       "cisco:catalyst:center:inventory:report",
       "cisco:catalyst:center:compliance:report",
-      "cisco:catalyst:center:report"
+      "cisco:catalyst:center:report",
+      "cisco:dnac:custom:*"
     ],
     "dashboards": [
       "overview",
@@ -4712,7 +4713,10 @@ export const PRODUCT_CATALOG = [
       "cisco:ise:analytics:registry",
       "cisco:ise:analytics:hardware",
       "cisco:ise:analytics:applications",
-      "cisco:ise:analytics:fullreport"
+      "cisco:ise:analytics:fullreport",
+      "cisco:ise",
+      "cisco:ise:custom:*",
+      "cisco:ise:securitygroups"
     ],
     "dashboards": [
       "security_insights"
@@ -5409,12 +5413,14 @@ export const PRODUCT_CATALOG = [
       "cisco:sgacl:logs"
     ],
     "current_sourcetypes": [
+      "cisco:firewall:logs",
       "cisco:sdwan:utdhealth",
       "cisco:sdwan:linkhealth",
       "cisco:sdwan:ssetunnelhealth",
       "cisco:sdwan:sitehealth",
       "cisco:sdwan:tunnelhealth",
       "cisco:sdwan:ssetunnels",
+      "cisco:sdwan:realtime",
       "cisco:sdwan:audit:logs",
       "cisco:sdwan:energy:stats",
       "cisco:sdwan:securityadvisory",
@@ -5440,7 +5446,10 @@ export const PRODUCT_CATALOG = [
       "cisco:sdwan:sgacl:logs",
       "cisco:sdwan:acl:logs",
       "cisco:sdwan:smart:lic:platform:error",
-      "cisco:sdwan:dmi:cli:engine:write:fail"
+      "cisco:sdwan:dmi:cli:engine:write:fail",
+      "cisco:sdwan:custom:*",
+      "cisco:sdwan:sytem:logs",
+      "cisco:sgacl:logs"
     ],
     "dashboards": [
       "performance"
@@ -8014,7 +8023,9 @@ export const PRODUCT_CATALOG = [
       "cisco:cybervision:syslog",
       "cisco:cybervision:custom"
     ],
-    "legacy_sourcetypes": [],
+    "legacy_sourcetypes": [
+      "cisco:cybervision:custom:*"
+    ],
     "dashboards": [
       "overview"
     ],

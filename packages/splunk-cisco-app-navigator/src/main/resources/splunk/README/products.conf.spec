@@ -239,14 +239,14 @@ sourcetypes = <comma-separated list>
 * Sourcetypes for MTTI health checks (e.g. "cisco:asa,cisco:asa:syslog").
 
 current_sourcetypes = <comma-separated list>
-* Optional subset of sourcetypes that use the current or consolidated naming.
-* Displayed separately on product cards while the combined sourcetypes field
-* remains authoritative for data detection and health checks.
+* Optional partition of sourcetypes emitted or used by the latest TA.
+* Displayed as Current on product cards. When either grouped field is present,
+* every value in sourcetypes must appear in exactly one grouped field.
 
 legacy_sourcetypes = <comma-separated list>
-* Optional subset of sourcetypes that use previous naming retained for detection.
-* Displayed separately on product cards while the combined sourcetypes field
-* remains authoritative for data detection and health checks.
+* Optional partition of sourcetypes emitted by older TA versions and retained
+* for historical detection. Displayed as Legacy on product cards with an inline
+* explanation that these sourcetypes are retained for historical searches.
 
 dashboards = <comma-separated list>
 * Dashboard view names for the "Launch" button. The first entry is the default.
