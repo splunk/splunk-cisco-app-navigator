@@ -11,7 +11,7 @@ Unreleased
 * **Catalyst TA guided setup links** — Added product-specific guided setup links to every card backed by Cisco Catalyst Add-on for Splunk, including controller-specific input pages and the shared syslog setup for device families.
 
 ### Catalog Fixes
-* **Cisco Catalyst sourcetype alignment** — Added current and legacy Catalyst Center, SD-WAN, ISE, and Cyber Vision sourcetypes from the revised Cisco Catalyst TA sourcetype catalog, including stable custom/API, report, policy, firewall/access, realtime, and historical compatibility names.
+* **Cisco Catalyst sourcetype alignment** — Reconciled current and previous Catalyst Center, SD-WAN, ISE, and Cyber Vision sourcetypes with the TA reference tables; added SD-WAN Security Advisories plus ISE Endpoint Context, Guest, Vulnerability, and Threat, and kept detection-only wildcard and ingress patterns out of the current/previous groups.
 * **Grouped sourcetype configuration validation** — Declared the `current_sourcetypes` and `legacy_sourcetypes` catalog fields in `products.conf.spec`, eliminating Splunk btool invalid-key errors for grouped sourcetype entries.
 * **Catalyst SD-WAN NetFlow guidance** — Linked the SD-WAN card to the guided NetFlow workflow and deployment guide in Cisco Catalyst Add-on for Splunk, corrected package placement and support boundaries, and aligned the modal with the production `stream:netflow` and `cisco_netflow` contracts.
 * **NetFlow exporter scope** — Removed the NetFlow badge from Catalyst Center because managed devices, not the controller, export flows; clarified Meraki MX and Z-Series scope; and corrected the ACI leaf-exporter comment.
