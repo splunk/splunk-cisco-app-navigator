@@ -7,6 +7,7 @@ Unreleased
 * **C3 catalog presentation** — Refined the Cisco Products dashboard with a layered atmospheric canvas, restrained frosted-glass command and section surfaces, command-style metrics, responsive control grouping, and simplified product cards in light and dark modes while preserving the established SCAN product identity.
 * **Unified React theme boundary** — Synchronized Splunk UI components and portal-rendered dialogs with the dashboard's Auto, Light, and Dark preference, and added semantic level-two headings to product sections.
 * **Grouped sourcetype lists** — Product cards can now show Current and Legacy sourcetypes as separate groups, explain that Legacy represents older TA sourcetypes retained for historical searches, and preserve the combined list for data detection, search links, and props.conf audits.
+* **Catalog sync status styling** — Restored the green success, red error, and amber loading treatments for Sync Catalog after the C3 utility-pill styling unintentionally overrode those states.
 * **Catalyst TA user guide links** — Cisco Catalyst Add-on Docs links now open the shipped `TA_cisco_catalyst` user guide instead of the Splunkbase listing.
 * **Catalyst TA guided setup links** — Added product-specific guided setup links to every card backed by Cisco Catalyst Add-on for Splunk, including controller-specific input pages and the shared syslog setup for device families.
 
