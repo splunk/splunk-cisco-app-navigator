@@ -27,6 +27,7 @@ Unreleased
 * **Remote SSH installation** — Added a validated `--remote-install` workflow that uploads the release archive over SSH and installs it as the configured Splunk OS account, with optional password-prompted splunkd authentication.
 
 ### Documentation
+* **Version-neutral shipped README** — Removed stale app and dependency version pins from the shipped README while retaining the supported Splunk platform baseline.
 * **In-app User Guide** — Added a searchable, responsive React guide with task-based setup, catalog, deployment, operations, Splunk Cloud, troubleshooting, and configuration guidance; light/dark themes; print-to-PDF support; live build metadata; and a dedicated notebook icon in the app navigation rail that replaces the duplicate toolbar guide modal.
 
 1.0.27 — May 9, 2026
