@@ -6,16 +6,28 @@ Unreleased
 ### UI & Card Enhancements
 * **C3 catalog presentation** — Refined the Cisco Products dashboard with a layered atmospheric canvas, restrained frosted-glass command and section surfaces, command-style metrics, responsive control grouping, and simplified product cards in light and dark modes while preserving the established SCAN product identity.
 * **Unified React theme boundary** — Synchronized Splunk UI components and portal-rendered dialogs with the dashboard's Auto, Light, and Dark preference, and added semantic level-two headings to product sections.
-* **Grouped sourcetype lists** — Product cards can now show current and previous sourcetypes as separate groups while preserving the combined list for data detection, search links, and props.conf audits.
+* **Grouped sourcetype lists** — Product cards can now show Current and Legacy sourcetypes as separate groups, explain that Legacy represents older TA sourcetypes retained for historical searches, and preserve the combined list for data detection, search links, and props.conf audits.
+* **Catalog sync status styling** — Restored the green success, red error, and amber loading treatments for Sync Catalog after the C3 utility-pill styling unintentionally overrode those states.
 * **Catalyst TA user guide links** — Cisco Catalyst Add-on Docs links now open the shipped `TA_cisco_catalyst` user guide instead of the Splunkbase listing.
+* **Catalyst TA guided setup links** — Added product-specific guided setup links to every card backed by Cisco Catalyst Add-on for Splunk, including controller-specific input pages and the shared syslog setup for device families.
 
 ### Catalog Fixes
-* **Cisco Catalyst sourcetype alignment** — Added current and legacy Catalyst Center, SD-WAN, ISE, and Cyber Vision sourcetypes from the revised Cisco Catalyst TA sourcetype catalog, including stable custom/API, report, policy, firewall/access, realtime, and historical compatibility names.
+* **Cisco Catalyst sourcetype alignment** — Reconciled Current and Legacy Catalyst Center, SD-WAN, ISE, and Cyber Vision sourcetypes with the TA reference tables; added SD-WAN Security Advisories plus ISE Endpoint Context, Guest, Vulnerability, and Threat; and classified every catalog sourcetype as either Current or Legacy with no ambiguous Other group.
+* **Grouped sourcetype configuration validation** — Declared the `current_sourcetypes` and `legacy_sourcetypes` catalog fields in `products.conf.spec`, eliminating Splunk btool invalid-key errors for grouped sourcetype entries.
+* **Catalyst SD-WAN NetFlow guidance** — Linked the SD-WAN card to the guided NetFlow workflow and deployment guide in Cisco Catalyst Add-on for Splunk, corrected package placement and support boundaries, and aligned the modal with the production `stream:netflow` and `cisco_netflow` contracts.
+* **NetFlow exporter scope** — Removed the NetFlow badge from Catalyst Center because managed devices, not the controller, export flows; clarified Meraki MX and Z-Series scope; and corrected the ACI leaf-exporter comment.
 
 ### Security
 * **Build dependency hardening** — Refreshed the Yarn lockfile and added bounded security resolutions for Nx, Axios, nanoid, js-yaml, PostCSS, ip-address, brace-expansion, tar, form-data, and tmp.
 
+### Compatibility
+* **Python 3.13 command metadata** — Declared the required Python version for the `synclookup` and `synccatalog` custom search commands so future Splunk Cloud vetting remains compatible with Splunk 10.6.
+
+### Build & Release
+* **Remote SSH installation** — Added a validated `--remote-install` workflow that uploads the release archive over SSH and installs it as the configured Splunk OS account, with optional password-prompted splunkd authentication.
+
 ### Documentation
+* **Version-neutral shipped README** — Removed stale app and dependency version pins from the shipped README while retaining the supported Splunk platform baseline.
 * **In-app User Guide** — Added a searchable, responsive React guide with task-based setup, catalog, deployment, operations, Splunk Cloud, troubleshooting, and configuration guidance; light/dark themes; print-to-PDF support; live build metadata; and a dedicated notebook icon in the app navigation rail that replaces the duplicate toolbar guide modal.
 
 1.0.27 — May 9, 2026

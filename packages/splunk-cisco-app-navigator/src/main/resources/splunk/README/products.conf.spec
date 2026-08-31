@@ -130,6 +130,11 @@ addon_splunkbase_url = <string>
 addon_docs_url = <string>
 * Documentation URL for the required add-on (install guide, configuration reference, etc.).
 
+addon_setup_url = <string>
+* Optional. Product-specific URL for the required add-on's guided setup page.
+* Example: /app/TA_cisco_catalyst/add_input?app_name=dna_center_input
+* Default: (empty).
+
 addon_troubleshoot_url = <string>
 * Optional. URL for a troubleshooting guide specific to this add-on.
 * Links to diagnostic steps, common issues, and resolution procedures.
@@ -232,6 +237,16 @@ prereq_urls = <comma-separated list>
 
 sourcetypes = <comma-separated list>
 * Sourcetypes for MTTI health checks (e.g. "cisco:asa,cisco:asa:syslog").
+
+current_sourcetypes = <comma-separated list>
+* Optional partition of sourcetypes emitted or used by the latest TA.
+* Displayed as Current on product cards. When either grouped field is present,
+* every value in sourcetypes must appear in exactly one grouped field.
+
+legacy_sourcetypes = <comma-separated list>
+* Optional partition of sourcetypes emitted by older TA versions and retained
+* for historical detection. Displayed as Legacy on product cards with an inline
+* explanation that these sourcetypes are retained for historical searches.
 
 dashboards = <comma-separated list>
 * Dashboard view names for the "Launch" button. The first entry is the default.
@@ -447,20 +462,23 @@ sc4s_config_notes = <pipe-delimited string>
 * Default: (empty).
 
 netflow_supported = true | false
-* Whether this product supports network telemetry onboarding via NetFlow / Splunk Stream.
+* Whether this product or fabric contains a device that exports NetFlow or IPFIX
+  directly to Splunk Stream.
+* Do not set this field for a management controller that only configures or
+  receives flow telemetry from managed devices.
 * When true, the card displays a "NetFlow" tab in the Dual-Path Onboarding section,
 * alongside the Standard and SC4S tabs (if SC4S is also supported).
 * Default: false.
 
 netflow_addon = <string>
 * App ID of the Cisco-specific NetFlow add-on required for this onboarding path.
-* Typically the Cisco Catalyst Enhanced Netflow Add-on (splunk_app_stream_ipfix_cisco_hsl).
+* Typically the Cisco Catalyst Enhanced NetFlow Add-on (splunk_app_stream_ipfix_cisco_hsl).
 * Example: splunk_app_stream_ipfix_cisco_hsl
 * Default: (empty).
 
 netflow_addon_label = <string>
 * Display label for the NetFlow add-on.
-* Example: Cisco Catalyst Enhanced Netflow Add-on for Splunk
+* Example: Cisco Catalyst Enhanced NetFlow Add-on for Splunk
 * Default: (empty).
 
 netflow_addon_splunkbase_id = <string>
@@ -469,7 +487,14 @@ netflow_addon_splunkbase_id = <string>
 * Default: (empty).
 
 netflow_addon_docs_url = <url>
-* Documentation URL for the NetFlow add-on.
+* Product-specific NetFlow documentation URL.
+* Default: (empty).
+
+netflow_setup_url = <url>
+* Optional product-specific URL for a guided NetFlow setup workflow.
+* When set, the NetFlow modal links directly to the setup experience supplied
+* by the product add-on.
+* Example: /app/TA_cisco_catalyst/add_input?app_name=sdwan_input
 * Default: (empty).
 
 stream_docs_url = <url>

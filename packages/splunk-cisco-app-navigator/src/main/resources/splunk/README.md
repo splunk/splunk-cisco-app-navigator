@@ -2,7 +2,6 @@
 
 **Codename:** "The Front Door"  
 **Author:** Cisco Systems  
-**Version:** 1.0.27  
 **Compatibility:** Splunk Enterprise / Splunk Cloud 9.0+
 
 ## What It Does
@@ -131,14 +130,14 @@ Each Cisco product is represented by an **intelligent card** that actively inspe
 
 ## Technology Stack
 
-| Component | Version | Purpose |
-|---|---|---|
-| React | 18.3.1 | Core UI framework |
-| @splunk/react-ui | 5.8.0 | Splunk's official UI component library |
-| @splunk/themes | 1.5.0 | Splunk theme tokens |
-| @splunk/splunk-utils | 3.4.0 | URL helpers, CSRF tokens, REST utilities |
-| Webpack | 5.105.2 | Module bundler (~1s build time) |
-| Simple XML | 1.1 | Splunk dashboard container (`products.xml`) |
+| Component | Purpose |
+|---|---|
+| React | Core UI framework |
+| @splunk/react-ui | Splunk's official UI component library |
+| @splunk/themes | Splunk theme tokens |
+| @splunk/splunk-utils | URL helpers, CSRF tokens, REST utilities |
+| Webpack | Module bundler (~1s build time) |
+| Simple XML | Splunk dashboard container (`products.xml`) |
 
 ## Support
 
