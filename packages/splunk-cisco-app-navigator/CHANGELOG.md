@@ -1,6 +1,6 @@
 # Change Log
 
-Unreleased
+1.0.32 — October 9, 2026
 -------
 
 ### UI & Card Enhancements
@@ -12,6 +12,9 @@ Unreleased
 * **Catalyst TA guided setup links** — Added product-specific guided setup links to every card backed by Cisco Catalyst Add-on for Splunk, including controller-specific input pages and the shared syslog setup for device families.
 
 ### Catalog Fixes
+* **Three-add-on sourcetype alignment** — Matched Catalyst, DC Networking, and Meraki catalog coverage to the current source checkouts: added 27 missing product sourcetypes and the shared Catalyst syslog ingress, including dedicated ISE APIs, SD-WAN Insecure Configuration, Catalyst Center site health, AP positions and Assurance events, DC managed datasets and Custom APIs, and Meraki Custom API.
+* **Application Inventory transition** — Classified `cisco:dnac:application:inventory` as Current and retained `cisco:dnac:application:traffic` as Legacy for historical data detection.
+* **Hyperfabric and MDS integration cards** — Connected the existing cards to Cisco DC Networking and their command-center dashboards, listed all supported product sourcetypes, and replaced stale roadmap-gap metadata.
 * **Cisco Catalyst sourcetype alignment** — Reconciled Current and Legacy Catalyst Center, SD-WAN, ISE, and Cyber Vision sourcetypes with the TA reference tables; added SD-WAN Security Advisories plus ISE Endpoint Context, Guest, Vulnerability, and Threat; and classified every catalog sourcetype as either Current or Legacy with no ambiguous Other group.
 * **Grouped sourcetype configuration validation** — Declared the `current_sourcetypes` and `legacy_sourcetypes` catalog fields in `products.conf.spec`, eliminating Splunk btool invalid-key errors for grouped sourcetype entries.
 * **Catalyst SD-WAN NetFlow guidance** — Linked the SD-WAN card to the guided NetFlow workflow and deployment guide in Cisco Catalyst Add-on for Splunk, corrected package placement and support boundaries, and aligned the modal with the production `stream:netflow` and `cisco_netflow` contracts.
