@@ -88,6 +88,11 @@ export const PRODUCT_CATALOG = [
       "secure_firewall_dashboard",
       "asa_dashboard"
     ],
+    "essentials_dashboards": [
+      "sn_hmf_threat_detection_enforcement",
+      "sn_segmentation_operations"
+    ],
+    "essentials_coverage": "Related searches and dashboards for existing telemetry; required fields, models and index mappings vary by view.",
     "custom_dashboard": "",
     "icon_emoji": "fire",
     "icon_svg": "firewall",
@@ -355,6 +360,10 @@ export const PRODUCT_CATALOG = [
     "dashboards": [
       "sna_dashboard"
     ],
+    "essentials_dashboards": [
+      "workspace_insights"
+    ],
+    "essentials_coverage": "Reusable search content; select the relevant searches in an Essentials workspace.",
     "custom_dashboard": "",
     "icon_emoji": "chart",
     "icon_svg": "network_analytics",
@@ -465,6 +474,8 @@ export const PRODUCT_CATALOG = [
     "current_sourcetypes": [],
     "legacy_sourcetypes": [],
     "dashboards": [],
+    "essentials_dashboards": [],
+    "essentials_coverage": "",
     "custom_dashboard": "",
     "icon_emoji": "control",
     "icon_svg": "firewall",
@@ -563,6 +574,8 @@ export const PRODUCT_CATALOG = [
     "current_sourcetypes": [],
     "legacy_sourcetypes": [],
     "dashboards": [],
+    "essentials_dashboards": [],
+    "essentials_coverage": "",
     "custom_dashboard": "",
     "icon_emoji": "zap",
     "icon_svg": "network_analytics",
@@ -663,6 +676,8 @@ export const PRODUCT_CATALOG = [
     "current_sourcetypes": [],
     "legacy_sourcetypes": [],
     "dashboards": [],
+    "essentials_dashboards": [],
+    "essentials_coverage": "",
     "custom_dashboard": "",
     "icon_emoji": "shield",
     "icon_svg": "cloud_protection",
@@ -760,6 +775,8 @@ export const PRODUCT_CATALOG = [
     "current_sourcetypes": [],
     "legacy_sourcetypes": [],
     "dashboards": [],
+    "essentials_dashboards": [],
+    "essentials_coverage": "",
     "custom_dashboard": "",
     "icon_emoji": "lock",
     "icon_svg": "breach_protection",
@@ -857,6 +874,8 @@ export const PRODUCT_CATALOG = [
     "current_sourcetypes": [],
     "legacy_sourcetypes": [],
     "dashboards": [],
+    "essentials_dashboards": [],
+    "essentials_coverage": "",
     "custom_dashboard": "",
     "icon_emoji": "cloud",
     "icon_svg": "cloud_analytics",
@@ -960,6 +979,8 @@ export const PRODUCT_CATALOG = [
     "current_sourcetypes": [],
     "legacy_sourcetypes": [],
     "dashboards": [],
+    "essentials_dashboards": [],
+    "essentials_coverage": "",
     "custom_dashboard": "",
     "icon_emoji": "eye",
     "icon_svg": "breach_protection",
@@ -1073,6 +1094,11 @@ export const PRODUCT_CATALOG = [
     "dashboards": [
       "duo_overview"
     ],
+    "essentials_dashboards": [
+      "sn_zta_posture",
+      "sn_zta_authentication_policy_enforcement"
+    ],
+    "essentials_coverage": "Related searches and dashboards for existing telemetry; required fields, models and index mappings vary by view.",
     "custom_dashboard": "",
     "icon_emoji": "lock",
     "icon_svg": "duo",
@@ -1220,6 +1246,8 @@ export const PRODUCT_CATALOG = [
     "dashboards": [
       "cii_dashboard"
     ],
+    "essentials_dashboards": [],
+    "essentials_coverage": "",
     "custom_dashboard": "",
     "icon_emoji": "badge",
     "icon_svg": "ise",
@@ -1320,6 +1348,8 @@ export const PRODUCT_CATALOG = [
     "current_sourcetypes": [],
     "legacy_sourcetypes": [],
     "dashboards": [],
+    "essentials_dashboards": [],
+    "essentials_coverage": "",
     "custom_dashboard": "",
     "icon_emoji": "handshake",
     "icon_svg": "ise",
@@ -1426,6 +1456,10 @@ export const PRODUCT_CATALOG = [
     "dashboards": [
       "cse_dashboard"
     ],
+    "essentials_dashboards": [
+      "sn_secure_infrastructure_status"
+    ],
+    "essentials_coverage": "Related searches and dashboards for existing telemetry; required fields, models and index mappings vary by view.",
     "custom_dashboard": "",
     "icon_emoji": "shield",
     "icon_svg": "endpoint",
@@ -1559,6 +1593,10 @@ export const PRODUCT_CATALOG = [
     "dashboards": [
       "nvm_dashboard"
     ],
+    "essentials_dashboards": [
+      "sn_zta_user_activity_monitoring"
+    ],
+    "essentials_coverage": "Related searches and dashboards for existing telemetry; required fields, models and index mappings vary by view.",
     "custom_dashboard": "",
     "icon_emoji": "satellite",
     "icon_svg": "client",
@@ -1723,6 +1761,8 @@ export const PRODUCT_CATALOG = [
     "dashboards": [
       "cse_dashboard"
     ],
+    "essentials_dashboards": [],
+    "essentials_coverage": "",
     "custom_dashboard": "",
     "icon_emoji": "mag",
     "icon_svg": "vulnerability_mgmt",
@@ -1821,6 +1861,8 @@ export const PRODUCT_CATALOG = [
     "current_sourcetypes": [],
     "legacy_sourcetypes": [],
     "dashboards": [],
+    "essentials_dashboards": [],
+    "essentials_coverage": "",
     "custom_dashboard": "",
     "icon_emoji": "laptop",
     "icon_svg": "client",
@@ -1931,6 +1973,11 @@ export const PRODUCT_CATALOG = [
     "dashboards": [
       "xdr_dashboard"
     ],
+    "essentials_dashboards": [
+      "sn_zta_detection_response",
+      "sn_agentic_ops_secure_networking_assurance"
+    ],
+    "essentials_coverage": "Related searches and dashboards for existing telemetry; required fields, models and index mappings vary by view.",
     "custom_dashboard": "",
     "icon_emoji": "search",
     "icon_svg": "xdr",
@@ -2041,6 +2088,8 @@ export const PRODUCT_CATALOG = [
     "dashboards": [
       "talos_logs"
     ],
+    "essentials_dashboards": [],
+    "essentials_coverage": "",
     "custom_dashboard": "",
     "icon_emoji": "skull",
     "icon_svg": "security_cloud",
@@ -2149,6 +2198,10 @@ export const PRODUCT_CATALOG = [
     "dashboards": [
       "cvi_dashboard"
     ],
+    "essentials_dashboards": [
+      "workspace_insights"
+    ],
+    "essentials_coverage": "Reusable search content; select the relevant searches in an Essentials workspace.",
     "custom_dashboard": "",
     "icon_emoji": "eye",
     "icon_svg": "vulnerability_intel",
@@ -2255,6 +2308,10 @@ export const PRODUCT_CATALOG = [
     "dashboards": [
       "sma_dashboard"
     ],
+    "essentials_dashboards": [
+      "workspace_insights"
+    ],
+    "essentials_coverage": "Reusable search content; select the relevant searches in an Essentials workspace.",
     "custom_dashboard": "",
     "icon_emoji": "microscope",
     "icon_svg": "malware_analytics",
@@ -2365,6 +2422,10 @@ export const PRODUCT_CATALOG = [
     "dashboards": [
       "etd_dashboard"
     ],
+    "essentials_dashboards": [
+      "workspace_insights"
+    ],
+    "essentials_coverage": "Reusable search content; select the relevant searches in an Essentials workspace.",
     "custom_dashboard": "",
     "icon_emoji": "email",
     "icon_svg": "mail",
@@ -2482,6 +2543,10 @@ export const PRODUCT_CATALOG = [
     "dashboards": [
       "application"
     ],
+    "essentials_dashboards": [
+      "workspace_insights"
+    ],
+    "essentials_coverage": "Reusable search content; select the relevant searches in an Essentials workspace.",
     "custom_dashboard": "",
     "icon_emoji": "email",
     "icon_svg": "mail",
@@ -2640,6 +2705,11 @@ export const PRODUCT_CATALOG = [
     "dashboards": [
       "access"
     ],
+    "essentials_dashboards": [
+      "sn_zta_ravpn_sessions_and_posture",
+      "sn_zta_posture"
+    ],
+    "essentials_coverage": "Related searches and dashboards for existing telemetry; required fields, models and index mappings vary by view.",
     "custom_dashboard": "",
     "icon_emoji": "lock_globe",
     "icon_svg": "secure_access",
@@ -2767,6 +2837,11 @@ export const PRODUCT_CATALOG = [
     "dashboards": [
       "dns"
     ],
+    "essentials_dashboards": [
+      "sn_hmf_enforcement",
+      "sn_hmf_threat_detection_enforcement"
+    ],
+    "essentials_coverage": "Related searches and dashboards for existing telemetry; required fields, models and index mappings vary by view.",
     "custom_dashboard": "",
     "icon_emoji": "umbrella",
     "icon_svg": "umbrella",
@@ -2893,6 +2968,8 @@ export const PRODUCT_CATALOG = [
     "dashboards": [
       "investigate"
     ],
+    "essentials_dashboards": [],
+    "essentials_coverage": "",
     "custom_dashboard": "",
     "icon_emoji": "detective",
     "icon_svg": "vulnerability_intel",
@@ -3000,6 +3077,8 @@ export const PRODUCT_CATALOG = [
     "dashboards": [
       "cloudlock"
     ],
+    "essentials_dashboards": [],
+    "essentials_coverage": "",
     "custom_dashboard": "",
     "icon_emoji": "cloud_lock",
     "icon_svg": "cloudlock",
@@ -3125,6 +3204,11 @@ export const PRODUCT_CATALOG = [
     "dashboards": [
       "mcd_dashboard"
     ],
+    "essentials_dashboards": [
+      "sn_hmf_threat_detection_enforcement",
+      "sn_hmf_dlp_cloud_native_security"
+    ],
+    "essentials_coverage": "Related searches and dashboards for existing telemetry; required fields, models and index mappings vary by view.",
     "custom_dashboard": "",
     "icon_emoji": "cloud",
     "icon_svg": "multicloud_defense",
@@ -3231,6 +3315,8 @@ export const PRODUCT_CATALOG = [
     "current_sourcetypes": [],
     "legacy_sourcetypes": [],
     "dashboards": [],
+    "essentials_dashboards": [],
+    "essentials_coverage": "",
     "custom_dashboard": "",
     "icon_emoji": "cloud",
     "icon_svg": "cloud_protection",
@@ -3336,6 +3422,8 @@ export const PRODUCT_CATALOG = [
     "current_sourcetypes": [],
     "legacy_sourcetypes": [],
     "dashboards": [],
+    "essentials_dashboards": [],
+    "essentials_coverage": "",
     "custom_dashboard": "",
     "icon_emoji": "cloud_lock",
     "icon_svg": "cloud_analytics",
@@ -3444,6 +3532,10 @@ export const PRODUCT_CATALOG = [
     "dashboards": [
       "application"
     ],
+    "essentials_dashboards": [
+      "workspace_insights"
+    ],
+    "essentials_coverage": "Reusable search content; select the relevant searches in an Essentials workspace.",
     "custom_dashboard": "",
     "icon_emoji": "web",
     "icon_svg": "web_appliance",
@@ -3567,6 +3659,10 @@ export const PRODUCT_CATALOG = [
     "dashboards": [
       "csw_dashboard"
     ],
+    "essentials_dashboards": [
+      "sn_hmf_dlp_cloud_native_security"
+    ],
+    "essentials_coverage": "Related searches and dashboards for existing telemetry; required fields, models and index mappings vary by view.",
     "custom_dashboard": "",
     "icon_emoji": "building",
     "icon_svg": "workload",
@@ -3674,6 +3770,10 @@ export const PRODUCT_CATALOG = [
     "dashboards": [
       "aid_dashboard"
     ],
+    "essentials_dashboards": [
+      "sn_agentic_ops_operational_intelligence"
+    ],
+    "essentials_coverage": "Related searches and dashboards for existing telemetry; required fields, models and index mappings vary by view.",
     "custom_dashboard": "",
     "icon_emoji": "robot",
     "icon_svg": "app_security",
@@ -3785,6 +3885,11 @@ export const PRODUCT_CATALOG = [
     "dashboards": [
       "irs_dashboard"
     ],
+    "essentials_dashboards": [
+      "sn_hmf_threat_detection_enforcement",
+      "sn_hmf_dlp_cloud_native_security"
+    ],
+    "essentials_coverage": "Related searches and dashboards for existing telemetry; required fields, models and index mappings vary by view.",
     "custom_dashboard": "",
     "icon_emoji": "bee",
     "icon_svg": "cloud_protection",
@@ -3924,6 +4029,8 @@ export const PRODUCT_CATALOG = [
     "dashboards": [
       "irs_dashboard"
     ],
+    "essentials_dashboards": [],
+    "essentials_coverage": "",
     "custom_dashboard": "",
     "icon_emoji": "zap",
     "icon_svg": "sse",
@@ -4020,6 +4127,8 @@ export const PRODUCT_CATALOG = [
     "current_sourcetypes": [],
     "legacy_sourcetypes": [],
     "dashboards": [],
+    "essentials_dashboards": [],
+    "essentials_coverage": "",
     "custom_dashboard": "",
     "icon_emoji": "stop_sign",
     "icon_svg": "ddos",
@@ -4120,6 +4229,8 @@ export const PRODUCT_CATALOG = [
     "current_sourcetypes": [],
     "legacy_sourcetypes": [],
     "dashboards": [],
+    "essentials_dashboards": [],
+    "essentials_coverage": "",
     "custom_dashboard": "",
     "icon_emoji": "globe",
     "icon_svg": "vulnerability_mgmt",
@@ -4221,6 +4332,8 @@ export const PRODUCT_CATALOG = [
     "current_sourcetypes": [],
     "legacy_sourcetypes": [],
     "dashboards": [],
+    "essentials_dashboards": [],
+    "essentials_coverage": "",
     "custom_dashboard": "",
     "icon_emoji": "factory",
     "icon_svg": "workload",
@@ -4392,6 +4505,11 @@ export const PRODUCT_CATALOG = [
       "overview",
       "events_and_incident_viewer"
     ],
+    "essentials_dashboards": [
+      "sn_agentic_ops_executive_assurance",
+      "sn_segmentation_readiness"
+    ],
+    "essentials_coverage": "Related searches and dashboards for existing telemetry; required fields, models and index mappings vary by view.",
     "custom_dashboard": "",
     "icon_emoji": "globe",
     "icon_svg": "network_analytics",
@@ -4515,6 +4633,11 @@ export const PRODUCT_CATALOG = [
     "dashboards": [
       "network_insights"
     ],
+    "essentials_dashboards": [
+      "sn_hmf_sdwan_network_health",
+      "sn_segmentation_operations"
+    ],
+    "essentials_coverage": "Shared Cisco IOS/syslog operational searches; device-specific coverage depends on available fields.",
     "custom_dashboard": "",
     "icon_emoji": "switch",
     "icon_svg": "cisco_switch",
@@ -4738,6 +4861,11 @@ export const PRODUCT_CATALOG = [
     "dashboards": [
       "security_insights"
     ],
+    "essentials_dashboards": [
+      "sn_segmentation_operations",
+      "sn_zta_policy_management"
+    ],
+    "essentials_coverage": "Related searches and dashboards for existing telemetry; required fields, models and index mappings vary by view.",
     "custom_dashboard": "",
     "icon_emoji": "key",
     "icon_svg": "ise",
@@ -4869,6 +4997,11 @@ export const PRODUCT_CATALOG = [
     "dashboards": [
       "endpoint"
     ],
+    "essentials_dashboards": [
+      "sn_hmf_sdwan_network_health",
+      "sn_segmentation_operations"
+    ],
+    "essentials_coverage": "Shared Cisco IOS/syslog operational searches; device-specific coverage depends on available fields.",
     "custom_dashboard": "",
     "icon_emoji": "satellite",
     "icon_svg": "cisco_wifi",
@@ -4988,6 +5121,11 @@ export const PRODUCT_CATALOG = [
     "dashboards": [
       "network_insights"
     ],
+    "essentials_dashboards": [
+      "sn_hmf_sdwan_network_health",
+      "sn_segmentation_operations"
+    ],
+    "essentials_coverage": "Shared Cisco IOS/syslog operational searches; device-specific coverage depends on available fields.",
     "custom_dashboard": "",
     "icon_emoji": "wifi",
     "icon_svg": "cisco_wifi",
@@ -5167,6 +5305,11 @@ export const PRODUCT_CATALOG = [
       "sensors",
       "network_insights"
     ],
+    "essentials_dashboards": [
+      "sn_secure_infrastructure_posture",
+      "sn_secure_infrastructure_status"
+    ],
+    "essentials_coverage": "Related searches and dashboards for existing telemetry; required fields, models and index mappings vary by view.",
     "custom_dashboard": "",
     "icon_emoji": "cloud_network",
     "icon_svg": "cisco_cloud_networking",
@@ -5301,6 +5444,10 @@ export const PRODUCT_CATALOG = [
     "current_sourcetypes": [],
     "legacy_sourcetypes": [],
     "dashboards": [],
+    "essentials_dashboards": [
+      "workplace_building_intelligence"
+    ],
+    "essentials_coverage": "Related searches and dashboards for existing telemetry; required fields, models and index mappings vary by view.",
     "custom_dashboard": "",
     "icon_emoji": "globe",
     "icon_svg": "cisco_wifi",
@@ -5483,6 +5630,11 @@ export const PRODUCT_CATALOG = [
     "dashboards": [
       "performance"
     ],
+    "essentials_dashboards": [
+      "sn_hmf_sdwan_network_health",
+      "sn_agentic_ops_executive_assurance"
+    ],
+    "essentials_coverage": "Related searches and dashboards for existing telemetry; required fields, models and index mappings vary by view.",
     "custom_dashboard": "",
     "icon_emoji": "highway",
     "icon_svg": "cisco_sdwan",
@@ -5629,6 +5781,11 @@ export const PRODUCT_CATALOG = [
     "dashboards": [
       "network_insights"
     ],
+    "essentials_dashboards": [
+      "sn_hmf_sdwan_network_health",
+      "sn_segmentation_operations"
+    ],
+    "essentials_coverage": "Shared Cisco IOS/syslog operational searches; device-specific coverage depends on available fields.",
     "custom_dashboard": "",
     "icon_emoji": "router",
     "icon_svg": "cisco_router",
@@ -5749,6 +5906,8 @@ export const PRODUCT_CATALOG = [
     "current_sourcetypes": [],
     "legacy_sourcetypes": [],
     "dashboards": [],
+    "essentials_dashboards": [],
+    "essentials_coverage": "",
     "custom_dashboard": "",
     "icon_emoji": "globe",
     "icon_svg": "cisco_sdwan",
@@ -5862,6 +6021,11 @@ export const PRODUCT_CATALOG = [
     "dashboards": [
       "network_insights"
     ],
+    "essentials_dashboards": [
+      "sn_hmf_sdwan_network_health",
+      "sn_segmentation_operations"
+    ],
+    "essentials_coverage": "Shared Cisco IOS/syslog operational searches; device-specific coverage depends on available fields.",
     "custom_dashboard": "",
     "icon_emoji": "router",
     "icon_svg": "cisco_router",
@@ -5990,6 +6154,11 @@ export const PRODUCT_CATALOG = [
     "dashboards": [
       "network_insights"
     ],
+    "essentials_dashboards": [
+      "sn_hmf_sdwan_network_health",
+      "sn_segmentation_operations"
+    ],
+    "essentials_coverage": "Shared Cisco IOS/syslog operational searches; device-specific coverage depends on available fields.",
     "custom_dashboard": "",
     "icon_emoji": "globe",
     "icon_svg": "cisco_router",
@@ -6109,6 +6278,8 @@ export const PRODUCT_CATALOG = [
     "current_sourcetypes": [],
     "legacy_sourcetypes": [],
     "dashboards": [],
+    "essentials_dashboards": [],
+    "essentials_coverage": "",
     "custom_dashboard": "",
     "icon_emoji": "gear",
     "icon_svg": "cisco_sdwan",
@@ -6213,6 +6384,8 @@ export const PRODUCT_CATALOG = [
     "current_sourcetypes": [],
     "legacy_sourcetypes": [],
     "dashboards": [],
+    "essentials_dashboards": [],
+    "essentials_coverage": "",
     "custom_dashboard": "",
     "icon_emoji": "satellite",
     "icon_svg": "cisco_router",
@@ -6310,6 +6483,8 @@ export const PRODUCT_CATALOG = [
     "current_sourcetypes": [],
     "legacy_sourcetypes": [],
     "dashboards": [],
+    "essentials_dashboards": [],
+    "essentials_coverage": "",
     "custom_dashboard": "",
     "icon_emoji": "satellite_antenna",
     "icon_svg": "cisco_router",
@@ -6420,6 +6595,8 @@ export const PRODUCT_CATALOG = [
     "current_sourcetypes": [],
     "legacy_sourcetypes": [],
     "dashboards": [],
+    "essentials_dashboards": [],
+    "essentials_coverage": "",
     "custom_dashboard": "",
     "icon_emoji": "satellite_antenna",
     "icon_svg": "cisco_router",
@@ -6519,6 +6696,8 @@ export const PRODUCT_CATALOG = [
     "current_sourcetypes": [],
     "legacy_sourcetypes": [],
     "dashboards": [],
+    "essentials_dashboards": [],
+    "essentials_coverage": "",
     "custom_dashboard": "",
     "icon_emoji": "chart",
     "icon_svg": "analytics_logging",
@@ -6632,6 +6811,10 @@ export const PRODUCT_CATALOG = [
       "fabric_dashboard",
       "tenant_dashboard"
     ],
+    "essentials_dashboards": [
+      "sn_data_center_operations"
+    ],
+    "essentials_coverage": "Related searches and dashboards for existing telemetry; required fields, models and index mappings vary by view.",
     "custom_dashboard": "",
     "icon_emoji": "jigsaw",
     "icon_svg": "cisco_nexus_aci",
@@ -6761,6 +6944,10 @@ export const PRODUCT_CATALOG = [
       "n9k_syslog",
       "dashboard"
     ],
+    "essentials_dashboards": [
+      "workspace_insights"
+    ],
+    "essentials_coverage": "Reusable search content; select the relevant searches in an Essentials workspace.",
     "custom_dashboard": "",
     "icon_emoji": "switch",
     "icon_svg": "cisco_nexus_switch",
@@ -6895,6 +7082,11 @@ export const PRODUCT_CATALOG = [
       "nd_flow_overview",
       "anomalies"
     ],
+    "essentials_dashboards": [
+      "sn_secure_infrastructure_posture",
+      "sn_data_center_operations"
+    ],
+    "essentials_coverage": "Related searches and dashboards for existing telemetry; required fields, models and index mappings vary by view.",
     "custom_dashboard": "",
     "icon_emoji": "dashboard",
     "icon_svg": "cisco_nexus_dashboard",
@@ -7007,6 +7199,10 @@ export const PRODUCT_CATALOG = [
     "dashboards": [
       "nexus_hyperfabric_command_center"
     ],
+    "essentials_dashboards": [
+      "sn_data_center_operations"
+    ],
+    "essentials_coverage": "Related searches and dashboards for existing telemetry; required fields, models and index mappings vary by view.",
     "custom_dashboard": "",
     "icon_emoji": "cloud",
     "icon_svg": "cloud_insights",
@@ -7113,6 +7309,10 @@ export const PRODUCT_CATALOG = [
     "dashboards": [
       "mds_san_command_center"
     ],
+    "essentials_dashboards": [
+      "sn_data_center_operations"
+    ],
+    "essentials_coverage": "Related searches and dashboards for existing telemetry; required fields, models and index mappings vary by view.",
     "custom_dashboard": "",
     "icon_emoji": "server",
     "icon_svg": "cisco_mds",
@@ -7212,6 +7412,8 @@ export const PRODUCT_CATALOG = [
     "current_sourcetypes": [],
     "legacy_sourcetypes": [],
     "dashboards": [],
+    "essentials_dashboards": [],
+    "essentials_coverage": "",
     "custom_dashboard": "",
     "icon_emoji": "flashlight",
     "icon_svg": "cloud_insights",
@@ -7314,6 +7516,8 @@ export const PRODUCT_CATALOG = [
     "current_sourcetypes": [],
     "legacy_sourcetypes": [],
     "dashboards": [],
+    "essentials_dashboards": [],
+    "essentials_coverage": "",
     "custom_dashboard": "",
     "icon_emoji": "factory",
     "icon_svg": "cloud_analytics",
@@ -7410,6 +7614,8 @@ export const PRODUCT_CATALOG = [
     "current_sourcetypes": [],
     "legacy_sourcetypes": [],
     "dashboards": [],
+    "essentials_dashboards": [],
+    "essentials_coverage": "",
     "custom_dashboard": "",
     "icon_emoji": "package",
     "icon_svg": "cisco_router",
@@ -7518,6 +7724,8 @@ export const PRODUCT_CATALOG = [
     "dashboards": [
       "dashboard"
     ],
+    "essentials_dashboards": [],
+    "essentials_coverage": "",
     "custom_dashboard": "",
     "icon_emoji": "server",
     "icon_svg": "cisco_rack_server",
@@ -7652,6 +7860,10 @@ export const PRODUCT_CATALOG = [
     "dashboards": [
       "activity_monitor"
     ],
+    "essentials_dashboards": [
+      "workspace_insights"
+    ],
+    "essentials_coverage": "Reusable search content; select the relevant searches in an Essentials workspace.",
     "custom_dashboard": "",
     "icon_emoji": "satellite",
     "icon_svg": "cisco_intersight_product",
@@ -7752,6 +7964,8 @@ export const PRODUCT_CATALOG = [
     "current_sourcetypes": [],
     "legacy_sourcetypes": [],
     "dashboards": [],
+    "essentials_dashboards": [],
+    "essentials_coverage": "",
     "custom_dashboard": "",
     "icon_emoji": "database",
     "icon_svg": "cisco_rack_server",
@@ -7852,6 +8066,8 @@ export const PRODUCT_CATALOG = [
     "current_sourcetypes": [],
     "legacy_sourcetypes": [],
     "dashboards": [],
+    "essentials_dashboards": [],
+    "essentials_coverage": "",
     "custom_dashboard": "",
     "icon_emoji": "wrench",
     "icon_svg": "cisco_server",
@@ -7955,6 +8171,8 @@ export const PRODUCT_CATALOG = [
     "current_sourcetypes": [],
     "legacy_sourcetypes": [],
     "dashboards": [],
+    "essentials_dashboards": [],
+    "essentials_coverage": "",
     "custom_dashboard": "",
     "icon_emoji": "factory",
     "icon_svg": "cisco_iot",
@@ -8085,6 +8303,10 @@ export const PRODUCT_CATALOG = [
     "dashboards": [
       "overview"
     ],
+    "essentials_dashboards": [
+      "workspace_insights"
+    ],
+    "essentials_coverage": "Reusable search content; select the relevant searches in an Essentials workspace.",
     "custom_dashboard": "",
     "icon_emoji": "factory",
     "icon_svg": "cisco_cyber_vision",
@@ -8203,6 +8425,11 @@ export const PRODUCT_CATALOG = [
       "cisco-catalyst-app/network",
       "cisco-catalyst-app/alerts"
     ],
+    "essentials_dashboards": [
+      "sn_agentic_ops_operational_intelligence",
+      "sn_agentic_ops_secure_networking_assurance"
+    ],
+    "essentials_coverage": "Related searches and dashboards for existing telemetry; required fields, models and index mappings vary by view.",
     "custom_dashboard": "",
     "icon_emoji": "eye",
     "icon_svg": "cloud_insights",
@@ -8330,6 +8557,8 @@ export const PRODUCT_CATALOG = [
     "dashboards": [
       "dashboard"
     ],
+    "essentials_dashboards": [],
+    "essentials_coverage": "",
     "custom_dashboard": "",
     "icon_emoji": "chart",
     "icon_svg": "cloud_analytics",
@@ -8440,6 +8669,8 @@ export const PRODUCT_CATALOG = [
     "current_sourcetypes": [],
     "legacy_sourcetypes": [],
     "dashboards": [],
+    "essentials_dashboards": [],
+    "essentials_coverage": "",
     "custom_dashboard": "",
     "icon_emoji": "chart",
     "icon_svg": "analytics_logging",
@@ -8576,6 +8807,10 @@ export const PRODUCT_CATALOG = [
     "current_sourcetypes": [],
     "legacy_sourcetypes": [],
     "dashboards": [],
+    "essentials_dashboards": [
+      "workspace_insights"
+    ],
+    "essentials_coverage": "Reusable search content; select the relevant searches in an Essentials workspace.",
     "custom_dashboard": "",
     "icon_emoji": "video",
     "icon_svg": "cisco_video",
@@ -8685,6 +8920,8 @@ export const PRODUCT_CATALOG = [
     "current_sourcetypes": [],
     "legacy_sourcetypes": [],
     "dashboards": [],
+    "essentials_dashboards": [],
+    "essentials_coverage": "",
     "custom_dashboard": "",
     "icon_emoji": "phone",
     "icon_svg": "cisco_call_manager",
@@ -8797,6 +9034,8 @@ export const PRODUCT_CATALOG = [
     "current_sourcetypes": [],
     "legacy_sourcetypes": [],
     "dashboards": [],
+    "essentials_dashboards": [],
+    "essentials_coverage": "",
     "custom_dashboard": "",
     "icon_emoji": "gear",
     "icon_svg": "cisco_video",
@@ -8902,6 +9141,8 @@ export const PRODUCT_CATALOG = [
     "current_sourcetypes": [],
     "legacy_sourcetypes": [],
     "dashboards": [],
+    "essentials_dashboards": [],
+    "essentials_coverage": "",
     "custom_dashboard": "",
     "icon_emoji": "video",
     "icon_svg": "cisco_conference",
@@ -9008,6 +9249,8 @@ export const PRODUCT_CATALOG = [
     "current_sourcetypes": [],
     "legacy_sourcetypes": [],
     "dashboards": [],
+    "essentials_dashboards": [],
+    "essentials_coverage": "",
     "custom_dashboard": "",
     "icon_emoji": "clipboard",
     "icon_svg": "cisco_conference",
@@ -9112,6 +9355,8 @@ export const PRODUCT_CATALOG = [
     "current_sourcetypes": [],
     "legacy_sourcetypes": [],
     "dashboards": [],
+    "essentials_dashboards": [],
+    "essentials_coverage": "",
     "custom_dashboard": "",
     "icon_emoji": "tv",
     "icon_svg": "cisco_telepresence",
@@ -9215,6 +9460,8 @@ export const PRODUCT_CATALOG = [
     "current_sourcetypes": [],
     "legacy_sourcetypes": [],
     "dashboards": [],
+    "essentials_dashboards": [],
+    "essentials_coverage": "",
     "custom_dashboard": "",
     "icon_emoji": "desktop_computer",
     "icon_svg": "cisco_desk_phone",
@@ -9314,6 +9561,8 @@ export const PRODUCT_CATALOG = [
     "current_sourcetypes": [],
     "legacy_sourcetypes": [],
     "dashboards": [],
+    "essentials_dashboards": [],
+    "essentials_coverage": "",
     "custom_dashboard": "",
     "icon_emoji": "headphone",
     "icon_svg": "cisco_desk_phone",
@@ -9425,6 +9674,8 @@ export const PRODUCT_CATALOG = [
     "current_sourcetypes": [],
     "legacy_sourcetypes": [],
     "dashboards": [],
+    "essentials_dashboards": [],
+    "essentials_coverage": "",
     "custom_dashboard": "",
     "icon_emoji": "video",
     "icon_svg": "cisco_telepresence",
@@ -9535,6 +9786,8 @@ export const PRODUCT_CATALOG = [
     "current_sourcetypes": [],
     "legacy_sourcetypes": [],
     "dashboards": [],
+    "essentials_dashboards": [],
+    "essentials_coverage": "",
     "custom_dashboard": "",
     "icon_emoji": "headphone",
     "icon_svg": "cisco_desk_phone",
@@ -9644,6 +9897,8 @@ export const PRODUCT_CATALOG = [
     "current_sourcetypes": [],
     "legacy_sourcetypes": [],
     "dashboards": [],
+    "essentials_dashboards": [],
+    "essentials_coverage": "",
     "custom_dashboard": "",
     "icon_emoji": "headphone",
     "icon_svg": "cisco_desk_phone",
@@ -9743,6 +9998,8 @@ export const PRODUCT_CATALOG = [
     "current_sourcetypes": [],
     "legacy_sourcetypes": [],
     "dashboards": [],
+    "essentials_dashboards": [],
+    "essentials_coverage": "",
     "custom_dashboard": "",
     "icon_emoji": "phone",
     "icon_svg": "cisco_desk_phone",
@@ -9849,6 +10106,8 @@ export const PRODUCT_CATALOG = [
     "current_sourcetypes": [],
     "legacy_sourcetypes": [],
     "dashboards": [],
+    "essentials_dashboards": [],
+    "essentials_coverage": "",
     "custom_dashboard": "",
     "icon_emoji": "balance_scale",
     "icon_svg": "app_delivery",
@@ -9952,6 +10211,8 @@ export const PRODUCT_CATALOG = [
     "current_sourcetypes": [],
     "legacy_sourcetypes": [],
     "dashboards": [],
+    "essentials_dashboards": [],
+    "essentials_coverage": "",
     "custom_dashboard": "",
     "icon_emoji": "umbrella",
     "icon_svg": "umbrella",
@@ -10057,6 +10318,8 @@ export const PRODUCT_CATALOG = [
     "current_sourcetypes": [],
     "legacy_sourcetypes": [],
     "dashboards": [],
+    "essentials_dashboards": [],
+    "essentials_coverage": "",
     "custom_dashboard": "",
     "icon_emoji": "email",
     "icon_svg": "mail",
@@ -10157,6 +10420,8 @@ export const PRODUCT_CATALOG = [
     "current_sourcetypes": [],
     "legacy_sourcetypes": [],
     "dashboards": [],
+    "essentials_dashboards": [],
+    "essentials_coverage": "",
     "custom_dashboard": "",
     "icon_emoji": "chart",
     "icon_svg": "network_analytics",
@@ -10262,6 +10527,8 @@ export const PRODUCT_CATALOG = [
     "current_sourcetypes": [],
     "legacy_sourcetypes": [],
     "dashboards": [],
+    "essentials_dashboards": [],
+    "essentials_coverage": "",
     "custom_dashboard": "",
     "icon_emoji": "dashboard",
     "icon_svg": "network_analytics",
@@ -10364,6 +10631,8 @@ export const PRODUCT_CATALOG = [
     "current_sourcetypes": [],
     "legacy_sourcetypes": [],
     "dashboards": [],
+    "essentials_dashboards": [],
+    "essentials_coverage": "",
     "custom_dashboard": "",
     "icon_emoji": "eye",
     "icon_svg": "vulnerability_intel",
@@ -10466,6 +10735,8 @@ export const PRODUCT_CATALOG = [
     "current_sourcetypes": [],
     "legacy_sourcetypes": [],
     "dashboards": [],
+    "essentials_dashboards": [],
+    "essentials_coverage": "",
     "custom_dashboard": "",
     "icon_emoji": "key",
     "icon_svg": "ise",
@@ -10572,6 +10843,8 @@ export const PRODUCT_CATALOG = [
     "current_sourcetypes": [],
     "legacy_sourcetypes": [],
     "dashboards": [],
+    "essentials_dashboards": [],
+    "essentials_coverage": "",
     "custom_dashboard": "",
     "icon_emoji": "search",
     "icon_svg": "xdr",
@@ -10670,6 +10943,8 @@ export const PRODUCT_CATALOG = [
     "current_sourcetypes": [],
     "legacy_sourcetypes": [],
     "dashboards": [],
+    "essentials_dashboards": [],
+    "essentials_coverage": "",
     "custom_dashboard": "",
     "icon_emoji": "shield",
     "icon_svg": "firewall",
@@ -10777,6 +11052,8 @@ export const PRODUCT_CATALOG = [
     "current_sourcetypes": [],
     "legacy_sourcetypes": [],
     "dashboards": [],
+    "essentials_dashboards": [],
+    "essentials_coverage": "",
     "custom_dashboard": "",
     "icon_emoji": "globe",
     "icon_svg": "cisco_wifi",
@@ -10877,6 +11154,8 @@ export const PRODUCT_CATALOG = [
     "current_sourcetypes": [],
     "legacy_sourcetypes": [],
     "dashboards": [],
+    "essentials_dashboards": [],
+    "essentials_coverage": "",
     "custom_dashboard": "",
     "icon_emoji": "detective",
     "icon_svg": "vulnerability_intel",
@@ -10995,6 +11274,8 @@ export const PRODUCT_CATALOG = [
     "current_sourcetypes": [],
     "legacy_sourcetypes": [],
     "dashboards": [],
+    "essentials_dashboards": [],
+    "essentials_coverage": "",
     "custom_dashboard": "",
     "icon_emoji": "chart",
     "icon_svg": "analytics_logging",

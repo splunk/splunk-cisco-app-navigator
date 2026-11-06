@@ -337,6 +337,16 @@ soar_connector_uids = <comma-separated list>
 * with this product. Used by the UI to look up SOAR connector metadata from the
 * Splunkbase CSV catalog.
 
+essentials_dashboards = <comma-separated view ids>
+* Optional. Product content entry points in Splunk Secure Networking Essentials
+* (splunk-cisco-dashboards, Splunkbase 9257). The first view is the card launch target.
+* This is an optional visualization recommendation, not a collection dependency.
+* View ids must contain only lowercase letters, digits and underscores.
+
+essentials_coverage = <string>
+* Short scope note for the optional Essentials recommendation and customer summary.
+* Describe reusable search content separately from product-specific dashboards.
+
 itsi_content_pack_label = <string>
 * Optional. Human-readable label for an ITSI Content Pack associated with this product.
 * ITSI Content Packs are installed via ITSI → Configuration → Data Integrations → Content Library,

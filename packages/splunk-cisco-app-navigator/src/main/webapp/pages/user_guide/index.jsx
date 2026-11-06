@@ -51,6 +51,7 @@ const GUIDE_GROUPS = [
             { id: 'product-cards', label: 'Read product cards' },
             { id: 'actions', label: 'Install, launch, and inspect' },
             { id: 'crosswork-assurance', label: 'Crosswork Assurance HEC' },
+            { id: 'essentials', label: 'Secure Networking Essentials' },
             { id: 'intelligence', label: 'Intelligence panels' },
         ],
     },
@@ -91,6 +92,7 @@ const SECTION_ICONS = {
     'product-cards': InformationCircle,
     actions: CloudArrowDown,
     'crosswork-assurance': CloudArrowDown,
+    essentials: Layout,
     intelligence: Shield,
     workspace: Palette,
     'custom-products': Clipboard,
@@ -1066,6 +1068,49 @@ function UserGuideContent() {
                             </GuideSection>
 
                             <GuideSection
+                                id="essentials"
+                                title="Visualize data with Splunk Secure Networking Essentials"
+                                kicker="An optional visualization app across Cisco networking, security, identity and observability data."
+                            >
+                                <p>
+                                    Supported product cards offer Essentials as an alternative alongside existing
+                                    visualization apps. It uses data already collected by the applicable TAs or
+                                    integrations; it does not replace collection. The recommendation describes
+                                    related dashboards or reusable search content, rather than full coverage of
+                                    every product feature or sourcetype.
+                                </p>
+                                <h3>Choose and configure your content</h3>
+                                <ol>
+                                    <li>
+                                        Open the product card&apos;s Essentials link to review the Splunkbase listing
+                                        and access requirements.
+                                    </li>
+                                    <li>Install Essentials on the search head that can search the required data.</li>
+                                    <li>
+                                        Use Essentials Setup and Macro Index Tuning to select indexes and check
+                                        the required fields, permissions and companion data models.
+                                    </li>
+                                    <li>
+                                        When the app is enabled, the product card offers a direct content link and
+                                        setup documentation. Cards with reusable searches lead to the workspace
+                                        where those searches can be selected.
+                                    </li>
+                                </ol>
+                                <p>
+                                    Coverage includes enterprise and data center networking, Meraki, ISE,
+                                    SD-WAN, Cyber Vision, Cisco security products, ThousandEyes, Spaces and
+                                    selected Webex telemetry. IOS-based device cards use shared syslog searches;
+                                    source fields determine which analyses apply. Existing app choices remain
+                                    available, and Essentials is not counted as a required TA.
+                                </p>
+                                <div className="scan-guide-actions scan-guide-no-print">
+                                    <GuideAction href="https://splunkbase.splunk.com/app/9257">
+                                        Splunk Secure Networking Essentials on Splunkbase
+                                    </GuideAction>
+                                </div>
+                            </GuideSection>
+
+                            <GuideSection
                                 id="intelligence"
                                 title="Use intelligence panels"
                                 kicker="Badges open focused guidance without overloading the card face."
@@ -1323,6 +1368,13 @@ function UserGuideContent() {
                             >
                                 <h3>Version 1.0.33 — November 6, 2026</h3>
                                 <ul>
+                                    <li>
+                                        <strong>Splunk Secure Networking Essentials:</strong>
+                                        {' '}
+                                        Added optional visualization recommendations to 37 product cards,
+                                        preserving existing app choices. Recommendations link to Splunkbase,
+                                        relevant content and setup documentation when the app is enabled.
+                                    </li>
                                     <li>
                                         <strong>Cisco Crosswork Assurance:</strong>
                                         {' '}

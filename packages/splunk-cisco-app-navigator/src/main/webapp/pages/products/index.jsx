@@ -59,11 +59,16 @@ import WaitSpinner from '@splunk/react-ui/WaitSpinner';
 import Message from '@splunk/react-ui/Message';
 import Modal from '@splunk/react-ui/Modal';
 import Card from '@splunk/react-ui/Card';
+// eslint-disable-next-line import/no-extraneous-dependencies -- Splunk UI is declared in this app's devDependencies.
+import Link from '@splunk/react-ui/Link';
 import Tooltip from '@splunk/react-ui/Tooltip';
 
 // ─────────────────────────────  CONSTANTS  ─────────────────────────────
 
 const APP_ID = 'splunk-cisco-app-navigator';
+const ESSENTIALS_APP_ID = 'splunk-cisco-dashboards';
+const ESSENTIALS_NAME = 'Splunk Secure Networking Essentials';
+const ESSENTIALS_SPLUNKBASE = 'https://splunkbase.splunk.com/app/9257';
 const CONF_ENDPOINT = `/splunkd/__raw/servicesNS/nobody/${APP_ID}/configs/conf-products`;
 const CONF_RELOAD_ENDPOINT = `/splunkd/__raw/servicesNS/nobody/${APP_ID}/configs/conf-products/_reload`;
 const APPS_LOCAL_ENDPOINT = '/splunkd/__raw/services/apps/local';
@@ -328,6 +333,7 @@ function keywordMatchesQuery(keyword, query) {
  * aliases, keywords, and sourcetypes against a lowercase query string.
  */
 function productMatchesSearch(p, q) {
+    if (p.essentials_dashboards?.length && ESSENTIALS_NAME.toLowerCase().includes(q)) { return true; }
     const nameField = `${p.display_name} ${p.vendor} ${p.product_id}`.toLowerCase();
     if (nameField.includes(q)) return true;
     const als = (p.aliases || []).map(a => a.toLowerCase());
@@ -522,6 +528,8 @@ async function loadProductsFromConf() {
             app_viz_2_docs_url: c.app_viz_2_docs_url || '',
             app_viz_2_troubleshoot_url: c.app_viz_2_troubleshoot_url || '',
             app_viz_2_install_url: c.app_viz_2_install_url || '',
+            essentials_dashboards: (c.essentials_dashboards || '').split(',').map(s => s.trim()).filter(Boolean),
+            essentials_coverage: c.essentials_coverage || '',
             learn_more_url: c.learn_more_url || '',
             legacy_uids: laUids.filter(Boolean),
             legacy_viz_uids: lvUids.filter(Boolean),
@@ -3770,6 +3778,11 @@ function generateCustomerSummary(product, splunkbaseData) {
         plain.push('');
     }
 
+    if (product.essentials_dashboards?.length) {
+        html.push(`<h3>Optional visualization</h3><p><a href="${ESSENTIALS_SPLUNKBASE}">${ESSENTIALS_NAME}</a>: ${esc(product.essentials_coverage || '')}</p>`);
+        plain.push('OPTIONAL VISUALIZATION', ESSENTIALS_NAME, ESSENTIALS_SPLUNKBASE, product.essentials_coverage || '', '');
+    }
+
     if (product.sc4s_supported) {
         html.push(`<h3 style="margin:12px 0 4px;font-size:13px;color:#003366;">Syslog Collection (SC4S)</h3>`);
         html.push(`<p style="margin:0 0 4px;">Splunk Connect for Syslog (SC4S) is supported. <a href="https://splunkbase.splunk.com/app/4740">SC4S on Splunkbase</a></p>`);
@@ -3937,7 +3950,65 @@ function generateCustomerSummary(product, splunkbaseData) {
 
 // ────────────────────────  PRODUCT CARD  ─────────────────────
 // Renders one product: icon, name, links, support bar (bottom), install/configure actions.
+/* eslint-disable react/prop-types -- Product records use the same validated catalog shape as ProductCard. */
+function EssentialsRecommendation({ product, installedApps }) {
+    const views = (product.essentials_dashboards || []).filter(view => /^[a-z][a-z0-9_]*$/.test(view));
+    if (!views.length) { return null; }
+    const app = installedApps[ESSENTIALS_APP_ID];
+    const enabled = app && !['true', '1'].includes(String(app.disabled).toLowerCase());
+    const headingId = `essentials-${product.product_id}`;
+    return (
+        <section className="csc-card-value-prop" aria-labelledby={headingId}>
+            <h4 id={headingId}>
+                Optional visualization for
+                {' '}
+                {product.display_name}
+            </h4>
+            <p>{ESSENTIALS_NAME}</p>
+            <p>{product.essentials_coverage}</p>
+            <ul>
+                {enabled && (
+                    <li>
+                        <Link
+                            appearance="standalone"
+                            openInNewContext
+                            to={createURL(`/app/${ESSENTIALS_APP_ID}/dashboard_manager#/${views[0]}`)}
+                        >
+                            {`Open ${product.display_name} content in Essentials`}
+                        </Link>
+                    </li>
+                )}
+                <li>
+                    <Link
+                        appearance="standalone"
+                        openInNewContext
+                        to={ESSENTIALS_SPLUNKBASE}
+                        aria-label={`${ESSENTIALS_NAME} on Splunkbase for ${product.display_name}`}
+                    >
+                        {`${ESSENTIALS_NAME} on Splunkbase`}
+                    </Link>
+                </li>
+                {enabled && (
+                    <li>
+                        <Link
+                            appearance="standalone"
+                            openInNewContext
+                            to={createURL(`/app/${ESSENTIALS_APP_ID}/user_guide#macro-tuning`)}
+                            aria-label={`Essentials setup documentation for ${product.display_name}`}
+                        >
+                            Essentials setup documentation
+                        </Link>
+                    </li>
+                )}
+            </ul>
+            {app && !enabled && <p>Essentials is disabled on this search head.</p>}
+            <p>Uses already ingested data; your collection add-on is still required.</p>
+        </section>
+    );
+}
+
 // Support indicator: one blue bar at bottom via supportBadgeClass / data-support-level (see products.css).
+/* eslint-enable react/prop-types */
 
 function ProductCard({ product, installedApps, appStatuses, indexerApps, sourcetypeData, splunkbaseData, appidToUidMap, isConfigured, isComingSoon, noIntegration, platformType, onToggleConfigured, onShowBestPractices, onViewLegacy, onSetCustomDashboard, devMode, onViewConfig, showGtmRibbon = false, onEditCustom, onCloneCustom, onDeleteCustom, sharedSourcetypeMap }) {
     const {
@@ -4838,6 +4909,8 @@ function ProductCard({ product, installedApps, appStatuses, indexerApps, sourcet
                 </div>
             )}
 
+            {!suppressActions && <EssentialsRecommendation product={product} installedApps={installedApps} />}
+
             {/* ── Footer: clean button row ── */}
             <div className="csc-card-footer">
                 {/* Learn More — full text, outline; falls back to Cisco A-to-Z directory */}
@@ -5244,6 +5317,7 @@ function toSplunkConf(data) {
             'app_viz_2', 'app_viz_2_label', 'app_viz_2_splunkbase_uid',
             'app_viz_2_docs_url', 'app_viz_2_install_url',
             'learn_more_url',
+            'essentials_coverage',
             'support_level', 'icon_emoji', 'sort_order',
             'gtm_pillar',
             'sc4s_url', 'sc4s_label', 'sc4s_search_head_ta', 'sc4s_search_head_ta_label',
@@ -5263,6 +5337,7 @@ function toSplunkConf(data) {
         if (p.current_sourcetypes && p.current_sourcetypes.length) lines.push(`current_sourcetypes = ${p.current_sourcetypes.join(',')}`);
         if (p.legacy_sourcetypes && p.legacy_sourcetypes.length) lines.push(`legacy_sourcetypes = ${p.legacy_sourcetypes.join(',')}`);
         if (p.dashboards && p.dashboards.length) lines.push(`dashboards = ${p.dashboards.join(',')}`);
+        if (p.essentials_dashboards && p.essentials_dashboards.length) { lines.push(`essentials_dashboards = ${p.essentials_dashboards.join(',')}`); }
         if (p.custom_dashboard) lines.push(`custom_dashboard = ${p.custom_dashboard}`);
         if (p.keywords && p.keywords.length) lines.push(`keywords = ${p.keywords.join(',')}`);
         if (p.aliases && p.aliases.length) lines.push(`aliases = ${p.aliases.join(',')}`);
