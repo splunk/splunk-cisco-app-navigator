@@ -128,3 +128,21 @@ Review the HTML report for any failures before uploading.
 | `dist/splunk-cisco-app-navigator-*.tar.gz` | Splunkbase upload package |
 | `docs/splunkbase_*.md` | Splunkbase listing content (gitignored) |
 | `CHANGELOG.md` | Version history |
+
+## Shared build numbers
+
+Every new package reserves a number from the `splunk/splunk-cisco-app-navigator`
+GitHub Actions workflow `reserve-build-number.yml`. The first new workflow run
+produces build 100 (99 plus the workflow run number). The workflow identity and
+offset must not be changed or reset. Developers need GitHub CLI (`gh`), their own
+authenticated GitHub account, connectivity, and permission to dispatch Actions.
+A failed or cancelled package can consume a number; no offline fallback or
+manual number selection is supported. Receipts are kept in ignored
+`dist/build-reservations/`. Reusing an existing package with `--no-build` does
+not reserve a number. Concurrent builds can finish out of order.
+
+Before the service can be used, the workflow must be published to the canonical
+repository's default branch, Actions enabled, and developers granted dispatch
+access. All developers must update their build tooling and stop using the prior
+local counter. Verify distinct reservations from two clients after activation.
+A local commit alone does not activate the service.
