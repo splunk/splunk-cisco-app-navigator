@@ -644,6 +644,15 @@ if [[ "$do_deploy" -eq 1 ]]; then
     fi
 fi
 
+# Bootstrap a fresh checkout through the same build entry point.
+export NODE_OPTIONS="${NODE_OPTIONS:---max-old-space-size=4096}"
+if [[ "$no_build" -eq 0 && "$from_stage" -eq 0 ]]; then
+    if ! (cd "$APP_DIR" && node -e 'for (const name of ["webpack", "webpack-cli", "glob", "shelljs", "@splunk/webpack-configs"]) require.resolve(name)' >/dev/null 2>&1); then
+        hdr "Installing missing build dependencies..."
+        run_quietly bash -c 'cd "$1" && COREPACK_ENABLE_AUTO_PIN=0 yarn install --frozen-lockfile --non-interactive --production=false' _ "$ROOT_DIR"
+    fi
+fi
+
 build_version=""
 if [[ "$no_build" -eq 0 ]]; then
     if [[ ! -f "$VERSION_FILE" ]]; then
