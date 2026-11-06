@@ -5145,6 +5145,13 @@ export const PRODUCT_CATALOG = [
       "meraki:switches",
       "meraki:switchportsbyswitch",
       "meraki:switchportsoverview",
+      "meraki:syslog",
+      "meraki:syslog:airmarshal",
+      "meraki:syslog:events",
+      "meraki:syslog:flows",
+      "meraki:syslog:security",
+      "meraki:syslog:unknown",
+      "meraki:syslog:urls",
       "meraki:webhook",
       "meraki:webhooklogs:api",
       "meraki:wirelesscontrolleravailabilitieschangehistory",
@@ -7098,7 +7105,8 @@ export const PRODUCT_CATALOG = [
       "cisco:dc:mds:custom",
       "cisco:dc:mds:inventory",
       "cisco:dc:mds:performance",
-      "cisco:dc:mds:san_analytics"
+      "cisco:dc:mds:san_analytics",
+      "cisco:dc:mds:syslog"
     ],
     "current_sourcetypes": [],
     "legacy_sourcetypes": [],

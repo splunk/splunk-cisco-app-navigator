@@ -1,5 +1,12 @@
 # Change Log
 
+1.0.33 — November 6, 2026
+-------
+
+### Catalog Fixes
+* **Meraki syslog sourcetypes** — Added the `meraki:syslog` ingress and the events, flows, URLs, security, Air Marshal, and unknown output families to the Meraki card for data detection, search links, and props.conf audits.
+* **MDS syslog sourcetype** — Added `cisco:dc:mds:syslog` to the Cisco MDS Storage Networking card alongside its existing API datasets.
+
 1.0.32 — October 9, 2026
 -------
 
