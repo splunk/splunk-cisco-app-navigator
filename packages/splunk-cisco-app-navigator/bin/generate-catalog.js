@@ -120,6 +120,8 @@ function buildProduct(name, c) {
         current_sourcetypes: csvToArray(c.current_sourcetypes),
         legacy_sourcetypes: csvToArray(c.legacy_sourcetypes),
         dashboards: csvToArray(c.dashboards),
+        essentials_dashboards: csvToArray(c.essentials_dashboards),
+        essentials_coverage: c.essentials_coverage || '',
         custom_dashboard: c.custom_dashboard || '',
         icon_emoji: c.icon_emoji || '',
         icon_svg: c.icon_svg || '',
