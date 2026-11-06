@@ -4,6 +4,7 @@
 -------
 
 ### Catalog Fixes
+* **Cisco Crosswork Assurance** — Added an active native HEC alert integration card with `cisco:crossworkassurance`, Cisco setup documentation, Splunk Enterprise and Cloud-connectivity guidance, and an explicit in-development ITSI content note. No TA or visualization app dependency is declared; legacy PCA/Skylight connector history is retained separately.
 * **Meraki syslog sourcetypes** — Added the `meraki:syslog` ingress and the events, flows, URLs, security, Air Marshal, and unknown output families to the Meraki card for data detection, search links, and props.conf audits.
 * **MDS syslog sourcetype** — Added `cisco:dc:mds:syslog` to the Cisco MDS Storage Networking card alongside its existing API datasets.
 
