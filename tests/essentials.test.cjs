@@ -27,7 +27,7 @@ const render = (p, apps) => renderToStaticMarkup(React.createElement(EssentialsR
 test('missing and disabled apps offer the listing without broken local launch links', () => {
     for (const apps of [{}, { [appId]: { disabled: true } }, { [appId]: { disabled: '1' } }, { [appId]: { disabled: 'true' } }]) {
         const html = render(product, apps);
-        assert.match(html, /https:\/\/splunkbase.splunk.com\/app\/9257/);
+        assert.match(html, /https:\/\/splunkbase\.splunk\.com\/app\/9257/);
         assert.doesNotMatch(html, /href="[^"]*\/app\/splunk-cisco-dashboards\//);
     }
 });
