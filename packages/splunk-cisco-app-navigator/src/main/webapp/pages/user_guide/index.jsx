@@ -50,6 +50,8 @@ const GUIDE_GROUPS = [
             { id: 'find-products', label: 'Find products' },
             { id: 'product-cards', label: 'Read product cards' },
             { id: 'actions', label: 'Install, launch, and inspect' },
+            { id: 'crosswork-assurance', label: 'Crosswork Assurance HEC' },
+            { id: 'essentials', label: 'Secure Networking Essentials' },
             { id: 'intelligence', label: 'Intelligence panels' },
         ],
     },
@@ -73,6 +75,7 @@ const GUIDE_GROUPS = [
         sections: [
             { id: 'troubleshooting', label: 'Troubleshooting' },
             { id: 'configuration', label: 'Configuration reference' },
+            { id: 'release-notes', label: 'Release notes' },
         ],
     },
 ];
@@ -88,6 +91,8 @@ const SECTION_ICONS = {
     'find-products': Magnifier,
     'product-cards': InformationCircle,
     actions: CloudArrowDown,
+    'crosswork-assurance': CloudArrowDown,
+    essentials: Layout,
     intelligence: Shield,
     workspace: Palette,
     'custom-products': Clipboard,
@@ -96,6 +101,7 @@ const SECTION_ICONS = {
     deployment: BookOpen,
     troubleshooting: Wrench,
     configuration: QuestionCircle,
+    'release-notes': BookOpen,
 };
 
 const statusRows = [
@@ -982,6 +988,129 @@ function UserGuideContent() {
                             </GuideSection>
 
                             <GuideSection
+                                id="crosswork-assurance"
+                                title="Connect Cisco Crosswork Assurance"
+                                kicker="Send alerts directly to Splunk through HTTP Event Collector (HEC)."
+                            >
+                                <p>
+                                    Open the Cisco Crosswork Assurance card under Observability or search for
+                                    {' '}
+                                    <code>cisco:crossworkassurance</code>
+                                    . This native HEC integration
+                                    requires no Splunk TA or visualization app. The deprecated PCA/Skylight
+                                    connector remains a separate catalog entry for legacy deployments.
+                                </p>
+                                <h3>Configure alert export</h3>
+                                <ol>
+                                    <li>
+                                        Create a HEC token for your destination index and set its sourcetype to
+                                        {' '}
+                                        <code>cisco:crossworkassurance</code>
+                                        . Use HTTPS with a certificate
+                                        trusted by Crosswork Assurance.
+                                    </li>
+                                    <li>Ask your Cisco customer success manager to enable the Splunk feature flag.</li>
+                                    <li>
+                                        Follow Cisco&apos;s setup guide to configure the selected alert policies through
+                                        {' '}
+                                        <code>/api/v3/alertexport</code>
+                                        . Set
+                                        {' '}
+                                        <code>alertexporttype</code>
+                                        {' '}
+                                        to
+                                        {' '}
+                                        <code>splunk-hec</code>
+                                        {' '}
+                                        and use the HEC
+                                        endpoint ending in
+                                        {' '}
+                                        <code>/services/collector/event</code>
+                                        .
+                                    </li>
+                                    <li>
+                                        The
+                                        <code>alertexporttoken</code>
+                                        {' '}
+                                        value requires the literal
+                                        {' '}
+                                        <code>Splunk </code>
+                                        {' '}
+                                        prefix, including the trailing space, before the
+                                        HEC token. Keep the token secure.
+                                    </li>
+                                    <li>
+                                        Generate an alert for a selected policy, then verify its arrival in the
+                                        intended index with sourcetype
+                                        <code>cisco:crossworkassurance</code>
+                                        .
+                                    </li>
+                                </ol>
+                                <h3>Deployment and ITSI scope</h3>
+                                <p>
+                                    Cisco documents Splunk Enterprise support starting with Crosswork Assurance
+                                    25.02. Direct worker-node connectivity to Splunk Cloud is currently unavailable;
+                                    confirm a supported architecture before planning a Cloud deployment.
+                                </p>
+                                <p>
+                                    ITSI integration content is in development. It is not a released content pack
+                                    or a prerequisite for native HEC alert ingestion. Adding the card in Navigator
+                                    does not configure HEC or enable alert export.
+                                </p>
+                                <div className="scan-guide-actions scan-guide-no-print">
+                                    <GuideAction href="https://docs.crossworkassurance.cisco.com/docs/splunk-alert-and-metric-integration">
+                                        Cisco HEC alert export setup
+                                    </GuideAction>
+                                    <GuideAction href="https://www.cisco.com/c/en/us/products/collateral/cloud-systems-management/provider-connectivity-assurance/provider-connect-assurance-so.html">
+                                        Crosswork Assurance product overview
+                                    </GuideAction>
+                                </div>
+                            </GuideSection>
+
+                            <GuideSection
+                                id="essentials"
+                                title="Visualize data with Splunk Secure Networking Essentials"
+                                kicker="An optional visualization app across Cisco networking, security, identity and observability data."
+                            >
+                                <p>
+                                    Supported product cards offer Essentials as an alternative alongside existing
+                                    visualization apps. It uses data already collected by the applicable TAs or
+                                    integrations; it does not replace collection. The recommendation describes
+                                    related dashboards or reusable search content, rather than full coverage of
+                                    every product feature or sourcetype.
+                                </p>
+                                <h3>Choose and configure your content</h3>
+                                <ol>
+                                    <li>
+                                        Open the product card&apos;s Essentials link to review the Splunkbase listing
+                                        and access requirements.
+                                    </li>
+                                    <li>Install Essentials on the search head that can search the required data.</li>
+                                    <li>
+                                        Use Essentials Setup and Macro Index Tuning to select indexes and check
+                                        the required fields, permissions and companion data models.
+                                    </li>
+                                    <li>
+                                        When the app is enabled, the product card offers a direct content link and
+                                        setup documentation. Cards with reusable searches lead to the workspace
+                                        where those searches can be selected.
+                                    </li>
+                                </ol>
+                                <p>
+                                    Coverage includes enterprise and data center networking, Meraki, ISE,
+                                    SD-WAN, Cyber Vision, Cisco security products, ThousandEyes, Spaces and
+                                    selected Webex telemetry. IOS-based device cards use shared syslog searches;
+                                    source fields determine which analyses apply. Existing app choices remain
+                                    available, and Essentials is not counted as a required TA.
+                                </p>
+                                <div className="scan-guide-actions scan-guide-no-print">
+                                    <GuideAction href="https://splunkbase.splunk.com/app/9257">
+                                        Splunk Secure Networking Essentials on Splunkbase
+                                    </GuideAction>
+                                </div>
+                            </GuideSection>
+
+                            <GuideSection
                                 id="intelligence"
                                 title="Use intelligence panels"
                                 kicker="Badges open focused guidance without overloading the card face."
@@ -1230,6 +1359,83 @@ function UserGuideContent() {
                                     The Guide button on Cisco Products keeps a concise task cheat sheet close to
                                     the workflow. Use this full guide when you need deployment, operations,
                                     troubleshooting, or configuration detail.
+                                </p>
+                            </GuideSection>
+                            <GuideSection
+                                id="release-notes"
+                                title="Release notes"
+                                kicker="Changes included in the current release, separate from collection setup."
+                            >
+                                <h3>Version 1.0.33 — November 6, 2026</h3>
+                                <ul>
+                                    <li>
+                                        <strong>Splunk Secure Networking Essentials:</strong>
+                                        {' '}
+                                        Added optional visualization recommendations to 37 product cards,
+                                        preserving existing app choices. Recommendations link to Splunkbase,
+                                        relevant content and setup documentation when the app is enabled.
+                                    </li>
+                                    <li>
+                                        <strong>Cisco Crosswork Assurance:</strong>
+                                        {' '}
+                                        Added an active native HEC card,
+                                        Cisco setup links, and
+                                        {' '}
+                                        <code>cisco:crossworkassurance</code>
+                                        . No TA or app
+                                        dependency is declared. ITSI integration content is in development.
+                                    </li>
+                                    <li>
+                                        <strong>Meraki syslog:</strong>
+                                        {' '}
+                                        Added
+                                        {' '}
+                                        <code>meraki:syslog</code>
+                                        {' '}
+                                        and its
+                                        {' '}
+                                        <code>:events</code>
+                                        ,
+                                        {' '}
+                                        <code>:flows</code>
+                                        ,
+                                        {' '}
+                                        <code>:urls</code>
+                                        ,
+                                        {' '}
+                                        <code>:security</code>
+                                        ,
+                                        {' '}
+                                        <code>:airmarshal</code>
+                                        , and
+                                        {' '}
+                                        <code>:unknown</code>
+                                        {' '}
+                                        output families to the Meraki card.
+                                    </li>
+                                    <li>
+                                        <strong>MDS syslog:</strong>
+                                        {' '}
+                                        Added
+                                        {' '}
+                                        <code>cisco:dc:mds:syslog</code>
+                                        {' '}
+                                        alongside
+                                        the existing MDS API sourcetypes.
+                                    </li>
+                                    <li>
+                                        <strong>User Guide:</strong>
+                                        {' '}
+                                        Added Crosswork Assurance HEC setup guidance
+                                        and this navigable Release Notes section.
+                                    </li>
+                                </ul>
+                                <h3>Using the updated sourcetype lists</h3>
+                                <p>
+                                    The Meraki and MDS additions extend Navigator&apos;s catalog detection, search
+                                    links, and props.conf audits. They do not install parsers, create inputs, or
+                                    change existing events. Configure collection with the corresponding add-on
+                                    before using Navigator to check for data.
                                 </p>
                             </GuideSection>
                         </div>

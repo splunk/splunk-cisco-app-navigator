@@ -14,7 +14,6 @@ const glob = require('glob');
 const cmd = process.argv[2] || 'build';
 const commandArgs = process.argv.slice(3);
 const pkgRoot = path.join(__dirname, '..');
-const rootDir = path.join(pkgRoot, '..', '..');
 
 const invalidBuildArgs = commandArgs.filter((arg) => arg !== '--minify');
 if (cmd === 'build' && invalidBuildArgs.length > 0) {
@@ -27,43 +26,6 @@ if (cmd !== 'build' && commandArgs.includes('--minify')) {
   process.exit(2);
 }
 const minify = cmd === 'build' && commandArgs.includes('--minify');
-
-function readBuildVersion() {
-  const versionPath = path.join(rootDir, 'VERSION');
-  if (fs.existsSync(versionPath)) {
-    const version = fs.readFileSync(versionPath, 'utf8').trim();
-    if (version) return version;
-  }
-
-  const appConfPath = path.join(pkgRoot, 'src/main/resources/splunk/default/app.conf');
-  if (fs.existsSync(appConfPath)) {
-    const appConf = fs.readFileSync(appConfPath, 'utf8');
-    const idMatch = appConf.match(/\[id\][\s\S]*?version\s*=\s*(\S+)/m);
-    if (idMatch) return idMatch[1].trim();
-  }
-
-  return '1.0.0';
-}
-
-// --- Pre-build: stamp products.conf line 1 (date/time) and min_app_version ---
-function stampProductsConf() {
-  const productsConfPath = path.join(pkgRoot, 'src/main/resources/splunk/default/products.conf');
-  if (!fs.existsSync(productsConfPath)) return;
-  const appVersion = readBuildVersion();
-
-  const now = new Date();
-  const pad = (n) => String(n).padStart(2, '0');
-  const versionStamp = `${now.getUTCFullYear()}_${pad(now.getUTCMonth() + 1)}_${pad(now.getUTCDate())}_${pad(now.getUTCHours())}${pad(now.getUTCMinutes())}`;
-  const line1 = `# version = ${versionStamp}`;
-  const line2 = `# min_app_version = ${appVersion}`;
-
-  let content = fs.readFileSync(productsConfPath, 'utf8');
-  const lines = content.split(/\r?\n/);
-  const rest = lines.slice(2).join('\n');
-  const newContent = line1 + '\n' + line2 + '\n' + rest;
-  fs.writeFileSync(productsConfPath, newContent, 'utf8');
-  console.log(`\x1b[36m[build-stamp]\x1b[0m products.conf: version = ${versionStamp}, min_app_version = ${appVersion}`);
-}
 
 // --- Post-webpack: stamp staged Splunk resources from VERSION ---
 function stampStageVersion() {
@@ -133,8 +95,6 @@ function postBuildRefresh() {
 }
 
 if (cmd === 'build') {
-  // 0. Stamp products.conf line 1 (date/time) and min_app_version from VERSION
-  stampProductsConf();
   // 1. Generate static catalog from products.conf
   const genResult = spawnSync('node', [path.join(pkgRoot, 'bin', 'generate-catalog.js')], {
     stdio: 'inherit',

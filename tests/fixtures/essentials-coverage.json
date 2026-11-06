@@ -1,0 +1,360 @@
+{
+  "basis": "Local 1.0.80 package; publication and public-download byte parity not established",
+  "splunkbase_id": 9257,
+  "archive_version": "1.0.80",
+  "products": {
+    "cisco_ai_defense": {
+      "dashboards": [
+        "sn_agentic_ops_operational_intelligence"
+      ],
+      "evidence_searches": [
+        "security_ai_defense_block_rate_kpi",
+        "security_ai_defense_action_trend"
+      ]
+    },
+    "cisco_duo": {
+      "dashboards": [
+        "sn_zta_posture",
+        "sn_zta_authentication_policy_enforcement"
+      ],
+      "evidence_searches": [
+        "identity_duo_tenant_kpis",
+        "identity_duo_auth_outcome_mix"
+      ]
+    },
+    "cisco_etd": {
+      "dashboards": [
+        "workspace_insights"
+      ],
+      "evidence_searches": [
+        "security_etd_admin_action_volume",
+        "security_etd_verdict_reclassification_distribution"
+      ]
+    },
+    "cisco_xdr": {
+      "dashboards": [
+        "sn_zta_detection_response",
+        "sn_agentic_ops_secure_networking_assurance"
+      ],
+      "evidence_searches": [
+        "executive_dashboard_xdr_incident_count",
+        "security_resilience_xdr_by_severity"
+      ]
+    },
+    "cisco_isovalent": {
+      "dashboards": [
+        "sn_hmf_threat_detection_enforcement",
+        "sn_hmf_dlp_cloud_native_security"
+      ],
+      "evidence_searches": [
+        "security_isovalent_alerts_by_severity",
+        "security_isovalent_top_alert_rules"
+      ]
+    },
+    "cisco_multicloud_defense": {
+      "dashboards": [
+        "sn_hmf_threat_detection_enforcement",
+        "sn_hmf_dlp_cloud_native_security"
+      ],
+      "evidence_searches": [
+        "security_multicloud_defense_action_breakdown_kpi",
+        "security_multicloud_defense_threat_type_distribution"
+      ]
+    },
+    "cisco_nvm": {
+      "dashboards": [
+        "sn_zta_user_activity_monitoring"
+      ],
+      "evidence_searches": [
+        "network_nvm_top_processes_by_flow_volume",
+        "network_nvm_top_destination_hosts"
+      ]
+    },
+    "cisco_secure_endpoint": {
+      "dashboards": [
+        "sn_secure_infrastructure_status"
+      ],
+      "evidence_searches": [
+        "secure_networking_infra_secure_endpoint_incidents",
+        "secure_networking_secure_endpoint_inventory_by_policy_group"
+      ]
+    },
+    "cisco_secure_firewall": {
+      "dashboards": [
+        "sn_hmf_threat_detection_enforcement",
+        "sn_segmentation_operations"
+      ],
+      "evidence_searches": [
+        "security_resilience_firepower_event_correlation",
+        "security_resilience_recent_security_events"
+      ]
+    },
+    "cisco_secure_malware_analytics": {
+      "dashboards": [
+        "workspace_insights"
+      ],
+      "evidence_searches": [
+        "security_sma_threat_score_distribution",
+        "security_sma_top_high_risk_submissions"
+      ]
+    },
+    "cisco_secure_network_analytics": {
+      "dashboards": [
+        "workspace_insights"
+      ],
+      "evidence_searches": [
+        "security_sna_top_applications_by_volume",
+        "security_sna_destination_category_breakdown"
+      ]
+    },
+    "cisco_secure_workload": {
+      "dashboards": [
+        "sn_hmf_dlp_cloud_native_security"
+      ],
+      "evidence_searches": [
+        "security_microseg_tetration_alerts_by_severity_type",
+        "security_microseg_tetration_top_scopes_by_alert"
+      ]
+    },
+    "cisco_vulnerability_intelligence": {
+      "dashboards": [
+        "workspace_insights"
+      ],
+      "evidence_searches": [
+        "security_cvi_cves_by_severity_bucket",
+        "security_cvi_top_vulnerability_categories"
+      ]
+    },
+    "cisco_esa": {
+      "dashboards": [
+        "workspace_insights"
+      ],
+      "evidence_searches": [
+        "security_resilience_email_security_events",
+        "security_resilience_email_threat_count"
+      ]
+    },
+    "cisco_secure_access": {
+      "dashboards": [
+        "sn_zta_ravpn_sessions_and_posture",
+        "sn_zta_posture"
+      ],
+      "evidence_searches": [
+        "security_resilience_dns_base_search",
+        "security_resilience_dns_blocked_queries"
+      ]
+    },
+    "cisco_wsa": {
+      "dashboards": [
+        "workspace_insights"
+      ],
+      "evidence_searches": [
+        "security_resilience_web_security_events",
+        "security_resilience_web_threat_count"
+      ]
+    },
+    "cisco_umbrella": {
+      "dashboards": [
+        "sn_hmf_enforcement",
+        "sn_hmf_threat_detection_enforcement"
+      ],
+      "evidence_searches": [
+        "security_resilience_dns_base_search",
+        "security_resilience_dns_blocked_queries"
+      ]
+    },
+    "cisco_intersight": {
+      "dashboards": [
+        "workspace_insights"
+      ],
+      "evidence_searches": [
+        "secure_networking_intersight_advisory_exposure",
+        "secure_networking_intersight_eol_field_notice_milestones"
+      ]
+    },
+    "cisco_meraki": {
+      "dashboards": [
+        "sn_secure_infrastructure_posture",
+        "sn_secure_infrastructure_status"
+      ],
+      "evidence_searches": [
+        "building_resilience_co2_level",
+        "building_resilience_door_alerts"
+      ]
+    },
+    "cisco_thousandeyes": {
+      "dashboards": [
+        "sn_agentic_ops_operational_intelligence",
+        "sn_agentic_ops_secure_networking_assurance"
+      ],
+      "evidence_searches": [
+        "teuc_5_9_37_page_load_completion_rate",
+        "overview_link_te_a2a_health"
+      ]
+    },
+    "cisco_cyber_vision": {
+      "dashboards": [
+        "workspace_insights"
+      ],
+      "evidence_searches": [
+        "asset_inventory_ot_devices_by_vendor",
+        "monitoring_ot_top_talkers"
+      ]
+    },
+    "cisco_catalyst_center": {
+      "dashboards": [
+        "sn_agentic_ops_executive_assurance",
+        "sn_segmentation_readiness"
+      ],
+      "evidence_searches": [
+        "building_resilience_compliance_detail",
+        "executive_dashboard_active_clients"
+      ]
+    },
+    "cisco_ise": {
+      "dashboards": [
+        "sn_segmentation_operations",
+        "sn_zta_policy_management"
+      ],
+      "evidence_searches": [
+        "building_resilience_wireless_device_trust_summary",
+        "building_resilience_wireless_devices_to_review"
+      ]
+    },
+    "cisco_catalyst_sdwan": {
+      "dashboards": [
+        "sn_hmf_sdwan_network_health",
+        "sn_agentic_ops_executive_assurance"
+      ],
+      "evidence_searches": [
+        "security_resilience_sdwan_utd_threat_trend",
+        "security_resilience_sdwan_utd_top_threats"
+      ]
+    },
+    "cisco_nexus": {
+      "dashboards": [
+        "workspace_insights"
+      ],
+      "evidence_searches": [
+        "dc_networking_cdp_neighbor",
+        "dc_networking_home_device_info"
+      ]
+    },
+    "cisco_aci": {
+      "dashboards": [
+        "sn_data_center_operations"
+      ],
+      "evidence_searches": [
+        "network_aci_health_score_leaderboard",
+        "network_aci_top_fault_codes"
+      ]
+    },
+    "cisco_nexus_dashboard": {
+      "dashboards": [
+        "sn_secure_infrastructure_posture",
+        "sn_data_center_operations"
+      ],
+      "evidence_searches": [
+        "network_dc_nd_active_anomalies_by_fabric",
+        "network_dc_nd_top_active_anomaly_types"
+      ]
+    },
+    "cisco_nexus_hyperfabric": {
+      "dashboards": [
+        "sn_data_center_operations"
+      ],
+      "evidence_searches": [
+        "network_dc_hyperfabric_port_inventory",
+        "network_dc_hyperfabric_port_rates"
+      ]
+    },
+    "cisco_access_points": {
+      "dashboards": [
+        "sn_hmf_sdwan_network_health",
+        "sn_segmentation_operations"
+      ],
+      "evidence_searches": [
+        "it_critical_systems_syslog_severity_distribution",
+        "security_resilience_rogue_device_detection"
+      ]
+    },
+    "cisco_asr": {
+      "dashboards": [
+        "sn_hmf_sdwan_network_health",
+        "sn_segmentation_operations"
+      ],
+      "evidence_searches": [
+        "it_critical_systems_syslog_severity_distribution",
+        "security_resilience_rogue_device_detection"
+      ]
+    },
+    "cisco_crs": {
+      "dashboards": [
+        "sn_hmf_sdwan_network_health",
+        "sn_segmentation_operations"
+      ],
+      "evidence_searches": [
+        "it_critical_systems_syslog_severity_distribution",
+        "security_resilience_rogue_device_detection"
+      ]
+    },
+    "cisco_catalyst_switches": {
+      "dashboards": [
+        "sn_hmf_sdwan_network_health",
+        "sn_segmentation_operations"
+      ],
+      "evidence_searches": [
+        "it_critical_systems_syslog_severity_distribution",
+        "security_resilience_rogue_device_detection"
+      ]
+    },
+    "cisco_isr": {
+      "dashboards": [
+        "sn_hmf_sdwan_network_health",
+        "sn_segmentation_operations"
+      ],
+      "evidence_searches": [
+        "it_critical_systems_syslog_severity_distribution",
+        "security_resilience_rogue_device_detection"
+      ]
+    },
+    "cisco_wlc": {
+      "dashboards": [
+        "sn_hmf_sdwan_network_health",
+        "sn_segmentation_operations"
+      ],
+      "evidence_searches": [
+        "it_critical_systems_syslog_severity_distribution",
+        "security_resilience_rogue_device_detection"
+      ]
+    },
+    "cisco_webex": {
+      "dashboards": [
+        "workspace_insights"
+      ],
+      "evidence_searches": [
+        "secure_networking_webex_login_outcome_trend",
+        "secure_networking_webex_failed_logins"
+      ]
+    },
+    "cisco_mds_switches": {
+      "dashboards": [
+        "sn_data_center_operations"
+      ],
+      "evidence_searches": [
+        "network_dc_mds_switch_health",
+        "network_dc_mds_congestion"
+      ]
+    },
+    "cisco_spaces": {
+      "dashboards": [
+        "workplace_building_intelligence"
+      ],
+      "evidence_searches": [
+        "building_resilience_environmental_health_index",
+        "building_resilience_environmental_trend_detail"
+      ]
+    }
+  },
+  "archive_sha256": "576d6c967edd57fcfa5b09328430fe3455338789e824be8b3327f3d3fe1147d3"
+}

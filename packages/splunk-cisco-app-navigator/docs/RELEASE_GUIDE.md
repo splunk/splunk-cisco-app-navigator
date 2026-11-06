@@ -75,7 +75,7 @@ yarn run package:app
 This runs a clean build + webpack + tarball creation in one step. The output lands at:
 
 ```
-dist/splunk-cisco-app-navigator-X.Y.Z.tar.gz
+dist/splunk-cisco-app-navigator-X.Y.Z-BUILD.tar.gz
 ```
 
 The `build` field in `app.conf` is stamped with the git short hash automatically during the CI build. For local packages, it reflects the hash at the time of your last commit.
@@ -95,7 +95,7 @@ Review the HTML report for any failures before uploading.
 2. Click **Edit Listing** (top right, requires publisher access)
 3. Go to **Version History** tab
 4. Click **New Version**
-5. Upload `dist/splunk-cisco-app-navigator-X.Y.Z.tar.gz`
+5. Upload `dist/splunk-cisco-app-navigator-X.Y.Z-BUILD.tar.gz`
 6. Set **Splunk compatibility** versions (e.g., 10.3, 10.2, 10.1, 10.0, 9.4, 9.3, 9.2, 9.1, 9.0)
 7. Set **CIM compatibility** (e.g., 8.x, 6.x)
 8. Paste release notes from `CHANGELOG.md` into the release notes field
@@ -128,3 +128,38 @@ Review the HTML report for any failures before uploading.
 | `dist/splunk-cisco-app-navigator-*.tar.gz` | Splunkbase upload package |
 | `docs/splunkbase_*.md` | Splunkbase listing content (gitignored) |
 | `CHANGELOG.md` | Version history |
+
+## Shared build numbers
+
+Every new package reserves a number from the `splunk/splunk-cisco-app-navigator`
+GitHub Actions workflow `reserve-build-number.yml`. The first new workflow run
+produces build 100 (99 plus the workflow run number). The workflow identity and
+offset must not be changed or reset. Developers need GitHub CLI (`gh`), their own
+authenticated GitHub account, connectivity, and permission to dispatch Actions.
+A failed or cancelled package can consume a number; no offline fallback or
+manual number selection is supported. Receipts are kept in ignored
+`dist/build-reservations/`. Reusing an existing package with `--no-build` does
+not reserve a number. Concurrent builds can finish out of order.
+
+Before the service can be used, the workflow must be published to the canonical
+repository's default branch, Actions enabled, and developers granted dispatch
+access. All developers must update their build tooling and stop using the prior
+local counter. Verify distinct reservations from two clients after activation.
+A local commit alone does not activate the service.
+
+## Publishing a catalog update
+
+Ordinary builds preserve the catalog revision in `products.conf`. When preparing
+an updated catalog for S3, stamp the source file deliberately:
+
+```sh
+python3 packages/splunk-cisco-app-navigator/bin/stamp_catalog.py
+```
+
+The command uses the current UTC minute in the existing `YYYY_MM_DD_HHMM`
+format and changes only the version header. Verify that the stamped version is
+strictly later than the version already published to S3, and that
+`min_app_version` accurately reflects compatibility, before uploading. The
+command does not check S3 or upload the file. If another update was stamped in
+the same minute, wait for the next minute. Older catalog versions can still
+be newer than a locally stamped file, so compare against S3 each time.

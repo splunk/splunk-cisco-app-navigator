@@ -57,7 +57,6 @@ if [[ "$FROM_STAGE" -eq 1 && "$MINIFY" -eq 1 ]]; then
 fi
 
 # Read version from repo-root VERSION (source of truth)
-APP_CONF="${PKG_ROOT}/src/main/resources/splunk/default/app.conf"
 if [[ ! -f "$VERSION_FILE" ]]; then
   echo "ERROR: VERSION file not found: ${VERSION_FILE}" >&2
   exit 1
@@ -70,7 +69,6 @@ fi
 
 DIST_DIR="${PKG_ROOT}/../../dist"
 mkdir -p "$DIST_DIR"
-PKG_PATH="${DIST_DIR}/${APP_NAME}-${VERSION}.tar.gz"
 
 if [[ "$FROM_STAGE" -eq 1 ]]; then
   if [[ ! -d "$STAGE_DIR" ]]; then
@@ -97,7 +95,8 @@ bash "${SCRIPT_DIR}/stamp_version.sh" "$STAGE_DIR"
 
 # Stage into a temp directory with the correct app directory name
 TMP_DIR="$(mktemp -d)"
-trap 'rm -rf "$TMP_DIR"' EXIT
+LOCK_DIR=""
+trap 'rm -rf "$TMP_DIR"; if [[ -n "$LOCK_DIR" ]]; then rmdir "$LOCK_DIR" 2>/dev/null || true; fi' EXIT
 cp -R "$STAGE_DIR" "${TMP_DIR}/${APP_NAME}"
 find "${TMP_DIR}" -name ".DS_Store" -delete
 # Remove Splunk-generated runtime artifacts — they should never ship in the package.
@@ -115,27 +114,22 @@ if [[ -f "$META_FILE" ]]; then
   echo "[package] default.meta: reverted export to 'none' for Splunkbase"
 fi
 
-# Bump [install] build in the packaged app.conf only. Source app.conf is
-# never modified. Counter climbs across runs: new = max(source_build, highest
-# build stamped in any existing dist/ tarball) + 1. The .tar.gz files in
-# dist/ act as the persistent counter — no state file needed.
-PKG_APP_CONF="${TMP_DIR}/${APP_NAME}/default/app.conf"
-source_build=$(grep -E '^\s*build\s*=' "$APP_CONF" | head -1 | sed -E 's/.*=\s*//' | tr -d '[:space:]')
-if [[ ! "$source_build" =~ ^[0-9]+$ ]]; then
-  source_build=0
+# Reserve one globally unique number for every new package. Failed builds spend
+# their reservation; existing dist archives are never used as a local counter.
+LOCK_DIR="${DIST_DIR}/.${APP_NAME}-build.lock"
+if ! mkdir "$LOCK_DIR" 2>/dev/null; then
+  echo "ERROR: another package operation may be running; inspect ${LOCK_DIR}." >&2
+  LOCK_DIR=""
+  exit 1
 fi
-highest_prev=0
-for prev_tar in "${DIST_DIR}"/${APP_NAME}-*.tar.gz; do
-  [[ -f "$prev_tar" ]] || continue
-  b=$(tar -xzOf "$prev_tar" "${APP_NAME}/default/app.conf" 2>/dev/null \
-      | grep -E '^\s*build\s*=' | head -1 | sed -E 's/.*=\s*//' | tr -d '[:space:]')
-  if [[ "$b" =~ ^[0-9]+$ ]] && (( b > highest_prev )); then
-    highest_prev=$b
-  fi
-done
-base=$source_build
-(( highest_prev > base )) && base=$highest_prev
-new_build=$((base + 1))
+PKG_APP_CONF="${TMP_DIR}/${APP_NAME}/default/app.conf"
+new_build="$(python3 "${ROOT_DIR}/tools/reserve_package_build.py" --receipts "${DIST_DIR}/build-reservations")"
+python3 "${ROOT_DIR}/tools/reserve_package_build.py" --receipts "${DIST_DIR}/build-reservations" --claim "$new_build"
+PKG_PATH="${DIST_DIR}/${APP_NAME}-${VERSION}-${new_build}.tar.gz"
+if [[ -e "$PKG_PATH" ]]; then
+  echo "ERROR: package already exists: ${PKG_PATH}" >&2
+  exit 1
+fi
 # sed -i has different syntax on macOS (BSD) vs Linux (GNU). Detect once
 # so this script keeps working in CI containers as well as on developer macs.
 if sed --version >/dev/null 2>&1; then
@@ -145,9 +139,10 @@ else
 fi
 if [[ -f "$PKG_APP_CONF" ]] && grep -Eq '^\s*build\s*=' "$PKG_APP_CONF"; then
   "${sed_i[@]}" -E "s/^([[:space:]]*build[[:space:]]*=[[:space:]]*)[^[:space:]]+/\\1${new_build}/" "$PKG_APP_CONF"
-  echo "[package] app.conf: bumped build ${base} -> ${new_build} (package only, source unchanged)"
+  echo "[package] app.conf: stamped shared build ${new_build} (package only, source unchanged)"
 else
-  echo "[package] WARNING: could not find [install] build line in app.conf" >&2
+  echo "ERROR: could not find build line in packaged app.conf" >&2
+  exit 1
 fi
 
 # Provenance comment block above [install]. Helps debug "which commit
@@ -178,3 +173,6 @@ cd "$TMP_DIR"
 COPYFILE_DISABLE=1 tar czf "$PKG_PATH" "$APP_NAME"
 SIZE=$(du -h "$PKG_PATH" | cut -f1 | xargs)
 echo "Created ${PKG_PATH} (${SIZE})"
+if [[ -n "${PACKAGE_PATH_FILE:-}" ]]; then
+  printf '%s\n' "$PKG_PATH" > "$PACKAGE_PATH_FILE"
+fi
