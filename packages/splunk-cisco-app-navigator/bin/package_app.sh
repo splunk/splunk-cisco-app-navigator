@@ -70,7 +70,6 @@ fi
 
 DIST_DIR="${PKG_ROOT}/../../dist"
 mkdir -p "$DIST_DIR"
-PKG_PATH="${DIST_DIR}/${APP_NAME}-${VERSION}.tar.gz"
 
 if [[ "$FROM_STAGE" -eq 1 ]]; then
   if [[ ! -d "$STAGE_DIR" ]]; then
@@ -97,7 +96,8 @@ bash "${SCRIPT_DIR}/stamp_version.sh" "$STAGE_DIR"
 
 # Stage into a temp directory with the correct app directory name
 TMP_DIR="$(mktemp -d)"
-trap 'rm -rf "$TMP_DIR"' EXIT
+LOCK_DIR=""
+trap 'rm -rf "$TMP_DIR"; if [[ -n "$LOCK_DIR" ]]; then rmdir "$LOCK_DIR" 2>/dev/null || true; fi' EXIT
 cp -R "$STAGE_DIR" "${TMP_DIR}/${APP_NAME}"
 find "${TMP_DIR}" -name ".DS_Store" -delete
 # Remove Splunk-generated runtime artifacts — they should never ship in the package.
@@ -119,6 +119,12 @@ fi
 # never modified. Counter climbs across runs: new = max(source_build, highest
 # build stamped in any existing dist/ tarball) + 1. The .tar.gz files in
 # dist/ act as the persistent counter — no state file needed.
+LOCK_DIR="${DIST_DIR}/.${APP_NAME}-build.lock"
+if ! mkdir "$LOCK_DIR" 2>/dev/null; then
+  echo "ERROR: another package operation may be running; inspect ${LOCK_DIR}." >&2
+  LOCK_DIR=""
+  exit 1
+fi
 PKG_APP_CONF="${TMP_DIR}/${APP_NAME}/default/app.conf"
 source_build=$(grep -E '^\s*build\s*=' "$APP_CONF" | head -1 | sed -E 's/.*=\s*//' | tr -d '[:space:]')
 if [[ ! "$source_build" =~ ^[0-9]+$ ]]; then
@@ -136,6 +142,11 @@ done
 base=$source_build
 (( highest_prev > base )) && base=$highest_prev
 new_build=$((base + 1))
+PKG_PATH="${DIST_DIR}/${APP_NAME}-${VERSION}-${new_build}.tar.gz"
+if [[ -e "$PKG_PATH" ]]; then
+  echo "ERROR: package already exists: ${PKG_PATH}" >&2
+  exit 1
+fi
 # sed -i has different syntax on macOS (BSD) vs Linux (GNU). Detect once
 # so this script keeps working in CI containers as well as on developer macs.
 if sed --version >/dev/null 2>&1; then
@@ -178,3 +189,6 @@ cd "$TMP_DIR"
 COPYFILE_DISABLE=1 tar czf "$PKG_PATH" "$APP_NAME"
 SIZE=$(du -h "$PKG_PATH" | cut -f1 | xargs)
 echo "Created ${PKG_PATH} (${SIZE})"
+if [[ -n "${PACKAGE_PATH_FILE:-}" ]]; then
+  printf '%s\n' "$PKG_PATH" > "$PACKAGE_PATH_FILE"
+fi

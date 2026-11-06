@@ -20,7 +20,7 @@ if [[ -z "$VERSION" ]]; then
   echo "ERROR: VERSION file is empty: ${VERSION_FILE}" >&2
   exit 1
 fi
-PKG_PATH="${DIST_DIR}/${APP_NAME}-${VERSION}.tar.gz"
+
 
 # ── Pre-flight: validate products.conf for duplicate keys ──
 echo "── Pre-flight: checking products.conf for duplicate keys..."
@@ -39,13 +39,20 @@ except configparser.DuplicateSectionError as e:
 "
 
 # ── Package the app (unless --quick) ──
-if [[ "$1" != "--quick" ]]; then
+if [[ "${1:-}" != "--quick" ]]; then
   echo "── Packaging app..."
-  bash "${SCRIPT_DIR}/package_app.sh"
+  package_path_file="$(mktemp)"
+  trap 'rm -f "$package_path_file"' EXIT
+  PACKAGE_PATH_FILE="$package_path_file" bash "${SCRIPT_DIR}/package_app.sh"
+  PKG_PATH="$(cat "$package_path_file")"
+  rm -f "$package_path_file"
+  trap - EXIT
+else
+  PKG_PATH="$(find "$DIST_DIR" -maxdepth 1 -type f -name "${APP_NAME}-${VERSION}-*.tar.gz" -print0 | xargs -0 ls -t 2>/dev/null | head -1)"
 fi
 
 if [[ ! -f "$PKG_PATH" ]]; then
-  echo "ERROR: Package not found at ${PKG_PATH}" >&2
+  echo "ERROR: Package not found for version ${VERSION} in ${DIST_DIR}" >&2
   exit 1
 fi
 

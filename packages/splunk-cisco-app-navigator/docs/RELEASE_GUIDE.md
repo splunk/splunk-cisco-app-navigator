@@ -75,7 +75,7 @@ yarn run package:app
 This runs a clean build + webpack + tarball creation in one step. The output lands at:
 
 ```
-dist/splunk-cisco-app-navigator-X.Y.Z.tar.gz
+dist/splunk-cisco-app-navigator-X.Y.Z-BUILD.tar.gz
 ```
 
 The `build` field in `app.conf` is stamped with the git short hash automatically during the CI build. For local packages, it reflects the hash at the time of your last commit.
@@ -95,7 +95,7 @@ Review the HTML report for any failures before uploading.
 2. Click **Edit Listing** (top right, requires publisher access)
 3. Go to **Version History** tab
 4. Click **New Version**
-5. Upload `dist/splunk-cisco-app-navigator-X.Y.Z.tar.gz`
+5. Upload `dist/splunk-cisco-app-navigator-X.Y.Z-BUILD.tar.gz`
 6. Set **Splunk compatibility** versions (e.g., 10.3, 10.2, 10.1, 10.0, 9.4, 9.3, 9.2, 9.1, 9.0)
 7. Set **CIM compatibility** (e.g., 8.x, 6.x)
 8. Paste release notes from `CHANGELOG.md` into the release notes field

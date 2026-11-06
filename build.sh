@@ -8,7 +8,7 @@
 # staged/package app.conf, app.manifest, and products.conf at package time.
 #
 # Default workflow:
-#   ./build.sh                                                # build only; produces dist/<app>-<version>.tar.gz
+#   ./build.sh                                                # build only; produces dist/<app>-<version>-<build>.tar.gz
 #
 # Install workflows (splunkd-managed; goes through REST mgmt port 8089):
 #   ./build.sh --install --auth admin:changeme                # build + `splunk install app` against the default Splunk
@@ -657,6 +657,12 @@ if [[ "$no_build" -eq 0 ]]; then
     fi
 fi
 
+if [[ "$no_build" -eq 0 ]]; then
+    package_path_file="$(mktemp)"
+    trap 'rm -f "$package_path_file"' EXIT
+    export PACKAGE_PATH_FILE="$package_path_file"
+fi
+
 if [[ "$no_build" -eq 1 ]]; then
     hdr "Reusing existing tarball (--no-build)..."
 elif [[ "$from_stage" -eq 1 ]]; then
@@ -680,7 +686,10 @@ if [[ "$no_build" -eq 1 ]]; then
             | head -n 1
     )"
 else
-    package_path="${DIST_DIR}/${APP_NAME}-${build_version}.tar.gz"
+    package_path="$(cat "$package_path_file")"
+    rm -f "$package_path_file"
+    trap - EXIT
+    unset PACKAGE_PATH_FILE
 fi
 
 if [[ -z "$package_path" ]]; then
