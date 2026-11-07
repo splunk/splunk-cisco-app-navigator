@@ -149,17 +149,17 @@ A local commit alone does not activate the service.
 
 ## Publishing a catalog update
 
-Ordinary builds preserve the catalog revision in `products.conf`. When preparing
-an updated catalog for S3, stamp the source file deliberately:
+The tracked `products.conf` keeps `# version = __CATALOG_VERSION__` as a stable
+placeholder. Packaging replaces this only in the archive copy with the current
+UTC minute (`YYYY_MM_DD_HHMM`), including `--from-stage` builds. The source and
+watch-maintained stage retain their revision header. `--no-build` reuses the
+existing archive and its timestamp unchanged.
 
-```sh
-python3 packages/splunk-cisco-app-navigator/bin/stamp_catalog.py
-```
-
-The command uses the current UTC minute in the existing `YYYY_MM_DD_HHMM`
-format and changes only the version header. Verify that the stamped version is
-strictly later than the version already published to S3, and that
-`min_app_version` accurately reflects compatibility, before uploading. The
-command does not check S3 or upload the file. If another update was stamped in
-the same minute, wait for the next minute. Older catalog versions can still
-be newer than a locally stamped file, so compare against S3 each time.
+For S3 publication, extract `default/products.conf` from the exact package being
+released and upload that stamped file, never the source template. Verify its
+revision is strictly later than the published S3 catalog and check
+`min_app_version` compatibility. Builds within one minute can share a catalog
+revision; wait until a later minute and rebuild if a second update must sync.
+The existing sync parser and comparison logic are unchanged. Packaging does not
+upload anything. The stamping helper requires an explicit copy path and rejects
+the tracked source file.

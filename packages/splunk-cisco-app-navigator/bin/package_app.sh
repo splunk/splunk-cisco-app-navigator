@@ -98,6 +98,8 @@ TMP_DIR="$(mktemp -d)"
 LOCK_DIR=""
 trap 'rm -rf "$TMP_DIR"; if [[ -n "$LOCK_DIR" ]]; then rmdir "$LOCK_DIR" 2>/dev/null || true; fi' EXIT
 cp -R "$STAGE_DIR" "${TMP_DIR}/${APP_NAME}"
+# Stamp only the archive copy, including when reusing a watch-maintained stage.
+python3 "${SCRIPT_DIR}/stamp_catalog.py" "${TMP_DIR}/${APP_NAME}/default/products.conf"
 find "${TMP_DIR}" -name ".DS_Store" -delete
 # Remove Splunk-generated runtime artifacts — they should never ship in the package.
 # Because /opt/splunk/etc/apps/splunk-cisco-app-navigator symlinks to stage/,

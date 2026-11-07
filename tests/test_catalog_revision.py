@@ -25,6 +25,30 @@ exec(compile(ast.Module(body=functions, type_ignores=[]), 'synccatalog.py', 'exe
 
 
 class CatalogRevisionTests(unittest.TestCase):
+    def test_package_copy_is_stamped_and_source_template_is_preserved(self):
+        import tarfile
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            source = root / 'source.conf'
+            original = b'# version = __CATALOG_VERSION__\n# min_app_version = 1.0.33\n[example]\n'
+            source.write_bytes(original)
+            packaged = root / 'app/default/products.conf'
+            packaged.parent.mkdir(parents=True)
+            shutil.copy(source, packaged)
+            stamp_catalog.stamp(packaged, datetime(2026, 11, 7, 19, 5, tzinfo=timezone.utc))
+            archive = root / 'app.tar.gz'
+            with tarfile.open(archive, 'w:gz') as tar:
+                tar.add(root / 'app', arcname='app')
+            with tarfile.open(archive) as tar:
+                content = tar.extractfile('app/default/products.conf').read()
+            self.assertEqual(namespace['get_file_version'](content), 202611071905)
+            self.assertEqual(source.read_bytes(), original)
+            self.assertEqual(content.split(b'\n', 1)[1], original.split(b'\n', 1)[1])
+
+    def test_tracked_source_cannot_be_stamped(self):
+        with self.assertRaisesRegex(ValueError, 'tracked source'):
+            stamp_catalog.stamp(stamp_catalog.DEFAULT_CATALOG, datetime.now(timezone.utc))
+
     def test_stamp_changes_only_header_and_sync_parser_orders_versions(self):
         with tempfile.TemporaryDirectory() as directory:
             path = Path(directory) / 'products.conf'
