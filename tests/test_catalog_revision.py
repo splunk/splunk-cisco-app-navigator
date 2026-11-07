@@ -25,6 +25,19 @@ exec(compile(ast.Module(body=functions, type_ignores=[]), 'synccatalog.py', 'exe
 
 
 class CatalogRevisionTests(unittest.TestCase):
+    def test_release_stamping_preserves_catalog_minimum(self):
+        with tempfile.TemporaryDirectory() as directory:
+            stage = Path(directory)
+            (stage / 'default').mkdir()
+            catalog = stage / 'default/products.conf'
+            original = b'# version = __CATALOG_VERSION__\n# min_app_version = 1.0.29\n[example]\n'
+            catalog.write_bytes(original)
+            app = stage / 'default/app.conf'
+            app.write_text('[id]\nversion = 0.0.0\n[launcher]\nversion = 0.0.0\n')
+            subprocess.run(['bash', str(PKG / 'bin/stamp_version.sh'), str(stage)], check=True, capture_output=True, timeout=10)
+            self.assertEqual(catalog.read_bytes(), original)
+            self.assertIn('version = ' + (ROOT / 'VERSION').read_text().strip(), app.read_text())
+
     def test_package_copy_is_stamped_and_source_template_is_preserved(self):
         import tarfile
         with tempfile.TemporaryDirectory() as directory:

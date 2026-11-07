@@ -58,24 +58,10 @@ stamp_manifest() {
   ' "$file" "$APP_VERSION"
 }
 
-stamp_products_conf() {
-  local file="${APP_ROOT}/default/products.conf"
-  local tmp
-  [[ -f "$file" ]] || return 0
-
-  tmp="$(mktemp)"
-  awk -v version="$APP_VERSION" '
-    /^[[:space:]]*#[[:space:]]*min_app_version[[:space:]]*=/ {
-      print "# min_app_version = " version
-      next
-    }
-    { print }
-  ' "$file" > "$tmp"
-  mv "$tmp" "$file"
-}
 
 stamp_app_conf
 stamp_manifest
-stamp_products_conf
+# products.conf min_app_version is a maintained compatibility requirement,
+# independent of the release VERSION. Preserve it verbatim.
 
 echo "[stamp] VERSION ${APP_VERSION} stamped into ${APP_ROOT}"

@@ -182,3 +182,7 @@ browser sign-in, and retry. For first-time setup use
 `aws configure sso --profile catalog-publisher`. The SSO region is `us-west-2`;
 the bucket/client region is `us-east-1`. Access-denied errors after login require
 checking the selected role's S3 permissions.
+
+Catalog `min_app_version` is maintained explicitly in the source catalog and is
+preserved during builds. Raise it only when a catalog change requires a newer
+app; it is independent of the packaged app version and catalog timestamp.
