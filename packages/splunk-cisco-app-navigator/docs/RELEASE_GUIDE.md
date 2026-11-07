@@ -22,8 +22,7 @@ git checkout main && git pull origin main --ff-only
 git checkout -b chore/bump-vX.Y.Z
 ```
 
-Set the repo-root `VERSION` file to `X.Y.Z` (the build version authority), then
-keep source metadata aligned in `packages/splunk-cisco-app-navigator/src/main/resources/splunk/default/app.conf`:
+Edit `packages/splunk-cisco-app-navigator/src/main/resources/splunk/default/app.conf`:
 
 ```conf
 [id]
