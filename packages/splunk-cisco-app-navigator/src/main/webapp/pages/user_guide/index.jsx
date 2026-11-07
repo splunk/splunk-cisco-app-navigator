@@ -1,4 +1,5 @@
-import { getThemeOptions, getUserTheme } from '@splunk/splunk-utils/themes';
+import { readUserTheme } from '../../common/shellTheme';
+import { getThemeOptions } from '@splunk/splunk-utils/themes';
 /* eslint-disable import/no-extraneous-dependencies, react/prop-types */
 /* global SCAN_APP_VERSION, SCAN_BUILD_HASH */
 import React, {
@@ -430,7 +431,7 @@ function UserGuideContent() {
         };
         updateFromDom();
 
-        getUserTheme()
+        readUserTheme()
             .then((theme) => {
                 if (!cancelled && theme) {
                     setSplunkDark(getThemeOptions(theme).colorScheme === 'dark');

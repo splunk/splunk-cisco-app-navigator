@@ -1,3 +1,4 @@
+import { readUserTheme } from '../../common/shellTheme';
 /**
  * Splunk Cisco App Navigator — Products Page ("The Glass Pane")
  *
@@ -30,7 +31,7 @@
 import React, { useState, useEffect, useMemo, useCallback, useRef } from 'react';
 import ReactDOM from 'react-dom';
 import { createURL } from '@splunk/splunk-utils/url';
-import { getThemeOptions, getUserTheme } from '@splunk/splunk-utils/themes';
+import { getThemeOptions } from '@splunk/splunk-utils/themes';
 import { getCSRFToken } from '@splunk/splunk-utils/config';
 import Plus from '@splunk/react-icons/Plus';
 import Close from '@splunk/react-icons/Cross';
@@ -7950,7 +7951,7 @@ function SCANProductsPage() {
 
         const fetchSplunkTheme = async () => {
             try {
-                const theme = await getUserTheme();
+                const theme = await readUserTheme();
                 return theme ? getThemeOptions(theme).colorScheme === 'dark' : null;
             } catch (_e) {
                 return null;

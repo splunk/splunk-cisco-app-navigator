@@ -3,7 +3,7 @@ const assert = require('node:assert/strict');
 const fs = require('node:fs');
 const vm = require('node:vm');
 const source = fs.readFileSync('packages/splunk-cisco-app-navigator/src/main/webapp/common/shellTheme.js', 'utf8')
-    .replace(/^import .*;\n/, '').replace('export async function', 'async function');
+    .replace(/^import .*;\n/gm, '').replaceAll('export async function', 'async function').replaceAll('export function', 'function');
 async function run(href, theme, fail = false) {
     let destination;
     let mounts = 0;
@@ -33,4 +33,19 @@ test('explicit light link remains light for a dark user', async () => {
 test('saved light preference and unavailable theme API remain usable', async () => {
     assert.equal(new URL((await run('http://forge/products', 'light')).destination).searchParams.get('theme'), 'light');
     assert.equal((await run('http://forge/products', null, true)).mounts, 1);
+});
+
+test('RequireJS theme API returns the user preference rather than page fallback', async () => {
+    let requested;
+    const context = vm.createContext({
+        window: { define: { amd: {} }, require: (modules, success) => {
+            requested = modules[0];
+            success({ getTheme: async () => 'dark' });
+        } },
+        createStaticURL: value => '/static/' + value,
+        getUserTheme: () => { throw Error('standalone loader must not run'); },
+    });
+    vm.runInContext(source, context);
+    assert.equal(await context.readUserTheme(), 'dark');
+    assert.equal(requested, '/static/build/api/get_theme.js');
 });
