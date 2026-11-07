@@ -163,3 +163,22 @@ revision; wait until a later minute and rebuild if a second update must sync.
 The existing sync parser and comparison logic are unchanged. Packaging does not
 upload anything. The stamping helper requires an explicit copy path and rejects
 the tracked source file.
+
+### Publish the packaged catalog with AWS CLI
+
+Check an exact package first (replace BUILD with its number):
+
+```sh
+python3 tools/publish_catalog.py dist/splunk-cisco-app-navigator-1.0.33-BUILD.tar.gz
+```
+
+Repeat with `--publish` to replace `s3://is4s/scan/products.conf` without a backup.
+The helper verifies account, catalog timestamp and app compatibility; it refuses
+to overwrite a concurrent S3 update and verifies uploaded bytes. It never builds
+or chooses a package automatically. Temporary downloads are cleaned up.
+
+For an expired session, run `aws sso login --profile catalog-publisher`, complete
+browser sign-in, and retry. For first-time setup use
+`aws configure sso --profile catalog-publisher`. The SSO region is `us-west-2`;
+the bucket/client region is `us-east-1`. Access-denied errors after login require
+checking the selected role's S3 permissions.
