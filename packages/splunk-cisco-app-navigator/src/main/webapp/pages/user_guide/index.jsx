@@ -1,3 +1,4 @@
+import { getThemeOptions, getUserTheme } from '@splunk/splunk-utils/themes';
 /* eslint-disable import/no-extraneous-dependencies, react/prop-types */
 /* global SCAN_APP_VERSION, SCAN_BUILD_HASH */
 import React, {
@@ -429,13 +430,11 @@ function UserGuideContent() {
         };
         updateFromDom();
 
-        fetch(createURL('/splunkd/__raw/servicesNS/-/-/data/user-prefs/general?output_mode=json'), {
-            credentials: 'include',
-        })
-            .then((response) => (response.ok ? response.json() : null))
-            .then((data) => {
-                const theme = data?.entry?.[0]?.content?.theme;
-                if (!cancelled && theme) {setSplunkDark(theme === 'dark');}
+        getUserTheme()
+            .then((theme) => {
+                if (!cancelled && theme) {
+                    setSplunkDark(getThemeOptions(theme).colorScheme === 'dark');
+                }
             })
             .catch(() => {});
 

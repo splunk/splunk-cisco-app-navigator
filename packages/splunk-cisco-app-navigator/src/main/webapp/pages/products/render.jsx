@@ -1,3 +1,4 @@
+import { mountWithUserTheme } from '../../common/shellTheme';
 import React, { useEffect, useState } from 'react';
 import { createRoot } from 'react-dom/client';
 import { SplunkThemeProvider } from '@splunk/themes';
@@ -49,4 +50,4 @@ function mount() {
     reactRoot.render(<ProductsThemeRoot />);
 }
 
-mount();
+mountWithUserTheme(mount);

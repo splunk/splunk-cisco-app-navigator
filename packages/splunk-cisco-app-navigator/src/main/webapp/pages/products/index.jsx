@@ -30,6 +30,7 @@
 import React, { useState, useEffect, useMemo, useCallback, useRef } from 'react';
 import ReactDOM from 'react-dom';
 import { createURL } from '@splunk/splunk-utils/url';
+import { getThemeOptions, getUserTheme } from '@splunk/splunk-utils/themes';
 import { getCSRFToken } from '@splunk/splunk-utils/config';
 import Plus from '@splunk/react-icons/Plus';
 import Close from '@splunk/react-icons/Cross';
@@ -7949,31 +7950,18 @@ function SCANProductsPage() {
 
         const fetchSplunkTheme = async () => {
             try {
-                const res = await fetch(
-                    createURL('/splunkd/__raw/servicesNS/-/-/data/user-prefs/general?output_mode=json'),
-                    { credentials: 'include' }
-                );
-                if (!res.ok) return null;
-                const data = await res.json();
-                const theme = data?.entry?.[0]?.content?.theme;
-                if (theme === 'dark') return true;
-                if (theme === 'light') return false;
-                return null;
+                const theme = await getUserTheme();
+                return theme ? getThemeOptions(theme).colorScheme === 'dark' : null;
             } catch (_e) {
                 return null;
             }
         };
 
-        // Synchronous DOM check first
         const domResult = isDarkDOM();
-        if (domResult !== null) {
-            if (!cancelled) setSplunkTheme(domResult);
-        } else {
-            if (!cancelled) setSplunkTheme(false); // default light
-            fetchSplunkTheme().then((isDark) => {
-                if (!cancelled && isDark !== null) setSplunkTheme(isDark);
-            });
-        }
+        if (domResult !== null) setSplunkTheme(domResult);
+        fetchSplunkTheme().then((isDark) => {
+            if (!cancelled && isDark !== null) setSplunkTheme(isDark);
+        });
 
         // Watch for Splunk toggling theme dynamically
         const observer = new MutationObserver(() => {
