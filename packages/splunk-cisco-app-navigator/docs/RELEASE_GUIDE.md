@@ -169,7 +169,7 @@ the tracked source file.
 Check an exact package first (replace BUILD with its number):
 
 ```sh
-python3 tools/publish_catalog.py dist/splunk-cisco-app-navigator-1.0.33-BUILD.tar.gz
+./publish-catalog.sh dist/splunk-cisco-app-navigator-1.0.33-BUILD.tar.gz
 ```
 
 Repeat with `--publish` to replace `s3://is4s/scan/products.conf` without a backup.
