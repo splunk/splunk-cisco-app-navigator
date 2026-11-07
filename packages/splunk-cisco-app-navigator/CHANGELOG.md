@@ -1,5 +1,13 @@
 # Change Log
 
+1.0.50 — November 7, 2026
+-------
+
+* Shared build numbers across developers and machines, with build numbers in package filenames.
+* Catalog timestamps stamped only into packaged output; catalog minimum app versions preserved independently of the release version.
+* Added a catalog publisher with validation, upload verification, and authentication guidance.
+* Updated Products and User Guide theme loading for the Simple XML dashboard shell.
+
 1.0.33 — November 6, 2026
 -------
 
