@@ -355,11 +355,12 @@ class SyncCatalog(GeneratingCommand):
             if backup_file_path:
                 prune_old_backups()
 
-            INFO("Catalog sync completed successfully.")
+            reload_ok = reload_result["status"] == "Success"
+            INFO("Catalog file updated. Configuration reload successful: %s", reload_ok)
             yield {
                 "_time": time.time(),
-                "status": "Success",
-                "reason": f"Synced: updated catalog from {format_version_timestamp(local_version)} to {format_version_timestamp(s3_version)}.",
+                "status": "Success" if reload_ok else "Partial Success",
+                "reason": f"{'Synced' if reload_ok else 'Catalog file updated, but configuration reload failed'}: updated catalog from {format_version_timestamp(local_version)} to {format_version_timestamp(s3_version)}.",
                 "message": f"Updated from {local_version} to {s3_version}.",
                 "bytes_written": bytes_written,
                 "destination": full_path,

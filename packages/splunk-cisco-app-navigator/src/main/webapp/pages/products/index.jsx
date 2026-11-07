@@ -1211,33 +1211,19 @@ function getBestPractices(product, platformType, splunkbaseData) {
     const viz = resolveLabel(product.app_viz_splunkbase_uid, product.app_viz_label, product.app_viz, splunkbaseData) || null;
     const tips = [];
 
-    // ── Platform / data-collection tip ──────────────────────────────────
-    if (product.sc4s_url) {
-        // Product has a specific SC4S page — show a targeted recommendation with link
-        const sc4sLabel = product.sc4s_label || 'SC4S documentation';
-        if (isCloud) {
-            tips.push({
-                text: `Since you are running Splunk Cloud, we highly recommend using SC4S (Splunk Connect for Syslog) for data collection. While the TA can be installed on an on-prem Heavy Forwarder to listen on a UDP port, this approach is only advisable for very small environments or single-integration use cases.`,
-                linkLabel: sc4sLabel,
+    // Recommend syslog collection only when explicitly declared by the catalog.
+    if (product.sc4s_supported) {
+        tips.push({
+            text: `For the supported syslog sources of ${pn}, SC4S (Splunk Connect for Syslog) can forward events to Splunk over HEC. Follow the product-specific source configuration and parsing requirements.${isCloud ? ' Deploy SC4S outside Splunk Cloud and verify connectivity to the approved Cloud HEC endpoint.' : ''}`,
+            ...(product.sc4s_url ? {
+                linkLabel: product.sc4s_label || 'SC4S documentation',
                 linkUrl: product.sc4s_url,
-                icon: '',
-            });
-        } else {
-            tips.push({
-                text: `For data collection, we highly recommend using SC4S (Splunk Connect for Syslog) to reliably ingest data for ${pn}. While the TA can be installed on a Heavy Forwarder to listen directly on a UDP port, this approach is only advisable for very small environments or single-integration use cases.`,
-                linkLabel: sc4sLabel,
-                linkUrl: product.sc4s_url,
-                icon: '',
-            });
-        }
-    } else if (isCloud) {
-        tips.push({ text: `Since you are running Splunk Cloud, data for ${pn} is best ingested using a cloud-compatible input method such as an HTTP Event Collector (HEC) endpoint or the Splunk Cloud Data Manager.` });
-    } else {
-        tips.push({ text: `On Splunk Enterprise, consider using Splunk Connect for Syslog (SC4S) to reliably ingest data for ${pn}. SC4S handles syslog parsing and routes events to the correct sourcetype automatically.` });
+            } : {}),
+        });
     }
 
     if (ta) {
-        tips.push({ text: `The required add-on for data ingestion is "${ta}". Make sure it is installed and enabled on your search heads and heavy forwarders.` });
+        tips.push({ text: `Follow the deployment documentation for "${ta}" to determine where its inputs and knowledge objects belong. Configure each input on the designated collector and avoid duplicate collection.${isCloud ? ' Confirm the add-on and input method are supported for your Splunk Cloud deployment.' : ''}` });
     }
 
     if (viz) {
@@ -1254,7 +1240,7 @@ function getBestPractices(product, platformType, splunkbaseData) {
             const sb = splunkbaseData && splunkbaseData[uid];
             return sb ? (sb.title || sb.appid || `App #${uid}`) : `App #${uid}`;
         }).join(', ');
-        tips.push({ text: `Disable and remove these deprecated apps before using the recommended add-on: ${names}`, icon: '' });
+        tips.push({ text: `Review these legacy integrations before migrating: ${names}. Confirm input ownership, historical searches, dashboards and migration requirements before disabling or removing anything.`, icon: '' });
     }
 
     // ── Custom per-product tips ────────────────────────────────────────
@@ -8444,15 +8430,17 @@ function SCANProductsPage() {
             const countRow = results.find(r => r.count != null);
             const entryCount = countRow ? parseInt(countRow.count, 10) : 0;
             const catStatus = catalogRow ? catalogRow.status : '';
-            const catNote = catStatus === 'Success' ? 'Product catalog updated'
-                : catStatus === 'Skipped' ? 'Product catalog current'
+            const reloadFailed = catalogRow?.reload_status === 'Failed' || catStatus === 'Partial Success';
+            const catNote = reloadFailed ? 'Catalog file updated; configuration reload failed'
+                : catStatus === 'Success' ? 'Product catalog updated'
+                : catStatus === 'Skipped' ? (catalogRow.reason || 'Product catalog update skipped')
                 : catStatus === 'Failed' ? 'Product catalog sync failed'
                 : '';
             if (entryCount > 0) {
-                setCsvSyncStatus(catStatus === 'Failed' ? 'error' : 'success');
+                setCsvSyncStatus(catStatus === 'Failed' || reloadFailed ? 'error' : 'success');
                 const parts = [`${entryCount.toLocaleString()} apps`];
                 if (catNote) parts.push(catNote);
-                setCsvSyncMessage(`Synced — ${parts.join(' · ')}`);
+                setCsvSyncMessage(`${catStatus === 'Failed' || reloadFailed ? 'Sync incomplete' : 'Synced'} — ${parts.join(' · ')}`);
                 // Reload only the UIDs our catalog references
                 const reloadSearch = buildSplunkbaseLookupSPL(products);
                 if (!reloadSearch) return;
