@@ -3038,8 +3038,8 @@ function ITOpsContentModal({ open, onClose, itsiContentPack, iteLearnContent, it
                         <div className="csc-sc4s-info-section" style={{ borderLeft: '3px solid #7C3AED', paddingLeft: '16px' }}>
                             <h4 style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                                 Splunk IT Service Intelligence
-                                <span style={{ fontSize: '11px', padding: '2px 8px', borderRadius: '4px', background: '#EDE9FE', color: '#5B21B6', fontWeight: 600 }}>Premium</span>
-                                {itsiInstalled && <span style={{ fontSize: '11px', padding: '2px 8px', borderRadius: '4px', background: '#D1FAE5', color: '#065F46', fontWeight: 600 }}>Installed</span>}
+                                <span className="scan-content-badge scan-content-badge--itsi">Premium</span>
+                                {itsiInstalled && <span className="scan-content-badge scan-content-badge--success">Installed</span>}
                             </h4>
                             <p style={{ marginBottom: '10px', fontSize: '13px' }}>
                                 ITSI Content Packs provide <strong>pre-built service templates, KPIs, glass tables, and deep dives</strong> for monitoring Cisco infrastructure.
@@ -3075,8 +3075,8 @@ function ITOpsContentModal({ open, onClose, itsiContentPack, iteLearnContent, it
                         <div className="csc-sc4s-info-section" style={{ borderLeft: '3px solid #22C55E', paddingLeft: '16px' }}>
                             <h4 style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                                 IT Essentials Learn
-                                <span style={{ fontSize: '11px', padding: '2px 8px', borderRadius: '4px', background: '#D1FAE5', color: '#065F46', fontWeight: 600 }}>Free</span>
-                                {iteInstalled && <span style={{ fontSize: '11px', padding: '2px 8px', borderRadius: '4px', background: '#D1FAE5', color: '#065F46', fontWeight: 600 }}>Installed</span>}
+                                <span className="scan-content-badge scan-content-badge--success">Free</span>
+                                {iteInstalled && <span className="scan-content-badge scan-content-badge--success">Installed</span>}
                             </h4>
                             <p style={{ marginBottom: '10px', fontSize: '13px' }}>
                                 IT Essentials Learn provides guided operational procedures and analytics
@@ -3192,8 +3192,8 @@ function SecOpsContentModal({ open, onClose, productName, esCompatible, cimDataM
                             <div className="csc-sc4s-info-section" style={{ borderLeft: '3px solid #F59E0B', paddingLeft: '16px' }}>
                                 <h4 style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                                     Splunk Enterprise Security
-                                    <span style={{ fontSize: '11px', padding: '2px 8px', borderRadius: '4px', background: '#FEF3C7', color: '#92400E', fontWeight: 600 }}>Premium</span>
-                                    {esInstalled && <span style={{ fontSize: '11px', padding: '2px 8px', borderRadius: '4px', background: '#D1FAE5', color: '#065F46', fontWeight: 600 }}>Installed</span>}
+                                    <span className="scan-content-badge scan-content-badge--premium">Premium</span>
+                                    {esInstalled && <span className="scan-content-badge scan-content-badge--success">Installed</span>}
                                 </h4>
                                 <p style={{ marginBottom: '10px', fontSize: '13px' }}>
                                     The add-on maps data to the <strong>Common Information Model (CIM)</strong> via
@@ -3255,8 +3255,8 @@ function SecOpsContentModal({ open, onClose, productName, esCompatible, cimDataM
                         <div className="csc-sc4s-info-section" style={{ borderLeft: '3px solid #22C55E', paddingLeft: '16px' }}>
                             <h4 style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                                 Splunk Security Essentials
-                                <span style={{ fontSize: '11px', padding: '2px 8px', borderRadius: '4px', background: '#D1FAE5', color: '#065F46', fontWeight: 600 }}>Free</span>
-                                {sseInstalled && <span style={{ fontSize: '11px', padding: '2px 8px', borderRadius: '4px', background: '#D1FAE5', color: '#065F46', fontWeight: 600 }}>Installed</span>}
+                                <span className="scan-content-badge scan-content-badge--success">Free</span>
+                                {sseInstalled && <span className="scan-content-badge scan-content-badge--success">Installed</span>}
                             </h4>
                             <p style={{ marginBottom: '10px', fontSize: '13px' }}>
                                 Security Essentials provides detection guidance, analytics stories, and security use cases

@@ -4623,12 +4623,8 @@ a.csc-dep-name-link:hover {
     color: var(--modal-color) !important;
 }
 
-/* Ensure ALL text inside modals inherits the theme color */
-:root.dce-dark [data-test='modal'] [data-test='header'] *,
-:root.dce-dark [data-test='modal'] [data-test='body'] *,
-:root.dce-dark [data-test='modal'] [data-test='footer'] * {
-    color: var(--modal-color) !important;
-}
+/* Modal text inherits from its themed body/header/footer. Do not force a
+   descendant color: badges, links and status indicators own semantic colors. */
 
 /* Modal close button (X) */
 :root.dce-dark [data-test='modal'] [data-test='close'] {
@@ -9133,3 +9129,19 @@ tr.scan-ts-ahead .scan-ts-name {
         transition-duration: 0.01ms !important;
     }
 }
+
+/* Semantic modal badges: paired surfaces and foregrounds for each theme. */
+.scan-content-badge {
+    font-size: 11px;
+    padding: 2px 8px;
+    border-radius: 4px;
+    font-weight: 600;
+    background: var(--scan-badge-bg);
+    color: var(--scan-badge-fg);
+}
+.scan-content-badge--success { --scan-badge-bg: #d1fae5; --scan-badge-fg: #065f46; }
+.scan-content-badge--premium { --scan-badge-bg: #fef3c7; --scan-badge-fg: #92400e; }
+.scan-content-badge--itsi { --scan-badge-bg: #ede9fe; --scan-badge-fg: #5b21b6; }
+:root.dce-dark .scan-content-badge--success { --scan-badge-bg: #123d2c; --scan-badge-fg: #a7f3d0; }
+:root.dce-dark .scan-content-badge--premium { --scan-badge-bg: #49330e; --scan-badge-fg: #fde68a; }
+:root.dce-dark .scan-content-badge--itsi { --scan-badge-bg: #342451; --scan-badge-fg: #ddd6fe; }
