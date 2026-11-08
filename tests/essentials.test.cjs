@@ -15,7 +15,7 @@ const compiled = new Module(page, module);
 compiled.filename = page;
 compiled.paths = Module._nodeModulePaths(path.dirname(page));
 const originalRequire = compiled.require.bind(compiled);
-compiled.require = id => id === './productCatalog.generated' ? { PRODUCT_CATALOG: catalog } : originalRequire(id);
+compiled.require = id => id === '@splunk/splunk-utils/themes' ? { getThemeOptions: () => ({ colorScheme: 'light' }) } : id === '../../common/shellTheme' ? { readUserTheme: async () => 'light' } : id === './productCatalog.generated' ? { PRODUCT_CATALOG: catalog } : originalRequire(id);
 compiled._compile(babel.transformSync(fs.readFileSync(page, 'utf8'), {
     filename: page, presets: ['@splunk/babel-preset'],
 }).code + '\nmodule.exports.review = { EssentialsRecommendation, generateCustomerSummary, toSplunkConf, productMatchesSearch };', page);
@@ -70,7 +70,7 @@ test('the actual User Guide renders Essentials instructions and current release 
     guide.filename = file;
     guide.paths = Module._nodeModulePaths(path.dirname(file));
     const requireGuide = guide.require.bind(guide);
-    guide.require = id => id === '../products/productCatalog.generated' ? { PRODUCT_CATALOG: catalog } : requireGuide(id);
+    guide.require = id => id === '@splunk/splunk-utils/themes' ? { getThemeOptions: () => ({ colorScheme: 'light' }) } : id === '../../common/shellTheme' ? { readUserTheme: async () => 'light' } : id === '../products/productCatalog.generated' ? { PRODUCT_CATALOG: catalog } : requireGuide(id);
     guide._compile(babel.transformSync(fs.readFileSync(file, 'utf8'), {
         filename: file, presets: ['@splunk/babel-preset'],
     }).code, file);
@@ -80,4 +80,17 @@ test('the actual User Guide renders Essentials instructions and current release 
     assert.ok(html.includes('Version 1.0.33'));
     assert.ok(html.includes('37 product cards'));
     assert.ok(html.includes('Macro Index Tuning'));
+});
+
+test('Essentials installation and disabled management remain separate from product dependencies', () => {
+    const missing = render(product, {});
+    assert.match(missing, /Install Essentials/);
+    assert.match(missing, /appsremote\?query=Splunk%20Secure%20Networking%20Essentials/);
+    const disabled = render(product, { [appId]: { disabled: true } });
+    assert.match(disabled, /Manage Essentials/);
+    assert.match(disabled, /apps\/local\?search=splunk-cisco-dashboards/);
+    assert.doesNotMatch(disabled, />Install Essentials</);
+    const enabled = render(product, { [appId]: { disabled: false } });
+    assert.match(enabled, /Open Essentials content/);
+    assert.doesNotMatch(enabled, /appsremote/);
 });

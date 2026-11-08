@@ -9145,3 +9145,5 @@ tr.scan-ts-ahead .scan-ts-name {
 :root.dce-dark .scan-content-badge--success { --scan-badge-bg: #123d2c; --scan-badge-fg: #a7f3d0; }
 :root.dce-dark .scan-content-badge--premium { --scan-badge-bg: #49330e; --scan-badge-fg: #fde68a; }
 :root.dce-dark .scan-content-badge--itsi { --scan-badge-bg: #342451; --scan-badge-fg: #ddd6fe; }
+
+.scan-essentials-actions { margin: 10px 0; }

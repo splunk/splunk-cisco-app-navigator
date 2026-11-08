@@ -3939,7 +3939,7 @@ function generateCustomerSummary(product, splunkbaseData) {
 // ────────────────────────  PRODUCT CARD  ─────────────────────
 // Renders one product: icon, name, links, support bar (bottom), install/configure actions.
 /* eslint-disable react/prop-types -- Product records use the same validated catalog shape as ProductCard. */
-function EssentialsRecommendation({ product, installedApps }) {
+function EssentialsRecommendation({ product, installedApps = {} }) {
     const views = (product.essentials_dashboards || []).filter(view => /^[a-z][a-z0-9_]*$/.test(view));
     if (!views.length) { return null; }
     const app = installedApps[ESSENTIALS_APP_ID];
@@ -3955,17 +3955,6 @@ function EssentialsRecommendation({ product, installedApps }) {
             <p>{ESSENTIALS_NAME}</p>
             <p>{product.essentials_coverage}</p>
             <ul>
-                {enabled && (
-                    <li>
-                        <Link
-                            appearance="standalone"
-                            openInNewContext
-                            to={createURL(`/app/${ESSENTIALS_APP_ID}/dashboard_manager#/${views[0]}`)}
-                        >
-                            {`Open ${product.display_name} content in Essentials`}
-                        </Link>
-                    </li>
-                )}
                 <li>
                     <Link
                         appearance="standalone"
@@ -3989,7 +3978,22 @@ function EssentialsRecommendation({ product, installedApps }) {
                     </li>
                 )}
             </ul>
-            {app && !enabled && <p>Essentials is disabled on this search head.</p>}
+            <div className="scan-essentials-actions">
+                <a
+                    className="csc-btn csc-btn-green"
+                    href={enabled
+                        ? createURL(`/app/${ESSENTIALS_APP_ID}/dashboard_manager#/${views[0]}`)
+                        : app
+                            ? createURL(`/manager/${APP_ID}/apps/local?search=${encodeURIComponent(ESSENTIALS_APP_ID)}`)
+                            : createURL(`/manager/${APP_ID}/appsremote?query=${encodeURIComponent(ESSENTIALS_NAME)}`)}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    aria-label={`${enabled ? 'Open Essentials content' : app ? 'Manage disabled Essentials' : 'Install Essentials'} for ${product.display_name}`}
+                >
+                    {enabled ? 'Open Essentials content' : app ? 'Manage Essentials' : 'Install Essentials'}
+                </a>
+            </div>
+            {app && !enabled && <p>Essentials is disabled on this search head. Enable it in Manage Apps to open its content.</p>}
             <p>Uses already ingested data; your collection add-on is still required.</p>
         </section>
     );
