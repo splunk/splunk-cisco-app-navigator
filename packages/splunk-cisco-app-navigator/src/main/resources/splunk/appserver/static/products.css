@@ -2170,19 +2170,19 @@ button.scan-util-pill:disabled {
 }
 
 /* Modal context: use blue instead of green for consistency with modal chrome */
-.modal .csc-btn-green {
+.scan-app-modal .csc-btn-green {
     background: #0A60FF;
     border-color: #0A60FF;
 }
-.modal .csc-btn-green:hover {
+.scan-app-modal .csc-btn-green:hover {
     background: #0050D4;
     border-color: #0050D4;
 }
-.modal .csc-btn-green-outline {
+.scan-app-modal .csc-btn-green-outline {
     color: #0A60FF;
     border-color: #0A60FF;
 }
-.modal .csc-btn-green-outline:hover {
+.scan-app-modal .csc-btn-green-outline:hover {
     background: #0A60FF;
     border-color: #0A60FF;
     color: #fff;
@@ -2258,20 +2258,20 @@ button.scan-util-pill:disabled {
     color: #fff;
     border-color: #1f9b2c;
 }
-:root.dce-dark .modal .csc-btn-green {
+:root.dce-dark .scan-app-modal .csc-btn-green {
     background: var(--color-primary);
     border-color: var(--color-primary);
     color: var(--bg-primary);
 }
-:root.dce-dark .modal .csc-btn-green:hover {
+:root.dce-dark .scan-app-modal .csc-btn-green:hover {
     background: var(--color-primary-hover);
     border-color: var(--color-primary-hover);
 }
-:root.dce-dark .modal .csc-btn-green-outline {
+:root.dce-dark .scan-app-modal .csc-btn-green-outline {
     color: var(--color-primary);
     border-color: var(--color-primary);
 }
-:root.dce-dark .modal .csc-btn-green-outline:hover {
+:root.dce-dark .scan-app-modal .csc-btn-green-outline:hover {
     background: var(--color-primary);
     color: var(--bg-primary);
     border-color: var(--color-primary);
@@ -4611,14 +4611,14 @@ a.csc-dep-name-link:hover {
     font-weight: 600 !important;
 }
 
-[data-test='modal'] {
+.scan-app-modal[data-test='modal'] {
     max-width: 720px !important;
     width: 720px !important;
 }
 
-[data-test='modal'] [data-test='header'],
-[data-test='modal'] [data-test='body'],
-[data-test='modal'] [data-test='footer'] {
+.scan-app-modal[data-test='modal'] [data-test='header'],
+.scan-app-modal[data-test='modal'] [data-test='body'],
+.scan-app-modal[data-test='modal'] [data-test='footer'] {
     background-color: var(--modal-bg) !important;
     color: var(--modal-color) !important;
 }
@@ -4627,29 +4627,25 @@ a.csc-dep-name-link:hover {
    descendant color: badges, links and status indicators own semantic colors. */
 
 /* Modal close button (X) */
-:root.dce-dark [data-test='modal'] [data-test='close'] {
+:root.dce-dark .scan-app-modal[data-test='modal'] [data-test='close'] {
     color: var(--modal-color) !important;
 }
-:root.dce-dark [data-test='modal'] [data-test='close']:hover {
+:root.dce-dark .scan-app-modal[data-test='modal'] [data-test='close']:hover {
     color: #ffffff !important;
 }
 
-/* Modal overlay wrapper */
-:root.dce-dark [data-test='modal-wrapper'] {
-    background-color: rgba(0, 0, 0, 0.65) !important;
-}
 
 /* Input fields inside modals */
-:root.dce-dark [data-test='modal'] input,
-:root.dce-dark [data-test='modal'] textarea,
-:root.dce-dark [data-test='modal'] select {
+:root.dce-dark .scan-app-modal[data-test='modal'] input,
+:root.dce-dark .scan-app-modal[data-test='modal'] textarea,
+:root.dce-dark .scan-app-modal[data-test='modal'] select {
     background-color: var(--input-bg) !important;
     border-color: var(--input-border) !important;
     color: var(--modal-color) !important;
 }
 
 /* Splunk Button inside modals */
-:root.dce-dark [data-test='modal'] [data-test='button'] {
+:root.dce-dark .scan-app-modal[data-test='modal'] [data-test='button'] {
     border-color: var(--input-border) !important;
 }
 
@@ -7284,17 +7280,17 @@ tr.scan-ts-ahead .scan-ts-name {
 
 /* ── Splunk React UI <Button> overrides in dark mode ──
    Splunk Modals and our DRM render in portals (document.body),
-   so we target globally under :root.dce-dark.
+   so Navigator modals carry their own scan-app-modal class.
    Splunk Button renders <button> with styled-component classes.
    We use multiple selectors for resilience across Splunk UI versions. */
 /* All secondary/default buttons in modal footers and DRM footer */
-:root.dce-dark [data-test="modal"] [data-test="footer"] button[data-test="button"],
+:root.dce-dark .scan-app-modal[data-test="modal"] [data-test="footer"] button[data-test="button"],
 :root.dce-dark .scan-drm-footer button[data-test="button"] {
     background: rgba(255, 255, 255, 0.08) !important;
     color: #d4d4d4 !important;
     border-color: #4a5568 !important;
 }
-:root.dce-dark [data-test="modal"] [data-test="footer"] button[data-test="button"]:hover,
+:root.dce-dark .scan-app-modal[data-test="modal"] [data-test="footer"] button[data-test="button"]:hover,
 :root.dce-dark .scan-drm-footer button[data-test="button"]:hover {
     background: rgba(255, 255, 255, 0.14) !important;
     color: #ffffff !important;
@@ -7318,25 +7314,25 @@ tr.scan-ts-ahead .scan-ts-name {
     background: #b71c1c !important;
 }
 /* Modal close (X) button — transparent, no fill */
-:root.dce-dark [data-test="modal"] button[data-test="close"] {
+:root.dce-dark .scan-app-modal[data-test="modal"] button[data-test="close"] {
     background: transparent !important;
     border-color: transparent !important;
     color: #d4d4d4 !important;
 }
 /* Splunk Modal chrome (header, footer, body) */
-:root.dce-dark [data-test="modal"] [data-test="header"],
-:root.dce-dark .modal .modal-header {
+:root.dce-dark .scan-app-modal[data-test="modal"] [data-test="header"],
+:root.dce-dark .scan-app-modal.modal .modal-header {
     background: var(--bg-surface, #1e262c) !important;
     color: var(--text-primary, #d4d4d4) !important;
     border-bottom-color: var(--border-light, #333d44) !important;
 }
-:root.dce-dark [data-test="modal"] [data-test="body"],
-:root.dce-dark .modal .modal-body {
+:root.dce-dark .scan-app-modal[data-test="modal"] [data-test="body"],
+:root.dce-dark .scan-app-modal.modal .modal-body {
     background: var(--bg-surface, #1e262c) !important;
     color: var(--text-primary, #d4d4d4) !important;
 }
-:root.dce-dark [data-test="modal"] [data-test="footer"],
-:root.dce-dark .modal .modal-footer {
+:root.dce-dark .scan-app-modal[data-test="modal"] [data-test="footer"],
+:root.dce-dark .scan-app-modal.modal .modal-footer {
     background: var(--bg-primary, #1a1f24) !important;
     border-top-color: var(--border-light, #333d44) !important;
 }
@@ -7346,19 +7342,15 @@ tr.scan-ts-ahead .scan-ts-name {
     border-top-color: var(--border-light, #333d44) !important;
 }
 /* Splunk Modal dialog wrapper (the container itself) */
-:root.dce-dark [data-test="modal"] [data-test="dialog"],
-:root.dce-dark [data-test="modal"] [role="dialog"] {
+:root.dce-dark .scan-app-modal[data-test="modal"] [data-test="dialog"],
+:root.dce-dark .scan-app-modal[data-test="modal"] [role="dialog"] {
     background: var(--bg-surface, #1e262c) !important;
     color: var(--text-primary, #d4d4d4) !important;
     border-color: var(--border-light, #333d44) !important;
 }
 /* Title text inside modal header */
-:root.dce-dark [data-test="modal"] [data-test="title"] {
+:root.dce-dark .scan-app-modal[data-test="modal"] [data-test="title"] {
     color: var(--text-primary, #d4d4d4) !important;
-}
-/* Splunk Modal backdrop */
-:root.dce-dark [data-test="modal-backdrop"] {
-    background: rgba(0, 0, 0, 0.55) !important;
 }
 
 /* ── Info panel best-practice items — full dark override ── */

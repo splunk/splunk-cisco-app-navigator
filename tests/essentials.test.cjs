@@ -97,7 +97,7 @@ test('the actual User Guide renders Essentials instructions and current release 
     assert.ok(html.includes('Collapse all'));
     const releases = JSON.parse(fs.readFileSync(path.resolve(path.dirname(page), '../user_guide/releaseNotes.generated.json'), 'utf8'));
     assert.equal((html.match(/<details/g) || []).length, releases.length);
-    assert.equal(releases[0].version, '1.0.50');
+    assert.equal(releases[0].version, fs.readFileSync(path.join(root, 'VERSION'), 'utf8').trim());
     assert.ok(html.includes('Install Essentials'));
     assert.ok(html.includes('Partial Success'));
     assert.ok(html.includes('Introducing Splunk Secure Networking Essentials recommendations'));

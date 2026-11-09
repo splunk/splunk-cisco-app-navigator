@@ -1,5 +1,11 @@
 # Change Log
 
+1.0.60 — November 9, 2026
+-------
+
+### Fixes
+* **Splunk dialog appearance** — Prevent Navigator theme styles from changing the colors and sizing of Splunk Help and About dialogs.
+
 1.0.50 — November 9, 2026
 -------
 

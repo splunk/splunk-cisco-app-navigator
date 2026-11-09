@@ -27,3 +27,30 @@ test('modal rules do not force foreground color on every descendant', () => {
         }
     });
 });
+
+
+test('Navigator modal overrides cannot match unmarked Splunk shell dialogs', () => {
+    let scoped = 0;
+    root.walkRules(rule => {
+        for (const selector of rule.selectors) {
+            if (/\[data-test=["']modal(?:-wrapper|-backdrop)?["']\]|\.modal[ >]/.test(selector)) {
+                assert.ok(selector.includes('.scan-app-modal'), selector);
+                scoped++;
+            }
+        }
+    });
+    assert.ok(scoped > 10);
+    const babel = require('@babel/core');
+    const page = fs.readFileSync('packages/splunk-cisco-app-navigator/src/main/webapp/pages/products/index.jsx', 'utf8');
+    const ast = babel.parseSync(page, { presets: ['@splunk/babel-preset'] });
+    let modals = 0;
+    require('@babel/traverse').default(ast, {
+        JSXOpeningElement({ node }) {
+            if (node.name.name !== 'Modal') return;
+            const cls = node.attributes.find(a => a.name?.name === 'className');
+            assert.ok(cls?.value?.value.split(/\s+/).includes('scan-app-modal'));
+            modals++;
+        },
+    });
+    assert.ok(modals > 10);
+});

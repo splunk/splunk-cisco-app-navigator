@@ -1445,7 +1445,7 @@ function SC4SInfoModal({ open, onClose, productContext }) {
     if (!open) return null;
     const pc = productContext || null;
     return (
-        <Modal open returnFocus={returnFocusRef} onRequestClose={onClose} style={{ maxWidth: '820px', width: '92vw' }}>
+        <Modal className="scan-app-modal" open returnFocus={returnFocusRef} onRequestClose={onClose} style={{ maxWidth: '820px', width: '92vw' }}>
             <Modal.Header title="Splunk Connect for Syslog (SC4S)" />
             <Modal.Body>
                 <div className="csc-sc4s-info" style={{ '--info-accent': '#00897b' }}>
@@ -1645,7 +1645,7 @@ function NetFlowInfoModal({ open, onClose, installedApps, productContext }) {
     ];
 
     return (
-        <Modal open returnFocus={returnFocusRef} onRequestClose={onClose} style={{ maxWidth: '860px', width: '92vw' }}>
+        <Modal className="scan-app-modal" open returnFocus={returnFocusRef} onRequestClose={onClose} style={{ maxWidth: '860px', width: '92vw' }}>
             <Modal.Header title="NetFlow / Splunk Stream" />
             <Modal.Body>
                 <div className="csc-sc4s-info" style={{ '--info-accent': '#1565c0' }}>
@@ -1941,7 +1941,7 @@ function HFInfoModal({ open, onClose, isCloud }) {
     const returnFocusRef = useRef(null);
     if (!open) return null;
     return (
-        <Modal open returnFocus={returnFocusRef} onRequestClose={onClose} style={{ maxWidth: '720px', width: '92vw' }}>
+        <Modal className="scan-app-modal" open returnFocus={returnFocusRef} onRequestClose={onClose} style={{ maxWidth: '720px', width: '92vw' }}>
             <Modal.Header title="Heavy Forwarder Deployment" />
             <Modal.Body>
                 <div className="csc-sc4s-info" style={{ '--info-accent': '#0A60FF' }}>
@@ -2842,7 +2842,7 @@ function SOARInfoModal({ open, onClose, soarConnectorUids, splunkbaseData, produ
         return { uid, label: sb ? (sb.title || sb.appid || `App #${uid}`) : `App #${uid}` };
     });
     return (
-        <Modal open returnFocus={returnFocusRef} onRequestClose={onClose} style={{ maxWidth: '820px', width: '92vw' }}>
+        <Modal className="scan-app-modal" open returnFocus={returnFocusRef} onRequestClose={onClose} style={{ maxWidth: '820px', width: '92vw' }}>
             <Modal.Header title="Splunk SOAR Integration" />
             <Modal.Body>
                 <div className="csc-sc4s-info" style={{ '--info-accent': '#00838f' }}>
@@ -2970,7 +2970,7 @@ function AlertActionsInfoModal({ open, onClose, alertActionUids, splunkbaseData,
         return { uid, label: sb ? (sb.title || sb.appid || `App #${uid}`) : `App #${uid}` };
     });
     return (
-        <Modal open returnFocus={returnFocusRef} onRequestClose={onClose} style={{ maxWidth: '560px', width: '92vw' }}>
+        <Modal className="scan-app-modal" open returnFocus={returnFocusRef} onRequestClose={onClose} style={{ maxWidth: '560px', width: '92vw' }}>
             <Modal.Header title="Alert Actions" />
             <Modal.Body>
                 <div className="csc-sc4s-info" style={{ fontSize: '13px' }}>
@@ -3016,7 +3016,7 @@ function ITOpsContentModal({ open, onClose, itsiContentPack, iteLearnContent, it
     const iteInstalled = installedApps?.['it_essentials_learn'];
 
     return (
-        <Modal open returnFocus={returnFocusRef} onRequestClose={onClose} style={{ maxWidth: '860px', width: '92vw' }}>
+        <Modal className="scan-app-modal" open returnFocus={returnFocusRef} onRequestClose={onClose} style={{ maxWidth: '860px', width: '92vw' }}>
             <Modal.Header title="ITOps Content" />
             <Modal.Body>
                 <div className="csc-sc4s-info" style={{ '--info-accent': '#2e7d32' }}>
@@ -3169,7 +3169,7 @@ function SecOpsContentModal({ open, onClose, productName, esCompatible, cimDataM
     const sseInstalled = installedApps?.['Splunk_Security_Essentials'];
 
     return (
-        <Modal open returnFocus={returnFocusRef} onRequestClose={onClose} style={{ maxWidth: '900px', width: '92vw' }}>
+        <Modal className="scan-app-modal" open returnFocus={returnFocusRef} onRequestClose={onClose} style={{ maxWidth: '900px', width: '92vw' }}>
             <Modal.Header title="SecOps Content" />
             <Modal.Body>
                 <div className="csc-sc4s-info" style={{ '--info-accent': '#455a64' }}>
@@ -3322,7 +3322,7 @@ function BestPracticesModal({ open, onClose, product, platformType, splunkbaseDa
     if (!open || !product) return null;
     const tips = getBestPractices(product, platformType, splunkbaseData);
     return (
-        <Modal open={true} returnFocus={returnFocusRef} onRequestClose={onClose} style={{ maxWidth: '640px', width: '92vw' }}>
+        <Modal className="scan-app-modal" open={true} returnFocus={returnFocusRef} onRequestClose={onClose} style={{ maxWidth: '640px', width: '92vw' }}>
             <Modal.Header title={`Best Practices — ${product.display_name}`} />
             <Modal.Body>
                 <div className="csc-sc4s-info" style={{ fontSize: '13px', lineHeight: '1.7' }}>
@@ -3430,7 +3430,7 @@ function LegacyAuditModal({ open, onClose, legacyUids, installedApps, indexerApp
     };
 
     return (
-        <Modal open={true} returnFocus={returnFocusRef} onRequestClose={onClose} style={{ maxWidth: '820px', width: '92vw' }}>
+        <Modal className="scan-app-modal" open={true} returnFocus={returnFocusRef} onRequestClose={onClose} style={{ maxWidth: '820px', width: '92vw' }}>
             <Modal.Header title="Legacy Debt Audit Report" />
             <Modal.Body>
                 <div className="csc-sc4s-info">
@@ -5199,7 +5199,7 @@ function ProductCard({ product, installedApps, appStatuses, indexerApps, sourcet
 
             {/* ── Custom Dashboard Modal ── */}
             {customDashModalOpen && (
-                <Modal open returnFocus={launchBtnRef} onRequestClose={() => { setCustomDashModalOpen(false); setCustomDashMsg(null); }} style={{ maxWidth: '640px', width: '92vw' }}>
+                <Modal className="scan-app-modal" open returnFocus={launchBtnRef} onRequestClose={() => { setCustomDashModalOpen(false); setCustomDashMsg(null); }} style={{ maxWidth: '640px', width: '92vw' }}>
                     <Modal.Header title={`Custom Dashboard — ${display_name}`} />
                     <Modal.Body>
                         <div style={{ padding: '8px 0' }}>
@@ -5792,7 +5792,7 @@ function ConfigViewerModal({ open, onClose, products, initialProductId, installe
     };
 
     return (
-        <Modal open returnFocus={returnFocusRef} onRequestClose={onClose} style={{ maxWidth: '900px', width: '92vw' }}>
+        <Modal className="scan-app-modal" open returnFocus={returnFocusRef} onRequestClose={onClose} style={{ maxWidth: '900px', width: '92vw' }}>
             <Modal.Header title="Config Viewer — Developer Mode" />
             <Modal.Body>
                 <div className="csc-devmode-controls">
@@ -5933,7 +5933,7 @@ function DataDetectionDiagnosticsModal({ open, onClose, diagnostic, onRerun }) {
     ];
 
     return (
-        <Modal open returnFocus={returnFocusRef} onRequestClose={onClose} style={{ maxWidth: '820px', width: '94vw' }}>
+        <Modal className="scan-app-modal" open returnFocus={returnFocusRef} onRequestClose={onClose} style={{ maxWidth: '820px', width: '94vw' }}>
             <Modal.Header title="Data Detection Diagnostics — Developer Mode" />
             <Modal.Body>
                 <div className={`scan-detection-status scan-detection-status-${status}`}>
@@ -6181,7 +6181,7 @@ function TechStackModal({ open, onClose }) {
     );
 
     return (
-        <Modal open returnFocus={returnFocusRef} onRequestClose={onClose} style={{ maxWidth: '860px', width: '92vw' }}>
+        <Modal className="scan-app-modal" open returnFocus={returnFocusRef} onRequestClose={onClose} style={{ maxWidth: '860px', width: '92vw' }}>
             <Modal.Header title="Tech Stack — Developer Mode" />
             <Modal.Body>
                 <div className="scan-ts-summary">
@@ -6371,7 +6371,7 @@ function CustomProductFormModal({ open, onClose, onSave, editProduct, cloneProdu
 
     if (!open) return null;
     return (
-        <Modal open returnFocus={returnFocusRef} onRequestClose={onClose} style={{ maxWidth: '860px', width: '94vw' }}>
+        <Modal className="scan-app-modal" open returnFocus={returnFocusRef} onRequestClose={onClose} style={{ maxWidth: '860px', width: '94vw' }}>
             <Modal.Header title={isEdit ? 'Edit Custom Product' : 'Add Custom Product'} />
             <Modal.Body>
                 <div className="csc-custom-form">
@@ -6607,7 +6607,7 @@ function DeleteCustomProductModal({ open, onClose, product, onConfirm }) {
     };
 
     return (
-        <Modal open onRequestClose={onClose} style={{ width: '420px' }}>
+        <Modal className="scan-app-modal" open onRequestClose={onClose} style={{ width: '420px' }}>
             <Modal.Header title="Delete Custom Product" />
             <Modal.Body>
                 <div className="csc-delete-confirm-body">
@@ -7534,7 +7534,7 @@ function PersonaModal({ open, onClose, onSelectPersona, products }) {
     const productIds = new Set(products.map(p => p.product_id));
 
     return (
-        <Modal open returnFocus={returnFocusRef} onRequestClose={onClose} style={{ maxWidth: '780px', width: '92vw' }}>
+        <Modal className="scan-app-modal" open returnFocus={returnFocusRef} onRequestClose={onClose} style={{ maxWidth: '780px', width: '92vw' }}>
             <Modal.Header title="Quick Start — Choose Your Role" />
             <Modal.Body>
                 <div className="csc-persona-intro">
@@ -9925,7 +9925,7 @@ function SCANProductsPage() {
 
             {/* Remove All Confirmation Modal */}
             {removeAllModalOpen && (
-                <Modal open returnFocus={removeAllReturnRef} onRequestClose={() => setRemoveAllModalOpen(false)} style={{ maxWidth: '520px', width: '92vw' }}>
+                <Modal className="scan-app-modal" open returnFocus={removeAllReturnRef} onRequestClose={() => setRemoveAllModalOpen(false)} style={{ maxWidth: '520px', width: '92vw' }}>
                     <Modal.Header
                         title="Remove All Configured Products"
                     />
