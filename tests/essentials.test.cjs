@@ -86,7 +86,7 @@ test('the actual User Guide renders Essentials instructions and current release 
     assert.equal(releases[0].version, '1.0.50');
     assert.ok(html.includes('Install Essentials'));
     assert.ok(html.includes('Partial Success'));
-    assert.ok(html.includes('37 product cards'));
+    assert.ok(html.includes('Introducing Splunk Secure Networking Essentials recommendations'));
     assert.ok(html.includes('Macro Index Tuning'));
 });
 

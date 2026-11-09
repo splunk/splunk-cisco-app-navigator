@@ -5,7 +5,7 @@
     "blocks": [
       "### Product experience",
       "* **Catalog compatibility** — Updated product definitions can be synchronized by Navigator 1.0.26 and newer. Older interfaces may not display every newer feature.",
-      "* **Essentials actions** — Install Essentials from Browse More Apps, manage a disabled installation, or open product content directly from the optional visualization panel. Existing collection and visualization choices are preserved.",
+      "* **Introducing Splunk Secure Networking Essentials recommendations** — Discover dashboards and reusable searches for your Cisco networking and security data directly from supported product cards. Navigator now highlights relevant Essentials content and helps you install the app or open it when available. Essentials is an optional visualization app that uses data collected by your existing integrations; your collection add-ons and other visualization choices remain available.",
       "* **Theme and navigation** — Follow the Splunk user theme for Products and User Guide, improve Free/Premium/Installed badge contrast, and restore the visible Search navigation item.",
       "* **Accurate guidance** — Scope SC4S recommendations to declared syslog support, use documented add-on placement, and review legacy integrations before removal.",
       "* **Sync reporting** — Distinguish a catalog file update from a failed configuration reload, and explain why an update was skipped. A TLS hostname mismatch still requires correcting the local management endpoint or certificate.",
@@ -17,7 +17,6 @@
     "date": "November 6, 2026",
     "blocks": [
       "### Catalog Fixes",
-      "* **Splunk Secure Networking Essentials recommendations** — Added optional visualization recommendations to 37 product cards. Preserved existing app choices, added enabled-app content and setup links, kept the recommendation separate from required collection dependencies, and updated the User Guide and in-guide release notes.",
       "* **User Guide and in-guide release notes** — Added Crosswork Assurance HEC setup instructions, deployment and ITSI development boundaries, and a navigable 1.0.33 Release Notes section covering Crosswork Assurance, Meraki syslog, and MDS syslog catalog additions.",
       "* **Cisco Crosswork Assurance** — Added an active native HEC alert integration card with `cisco:crossworkassurance`, Cisco setup documentation, Splunk Enterprise and Cloud-connectivity guidance, and an explicit in-development ITSI content note. No TA or visualization app dependency is declared; legacy PCA/Skylight connector history is retained separately.",
       "* **Meraki syslog sourcetypes** — Added the `meraki:syslog` ingress and the events, flows, URLs, security, Air Marshal, and unknown output families to the Meraki card for data detection, search links, and props.conf audits.",
