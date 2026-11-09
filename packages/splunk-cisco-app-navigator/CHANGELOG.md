@@ -6,6 +6,7 @@
 ### Product experience
 * **Catalog compatibility** — Updated product definitions can be synchronized by Navigator 1.0.26 and newer. Older interfaces may not display every newer feature.
 * **Introducing Splunk Secure Networking Essentials recommendations** — Discover dashboards and reusable searches for your Cisco networking and security data directly from supported product cards. Navigator now highlights relevant Essentials content and helps you install the app or open it when available. Essentials is an optional visualization app that uses data collected by your existing integrations; your collection add-ons and other visualization choices remain available.
+* **Essentials workspace links** — Corrected product recommendations, including Cisco Secure Network Analytics, to open Insights Workspace directly.
 * **Theme and navigation** — Follow the Splunk user theme for Products and User Guide, improve Free/Premium/Installed badge contrast, and restore the visible Search navigation item.
 * **Accurate guidance** — Scope SC4S recommendations to declared syslog support, use documented add-on placement, and review legacy integrations before removal.
 * **Sync reporting** — Distinguish a catalog file update from a failed configuration reload, and explain why an update was skipped. A TLS hostname mismatch still requires correcting the local management endpoint or certificate.

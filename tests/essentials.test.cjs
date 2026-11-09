@@ -41,6 +41,20 @@ test('enabled apps link to the product target and index-mapping documentation', 
     assert.ok(html.includes('collection add-on is still required'));
 });
 
+test('workspace recommendations open the native page while dashboards use Dashboard Manager', () => {
+    const apps = { [appId]: { disabled: false } };
+    const workspaceProducts = catalog.filter(p => p.essentials_dashboards[0] === 'workspace_insights');
+    assert.ok(workspaceProducts.some(p => p.display_name.includes('Secure Network Analytics')));
+    for (const p of workspaceProducts) {
+        const html = render(p, apps);
+        assert.ok(html.includes(`/app/${appId}/workspace_insights"`), p.product_id);
+        assert.doesNotMatch(html, /dashboard_manager#\/workspace_insights/);
+    }
+    for (const p of catalog.filter(p => p.essentials_dashboards.length && p.essentials_dashboards[0] !== 'workspace_insights')) {
+        assert.ok(render(p, apps).includes(`/dashboard_manager#/${p.essentials_dashboards[0]}`), p.product_id);
+    }
+});
+
 test('unmapped products and invalid routes do not create recommendations', () => {
     assert.equal(render({ product_id: 'unmapped' }, {}), '');
     assert.equal(render({ ...product, essentials_dashboards: ['https://invalid.example/', '../setup'] }, {}), '');

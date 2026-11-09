@@ -3982,7 +3982,7 @@ function EssentialsRecommendation({ product, installedApps = {} }) {
                 <a
                     className="csc-btn csc-btn-green"
                     href={enabled
-                        ? createURL(`/app/${ESSENTIALS_APP_ID}/dashboard_manager#/${views[0]}`)
+                        ? createURL(`/app/${ESSENTIALS_APP_ID}/${views[0] === 'workspace_insights' ? 'workspace_insights' : `dashboard_manager#/${views[0]}`}`)
                         : app
                             ? createURL(`/manager/${APP_ID}/apps/local?search=${encodeURIComponent(ESSENTIALS_APP_ID)}`)
                             : createURL(`/manager/${APP_ID}/appsremote?query=${encodeURIComponent(ESSENTIALS_NAME)}`)}
