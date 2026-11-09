@@ -78,6 +78,14 @@ test('the actual User Guide renders Essentials instructions and current release 
     assert.ok(html.includes('id="essentials"'));
     assert.ok(html.includes('id="release-notes"'));
     assert.ok(html.includes('Version 1.0.33'));
+    assert.ok(html.includes('Version 1.0.50'));
+    assert.ok(html.includes('Expand all'));
+    assert.ok(html.includes('Collapse all'));
+    const releases = JSON.parse(fs.readFileSync(path.resolve(path.dirname(page), '../user_guide/releaseNotes.generated.json'), 'utf8'));
+    assert.equal((html.match(/<details/g) || []).length, releases.length);
+    assert.equal(releases[0].version, '1.0.50');
+    assert.ok(html.includes('Install Essentials'));
+    assert.ok(html.includes('Partial Success'));
     assert.ok(html.includes('37 product cards'));
     assert.ok(html.includes('Macro Index Tuning'));
 });

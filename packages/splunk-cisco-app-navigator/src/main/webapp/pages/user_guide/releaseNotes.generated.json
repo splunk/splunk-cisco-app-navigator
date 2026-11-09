@@ -1,0 +1,293 @@
+[
+  {
+    "version": "1.0.50",
+    "date": "November 9, 2026",
+    "blocks": [
+      "### Product experience",
+      "* **Essentials actions** — Install Essentials from Browse More Apps, manage a disabled installation, or open product content directly from the optional visualization panel. Existing collection and visualization choices are preserved.",
+      "* **Theme and navigation** — Follow the Splunk user theme for Products and User Guide, improve Free/Premium/Installed badge contrast, and restore the visible Search navigation item.",
+      "* **Accurate guidance** — Scope SC4S recommendations to declared syslog support, use documented add-on placement, and review legacy integrations before removal.",
+      "* **Sync reporting** — Distinguish a catalog file update from a failed configuration reload, and explain why an update was skipped. A TLS hostname mismatch still requires correcting the local management endpoint or certificate.",
+      "* **User Guide** — Refresh the three-column reading layout and add expandable release history with search, section links and print support.",
+      "### Build and catalog delivery",
+      "* **Shared build identities** — Reserve increasing build numbers across developers and machines and include them in package filenames. VERSION is the release authority; source metadata uses generic templates.",
+      "* **Catalog revisions** — Stamp only the packaged catalog with a full UTC timestamp and preserve the independent minimum app version (currently 1.0.26). Older interfaces may not expose every new feature.",
+      "* **Catalog publication** — Add publish-catalog.sh with check-only and explicit publish modes, SSO recovery guidance, concurrent-update protection and upload verification. Builds do not publish automatically."
+    ]
+  },
+  {
+    "version": "1.0.33",
+    "date": "November 6, 2026",
+    "blocks": [
+      "### Catalog Fixes",
+      "* **Splunk Secure Networking Essentials recommendations** — Added optional visualization recommendations to 37 product cards based on searches and views inspected in the 1.0.80 package. Preserved existing app choices, added enabled-app content and setup links, kept the recommendation separate from required collection dependencies, and updated the User Guide and in-guide release notes.",
+      "* **User Guide and in-guide release notes** — Added Crosswork Assurance HEC setup instructions, deployment and ITSI development boundaries, and a navigable 1.0.33 Release Notes section covering Crosswork Assurance, Meraki syslog, and MDS syslog catalog additions.",
+      "* **Cisco Crosswork Assurance** — Added an active native HEC alert integration card with `cisco:crossworkassurance`, Cisco setup documentation, Splunk Enterprise and Cloud-connectivity guidance, and an explicit in-development ITSI content note. No TA or visualization app dependency is declared; legacy PCA/Skylight connector history is retained separately.",
+      "* **Meraki syslog sourcetypes** — Added the `meraki:syslog` ingress and the events, flows, URLs, security, Air Marshal, and unknown output families to the Meraki card for data detection, search links, and props.conf audits.",
+      "* **MDS syslog sourcetype** — Added `cisco:dc:mds:syslog` to the Cisco MDS Storage Networking card alongside its existing API datasets."
+    ]
+  },
+  {
+    "version": "1.0.32",
+    "date": "October 9, 2026",
+    "blocks": [
+      "### UI & Card Enhancements",
+      "* **C3 catalog presentation** — Refined the Cisco Products dashboard with a layered atmospheric canvas, restrained frosted-glass command and section surfaces, command-style metrics, responsive control grouping, and simplified product cards in light and dark modes while preserving the established SCAN product identity.",
+      "* **Unified React theme boundary** — Synchronized Splunk UI components and portal-rendered dialogs with the dashboard's Auto, Light, and Dark preference, and added semantic level-two headings to product sections.",
+      "* **Grouped sourcetype lists** — Product cards can now show Current and Legacy sourcetypes as separate groups, explain that Legacy represents older TA sourcetypes retained for historical searches, and preserve the combined list for data detection, search links, and props.conf audits.",
+      "* **Catalog sync status styling** — Restored the green success, red error, and amber loading treatments for Sync Catalog after the C3 utility-pill styling unintentionally overrode those states.",
+      "* **Catalyst TA user guide links** — Cisco Catalyst Add-on Docs links now open the shipped `TA_cisco_catalyst` user guide instead of the Splunkbase listing.",
+      "* **Catalyst TA guided setup links** — Added product-specific guided setup links to every card backed by Cisco Catalyst Add-on for Splunk, including controller-specific input pages and the shared syslog setup for device families.",
+      "### Catalog Fixes",
+      "* **Three-add-on sourcetype alignment** — Matched Catalyst, DC Networking, and Meraki catalog coverage to the current source checkouts: added 27 missing product sourcetypes and the shared Catalyst syslog ingress, including dedicated ISE APIs, SD-WAN Insecure Configuration, Catalyst Center site health, AP positions and Assurance events, DC managed datasets and Custom APIs, and Meraki Custom API.",
+      "* **Application Inventory transition** — Classified `cisco:dnac:application:inventory` as Current and retained `cisco:dnac:application:traffic` as Legacy for historical data detection.",
+      "* **Hyperfabric and MDS integration cards** — Connected the existing cards to Cisco DC Networking and their command-center dashboards, listed all supported product sourcetypes, and replaced stale roadmap-gap metadata.",
+      "* **Cisco Catalyst sourcetype alignment** — Reconciled Current and Legacy Catalyst Center, SD-WAN, ISE, and Cyber Vision sourcetypes with the TA reference tables; added SD-WAN Security Advisories plus ISE Endpoint Context, Guest, Vulnerability, and Threat; and classified every catalog sourcetype as either Current or Legacy with no ambiguous Other group.",
+      "* **Grouped sourcetype configuration validation** — Declared the `current_sourcetypes` and `legacy_sourcetypes` catalog fields in `products.conf.spec`, eliminating Splunk btool invalid-key errors for grouped sourcetype entries.",
+      "* **Catalyst SD-WAN NetFlow guidance** — Linked the SD-WAN card to the guided NetFlow workflow and deployment guide in Cisco Catalyst Add-on for Splunk, corrected package placement and support boundaries, and aligned the modal with the production `stream:netflow` and `cisco_netflow` contracts.",
+      "* **NetFlow exporter scope** — Removed the NetFlow badge from Catalyst Center because managed devices, not the controller, export flows; clarified Meraki MX and Z-Series scope; and corrected the ACI leaf-exporter comment.",
+      "### Security",
+      "* **Build dependency hardening** — Refreshed the Yarn lockfile and added bounded security resolutions for Nx, Axios, nanoid, js-yaml, PostCSS, ip-address, brace-expansion, tar, form-data, and tmp.",
+      "### Compatibility",
+      "* **Python 3.13 command metadata** — Declared the required Python version for the `synclookup` and `synccatalog` custom search commands so future Splunk Cloud vetting remains compatible with Splunk 10.6.",
+      "### Build & Release",
+      "* **Remote SSH installation** — Added a validated `--remote-install` workflow that uploads the release archive over SSH and installs it as the configured Splunk OS account, with optional password-prompted splunkd authentication.",
+      "### Documentation",
+      "* **Version-neutral shipped README** — Removed stale app and dependency version pins from the shipped README while retaining the supported Splunk platform baseline.",
+      "* **In-app User Guide** — Added a searchable, responsive React guide with task-based setup, catalog, deployment, operations, Splunk Cloud, troubleshooting, and configuration guidance; light/dark themes; print-to-PDF support; live build metadata; and a dedicated notebook icon in the app navigation rail that replaces the duplicate toolbar guide modal."
+    ]
+  },
+  {
+    "version": "1.0.27",
+    "date": "May 9, 2026",
+    "blocks": [
+      "### Catalog Fixes",
+      "* **Cisco DNA Center / Catalyst Center card** — Restored `cisco:catalyst:center:compliance:report` and `cisco:catalyst:center:inventory:report` sourcetypes that the Catalyst Center TA emits but had been previously commented out (#10, #16).",
+      "### Documentation",
+      "* **CONTRIBUTING.md expanded** — Added Daily Workflow with CLI + GitHub Desktop instructions, 12-step quick reference, \"What Goes Where\" file map, Build & Test pre-PR checklist, \"Files to Never Commit\" list, and SCAN Conventions cheat sheet. Added Issue Tracking run-book: every bug fix and enhancement gets a tracked GitHub issue with required fields and a backfill rule tied to releases (#15, #17)."
+    ]
+  },
+  {
+    "version": "1.0.26",
+    "date": "April 22, 2026",
+    "blocks": [
+      "### Launch Button — Explicit App Context for Dashboards",
+      "* **`app_id/view_name` format** — The `dashboards` field in products.conf now accepts explicit app context (e.g. `ta_cisco_thousandeyes/application`) alongside plain view names. This resolves ambiguity for hybrid TA+app products whose dashboards span multiple Splunk apps.",
+      "* **Smart launch handler** — The Launch button and dropdown now parse the explicit app from each dashboard entry, falling back to the existing `app_viz || addon` resolution for plain names. Backward-compatible with all existing products.",
+      "* **Per-dashboard app label** — The dropdown shows the owning app name alongside each dashboard entry, with dimmed styling when the app is not installed.",
+      "* **Cisco ThousandEyes** — Added `dashboards = ta_cisco_thousandeyes/application,cisco-catalyst-app/network,cisco-catalyst-app/alerts` so the primary dashboard opens in the TA while the network and alerts dashboards open in the viz app.",
+      "### Bug Fixes",
+      "* **Stray text in savedsearches.conf** — Removed accidental `so thi` appended to end of file that caused a Splunk btool parse error.",
+      "* **Export function** — Fixed dashboard export to use `p.dashboards` (array) instead of stale `p.dashboard` (singular)."
+    ]
+  },
+  {
+    "version": "1.0.25",
+    "date": "April 6, 2026",
+    "blocks": [
+      "*Splunkbase release — version bump, build hash stamp, README update.*"
+    ]
+  },
+  {
+    "version": "1.0.23",
+    "date": "April 1, 2026",
+    "blocks": [
+      "### UI & Card Enhancements",
+      "* **Retired/Deprecated filter fix** — Products with `status = retired` or `status = deprecated` now render correctly when their visibility toggles are active. Fixed in `portfolioProducts` useMemo, FilterDrawer counting, and badge counts.",
+      "* **Slim Data Paths** — Streamlined data path display on cards, enriched SC4S and NetFlow modals with product-specific context.",
+      "* **Glass Pane view** — Added \"Active STs\" metric to stats bar for data flow visibility.",
+      "* **Dynamic labels from Splunkbase lookup** — Badge and status labels sourced from Splunkbase CSV for accuracy.",
+      "* **Explore button** — Cards with TA-only products (no visible UI) get a contextual \"Explore\" dropdown (Explore Data in Search, Create Dashboard, Set Custom).",
+      "### Catalog Updates",
+      "* **50 active products** (was 48), **38 roadmap** (was 22), **320 unique sourcetypes** (was 303).",
+      "* **Cisco Spaces** — Promoted to active with Splunkbase TA reference.",
+      "* **Cisco Secure Cloud Analytics** — Promoted to active.",
+      "* **Coverage gaps** — Identified and tagged products missing Splunk integration.",
+      "* **NetFlow guidance** — 11 products now include NetFlow collection details.",
+      "* **SC4S expansion** — 23 products (was 17) with SC4S documentation links.",
+      "### Build & Packaging",
+      "* **AppInspect automation** — `appinspect.sh` and `appinspect_html_report.py` for automated Splunkbase validation with HTML reports.",
+      "* **App manifest** — `app.manifest` auto-stamped during build.",
+      "* **CODEOWNERS** — Added with `cisco.com` emails for GitHub org matching.",
+      "* **Duplicate key fix** — Merged duplicate `dashboards` key in `[cisco_aci]`.",
+      "* **Package hygiene** — Stripped `local.meta` from package tarball.",
+      "### Documentation",
+      "* **Architecture Guide** — Comprehensive A-to-Z guide tracked in `packages/.../docs/`.",
+      "* **User Manual** — End-user guide added to tracked docs.",
+      "* **Decision log** — `DECISIONS.md` tracks all major design decisions with rationale.",
+      "* **Cursor rules** — AI development conventions added for consistent coding assistance.",
+      "### Bug Fixes",
+      "* **Sourcetype data accuracy** — Improved chip coloring and search scoping.",
+      "* **Standalone detection** — Fixed for non-cluster Splunk deployments.",
+      "* **Feedback clipboard fallback** — Graceful degradation when clipboard API unavailable.",
+      "* **Build number display** — Correctly reflects `app.conf` build hash."
+    ]
+  },
+  {
+    "version": "1.0.5",
+    "date": "March 21, 2026",
+    "blocks": [
+      "### Product Catalog Expansion (79 → 93)",
+      "* **93 total products** — Added 7 new product cards: Cisco Secure Client (AnyConnect), Cisco Secure Cloud Analytics, Cisco Attack Surface Management, Cisco BroadWorks, Cisco UCCX, Cisco Crosswork NSO, Cisco HyperFlex.",
+      "* **Security:** 43 products (was 39). **Networking:** 35 (was 31). **Collaboration:** 12 (was 6). **Observability:** 3.",
+      "* **19 subcategories** — Added `meetings_calling`, `voice_telephony`, `contact_center`, `threat_intelligence`, `digital_experience`, `application_monitoring`.",
+      "* **725+ search keywords** — Expanded from 408 across all 93 products.",
+      "### Splunkbase Sourcetype Audit & Fixes",
+      "* **Meraki card** — `[cisco_meraki]` was pointing to Catalyst TA (7538) which has zero Meraki sourcetypes. Swapped to `Splunk_TA_cisco_meraki` (5580); removed 5580 from `legacy_uids`; added 2 missing sourcetypes (`devicesavailabilities`, `devicesuplinkslossandlatency`).",
+      "* **ThousandEyes card** — Removed self-referencing `addon_uid` 7719 from `legacy_uids`; added `app_viz` pointing to Enterprise Networking App (7539) which has ThousandEyes dashboards.",
+      "* **Isovalent cards** — Fixed sourcetype casing: `processConnect` → `processconnect`, `processExec` → `processexec` (both `[cisco_isovalent]` and `[cisco_isovalent_edge_processor]`).",
+      "* **Intersight card** — Added 5 missing sourcetypes from TA: `contract`, `fabric`, `license`, `network`, `target`.",
+      "* **Full cross-validation** — Validated all 93 products' sourcetypes against Splunkbase CSV and on-disk TA configs. Identified and documented Secure Access ecosystem split (Q5), Splunkbase metadata gaps (transforms/inputs not registered), and 8 unreferenced Cisco apps.",
+      "### \"Integration Needed\" Section",
+      "* **Renamed** \"Unsupported Products\" → \"Integration Needed\" for clarity.",
+      "* **Coming Soon treatment** — Cards in Integration Needed render identically to GTM Roadmap cards: no \"+ Add\" button, no sourcetype warnings, \"Coming Soon\" badge displayed.",
+      "* **Gated behind devMode/gtmMode** — Section only visible when internal content is enabled.",
+      "* **Counter fix** — Products with `support_level = not_supported` are excluded from the header counter and category pill counts when the Integration Needed section is hidden, preventing phantom product counts (e.g., \"53 products\" shown but only 47 visible).",
+      "* **\"No Integration\" filter pill** — Gated behind `showInternalContent` in the FilterDrawer so non-dev users cannot filter for invisible products.",
+      "### Dark Mode Fixes",
+      "* **Warning banner styling** — Fixed dark mode styling for \"Integration Needed\" and \"Deprecated Products\" warning banners. Replaced hardcoded colors with theme-aware CSS variables (`--status-warning-bg`, `--status-warning-border`, `--text-primary`).",
+      "### Catalog Metadata",
+      "* **`date_created` / `date_updated`** — New fields added to all 93 product stanzas, populated from git history.",
+      "* **products.conf.spec** — Updated with `date_created` and `date_updated` field documentation.",
+      "### Documentation",
+      "* **`docs/OPEN_QUESTIONS.md`** — Created structured question tracker for pending decisions (Colin, Alec, Salah). Expanded with Q5 (Secure Access split), Q6 (Catalyst TA ThousandEyes claims), Q7 (Spaces Add-on), and full audit summary.",
+      "* Updated CHANGELOG.md, all README.md files, copilot-instructions.md with current v1.0.5 stats (93 products, 8772 LOC index.jsx, 7165 LOC CSS, 42 saved searches)."
+    ]
+  },
+  {
+    "version": "1.0.4",
+    "date": "March 2, 2026",
+    "blocks": [
+      "### Dark Mode Icon Enhancements",
+      "* **Filter pill icon visibility** — Added `csc-filter-pill-icon` class to all category filter pill `<img>` tags for dark mode white chip treatment.",
+      "* **Card icon frosted glass** — Dark mode card icons render with frosted glass container, Cisco-blue glow, white drop-shadow, and 40px sizing.",
+      "* **Badge pill preservation** — SOAR, AI, ITSI, and Alert badge pills preserve light-mode styling in dark mode for icon visibility.",
+      "### Documentation",
+      "* Updated copilot-instructions.md, README.md, and CHANGELOG.md with current v1.0.4 stats."
+    ]
+  },
+  {
+    "version": "1.0.3",
+    "date": "February 28, 2026",
+    "blocks": [
+      "### AI-Powered Badge",
+      "* **AI badge** — Purple gradient badge with sparkle icon on cards with `ai_enabled = 1`.",
+      "* **AI tooltip** — Hover tooltip shows `ai_description` text.",
+      "* **AI cross-cutting filter** — \"AI-Powered\" pill in Category Filter Bar (15 products).",
+      "* **`ai_enabled`, `ai_description`** — New fields in products.conf.",
+      "### Subcategory Pills",
+      "* **13 subcategories** — Granular filtering within Security (8), Networking (4), and Observability (1).",
+      "* **Animated slide-in** — Subcategory pills expand with CSS animation when category selected.",
+      "* **`subcategory`** — New field in products.conf.",
+      "### SC4S Integration",
+      "* **SC4S pills** — Blue SC4S pill on cards with `sc4s_url` set (18 products).",
+      "* **SC4S best practices** — SC4S tip merges with platform syslog tip, avoids duplication.",
+      "* **`sc4s_url`, `sc4s_label`** — New fields in products.conf."
+    ]
+  },
+  {
+    "version": "1.0.2",
+    "date": "February 27, 2026",
+    "blocks": [
+      "### Strategic Sort Order",
+      "* **Sort ranges** — Products strategically sorted with related products adjacent within categories.",
+      "* **Keyword cleanup** — Keywords start with primary acronym; generic terms removed.",
+      "* **`update_sort_keywords_v2.py`** — Line-by-line parser for bulk updates (replaces broken v1).",
+      "### Cisco Brand Icons",
+      "* **128 icons** — 126 SVGs + 2 PNGs covering all 78 products.",
+      "* **Light/dark variants** — `{name}.svg` and `{name}_white.svg` variants.",
+      "* **Icon fallback chain** — icon_svg -> icon_emoji (32 emojis) -> first-letter fallback.",
+      "### ACE Product Addition",
+      "* **Application Centric Engine (ACE)** — New product in Networking/data_center_net."
+    ]
+  },
+  {
+    "version": "1.0.1",
+    "date": "February 26, 2026",
+    "blocks": [
+      "### Secure Networking GTM",
+      "* **GTM tagging** — 60 products tagged with `secure_networking_gtm = 1`.",
+      "* **GTM filter pill** — Secure Networking GTM cross-cutting filter with `cat-secnet.svg` icon.",
+      "### Product Catalog Expansion (57 -> 78)",
+      "* **78 total products** — Added 21 new products across all categories.",
+      "* **Security:** 27 -> 39 products.",
+      "* **Networking:** 15 -> 30 products.",
+      "* **Observability:** 2 -> 3 products.",
+      "* **Collaboration:** 3 -> 6 products.",
+      "### CCC -> SCAN Rename",
+      "* **Full rebrand** — Cisco Control Center renamed to Splunk Cisco App Navigator.",
+      "* **App ID:** `splunk-cisco-app-navigator`",
+      "* **Git:** New repo, old repo archived."
+    ]
+  },
+  {
+    "version": "1.0.0",
+    "date": "February 25, 2026",
+    "blocks": [
+      "### Production Release",
+      "* **Feature-complete Glass Pane UI** — All card intelligence badges, category filtering, search, theme toggle, best practices modals.",
+      "* **Build system** — generate-catalog.js + webpack + auto build hash stamp.",
+      "* **Splunkbase packaging** — package_app.sh creates versioned tarball.",
+      "* **CiscoSansTT fonts** — Cisco brand typography integrated.",
+      "* **Platform detection** — Cloud vs Enterprise via server/info REST endpoint.",
+      "* **Sourcetype detection** — tstats-based data flow validation for 429+ sourcetypes.",
+      "* **Persona Quick Start** — Pre-built workspace configurations.",
+      "* **Tech Stack Modal** — Full technology stack visualization."
+    ]
+  },
+  {
+    "version": "0.0.3",
+    "date": "February 22, 2026",
+    "blocks": [
+      "### Product Catalog Expansion",
+      "* **57 products** — Expanded from 47 to 57 total products.",
+      "* **10 deprecated products** added.",
+      "* **Collaboration active** — Webex, Meeting Server, CUCM moved to active.",
+      "* **New networking/security products** added.",
+      "### SOAR Connector Intelligence",
+      "* **SOAR badges** — Purple badge on cards with SOAR connectors (10 products).",
+      "* **SOAR cross-cutting filter** — SOAR pill in Category Filter Bar.",
+      "* **SVG icon** — Custom icon-soar.svg badge.",
+      "### ITSI Content Pack Intelligence",
+      "* **ITSI refactor** — Dedicated `itsi_content_pack` fields.",
+      "* **ITSI badges** — Blue badge on cards with Content Packs (4 products).",
+      "* **SVG icon** — Custom icon-itsi.svg badge.",
+      "### Alert Actions Intelligence",
+      "* **Alert Actions badges** — Blue badge on cards with alert action add-ons.",
+      "* **Alert Actions cross-cutting filter** — Alert Actions pill in Category Filter Bar.",
+      "### Community App Detection",
+      "* **Community app warning** — Collapsible warning for non-Cisco community TAs.",
+      "### SVG Badge Icons",
+      "* **Custom SVG icon set** — Replaced emoji for ITSI, SOAR, Enterprise, Cloud badges.",
+      "### Deprecated Product Enhancements",
+      "* **Deprecated/Replacement chips** — Each deprecated card links to successor.",
+      "### Additional Fields",
+      "* **aliases**, **prereq_apps**, **addon_family**, **addon_docs_url**, **dashboards** — New fields.",
+      "### Bug Fixes",
+      "* **Meraki prerequisite guard** — Fixed prereq dependency rendering.",
+      "* **FeedbackModal crash** — Fixed uncontrolled component warning."
+    ]
+  },
+  {
+    "version": "0.0.2",
+    "date": "February 22, 2026",
+    "blocks": [
+      "### UI/UX Redesign",
+      "* **IS4S green design language** — Green accent throughout.",
+      "* **Uniform card styling** — Clean design with subtle accent stripe.",
+      "### Dark/Light Mode",
+      "* **Theme detection** — Detects Splunk theme via DOM attributes and REST API.",
+      "* **30+ dark-mode CSS overrides** via `:root.dce-dark`.",
+      "* **MutationObserver** — Watches for dynamic theme class changes.",
+      "### Custom Dashboard Launch",
+      "* **Split-button Launch** — Default + custom dashboard dropdown.",
+      "* **Persistence** — Custom dashboards saved to `local/products.conf` via REST API.",
+      "### Bug Fixes",
+      "* **CSRF authentication** — Uses Splunk's official `getCSRFToken()`.",
+      "* **ITSI 404 elimination** — Only queries installed apps.",
+      "* **Sourcetype search guard** — Skips search if no CSRF token.",
+      "0.0.1",
+      "* Initial version"
+    ]
+  }
+]

@@ -1,3 +1,5 @@
+import releases from './releaseNotes.generated.json';
+import ChevronRight from '@splunk/react-icons/ChevronRight';
 import { readUserTheme } from '../../common/shellTheme';
 import { getThemeOptions } from '@splunk/splunk-utils/themes';
 /* eslint-disable import/no-extraneous-dependencies, react/prop-types */
@@ -32,7 +34,7 @@ import { PRODUCT_CATALOG } from '../products/productCatalog.generated';
 
 const APP_ID = 'splunk-cisco-app-navigator';
 const THEME_STORAGE_KEY = 'scan_theme_preference';
-const SEARCHABLE_SELECTOR = 'h2, h3, h4, p, li, td, th';
+const SEARCHABLE_SELECTOR = 'h2, h3, h4, h5, summary, p, li, td, th';
 const SUPPORTED_LEVELS = new Set(['cisco_supported', 'splunk_supported']);
 const BUILD_VERSION = typeof SCAN_APP_VERSION !== 'undefined' ? SCAN_APP_VERSION : '';
 const BUILD_HASH = typeof SCAN_BUILD_HASH !== 'undefined' ? SCAN_BUILD_HASH : '';
@@ -113,7 +115,7 @@ const statusRows = [
     ['No recent data', 'SCAN found no matching events; confirm time, indexes, permissions, and parsing.'],
     ['Version mismatch', 'Different app versions were detected across relevant Splunk tiers.'],
     ['Missing on tier', 'An add-on may be absent where index-time configuration is expected.'],
-    ['Legacy app', 'A deprecated or replaced integration is installed and should be reviewed.'],
+    ['Legacy app', 'A historical integration is installed; review dependencies and migration requirements before changing it.'],
 ];
 
 const intelligenceRows = [
@@ -246,6 +248,45 @@ function DataTable({ columns, rows }) {
                     ))}
                 </tbody>
             </table>
+        </div>
+    );
+}
+
+function ReleaseText({ text }) {
+    return text.split(/(\*\*[^*]+\*\*|`[^`]+`)/g).map((part, index) => {
+        if (part.startsWith('**')) return <strong key={index}>{part.slice(2, -2)}</strong>;
+        if (part.startsWith('`')) return <code key={index}>{part.slice(1, -1)}</code>;
+        return part;
+    });
+}
+
+function ReleaseHistory() {
+    const root = useRef(null);
+    const expand = (open) => root.current?.querySelectorAll('details').forEach((panel) => { panel.open = open; });
+    return (
+        <div ref={root} className="scan-guide-release-history">
+            <h3>Splunk Cisco App Navigator release history</h3>
+            <div className="scan-guide-actions scan-guide-no-print">
+                <button type="button" onClick={() => expand(true)}>Expand all</button>
+                <button type="button" onClick={() => expand(false)}>Collapse all</button>
+            </div>
+            <p>These notes cover Navigator&apos;s product catalog, interface, operations and package delivery. Catalog synchronization updates product definitions; it does not upgrade application code.</p>
+            {releases.map((release) => (
+                <details className="scan-guide-release-panel" key={release.version}>
+                    <summary className="scan-guide-release-summary" id={`release-${release.version.replaceAll('.', '-')}`}>
+                        <ChevronRight className="scan-guide-release-chevron" size="16px" />
+                        <span><strong>Release Notes</strong><span className="scan-guide-release-meta">{`${release.date} - Version ${release.version}`}</span></span>
+                    </summary>
+                    <div className="scan-guide-release-body">
+                        <h4>{`Version ${release.version} — ${release.date}`}</h4>
+                        {release.blocks.map((line, index) => {
+                            if (line.startsWith('### ')) return <h5 key={index}>{line.slice(4)}</h5>;
+                            if (/^[*-] /.test(line)) return <ul key={index}><li><ReleaseText text={line.slice(2)} /></li></ul>;
+                            return <p key={index}><ReleaseText text={line} /></p>;
+                        })}
+                    </div>
+                </details>
+            ))}
         </div>
     );
 }
@@ -511,6 +552,8 @@ function UserGuideContent() {
         const match = matches[nextIndex];
         currentSearchIndexRef.current = nextIndex;
         match.classList.add('scan-guide-search-current');
+        const panel = match.closest('details');
+        if (panel) panel.open = true;
         setCurrentSearchIndex(nextIndex);
         setSearchStatus(`${matches.length} ${matches.length === 1 ? 'match' : 'matches'}`);
         const section = match.closest('[data-guide-section]');
@@ -565,15 +608,21 @@ function UserGuideContent() {
         const section = heading.closest('[data-guide-section]');
         if (section?.dataset?.guideSection) {setActiveSection(section.dataset.guideSection);}
         setActiveHeading(id);
+        const panel = heading.closest('details');
+        if (panel) panel.open = true;
         heading.scrollIntoView({ behavior: smoothScrollBehavior(), block: 'start' });
         window.history.replaceState(null, '', `#${id}`);
     }, [smoothScrollBehavior]);
 
     const exportPdf = useCallback(() => {
         const previousTitle = document.title;
+        const releasePanels = Array.from(document.querySelectorAll('.scan-guide-release-panel'));
+        const releaseStates = releasePanels.map(panel => panel.open);
+        releasePanels.forEach(panel => { panel.open = true; });
         const cleanup = () => {
             document.body.classList.remove('scan-guide-printing');
             document.title = previousTitle;
+            releasePanels.forEach((panel, index) => { panel.open = releaseStates[index]; });
             window.removeEventListener('afterprint', cleanup);
         };
         document.body.classList.add('scan-guide-printing');
@@ -602,10 +651,11 @@ function UserGuideContent() {
                 label: section.querySelector('h2')?.textContent?.trim() || sectionDefinition.label,
             }];
             const seen = new Set();
-            section.querySelectorAll('h3, h4').forEach((heading) => {
-                const label = heading.textContent?.trim();
+            section.querySelectorAll('h3, h4, summary.scan-guide-release-summary').forEach((heading) => {
+                if (heading.closest('.scan-guide-release-body')) return;
+                const label = heading.matches('summary') ? heading.querySelector('.scan-guide-release-meta')?.textContent?.trim() : heading.textContent?.trim();
                 if (!label) {return;}
-                const base = `${sectionDefinition.id}-${headingSlug(label)}`;
+                const base = heading.id || `${sectionDefinition.id}-${headingSlug(label)}`;
                 let id = base;
                 let suffix = 2;
                 while (seen.has(id) || (document.getElementById(id) && heading.id !== id)) {
@@ -1082,8 +1132,7 @@ function UserGuideContent() {
                                 <h3>Choose and configure your content</h3>
                                 <ol>
                                     <li>
-                                        Open the product card&apos;s Essentials link to review the Splunkbase listing
-                                        and access requirements.
+                                        Choose Install Essentials in the optional visualization panel to open Browse More Apps filtered to Essentials. Review the listing and access requirements before installing.
                                     </li>
                                     <li>Install Essentials on the search head that can search the required data.</li>
                                     <li>
@@ -1091,8 +1140,7 @@ function UserGuideContent() {
                                         the required fields, permissions and companion data models.
                                     </li>
                                     <li>
-                                        When the app is enabled, the product card offers a direct content link and
-                                        setup documentation. Cards with reusable searches lead to the workspace
+                                        When enabled, choose Open Essentials content or use the setup documentation. If installed but disabled, choose Manage Essentials to open Manage Apps. Cards with reusable searches lead to the workspace
                                         where those searches can be selected.
                                     </li>
                                 </ol>
@@ -1280,6 +1328,9 @@ function UserGuideContent() {
                                         Manage saved searches
                                     </GuideAction>
                                 </div>
+                                <h3>Understand incomplete synchronization</h3>
+                                <p>A catalog file can download successfully while the configuration reload fails. Partial Success means the file was updated but activation is unconfirmed; inspect reload_status and reload_message. A certificate hostname mismatch requires a management endpoint covered by its trusted certificate. Do not disable TLS verification. A skipped update can also mean the catalog requires a newer app, rather than that the local catalog is current.</p>
+                                <p>Catalog updates preserve local customizations in local/products.conf and do not install add-ons, configure collection, or upgrade the Navigator interface.</p>
                             </GuideSection>
 
                             <GuideSection
@@ -1366,77 +1417,7 @@ function UserGuideContent() {
                                 title="Release notes"
                                 kicker="Changes included in the current release, separate from collection setup."
                             >
-                                <h3>Version 1.0.33 — November 6, 2026</h3>
-                                <ul>
-                                    <li>
-                                        <strong>Splunk Secure Networking Essentials:</strong>
-                                        {' '}
-                                        Added optional visualization recommendations to 37 product cards,
-                                        preserving existing app choices. Recommendations link to Splunkbase,
-                                        relevant content and setup documentation when the app is enabled.
-                                    </li>
-                                    <li>
-                                        <strong>Cisco Crosswork Assurance:</strong>
-                                        {' '}
-                                        Added an active native HEC card,
-                                        Cisco setup links, and
-                                        {' '}
-                                        <code>cisco:crossworkassurance</code>
-                                        . No TA or app
-                                        dependency is declared. ITSI integration content is in development.
-                                    </li>
-                                    <li>
-                                        <strong>Meraki syslog:</strong>
-                                        {' '}
-                                        Added
-                                        {' '}
-                                        <code>meraki:syslog</code>
-                                        {' '}
-                                        and its
-                                        {' '}
-                                        <code>:events</code>
-                                        ,
-                                        {' '}
-                                        <code>:flows</code>
-                                        ,
-                                        {' '}
-                                        <code>:urls</code>
-                                        ,
-                                        {' '}
-                                        <code>:security</code>
-                                        ,
-                                        {' '}
-                                        <code>:airmarshal</code>
-                                        , and
-                                        {' '}
-                                        <code>:unknown</code>
-                                        {' '}
-                                        output families to the Meraki card.
-                                    </li>
-                                    <li>
-                                        <strong>MDS syslog:</strong>
-                                        {' '}
-                                        Added
-                                        {' '}
-                                        <code>cisco:dc:mds:syslog</code>
-                                        {' '}
-                                        alongside
-                                        the existing MDS API sourcetypes.
-                                    </li>
-                                    <li>
-                                        <strong>User Guide:</strong>
-                                        {' '}
-                                        Added Crosswork Assurance HEC setup guidance
-                                        and this navigable Release Notes section.
-                                    </li>
-                                </ul>
-                                <h3>Using the updated sourcetype lists</h3>
-                                <p>
-                                    The Meraki and MDS additions extend Navigator&apos;s catalog detection, search
-                                    links, and props.conf audits. They do not install parsers, create inputs, or
-                                    change existing events. Configure collection with the corresponding add-on
-                                    before using Navigator to check for data.
-                                </p>
+                                <ReleaseHistory />
                             </GuideSection>
                         </div>
                     </article>

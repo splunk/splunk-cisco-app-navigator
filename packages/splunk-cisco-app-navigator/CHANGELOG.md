@@ -1,5 +1,20 @@
 # Change Log
 
+1.0.50 — November 9, 2026
+-------
+
+### Product experience
+* **Essentials actions** — Install Essentials from Browse More Apps, manage a disabled installation, or open product content directly from the optional visualization panel. Existing collection and visualization choices are preserved.
+* **Theme and navigation** — Follow the Splunk user theme for Products and User Guide, improve Free/Premium/Installed badge contrast, and restore the visible Search navigation item.
+* **Accurate guidance** — Scope SC4S recommendations to declared syslog support, use documented add-on placement, and review legacy integrations before removal.
+* **Sync reporting** — Distinguish a catalog file update from a failed configuration reload, and explain why an update was skipped. A TLS hostname mismatch still requires correcting the local management endpoint or certificate.
+* **User Guide** — Refresh the three-column reading layout and add expandable release history with search, section links and print support.
+
+### Build and catalog delivery
+* **Shared build identities** — Reserve increasing build numbers across developers and machines and include them in package filenames. VERSION is the release authority; source metadata uses generic templates.
+* **Catalog revisions** — Stamp only the packaged catalog with a full UTC timestamp and preserve the independent minimum app version (currently 1.0.26). Older interfaces may not expose every new feature.
+* **Catalog publication** — Add publish-catalog.sh with check-only and explicit publish modes, SSO recovery guidance, concurrent-update protection and upload verification. Builds do not publish automatically.
+
 1.0.33 — November 6, 2026
 -------
 

@@ -95,6 +95,8 @@ function postBuildRefresh() {
 }
 
 if (cmd === 'build') {
+  const notesResult = spawnSync('node', [path.join(pkgRoot, 'bin', 'generate-release-notes.js')], { stdio: 'inherit', cwd: pkgRoot });
+  if (notesResult.status !== 0) process.exit(notesResult.status || 1);
   // 1. Generate static catalog from products.conf
   const genResult = spawnSync('node', [path.join(pkgRoot, 'bin', 'generate-catalog.js')], {
     stdio: 'inherit',

@@ -101,6 +101,7 @@ class CatalogRevisionTests(unittest.TestCase):
             catalog.write_bytes(original)
             # A no-op catalog generator and webpack keep the check local and avoid a Splunk instance.
             (pkg / 'bin/generate-catalog.js').write_text('')
+            (pkg / 'bin/generate-release-notes.js').write_text('')
             fakebin = root / 'fakebin'
             fakebin.mkdir()
             for name in ('npx', 'curl'):

@@ -978,3 +978,64 @@
         box-shadow: none !important;
     }
 }
+
+/* Reader styling aligned with the Cisco Catalyst guide; keep Navigator content. */
+#scan-root .scan-user-guide {
+    --guide-canvas: #f5f5f7;
+    --guide-canvas-image: none;
+    --guide-panel: #ffffff;
+    --guide-panel-secondary: #fbfbfd;
+    --guide-text: #1d1d1f;
+    --guide-text-muted: #424245;
+    --guide-text-subtle: #6e6e73;
+    --guide-info: #0a66c2;
+    --guide-info-soft: #e8f0fb;
+    --guide-border: #e2e2e5;
+    --guide-border-soft: #ececef;
+    font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'Segoe UI', 'Helvetica Neue', Arial, sans-serif;
+}
+#scan-root .scan-user-guide[data-theme='dark'] {
+    --guide-canvas-image: none;
+    --guide-canvas: #111720;
+    --guide-panel: #17212d;
+    --guide-panel-secondary: #1c2836;
+    --guide-text: #ecf0f5;
+    --guide-text-muted: #c1cad6;
+    --guide-text-subtle: #a6b3c3;
+    --guide-info: #80baff;
+    --guide-info-soft: #203750;
+    --guide-border: #344355;
+    --guide-border-soft: #2b394a;
+}
+#scan-root .scan-guide-layout { grid-template-columns: 280px minmax(0, 1fr) 300px; gap: 24px; max-width: 1760px; }
+#scan-root .scan-guide-document { background: var(--guide-panel); padding: 20px 28px; }
+#scan-root .scan-guide-toc { background: var(--guide-panel-secondary); box-shadow: 0 1px 2px rgba(0,0,0,.04), 0 8px 24px rgba(0,0,0,.04); }
+#scan-root .scan-guide-hero, #scan-root .scan-guide-section-card { border: 0; border-radius: 0; box-shadow: none; }
+#scan-root .scan-guide-hero { padding: 12px 0 24px; border-bottom: 1px solid var(--guide-border); }
+#scan-root .scan-guide-hero h1 { font-size: 28px; }
+#scan-root .scan-guide-section-header { padding: 20px 0 14px; }
+#scan-root .scan-guide-section-body { padding: 20px 0; }
+#scan-root .scan-guide-section-icon { display: none; }
+#scan-root .scan-guide-toc-list button > span { border-radius: 4px; }
+#scan-root .scan-guide-page-toc { background: transparent; border: 0; box-shadow: none; }
+#scan-root .scan-guide-release-panel { background: var(--guide-panel-secondary); border: 1px solid var(--guide-border); border-radius: 10px; margin: 12px 0; overflow: hidden; }
+#scan-root .scan-guide-release-summary { display: flex; align-items: center; gap: 8px; cursor: pointer; list-style: none; padding: 12px 14px; }
+#scan-root .scan-guide-release-summary::-webkit-details-marker { display: none; }
+#scan-root .scan-guide-release-summary:hover { background: var(--guide-info-soft); }
+#scan-root .scan-guide-release-summary:focus-visible { outline: 2px solid var(--guide-info); outline-offset: -2px; }
+#scan-root .scan-guide-release-summary strong { display: block; font-size: 16px; }
+#scan-root .scan-guide-release-meta { display: block; font-size: 12.5px; font-weight: 600; color: var(--guide-text-subtle); margin-top: 2px; }
+#scan-root .scan-guide-release-chevron { color: var(--guide-info); flex-shrink: 0; transition: transform 120ms ease; }
+#scan-root details[open] > summary .scan-guide-release-chevron { transform: rotate(90deg); }
+#scan-root .scan-guide-release-body { border-top: 1px solid var(--guide-border); padding: 16px 22px 6px; }
+#scan-root .scan-guide-release-body h5 { font-size: 14px; margin: 16px 0 8px; }
+#scan-root .scan-guide-actions button { background: var(--guide-panel); color: var(--guide-info); border: 1px solid var(--guide-border); border-radius: 7px; font: inherit; font-size: 12px; font-weight: 600; padding: 7px 10px; cursor: pointer; }
+#scan-root .scan-guide-actions button:focus-visible { outline: 2px solid var(--guide-info); outline-offset: 2px; }
+@media (max-width: 1400px) { #scan-root .scan-guide-layout { grid-template-columns: 250px minmax(0,1fr) 240px; } }
+@media (max-width: 1180px) { #scan-root .scan-guide-layout { grid-template-columns: 240px minmax(0,1fr); } }
+@media (max-width: 900px) { #scan-root .scan-guide-layout { grid-template-columns: 1fr; } #scan-root .scan-guide-document { padding: 16px; } }
+@media (prefers-reduced-motion: reduce) { #scan-root .scan-guide-release-chevron { transition: none; } }
+@media print {
+    #scan-root .scan-guide-release-panel > .scan-guide-release-body { display: block !important; }
+    #scan-root .scan-guide-release-panel { break-inside: auto; }
+}
