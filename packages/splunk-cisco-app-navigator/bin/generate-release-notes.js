@@ -16,5 +16,12 @@ for (const line of text.split(/\r?\n/)) {
     }
 }
 if (!releases.length) throw new Error('No versioned release notes found');
+// This changelog feeds customer help. Fail rather than silently publishing
+// recognizable maintainer-only process notes into the product.
+const maintainerOnly = /publish-catalog\.sh|shared build identities|build-number allocation|VERSION is the release authority|source metadata uses generic templates|CODEOWNERS|pre-PR checklist|CI\/CD|### Build (?:&|and) /i;
+if (releases.some(release => release.blocks.some(line => maintainerOnly.test(line)))) {
+    throw new Error('Maintainer-only content found in customer release notes; move it to maintainer documentation.');
+}
+
 fs.writeFileSync(path.join(pkg, 'src/main/webapp/pages/user_guide/releaseNotes.generated.json'), JSON.stringify(releases, null, 2) + '\n');
 console.log(`Generated ${releases.length} release history entries`);

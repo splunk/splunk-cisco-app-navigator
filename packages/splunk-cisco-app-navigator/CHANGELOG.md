@@ -4,22 +4,18 @@
 -------
 
 ### Product experience
+* **Catalog compatibility** — Updated product definitions can be synchronized by Navigator 1.0.26 and newer. Older interfaces may not display every newer feature.
 * **Essentials actions** — Install Essentials from Browse More Apps, manage a disabled installation, or open product content directly from the optional visualization panel. Existing collection and visualization choices are preserved.
 * **Theme and navigation** — Follow the Splunk user theme for Products and User Guide, improve Free/Premium/Installed badge contrast, and restore the visible Search navigation item.
 * **Accurate guidance** — Scope SC4S recommendations to declared syslog support, use documented add-on placement, and review legacy integrations before removal.
 * **Sync reporting** — Distinguish a catalog file update from a failed configuration reload, and explain why an update was skipped. A TLS hostname mismatch still requires correcting the local management endpoint or certificate.
 * **User Guide** — Refresh the three-column reading layout and add expandable release history with search, section links and print support.
 
-### Build and catalog delivery
-* **Shared build identities** — Reserve increasing build numbers across developers and machines and include them in package filenames. VERSION is the release authority; source metadata uses generic templates.
-* **Catalog revisions** — Stamp only the packaged catalog with a full UTC timestamp and preserve the independent minimum app version (currently 1.0.26). Older interfaces may not expose every new feature.
-* **Catalog publication** — Add publish-catalog.sh with check-only and explicit publish modes, SSO recovery guidance, concurrent-update protection and upload verification. Builds do not publish automatically.
-
 1.0.33 — November 6, 2026
 -------
 
 ### Catalog Fixes
-* **Splunk Secure Networking Essentials recommendations** — Added optional visualization recommendations to 37 product cards based on searches and views inspected in the 1.0.80 package. Preserved existing app choices, added enabled-app content and setup links, kept the recommendation separate from required collection dependencies, and updated the User Guide and in-guide release notes.
+* **Splunk Secure Networking Essentials recommendations** — Added optional visualization recommendations to 37 product cards. Preserved existing app choices, added enabled-app content and setup links, kept the recommendation separate from required collection dependencies, and updated the User Guide and in-guide release notes.
 * **User Guide and in-guide release notes** — Added Crosswork Assurance HEC setup instructions, deployment and ITSI development boundaries, and a navigable 1.0.33 Release Notes section covering Crosswork Assurance, Meraki syslog, and MDS syslog catalog additions.
 * **Cisco Crosswork Assurance** — Added an active native HEC alert integration card with `cisco:crossworkassurance`, Cisco setup documentation, Splunk Enterprise and Cloud-connectivity guidance, and an explicit in-development ITSI content note. No TA or visualization app dependency is declared; legacy PCA/Skylight connector history is retained separately.
 * **Meraki syslog sourcetypes** — Added the `meraki:syslog` ingress and the events, flows, URLs, security, Air Marshal, and unknown output families to the Meraki card for data detection, search links, and props.conf audits.
@@ -30,14 +26,14 @@
 
 ### UI & Card Enhancements
 * **C3 catalog presentation** — Refined the Cisco Products dashboard with a layered atmospheric canvas, restrained frosted-glass command and section surfaces, command-style metrics, responsive control grouping, and simplified product cards in light and dark modes while preserving the established SCAN product identity.
-* **Unified React theme boundary** — Synchronized Splunk UI components and portal-rendered dialogs with the dashboard's Auto, Light, and Dark preference, and added semantic level-two headings to product sections.
+* **Consistent theme behavior** — Aligned product cards and dialogs with the dashboard's Auto, Light, and Dark preference, and added semantic level-two headings to product sections.
 * **Grouped sourcetype lists** — Product cards can now show Current and Legacy sourcetypes as separate groups, explain that Legacy represents older TA sourcetypes retained for historical searches, and preserve the combined list for data detection, search links, and props.conf audits.
 * **Catalog sync status styling** — Restored the green success, red error, and amber loading treatments for Sync Catalog after the C3 utility-pill styling unintentionally overrode those states.
 * **Catalyst TA user guide links** — Cisco Catalyst Add-on Docs links now open the shipped `TA_cisco_catalyst` user guide instead of the Splunkbase listing.
 * **Catalyst TA guided setup links** — Added product-specific guided setup links to every card backed by Cisco Catalyst Add-on for Splunk, including controller-specific input pages and the shared syslog setup for device families.
 
 ### Catalog Fixes
-* **Three-add-on sourcetype alignment** — Matched Catalyst, DC Networking, and Meraki catalog coverage to the current source checkouts: added 27 missing product sourcetypes and the shared Catalyst syslog ingress, including dedicated ISE APIs, SD-WAN Insecure Configuration, Catalyst Center site health, AP positions and Assurance events, DC managed datasets and Custom APIs, and Meraki Custom API.
+* **Three-add-on sourcetype alignment** — Matched Catalyst, DC Networking, and Meraki catalog coverage to supported integrations: added 27 missing product sourcetypes and the shared Catalyst syslog ingress, including dedicated ISE APIs, SD-WAN Insecure Configuration, Catalyst Center site health, AP positions and Assurance events, DC managed datasets and Custom APIs, and Meraki Custom API.
 * **Application Inventory transition** — Classified `cisco:dnac:application:inventory` as Current and retained `cisco:dnac:application:traffic` as Legacy for historical data detection.
 * **Hyperfabric and MDS integration cards** — Connected the existing cards to Cisco DC Networking and their command-center dashboards, listed all supported product sourcetypes, and replaced stale roadmap-gap metadata.
 * **Cisco Catalyst sourcetype alignment** — Reconciled Current and Legacy Catalyst Center, SD-WAN, ISE, and Cyber Vision sourcetypes with the TA reference tables; added SD-WAN Security Advisories plus ISE Endpoint Context, Guest, Vulnerability, and Threat; and classified every catalog sourcetype as either Current or Legacy with no ambiguous Other group.
@@ -46,49 +42,43 @@
 * **NetFlow exporter scope** — Removed the NetFlow badge from Catalyst Center because managed devices, not the controller, export flows; clarified Meraki MX and Z-Series scope; and corrected the ACI leaf-exporter comment.
 
 ### Security
-* **Build dependency hardening** — Refreshed the Yarn lockfile and added bounded security resolutions for Nx, Axios, nanoid, js-yaml, PostCSS, ip-address, brace-expansion, tar, form-data, and tmp.
+* **Security maintenance** — Updated application components to address known vulnerabilities.
 
 ### Compatibility
-* **Python 3.13 command metadata** — Declared the required Python version for the `synclookup` and `synccatalog` custom search commands so future Splunk Cloud vetting remains compatible with Splunk 10.6.
-
-### Build & Release
-* **Remote SSH installation** — Added a validated `--remote-install` workflow that uploads the release archive over SSH and installs it as the configured Splunk OS account, with optional password-prompted splunkd authentication.
+* **Splunk compatibility** — Updated catalog synchronization commands for the Python runtime used by Splunk 10.6.
 
 ### Documentation
-* **Version-neutral shipped README** — Removed stale app and dependency version pins from the shipped README while retaining the supported Splunk platform baseline.
-* **In-app User Guide** — Added a searchable, responsive React guide with task-based setup, catalog, deployment, operations, Splunk Cloud, troubleshooting, and configuration guidance; light/dark themes; print-to-PDF support; live build metadata; and a dedicated notebook icon in the app navigation rail that replaces the duplicate toolbar guide modal.
+* **Platform guidance** — Clarified the supported Splunk platform baseline in the application documentation.
+* **In-app User Guide** — Added a searchable, responsive guide with task-based setup, catalog, deployment, operations, Splunk Cloud, troubleshooting, and configuration guidance; light/dark themes; print-to-PDF support; live build metadata; and a dedicated notebook icon in the app navigation rail that replaces the duplicate toolbar guide modal.
 
 1.0.27 — May 9, 2026
 -------
 
 ### Catalog Fixes
-* **Cisco DNA Center / Catalyst Center card** — Restored `cisco:catalyst:center:compliance:report` and `cisco:catalyst:center:inventory:report` sourcetypes that the Catalyst Center TA emits but had been previously commented out (#10, #16).
-
-### Documentation
-* **CONTRIBUTING.md expanded** — Added Daily Workflow with CLI + GitHub Desktop instructions, 12-step quick reference, "What Goes Where" file map, Build & Test pre-PR checklist, "Files to Never Commit" list, and SCAN Conventions cheat sheet. Added Issue Tracking run-book: every bug fix and enhancement gets a tracked GitHub issue with required fields and a backfill rule tied to releases (#15, #17).
+* **Cisco DNA Center / Catalyst Center card** — Restored `cisco:catalyst:center:compliance:report` and `cisco:catalyst:center:inventory:report` sourcetypes that the Catalyst Center TA emits but had been previously commented out.
 
 1.0.26 — April 22, 2026
 -------
 
 ### Launch Button — Explicit App Context for Dashboards
 * **`app_id/view_name` format** — The `dashboards` field in products.conf now accepts explicit app context (e.g. `ta_cisco_thousandeyes/application`) alongside plain view names. This resolves ambiguity for hybrid TA+app products whose dashboards span multiple Splunk apps.
-* **Smart launch handler** — The Launch button and dropdown now parse the explicit app from each dashboard entry, falling back to the existing `app_viz || addon` resolution for plain names. Backward-compatible with all existing products.
+* **Smart launch handler** — The Launch button and dropdown now parse the explicit app from each dashboard entry, using the product’s visualization app or add-on for plain dashboard names. Backward-compatible with all existing products.
 * **Per-dashboard app label** — The dropdown shows the owning app name alongside each dashboard entry, with dimmed styling when the app is not installed.
 * **Cisco ThousandEyes** — Added `dashboards = ta_cisco_thousandeyes/application,cisco-catalyst-app/network,cisco-catalyst-app/alerts` so the primary dashboard opens in the TA while the network and alerts dashboards open in the viz app.
 
 ### Bug Fixes
 * **Stray text in savedsearches.conf** — Removed accidental `so thi` appended to end of file that caused a Splunk btool parse error.
-* **Export function** — Fixed dashboard export to use `p.dashboards` (array) instead of stale `p.dashboard` (singular).
+* **Dashboard export** — Corrected exported dashboard selections.
 
 1.0.25 — April 6, 2026
 -------
-*Splunkbase release — version bump, build hash stamp, README update.*
+* Maintenance release with no additional customer-facing changes recorded.
 
 1.0.23 — April 1, 2026
 -------
 
 ### UI & Card Enhancements
-* **Retired/Deprecated filter fix** — Products with `status = retired` or `status = deprecated` now render correctly when their visibility toggles are active. Fixed in `portfolioProducts` useMemo, FilterDrawer counting, and badge counts.
+* **Retired/Deprecated filter fix** — Products with `status = retired` or `status = deprecated` now render correctly when their visibility toggles are active. The visible cards, filter counts and badges now agree.
 * **Slim Data Paths** — Streamlined data path display on cards, enriched SC4S and NetFlow modals with product-specific context.
 * **Glass Pane view** — Added "Active STs" metric to stats bar for data flow visibility.
 * **Dynamic labels from Splunkbase lookup** — Badge and status labels sourced from Splunkbase CSV for accuracy.
@@ -102,24 +92,14 @@
 * **NetFlow guidance** — 11 products now include NetFlow collection details.
 * **SC4S expansion** — 23 products (was 17) with SC4S documentation links.
 
-### Build & Packaging
-* **AppInspect automation** — `appinspect.sh` and `appinspect_html_report.py` for automated Splunkbase validation with HTML reports.
-* **App manifest** — `app.manifest` auto-stamped during build.
-* **CODEOWNERS** — Added with `cisco.com` emails for GitHub org matching.
-* **Duplicate key fix** — Merged duplicate `dashboards` key in `[cisco_aci]`.
-* **Package hygiene** — Stripped `local.meta` from package tarball.
-
 ### Documentation
-* **Architecture Guide** — Comprehensive A-to-Z guide tracked in `packages/.../docs/`.
-* **User Manual** — End-user guide added to tracked docs.
-* **Decision log** — `DECISIONS.md` tracks all major design decisions with rationale.
-* **Cursor rules** — AI development conventions added for consistent coding assistance.
+* **User Manual** — Added an end-user guide.
 
 ### Bug Fixes
 * **Sourcetype data accuracy** — Improved chip coloring and search scoping.
 * **Standalone detection** — Fixed for non-cluster Splunk deployments.
 * **Feedback clipboard fallback** — Graceful degradation when clipboard API unavailable.
-* **Build number display** — Correctly reflects `app.conf` build hash.
+* **Version identification** — Corrected the displayed application identifier used for support.
 
 1.0.5 — March 21, 2026
 -------
@@ -218,15 +198,12 @@
 ### CCC -> SCAN Rename
 * **Full rebrand** — Cisco Control Center renamed to Splunk Cisco App Navigator.
 * **App ID:** `splunk-cisco-app-navigator`
-* **Git:** New repo, old repo archived.
 
 1.0.0 — February 25, 2026
 -------
 
 ### Production Release
 * **Feature-complete Glass Pane UI** — All card intelligence badges, category filtering, search, theme toggle, best practices modals.
-* **Build system** — generate-catalog.js + webpack + auto build hash stamp.
-* **Splunkbase packaging** — package_app.sh creates versioned tarball.
 * **CiscoSansTT fonts** — Cisco brand typography integrated.
 * **Platform detection** — Cloud vs Enterprise via server/info REST endpoint.
 * **Sourcetype detection** — tstats-based data flow validation for 429+ sourcetypes.
@@ -280,18 +257,18 @@
 * **Uniform card styling** — Clean design with subtle accent stripe.
 
 ### Dark/Light Mode
-* **Theme detection** — Detects Splunk theme via DOM attributes and REST API.
-* **30+ dark-mode CSS overrides** via `:root.dce-dark`.
-* **MutationObserver** — Watches for dynamic theme class changes.
+* **Theme preference** — Follows the active Splunk theme.
+* **Dark-mode readability** — Improved contrast throughout the interface.
+* **Live theme changes** — The interface responds when the active theme changes.
 
 ### Custom Dashboard Launch
 * **Split-button Launch** — Default + custom dashboard dropdown.
 * **Persistence** — Custom dashboards saved to `local/products.conf` via REST API.
 
 ### Bug Fixes
-* **CSRF authentication** — Uses Splunk's official `getCSRFToken()`.
+* **Request security** — Improved authenticated action handling.
 * **ITSI 404 elimination** — Only queries installed apps.
-* **Sourcetype search guard** — Skips search if no CSRF token.
+* **Sourcetype search** — Avoids issuing searches when the session is not ready.
 
 0.0.1
 -------

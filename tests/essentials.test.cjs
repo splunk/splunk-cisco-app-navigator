@@ -102,3 +102,12 @@ test('Essentials installation and disabled management remain separate from produ
     assert.match(enabled, /Open Essentials content/);
     assert.doesNotMatch(enabled, /appsremote/);
 });
+
+test('customer release history excludes project delivery procedures', () => {
+    const file = path.resolve(path.dirname(page), '../user_guide/releaseNotes.generated.json');
+    const text = fs.readFileSync(file, 'utf8');
+    assert.doesNotMatch(text, /publish-catalog\.sh|shared build identities|VERSION is|CODEOWNERS|pre-PR|GitHub Desktop|build hash stamp|webpack/i);
+    assert.match(text, /Catalog compatibility/);
+    assert.match(text, /1\.0\.26/);
+    assert.match(text, /Sync reporting/);
+});

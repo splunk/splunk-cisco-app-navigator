@@ -270,7 +270,7 @@ function ReleaseHistory() {
                 <button type="button" onClick={() => expand(true)}>Expand all</button>
                 <button type="button" onClick={() => expand(false)}>Collapse all</button>
             </div>
-            <p>These notes cover Navigator&apos;s product catalog, interface, operations and package delivery. Catalog synchronization updates product definitions; it does not upgrade application code.</p>
+            <p>These notes cover Navigator&apos;s product catalog, interface, compatibility and operations. Catalog synchronization updates product definitions; upgrade Navigator separately to receive interface improvements.</p>
             {releases.map((release) => (
                 <details className="scan-guide-release-panel" key={release.version}>
                     <summary className="scan-guide-release-summary" id={`release-${release.version.replaceAll('.', '-')}`}>
