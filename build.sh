@@ -335,6 +335,9 @@ Usage: ./build.sh [options]
 
 Default behavior: build the .tar.gz only. No Splunk install, no restart.
 Version is read from ./VERSION and stamped at package time.
+Shared numbering outages prompt for a coordinated manual build number.
+Unattended override: NAVIGATOR_BUILD_NUMBER=<coordinated-integer> ./build.sh
+Manual numbers must exceed known builds and be coordinated across developers.
 
 Push-to-Splunk options (mutually exclusive):
   --install              splunkd-managed install via REST mgmt port. Calls

@@ -1,4 +1,4 @@
-# SCAN — Release Guide
+# SCAN — Maintainer Release Guide
 
 Step-by-step process for publishing a new version to Splunkbase.
 
@@ -124,28 +124,66 @@ Review the HTML report for any failures before uploading.
 
 | File | Purpose |
 |------|---------|
-| `src/main/resources/splunk/default/app.conf` | Version source of truth |
+| Repository-root `VERSION` | Release version source of truth |
 | `dist/splunk-cisco-app-navigator-*.tar.gz` | Splunkbase upload package |
 | `docs/splunkbase_*.md` | Splunkbase listing content (gitignored) |
 | `CHANGELOG.md` | Version history |
 
 ## Shared build numbers
 
-Every new package reserves a number from the `splunk/splunk-cisco-app-navigator`
-GitHub Actions workflow `reserve-build-number.yml`. The first new workflow run
-produces build 100 (99 plus the workflow run number). The workflow identity and
-offset must not be changed or reset. Developers need GitHub CLI (`gh`), their own
-authenticated GitHub account, connectivity, and permission to dispatch Actions.
-A failed or cancelled package can consume a number; no offline fallback or
-manual number selection is supported. Receipts are kept in ignored
-`dist/build-reservations/`. Reusing an existing package with `--no-build` does
-not reserve a number. Concurrent builds can finish out of order.
+Every new package normally reserves from the existing project-specific GitHub
+workflow `splunk/splunk-cisco-app-navigator:reserve-build-number.yml`. Preserve
+its filename, run sequence and permanent offset 99: build = 99 + run_number.
+GitHub assigns that number atomically at dispatch, before a runner starts;
+runner completion is not required. Failed attempts spend their numbers. Distinct
+workspaces/machines can reserve concurrently; completion can be out of order.
+Never delete/recreate or reset this counter, force-update it, or use a fork's
+counter. The sequence continues across application version changes.
 
-Before the service can be used, the workflow must be published to the canonical
-repository's default branch, Actions enabled, and developers granted dispatch
-access. All developers must update their build tooling and stop using the prior
-local counter. Verify distinct reservations from two clients after activation.
-A local commit alone does not activate the service.
+Local state is only ignored `dist/build-reservations/current.json`, atomically
+replaced with its reservation, backend, build, high-water mark and claimed status.
+Claiming consumes it before packaging; retry a failed attempt with a fresh number.
+Missing/corrupt state is recreated using the shared counter and available staged
+app.conf, optional repository-root `BUILD_NUMBER_FLOOR`, retained archive metadata
+(`.tar.gz`, including alternate/minified suffixes, and `.tgz`), target app.conf
+under `SPLUNK_HOME` (default `/opt/splunk`), and higher recoverable local state.
+Archives are history floors, never an automatic offline counter. Recognized old
+numbered receipts/claims and interrupted atomic-write files are cleaned after
+their high-water marks have been preserved. Unrelated files and archives remain.
+A malformed existing archive or unreadable metadata is an integrity error that
+must be repaired; it is not bypassed as a numbering outage.
+
+Shared numbering needs `gh` authenticated on github.com with dispatch access,
+and the workflow active on the canonical default branch (`main`, `master`,
+`develop`, or the repository's actual configured branch). Network, authentication
+or Actions outages offer a visible controlling-terminal prompt for a coordinated
+manual integer above every known floor. An explicit override works even online:
+
+```bash
+NAVIGATOR_BUILD_NUMBER=<coordinated-integer> ./build.sh --minify
+```
+
+Replace the placeholder with a coordinated number, not a guessed next value.
+Manual allocation is recorded as `backend: manual`; global uniqueness cannot be
+verified offline. Coordinate the number with every other developer, including
+those still using older tooling. If a manual number is ahead of the workflow,
+shared allocation can spend up to eight real reservations to catch up, then
+requests another coordinated manual number rather than inventing an identity.
+Unattended builds (CI, redirected stdin or no terminal) fail with an actionable
+override instruction when no shared reservation/override is usable. The prompt
+remains visible even when build.sh captures stdout/stderr. Compilation, disk,
+archive, packaging and installation errors still fail normally.
+
+Use one build per workspace. A lock covers stage/build/package; stale locks after
+an abrupt termination must be inspected before removal. Do not package a stage
+that an unrelated watcher is updating. `--no-build` reuses a package and allocates
+nothing. Package names remain `<app>-<version>-<build>.tar.gz`.
+
+A local commit does not distribute these improvements: other developers must
+update after the change reaches the canonical branch. The existing shared
+workflow identity is retained, so this change does not need a new counter or
+workflow activation. Protocol tests simulate shared dispatches, outages and
+competing machines; they do not qualify live service permissions.
 
 ## Publishing a catalog update
 

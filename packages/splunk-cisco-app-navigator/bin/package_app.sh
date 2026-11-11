@@ -26,6 +26,10 @@ Options:
   --minify                Enable JavaScript minification for a smaller release
                           package. Not valid with --from-stage.
   -h, --help              Show this help.
+
+Shared numbering outages prompt on the terminal for a coordinated manual number.
+For unattended use, set NAVIGATOR_BUILD_NUMBER to an integer above known builds.
+Manual numbers must be coordinated across developers; offline uniqueness is unverified.
 EOF
 }
 
@@ -69,6 +73,16 @@ fi
 
 DIST_DIR="${PKG_ROOT}/../../dist"
 mkdir -p "$DIST_DIR"
+# Guard the entire stage/build/package pipeline, not only tar creation.
+LOCK_DIR=""
+TMP_DIR=""
+trap 'if [[ -n "$TMP_DIR" ]]; then rm -rf "$TMP_DIR"; fi; if [[ -n "$LOCK_DIR" ]]; then rmdir "$LOCK_DIR" 2>/dev/null || true; fi' EXIT
+LOCK_DIR="${DIST_DIR}/.${APP_NAME}-build.lock"
+if ! mkdir "$LOCK_DIR" 2>/dev/null; then
+  echo "ERROR: another package operation may be running; inspect ${LOCK_DIR}." >&2
+  LOCK_DIR=""
+  exit 1
+fi
 
 if [[ "$FROM_STAGE" -eq 1 ]]; then
   if [[ ! -d "$STAGE_DIR" ]]; then
@@ -95,8 +109,6 @@ bash "${SCRIPT_DIR}/stamp_version.sh" "$STAGE_DIR"
 
 # Stage into a temp directory with the correct app directory name
 TMP_DIR="$(mktemp -d)"
-LOCK_DIR=""
-trap 'rm -rf "$TMP_DIR"; if [[ -n "$LOCK_DIR" ]]; then rmdir "$LOCK_DIR" 2>/dev/null || true; fi' EXIT
 cp -R "$STAGE_DIR" "${TMP_DIR}/${APP_NAME}"
 # Stamp only the archive copy, including when reusing a watch-maintained stage.
 python3 "${SCRIPT_DIR}/stamp_catalog.py" "${TMP_DIR}/${APP_NAME}/default/products.conf"
@@ -116,16 +128,14 @@ if [[ -f "$META_FILE" ]]; then
   echo "[package] default.meta: reverted export to 'none' for Splunkbase"
 fi
 
-# Reserve one globally unique number for every new package. Failed builds spend
-# their reservation; existing dist archives are never used as a local counter.
-LOCK_DIR="${DIST_DIR}/.${APP_NAME}-build.lock"
-if ! mkdir "$LOCK_DIR" 2>/dev/null; then
-  echo "ERROR: another package operation may be running; inspect ${LOCK_DIR}." >&2
-  LOCK_DIR=""
-  exit 1
-fi
+# Reserve a shared or explicitly coordinated number for every new package.
+# Failed attempts spend it; archives and installed metadata provide recovery floors.
 PKG_APP_CONF="${TMP_DIR}/${APP_NAME}/default/app.conf"
-new_build="$(python3 "${ROOT_DIR}/tools/reserve_package_build.py" --receipts "${DIST_DIR}/build-reservations")"
+new_build="$(python3 "${ROOT_DIR}/tools/reserve_package_build.py" \
+  --receipts "${DIST_DIR}/build-reservations" \
+  --app-conf "$PKG_APP_CONF" --floor-file "${ROOT_DIR}/BUILD_NUMBER_FLOOR" \
+  --dist "$DIST_DIR" \
+  --target-app-conf "${SPLUNK_HOME:-/opt/splunk}/etc/apps/${APP_NAME}/default/app.conf")"
 python3 "${ROOT_DIR}/tools/reserve_package_build.py" --receipts "${DIST_DIR}/build-reservations" --claim "$new_build"
 PKG_PATH="${DIST_DIR}/${APP_NAME}-${VERSION}-${new_build}.tar.gz"
 if [[ -e "$PKG_PATH" ]]; then
